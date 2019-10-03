@@ -37,6 +37,9 @@ void MessagePump::HandleUserEvents()
 			case SDLK_p:
 				E->activatePlacement();
 				break;
+			case SDLK_l:
+				E->activateLineDrawing();
+				break;
 			case SDLK_m:
 				E->activateRelocation();
 				break;
@@ -47,6 +50,7 @@ void MessagePump::HandleUserEvents()
 				E->toggleGridSnap();
 				break;
 			case SDLK_LSHIFT:
+			case SDLK_RSHIFT:
 				E->switchOrthoOn();
 				break;
 			case SDLK_s:
@@ -59,6 +63,7 @@ void MessagePump::HandleUserEvents()
 			switch (event.key.keysym.sym)
 			{
 			case SDLK_LSHIFT:
+			case SDLK_RSHIFT:
 				E->switchOrthoOff();
 				break;
 			}

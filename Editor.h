@@ -11,12 +11,13 @@
 class Editor
 {
 public:
-	Camera*				C;
-	Canvas*				S;
-	ModelElementBuffer* M;
+	Camera*				Cam;
+	Canvas*				Screen;
+	ModelElementBuffer* Model;
 
 	Button				arrowButton;
 	Button				crossButton;
+	Button				lineButton;
 	Button				moveButton;
 	Button				rotateButton;
 
@@ -78,6 +79,7 @@ public:
 
 	void activateSelection();
 	void activatePlacement();
+	void activateLineDrawing();
 	void activateRelocation();
 	void activateRotation();
 
@@ -94,6 +96,8 @@ public:
 	double calculateAngle(worldCoord rotStart, worldCoord rotEnd);
 
 	void deselectAll();
+
+	void drawLine();
 
 	void deleteSelected();
 	void moveSelected();

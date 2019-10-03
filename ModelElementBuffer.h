@@ -16,13 +16,16 @@ class ModelElementBuffer
 {
 	std::string			fileName;
 
-	std::vector<vertex3>	vertex3Buffer;
+	std::vector<vertex3>		vertex3Buffer;
+	std::vector<line3>			line3Buffer;
+	std::vector<triangle3dV>	polyBuffer;
 
 public:
 	ModelElementBuffer(std::string);
 	~ModelElementBuffer();
 
 	void addVertex3(vertex3);
+	void addLine3(line3);
 
 	void selectVertex3byID(int);
 	void deselectVertex3byID(int);
@@ -36,10 +39,19 @@ public:
 	void moveVertex3byIndex(int, worldCoord);
 	void rotVertex3byIndex(int, Side, worldCoord, double);
 
+	void selectLine3byIndex(int);
+	void deselectLine3byIndex(int);
+	void deleteLine3byIndex(int);
+
 	bool isVertex3Selected(int);
 	bool isVertex3Deleted(int);
 	int getVertex3BufferSize();
 	vertex3 getVertex3(int);
+
+	bool isLine3Selected(int);
+	bool isLine3Deleted(int);
+	int getLine3BufferSize();
+	line3 getLine3(int);
 
 	void exportTextFile();
 };

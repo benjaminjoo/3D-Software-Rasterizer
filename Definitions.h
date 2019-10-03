@@ -43,10 +43,10 @@
 enum Side { Bottom, Top, Back, Front, Left, Right };
 
 
-enum editingMode { Selection, Placement, Relocation, Rotation };
+enum editingMode { Selection, Placement, LineDrawing, Relocation, Rotation };
 
 
-enum tool { none, arrow, cross, move, rotate, view_top, view_front, view_side };
+enum tool { none, arrow, cross, line, move, rotate, view_top, view_front, view_side };
 
 
 enum toolStatus { active, inactive };
@@ -99,6 +99,15 @@ struct vertex3
 {
 	int			id;
 	worldCoord	pos;
+	bool		selected;
+	bool		deleted;
+};
+
+
+struct line3
+{
+	int			id;
+	worldCoord	vert[2];
 	bool		selected;
 	bool		deleted;
 };
@@ -468,7 +477,11 @@ worldCoord rotate2(worldCoord target, Side view, worldCoord origin, double angle
 
 double dotProductSquared(vect3 a, vect3 b);
 
-double distPoint2Plane(vect3, triangle3dV);
+double distPoint2Plane(vect3 P, triangle3dV T);
+
+double distPoint2Line(worldCoord P, Side view, line3 L);
+
+bool pointIsAroundLine(worldCoord P, Side view, line3 L);
 
 vect3 crossProduct(vect3 a, vect3 b);
 

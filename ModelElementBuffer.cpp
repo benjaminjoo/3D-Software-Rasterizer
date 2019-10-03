@@ -20,6 +20,12 @@ void ModelElementBuffer::addVertex3(vertex3 P)
 }
 
 
+void ModelElementBuffer::addLine3(line3 L)
+{
+	line3Buffer.push_back(L);
+}
+
+
 void ModelElementBuffer::selectVertex3byID(int ID)
 {
 	for (auto i = 0; i < vertex3Buffer.size(); i++)
@@ -110,6 +116,25 @@ void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord o
 }
 
 
+void ModelElementBuffer::selectLine3byIndex(int i)
+{
+	line3Buffer[i].selected = line3Buffer[i].selected ? false : true;
+}
+
+
+void ModelElementBuffer::deselectLine3byIndex(int i)
+{
+	line3Buffer[i].selected = false;
+}
+
+
+void ModelElementBuffer::deleteLine3byIndex(int i)
+{
+	line3Buffer[i].deleted = true;
+	line3Buffer[i].selected = false;
+}
+
+
 bool ModelElementBuffer::isVertex3Selected(int n)
 {
 	return vertex3Buffer[n].selected;
@@ -131,6 +156,30 @@ int ModelElementBuffer::getVertex3BufferSize()
 vertex3 ModelElementBuffer::getVertex3(int n)
 {
 	return vertex3Buffer[n];
+}
+
+
+bool ModelElementBuffer::isLine3Selected(int n)
+{
+	return line3Buffer[n].selected;
+}
+
+
+bool ModelElementBuffer::isLine3Deleted(int n)
+{
+	return line3Buffer[n].deleted;
+}
+
+
+int ModelElementBuffer::getLine3BufferSize()
+{
+	return line3Buffer.size();
+}
+
+
+line3 ModelElementBuffer::getLine3(int n)
+{
+	return line3Buffer[n];
 }
 
 

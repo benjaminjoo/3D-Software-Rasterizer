@@ -419,6 +419,39 @@ double distPoint2Plane(vect3 P, triangle3dV T)
 }
 
 
+double distPoint2Line(worldCoord P, Side view, line3 L)
+{
+	worldCoord normal = rotate2(unitVector2(subVectors2(L.vert[1], L.vert[0])), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
+	
+	return abs(dotProduct2(subVectors2(L.vert[0], P), normal));
+}
+
+
+bool pointIsAroundLine(worldCoord P, Side view, line3 L)
+{
+	worldCoord A = L.vert[0], B = L.vert[1];
+	switch (view)
+	{
+	case Top:
+		A.z = 0.0f;
+		B.z = 0.0f;
+		break;
+	case Front:
+		A.y = 0.0f;
+		B.y = 0.0f;
+		break;
+	case Right:
+		A.x = 0.0f;
+		B.x = 0.0f;
+		break;
+	}
+	double sA = dotProduct2(subVectors2(B, A), subVectors2(A, P));
+	double sB = dotProduct2(subVectors2(B, A), subVectors2(B, P));
+
+	return (sign(sA) != sign(sB)) ? true : false;
+}
+
+
 vect3 crossProduct(vect3 a, vect3 b)
 {
 	vect3 t;

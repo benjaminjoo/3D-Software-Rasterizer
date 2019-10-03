@@ -3,23 +3,23 @@
 
 Button::Button()
 {
-	S					= &Canvas(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
-	size				= { 32, 32 };
-	position			= { 0 * 32, 1 * 32 };
-	isActive			= false;
-	toolName			= none;
-	colour				= 255;
+	S			= &Canvas(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	size		= { 32, 32 };
+	position	= { 0 * 32, 1 * 32 };
+	isActive	= false;
+	toolName	= none;
+	colour		= 255;
 }
 
 
 Button::Button(Canvas* can, int posH, int posV, bool on, tool name, Uint32 col)
 {
-	S					= can;
-	size				= { 32, 32 };
-	position			= { posH * 32, posV * 32 };
-	isActive			= on;
-	toolName			= name;
-	colour				= col;
+	S			= can;
+	size		= { 32, 32 };
+	position	= { posH * 32, posV * 32 };
+	isActive	= on;
+	toolName	= name;
+	colour		= col;
 }
 
 
@@ -38,6 +38,9 @@ void Button::displayIcon()
 		break;
 	case cross:
 		currentIcon = cross_inactive;
+		break;
+	case line:
+		currentIcon = line_inactive;
 		break;
 	case move:
 		currentIcon = move_inactive;

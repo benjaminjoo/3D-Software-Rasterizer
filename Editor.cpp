@@ -21,18 +21,19 @@ Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
 	rotationEnd		= { 0.0f, 0.0f, 0.0f };
 	rotationAngle	= 0.0f;
 
-	C				= ca;	//Camera
-	S				= sc;	//Canvas
-	M				= buff;	//Model elements
+	Cam				= ca;	//Camera
+	Screen			= sc;	//Canvas
+	Model			= buff;	//Model elements
 
-	arrowButton		= { S, 0, 0, false,	arrow,		LIGHT_GRAY };
-	crossButton		= { S, 1, 0, true,	cross,		LIGHT_GRAY };
-	moveButton		= { S, 2, 0, false,	move,		LIGHT_GRAY };
-	rotateButton	= { S, 3, 0, false,	rotate,		LIGHT_GRAY };
+	arrowButton		= { Screen, 0, 0, false,	arrow,		LIGHT_GRAY };
+	crossButton		= { Screen, 1, 0, true,		cross,		LIGHT_GRAY };
+	lineButton		= { Screen, 2, 0, false,	line,		LIGHT_GRAY };
+	moveButton		= { Screen, 3, 0, false,	move,		LIGHT_GRAY };
+	rotateButton	= { Screen, 4, 0, false,	rotate,		LIGHT_GRAY };
 
-	topViewButton	= { S, 5, 0, true,	view_top,	LIGHT_GRAY };
-	frontViewButton = { S, 6, 0, false,	view_front,	LIGHT_GRAY };
-	sideViewButton	= { S, 7, 0, false,	view_side,	LIGHT_GRAY };
+	topViewButton	= { Screen, 5, 0, true,		view_top,	LIGHT_GRAY };
+	frontViewButton = { Screen, 6, 0, false,	view_front,	LIGHT_GRAY };
+	sideViewButton	= { Screen, 7, 0, false,	view_side,	LIGHT_GRAY };
 
 	scale			= 1.0f;
 	tolerance		= toler;
@@ -182,65 +183,83 @@ void Editor::updateScreen()
 
 	if (currentView == Top)
 	{
-		S->drawMouseCursor(currentMode, planPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, planPosition,	LIGHT_BLUE);
 	}
 	else if (currentView == Front)
 	{
-		S->drawMouseCursor(currentMode, frontPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, frontPosition,	LIGHT_BLUE);
 	}
 	else if (currentView == Right)
 	{
-		S->drawMouseCursor(currentMode, rightPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, rightPosition,	LIGHT_BLUE);
 	}
 
 	//Display scale
-	S->displayValue(scale * 100.0f, 2, 1, 2, WHITE);
-	S->displayString("%", 2, 2, WHITE);
+	Screen->displayValue(scale * 100.0f, 2, 1, 2, WHITE);
+	Screen->displayString("%", 2, 2, WHITE);
 
 	//Display mouse cursor world coordinates
-	S->displayValue(worldPosition.x, 4, 60, 2, RED	);
-	S->displayValue(worldPosition.y, 4, 40, 2, GREEN);
-	S->displayValue(worldPosition.z, 4, 20, 2, BLUE	);
+	Screen->displayValue(worldPosition.x, 4, 60, 2, RED		);
+	Screen->displayValue(worldPosition.y, 4, 40, 2, GREEN	);
+	Screen->displayValue(worldPosition.z, 4, 20, 2, BLUE	);
 
 	//Draw axes
-	C->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED		, S->pixelBuffer);
-	C->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN	, S->pixelBuffer);
-	C->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE	, S->pixelBuffer);
+	Cam->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED	, Screen->pixelBuffer);
+	Cam->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN	, Screen->pixelBuffer);
+	Cam->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE	, Screen->pixelBuffer);
 
-	for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 	{
-		if (!M->isVertex3Deleted(i))						//Draw all visible vertices
+		if (!Model->isLine3Deleted(i))							//Draw all visible lines
 		{
-			vertex3 tempVert = M->getVertex3(i);
-			screenCoord temp = world2screen(tempVert.pos);
-			if (M->isVertex3Selected(i))
+			line3 tempLine = Model->getLine3(i);
+			screenCoord tempStart	= world2screen(tempLine.vert[0]);
+			screenCoord tempEnd		= world2screen(tempLine.vert[1]);
+			if (Model->isLine3Selected(i))
 			{
-				C->drawSpot(temp, RED,	S->pixelBuffer);
+				Cam->drawLine(tempStart, tempEnd, 1, RED,	Screen->pixelBuffer);
 			}
 			else
 			{
-				C->drawSpot(temp, BLUE,	S->pixelBuffer);
+				Cam->drawLine(tempStart, tempEnd, 1, BLUE,	Screen->pixelBuffer);
+			}
+		}
+	}
+
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
+	{
+		if (!Model->isVertex3Deleted(i))						//Draw all visible vertices
+		{
+			vertex3 tempVert = Model->getVertex3(i);
+			screenCoord temp = world2screen(tempVert.pos);
+			if (Model->isVertex3Selected(i))
+			{
+				Cam->drawSpot(temp, RED,	Screen->pixelBuffer);
+			}
+			else
+			{
+				Cam->drawSpot(temp, BLUE,	Screen->pixelBuffer);
 			}
 		}
 		if (currentMode == Relocation && clicksInQueue == 1)
 		{
-			if (M->isVertex3Selected(i))					//Draw all visible vertices currently being moved
+			if (Model->isVertex3Selected(i))					//Draw all visible vertices currently being moved
 			{
-				vertex3 tempVert = M->getVertex3(i);
+				vertex3 tempVert = Model->getVertex3(i);
 				worldCoord tempMove	= subVectors2(movementStart, mouseBeforeZoom);
 				if (isOrthoOn) { this->alignToAxis(&tempMove); }
 				tempVert.pos.x -= tempMove.x;
 				tempVert.pos.y -= tempMove.y;
 				tempVert.pos.z -= tempMove.z;
 				screenCoord temp = world2screen(tempVert.pos);
-				C->drawSpot(temp, ORANGE, S->pixelBuffer);
+				Cam->drawSpot(temp, ORANGE, Screen->pixelBuffer);
 			}
 		}
-		if (currentMode == Rotation && clicksInQueue == 2)	//Draw all visible vertices currently being rotated
+		if (currentMode == Rotation && clicksInQueue == 2)		//Draw all visible vertices currently being rotated
 		{
-			if (M->isVertex3Selected(i))
+			if (Model->isVertex3Selected(i))
 			{
-				vertex3 tempVert		= M->getVertex3(i);
+				vertex3 tempVert		= Model->getVertex3(i);
 				worldCoord startVect	= unitVector2(subVectors2(rotationStart,	rotationCentre));
 				if (isOrthoOn)
 				{
@@ -252,12 +271,12 @@ void Editor::updateScreen()
 				double rotAngle			= calculateAngle(startVect, endVect);
 				tempVert.pos			= rotate2(tempVert.pos, currentView, rotationCentre, rotAngle);
 				screenCoord temp		= world2screen(tempVert.pos);
-				C->drawSpot(temp, ORANGE, S->pixelBuffer);
+				Cam->drawSpot(temp, ORANGE, Screen->pixelBuffer);
 			}
 		}
 	}
 
-	if (currentMode == Relocation)							//Hint line of movement
+	if (currentMode == Relocation)								//Hint line of movement
 	{
 		if (clicksInQueue == 1)
 		{
@@ -268,11 +287,11 @@ void Editor::updateScreen()
 			tempEnd.x = movementStart.x + tempMove.x;
 			tempEnd.y = movementStart.y + tempMove.y;
 			tempEnd.z = movementStart.z + tempMove.z;
-			C->drawLine(world2screen(movementStart), world2screen(tempEnd), 4, DARK_GRAY, S->pixelBuffer);
+			Cam->drawLine(world2screen(movementStart), world2screen(tempEnd), 4, DARK_GRAY, Screen->pixelBuffer);
 		}
 	}
 
-	if (currentMode == Rotation)							//Hint rotation angle
+	if (currentMode == Rotation)								//Hint rotation angle
 	{
 		if (clicksInQueue == 1)
 		{
@@ -282,7 +301,7 @@ void Editor::updateScreen()
 				this->alignToAxis(&temp);
 				mouseBeforeZoom = addVectors2(rotationCentre, temp);
 			}
-			C->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY, S->pixelBuffer);
+			Cam->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY, Screen->pixelBuffer);
 		}
 		else if (clicksInQueue == 2)
 		{
@@ -292,8 +311,23 @@ void Editor::updateScreen()
 				this->alignToAxis(&temp);
 				mouseBeforeZoom = addVectors2(rotationCentre, temp);
 			}
-			C->drawLine(world2screen(rotationCentre), world2screen(rotationStart), 2, DARK_GRAY, S->pixelBuffer);
-			C->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY, S->pixelBuffer);
+			Cam->drawLine(world2screen(rotationCentre), world2screen(rotationStart), 2, DARK_GRAY, Screen->pixelBuffer);
+			Cam->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY, Screen->pixelBuffer);
+		}
+	}
+
+	if (currentMode == LineDrawing)								//Hint line of movement
+	{
+		if (clicksInQueue == 1)
+		{
+			worldCoord tempMouse = screen2world(mousePosition);
+			worldCoord tempMove = subVectors2(tempMouse, movementStart);
+			if (isOrthoOn) { this->alignToAxis(&tempMove); }
+			worldCoord tempEnd;
+			tempEnd.x = movementStart.x + tempMove.x;
+			tempEnd.y = movementStart.y + tempMove.y;
+			tempEnd.z = movementStart.z + tempMove.z;
+			Cam->drawLine(world2screen(movementStart), world2screen(tempEnd), 1, BLUE, Screen->pixelBuffer);
 		}
 	}
 
@@ -305,6 +339,7 @@ void Editor::drawIcons()
 {
 	arrowButton.displayIcon();
 	crossButton.displayIcon();
+	lineButton.displayIcon();
 	moveButton.displayIcon();
 	rotateButton.displayIcon();
 
@@ -352,16 +387,29 @@ void Editor::leftMouseClick(screenCoord X)
 	{
 		if (currentMode == Selection)
 		{
-			for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+			for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 			{
-				if (!M->isVertex3Deleted(i))
+				if (!Model->isVertex3Deleted(i))
 				{
-					vertex3 tempVert = M->getVertex3(i);
+					vertex3 tempVert = Model->getVertex3(i);
 					worldCoord tempCoordW = tempVert.pos;
 					screenCoord P = world2screen(tempCoordW);
 					if (abs(P.x - X.x) <= 10 && abs(P.y - X.y) <= 10)
 					{
-						M->selectVertex3byIndex(i);
+						Model->selectVertex3byIndex(i);
+					}
+				}
+			}
+			for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+			{
+				if (!Model->isLine3Deleted(i))
+				{
+					line3 tempLine = Model->getLine3(i);
+					worldCoord currentP = screen2world(X);
+					double dist = distPoint2Line(currentP, currentView, tempLine);
+					if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 2)
+					{
+						Model->selectLine3byIndex(i);
 					}
 				}
 			}
@@ -371,8 +419,22 @@ void Editor::leftMouseClick(screenCoord X)
 			worldCoord temp = screen2world(X);
 			printf("Entity added at x: %.4f\ty: %.4f\n", temp.x, temp.y);
 			vertex3 tempVert = { currentID, temp, false, false };
-			M->addVertex3(tempVert);
+			Model->addVertex3(tempVert);
 			currentID++;
+		}
+		if (currentMode == LineDrawing)
+		{
+			if (clicksInQueue == 0)
+			{
+				movementStart = screen2world(X);
+				clicksInQueue++;
+			}
+			else
+			{
+				movementEnd = screen2world(X);
+				this->drawLine();
+				clicksInQueue = 0;
+			}
 		}
 		if (currentMode == Relocation)
 		{
@@ -417,7 +479,6 @@ void Editor::leftMouseClick(screenCoord X)
 				this->rotateSelected();
 				clicksInQueue = 0;
 			}
-
 		}
 	}
 	else
@@ -432,9 +493,12 @@ void Editor::leftMouseClick(screenCoord X)
 				this->activatePlacement();
 			break;
 			case 2:
+				this->activateLineDrawing();
+				break;
+			case 3:
 				this->activateRelocation();
 			break;
-			case 3:
+			case 4:
 				this->activateRotation();
 			break;
 
@@ -458,6 +522,7 @@ void Editor::activateSelection()
 	currentMode = Selection;
 	arrowButton.turnOn();
 	crossButton.turnOff();
+	lineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -469,6 +534,19 @@ void Editor::activatePlacement()
 	currentMode = Placement;
 	arrowButton.turnOff();
 	crossButton.turnOn();
+	lineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+}
+
+
+void Editor::activateLineDrawing()
+{
+	currentTool = line;
+	currentMode = LineDrawing;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOn();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -480,6 +558,7 @@ void Editor::activateRelocation()
 	currentMode = Relocation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
+	lineButton.turnOff();
 	moveButton.turnOn();
 	rotateButton.turnOff();
 }
@@ -491,6 +570,7 @@ void Editor::activateRotation()
 	currentMode = Rotation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
+	lineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOn();
 }
@@ -591,21 +671,41 @@ double Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
 
 void Editor::deselectAll()
 {
-	for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
-		M->deselectVertex3byIndex(i);
+		Model->deselectVertex3byIndex(i);
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		Model->deselectLine3byIndex(i);
 	}
 	clicksInQueue = 0;
 }
 
 
+void Editor::drawLine()
+{
+	worldCoord stretch = subVectors2(movementEnd, movementStart);
+	if (this->isOrthoOn) { this->alignToAxis(&stretch); }
+	line3 tempLine = { currentID, {movementStart, addVectors2(movementStart, stretch)}, false, false };
+	Model->addLine3(tempLine);
+}
+
+
 void Editor::deleteSelected()
 {
-	for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
-		if (!M->isVertex3Deleted(i) && M->isVertex3Selected(i))
+		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
-			M->deleteVertex3byIndex(i);
+			Model->deleteVertex3byIndex(i);
+		}
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
+		{
+			Model->deleteLine3byIndex(i);
 		}
 	}
 }
@@ -613,13 +713,13 @@ void Editor::deleteSelected()
 
 void Editor::moveSelected()
 {
-	for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
-		if (!M->isVertex3Deleted(i) && M->isVertex3Selected(i))
+		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
 			worldCoord move = subVectors2(movementEnd, movementStart);
 			if (isOrthoOn) { this->alignToAxis(&move); }
-			M->moveVertex3byIndex(i, move);
+			Model->moveVertex3byIndex(i, move);
 		}
 	}
 }
@@ -627,14 +727,14 @@ void Editor::moveSelected()
 
 void Editor::rotateSelected()
 {
-	for (auto i = 0; i < M->getVertex3BufferSize(); i++)
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
-		if (!M->isVertex3Deleted(i) && M->isVertex3Selected(i))
+		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
 			worldCoord startVect	= unitVector2(subVectors2(rotationStart,	rotationCentre));
 			worldCoord endVect		= unitVector2(subVectors2(rotationEnd,		rotationCentre));
 			rotationAngle			= calculateAngle(startVect, endVect);
-			M->rotVertex3byIndex(i, currentView, rotationCentre, rotationAngle);
+			Model->rotVertex3byIndex(i, currentView, rotationCentre, rotationAngle);
 		}
 	}
 }
@@ -642,5 +742,5 @@ void Editor::rotateSelected()
 
 void Editor::quickSave()
 {
-	M->exportTextFile();
+	Model->exportTextFile();
 }

@@ -128,6 +128,7 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 		}
 		break;
 		case Placement:
+		case LineDrawing:
 		{
 			for (int i = 0; i < w; i += 2)
 			{
