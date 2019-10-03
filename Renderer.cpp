@@ -545,19 +545,6 @@ void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer)
 }
 
 
-void Renderer::renderLines(int nLines, line3d * Lines, Uint32 * pixelBuffer, double* depthBuffer)
-{
-	transform3d playerPosition = Player->getTransformation();
-	for (int i = 0; i < nLines; i++)
-	{
-		line3d viewL = Player->world2viewL(playerPosition, Lines[i]);
-		Player->clipToFrustumL(&viewL);
-		viewL.colour = Lines[i].colour;
-		Player->projectLine(viewL, pixelBuffer, depthBuffer, hRatio, vRatio);
-	}
-}
-
-
 void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer)
 {
 	switch (E)

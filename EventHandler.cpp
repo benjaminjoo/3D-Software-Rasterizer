@@ -20,7 +20,7 @@ EventHandler::EventHandler()
 
 	event				= { 0 };
 	player				= &Camera(1.0, 1.0, 1.5, 0.1, 0.05, PI * 0.5, PI, 0.0, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, getColour(0, 255, 255, 255), 999.9);
+	screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
 	quit				= false;
 

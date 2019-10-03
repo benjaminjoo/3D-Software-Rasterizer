@@ -11,7 +11,6 @@ class Canvas
 	int cursorSize;
 	int iconSize;
 
-	Uint32 c;
 	double zFar;
 
 public:
@@ -20,7 +19,7 @@ public:
 	double* depthBuffer;
 
 	Canvas();
-	Canvas(int, int, Uint32, double);
+	Canvas(int, int, double);
 	~Canvas();
 
 	void resetPixelBuffer();
@@ -37,8 +36,5 @@ public:
 	void displayFps(double value, int dec, int shiftH, int shiftV);
 	void displayValue(double value, int dec, int shiftH, int shiftV, Uint32 col);
 	void displayString(const char* text, int shiftH, int shiftV, Uint32 col);
-
-	//void displayIcon(const bool* icon, int shiftH, int shiftV, Uint32 col);
-
 };
 

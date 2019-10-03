@@ -3,7 +3,7 @@
 
 Button::Button()
 {
-	S					= &Canvas(EDITOR_WIDTH, EDITOR_HEIGHT, getColour(0, 255, 255, 255), 999.9);
+	S					= &Canvas(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
 	size				= { 32, 32 };
 	position			= { 0 * 32, 1 * 32 };
 	isActive			= false;

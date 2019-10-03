@@ -10,8 +10,6 @@ Canvas::Canvas()
 	SDL_Init(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_JPG);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-	//SDL_ShowCursor(SDL_DISABLE);
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	w			= 640;
 	h			= 480;
@@ -19,7 +17,6 @@ Canvas::Canvas()
 	cursorSize	= 16;
 	iconSize	= 32;
 
-	c			= 0;
 	zFar		= 0.0;
 
 	pixelBuffer = new Uint32[w * h];
@@ -27,13 +24,13 @@ Canvas::Canvas()
 
 	for (int i = 0; i < w * h; i++)
 	{
-		pixelBuffer[i] = c;
+		pixelBuffer[i] = 0;
 		depthBuffer[i] = zFar;
 	}
 }
 
 
-Canvas::Canvas(int width, int height, Uint32 colour, double z)
+Canvas::Canvas(int width, int height, double z)
 {
 	w			= width;
 	h			= height;
@@ -41,7 +38,6 @@ Canvas::Canvas(int width, int height, Uint32 colour, double z)
 	cursorSize	= 16;
 	iconSize	= 32;
 
-	c			= colour;
 	zFar		= z;
 
 	pixelBuffer = new Uint32[w * h];
@@ -49,7 +45,7 @@ Canvas::Canvas(int width, int height, Uint32 colour, double z)
 
 	for (int i = 0; i < w * h; i++)
 	{
-		pixelBuffer[i] = c;
+		pixelBuffer[i] = 0;
 		depthBuffer[i] = zFar;
 	}
 }
@@ -62,10 +58,6 @@ Canvas::~Canvas()
 
 void Canvas::resetPixelBuffer()
 {
-	/*for (int i = 0; i < w * h; i++)
-	{
-		pixelBuffer[i] = c;
-	}*/
 	memset(pixelBuffer, 0, w * h * 4);
 }
 
@@ -75,7 +67,6 @@ void Canvas::resetDepthBuffer()
 	{
 		depthBuffer[i] = zFar;
 	}
-	//memset(depthBuffer, 255, w * h * 4);
 }
 
 

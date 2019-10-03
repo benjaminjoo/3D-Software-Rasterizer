@@ -44,7 +44,7 @@ void editor()
 
 	Camera Viewer(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
-	Canvas Screen(EDITOR_WIDTH, EDITOR_HEIGHT, getColour(0, 255, 255, 255), 999.9);
+	Canvas Screen(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
 
 	ModelElementBuffer Drawing("test.wtf");
 
@@ -100,40 +100,17 @@ void gameplay()
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-	Canvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, getColour(0, 255, 255, 255), 999.9);
-
-	//Canvas* Screen = new Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, getColour(0, 255, 255, 255), 999.9);
+	Canvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
 	Shapes Solids;
 
 	Shapes Actors;
 
-
-
-	//Camera			Player(3.0, 12.0, 1.5, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
-
-	//#include "quake1map.txt"
-	//#include "quake3map.txt"
-	//#include "rooms.txt"
-	//#include "test.txt"
 	#include "bbtest.txt"
-	//RayTracer PoshCamera(SCREEN_WIDTH, SCREEN_HEIGHT, &Player, &Screen, &Solids);
+
 	EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
+
 	Controls.torchIntensity = 10.0;
-
-	//#include "st_loo.txt"
-	//#include "meeting_room.txt"
-	//#include "quake.txt"
-	//#include "solar_system.txt"
-	//#include "vader.txt"
-	//#include "gun.txt"	
-	//#include "rooms2.txt"
-	//#include "bodies.txt"
-
-
 
 	Solids.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
@@ -176,10 +153,6 @@ void gameplay()
 
 		Game.renderEntities(actor, Screen.pixelBuffer, Screen.depthBuffer);
 
-		//PoshCamera.calculatePixel();
-
-		//Game.renderLines(nLine, linePile, Screen.pixelBuffer, Screen.depthBuffer);
-
 		//Game.renderPoints(nVert, pointCloud, Screen.pixelBuffer);
 
 		Game.displayStats(Controls.showCrosshair, Controls.showFPS, Controls.showPosition, Controls.showPolyN, Screen);
@@ -200,7 +173,6 @@ void gameplay()
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
 
 	//delete[] pointCloud;
-	//delete[] linePile;
 
 	SDL_DestroyTexture(sdl_texture);
 

@@ -36,14 +36,15 @@ double distancePN(polyNode a, polyNode b)
 }
 
 
-Uint32 getColour(unsigned char a, unsigned char r, unsigned char g, unsigned char b)
+Uint32 getColour(const unsigned char a, const unsigned char r, const unsigned char g, const unsigned char b)
 {
 	return (a << 24) | (r << 16) | (g << 8) | (b << 0);
 }
 
 
-Uint32 modifyColour(Uint32 inputColour, double illumination, bool red, bool green, bool blue)
+Uint32 modifyColour(const Uint32 inputColour, const double illumination)
 {
+	bool red = true, green = true, blue = true;
 	byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
 	double illSurplus = 0.0;
 

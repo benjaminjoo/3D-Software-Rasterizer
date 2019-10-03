@@ -60,18 +60,18 @@ public:
 	triangle3dV world2viewT(transform3d, triangle3dV);
 	line3d world2viewL(transform3d, line3d);
 	point3 world2viewP(transform3d, point3);
-	vect3 world2view(transform3d, vect3);
+	vect3 world2view(const transform3d, const vect3);
 
 	void clipToFrustumL(line3d*);
 	void clipLine(plane, line3d*);
 	bool insideFrustum(point3);
 	bool assertPointVis(plane, point3);
-	int clipToFrustum(triangle3dV, vect3*, textCoord*);
+	int clipToFrustum(const triangle3dV, vect3*, textCoord*);
 	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, plane clippingPlane);
 	void clipEdge(plane p, vect3 startV, vect3 endV, textCoord startUV, textCoord endUV, int* nResult, vect3* temp, textCoord* temp_uv);
 
-	void illuminatePoly(LightSource, triangle3dV*, triangle3dV, bool);
-	void illuminatePoly(LightSource, triangle3dV*, triangle3dV, projectionStyle);
+	void illuminatePoly(LightSource, triangle3dV*, const triangle3dV, bool);
+	void illuminatePoly(LightSource, triangle3dV*, const triangle3dV, projectionStyle);
 
 	coord2 view2screen(vect3 vertex, double hR, double vR);
 	vect3 screen2view(coord2 pixel, double hR, double vR);
@@ -80,16 +80,16 @@ public:
 	void projectLine(line3d, Uint32*, double*, double hRatio, double vRatio);
 	void projectPoint(point3, Uint32*, double hRatio, double vRatio);
 
-	void fillTriangleSolidColour(triangle3dV, triangle2dG, Uint32*, double*, bool);
-	void fillTriangleCheckerboard(triangle3dV, triangle2dG, Uint32*, double*, bool);
-	void fillTriangleFlatShaded(triangle2dG, Uint32*, double*);
-	void fillTriangleGouraudShaded(triangle2dG, Uint32*, double*, bool);
-	void fillTriangleDepthVisualised(triangle3dV, triangle2dG, Uint32*, double*, bool);
-	void fillTriangleSunlight(triangle3dV, triangle2dG, Uint32*, double*, bool);
-	void fillTriangleTorchlight(triangle3dV, triangle2dG, Uint32*, double*, bool, double, double);
-	void fillTriangleTorchlightSolidColour(triangle3dV, triangle2dG, Uint32*, double*, bool, double, double);
-	void fillTriangleTest(triangle3dV, triangle2dG, Uint32*, double*, bool);
-	void fillZBuffer(triangle3dV, triangle2dG, double*);
+	void fillTriangleSolidColour(const triangle3dV, const triangle2dG, Uint32*, double*, bool);
+	void fillTriangleCheckerboard(const triangle3dV, const triangle2dG, Uint32*, double*, bool);
+	void fillTriangleFlatShaded(const triangle2dG, Uint32*, double*);
+	void fillTriangleGouraudShaded(const triangle2dG, Uint32*, double*, bool);
+	void fillTriangleDepthVisualised(const triangle3dV, const triangle2dG, Uint32*, double*, bool);
+	void fillTriangleSunlight(const triangle3dV, const triangle2dG, Uint32*, double*, bool);
+	void fillTriangleTorchlight(const triangle3dV, const triangle2dG, Uint32*, double*, bool, double, double);
+	void fillTriangleTorchlightSolidColour(const triangle3dV, const triangle2dG, Uint32*, double*, bool, double, double);
+	void fillTriangleTest(const triangle3dV, const triangle2dG, Uint32*, double*, bool);
+	void fillZBuffer(const triangle3dV, const triangle2dG, double*);
 
 	void drawLine(coord2, coord2, Uint32, Uint32*);
 	void drawLine(screenCoord, screenCoord, int, Uint32, Uint32*);
