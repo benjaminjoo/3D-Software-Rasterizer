@@ -1,0 +1,31 @@
+Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
+
+
+//Controls.torchIntensity = 10.0;
+
+LightSource lights[] = {	LightSource(115.0, 60.0, 1.00) };
+
+
+SDL_Surface* textures[] = { 	IMG_Load("Textures/blue.jpg"),			//00
+				IMG_Load("Textures/wolf001.jpg"),		//01
+				IMG_Load("Textures/wolf002.jpg"),		//02
+				IMG_Load("Textures/timber.jpg")};		//03
+
+
+
+Room room_01;
+SolidBody* room_ptr_1 = &room_01;
+room_01.setPosition(-5.0, -5.0, -5.0);
+room_01.setDimension(10.0, 10.0, 10.0);
+room_01.setSideOn(1, 1, 1, 1, 1, 1);
+room_01.setTexture(2, 3, 1, 1, 1, 1);
+room_01.setColour(getColour(0, 255, 0, 0), getColour(0, 255, 0, 0), getColour(0, 0, 255, 0), getColour(0, 0, 255, 0),
+			getColour(0, 0, 0, 255), getColour(0, 0, 0, 255));
+room_01.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+room_01.calculateMesh();
+Solids.addSolid(room_ptr_1);
+
+Solids.addSolid(new SolidPrism (1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0,	getColour(0,   255, 0, 0), 3, 2.0, 8.0, 0.5));
+
+//Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, getColour(0,  255, 127,  0), 3, 1.0, 12));

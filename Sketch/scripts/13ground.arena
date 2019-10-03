@@ -1,0 +1,7 @@
+{
+map		"13ground"
+longname	"The Proving Grounds CTF (by sst13)"
+capturelimit    "8"
+type		"ctf oneflag harvester overload"
+author		"sst13"
+}

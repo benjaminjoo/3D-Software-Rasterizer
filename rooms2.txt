@@ -1,0 +1,117 @@
+	LightSource lights[] = {	LightSource(115.0, 45.0, 0.95) };
+
+	SDL_Surface* textures[] = { 			IMG_Load("Textures/blue.jpg"),
+								IMG_Load("Textures/wolf001.jpg"),
+								IMG_Load("Textures/wolf002.jpg"),
+								IMG_Load("Textures/timber.jpg"),
+								IMG_Load("Textures/tisza001.jpg"),
+								IMG_Load("Textures/vader001.jpg"),
+								IMG_Load("Textures/brick001.jpg"),
+								IMG_Load("Textures/wolf003.jpg"),
+								IMG_Load("Textures/cat001.jpg"),
+								IMG_Load("Textures/quake001.jpg"),
+								IMG_Load("Textures/quake002.jpg"),
+								IMG_Load("Textures/quake003.jpg"),
+								IMG_Load("Textures/quake004.jpg"),
+								IMG_Load("Textures/quake005.jpg"),
+								IMG_Load("Textures/mosaic001.jpg"),
+								IMG_Load("Textures/concrete001.jpg"),
+								IMG_Load("Textures/eggshell.jpg") };
+
+
+	Room room_01;
+	SolidBody* room_ptr_1 = &room_01;
+	room_01.setDimension(8.0, 20.0, 6.0);
+	room_01.setSideOn(1, 1, 1, 1, 1, 1);
+	room_01.setTexture(0, 0, 0, 0, 0, 0);
+	room_01.setTextureScale(1.0, 2.0, 2.0, 4.0, 2.0, 2.0);
+	room_01.addOpening(Bottom, 1.5, 1.5, 2.0, 2.0);
+	room_01.addOpening(Left, 3.0, 1.0, 12.0, 3.5);
+	room_01.addOpening(Right, 3.0, 1.0, 4.0, 2.5);
+	room_01.calculateMesh();
+	Solids.addSolid(room_ptr_1);
+
+
+	Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 2.0, 4.0, 0.0, 0.0, 0.0, 0.0, 	getColour(0, 255,   0,   0),  0, 2.0));
+
+
+
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, getColour(0,   0, 255,   0), 0, 5.0, 60));
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 5.0, 14.0, 3.0, 0.0, 0.0, 0.0, getColour(0,   0, 255,   0), 0, 0.5, 36));
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.5, 17.5, 5.0, -1.0, 0.0, 0.0, 0.0, getColour(0,  255, 127,  0), 0, 1.5, 36));
+
+
+	Solids.addSolid(new SolidCube(0.5, 0.5, 0.5, 12.0, 4.0, 1.0, PI / 4, 0.0, PI / 6, 	getColour(0, 255,   0,   0),  0, 2.0));
+
+
+	Room room_02;
+	SolidBody* room_ptr_2 = &room_02;
+	room_02.setPosition(1.5, 1.5, -3.0);
+	room_02.setDimension(2.0, 2.0, 3.0);
+	room_02.setSideOn(1, 0, 1, 1, 1, 1);
+	room_02.setTexture(0, 0, 0, 0, 0, 0);
+	room_02.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	room_02.calculateMesh();
+	Solids.addSolid(room_ptr_2);
+
+
+	Room room_03;
+	SolidBody* room_ptr_3 = &room_03;
+	room_03.setPosition(-4.0, 3.0, 1.0);
+	room_03.setDimension(4.0, 12.0, 3.5);
+	room_03.setSideOn(1, 1, 1, 1, 1, 0);
+	room_03.setTexture(0, 0, 0, 0, 0, 0);
+	room_03.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	room_03.calculateMesh();
+	Solids.addSolid(room_ptr_3);
+
+
+	Room room_04;
+	SolidBody* room_ptr_4 = &room_04;
+	room_04.setPosition(8.0, 3.0, 1.0);
+	room_04.setDimension(7.0, 4.0, 2.5);
+	room_04.setSideOn(1, 1, 1, 1, 0, 0);
+	room_04.setTexture(0, 0, 0, 0, 0, 0);
+	room_04.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	room_04.calculateMesh();
+	Solids.addSolid(room_ptr_4);
+
+
+	Room room_05;
+	SolidBody* room_ptr_5 = &room_05;
+	room_05.setPosition(15.0, -8.0, 0.0);
+	room_05.setDimension(8.0, 20.0, 8.0);
+	room_05.setSideOn(1, 1, 1, 1, 1, 1);
+	room_05.setTexture(0, 0, 0, 0, 0, 0);
+	room_05.setTextureScale(1.0, 2.0, 2.0, 8.0, 2.0, 2.0);
+	room_05.addOpening(Left, 11.0, 1.0, 4.0, 2.5);
+	room_05.addOpening(Bottom, 1.0, 3.0, 6.0, 14.0);
+	room_05.calculateMesh();
+	Solids.addSolid(room_ptr_5);
+
+
+	Room room_06;
+	SolidBody* room_ptr_6 = &room_06;
+	room_06.setPosition(16.0, -5.0, -1.5);
+	room_06.setDimension(6.0, 14.0, 1.5);
+	room_06.setSideOn(1, 0, 1, 1, 1, 1);
+	room_06.setTexture(14, 14, 14, 14, 14, 14);
+	room_06.setTextureScale(2.0, 2.0, 2.0, 2.0, 2.0, 2.0);
+	room_06.calculateMesh();
+	Solids.addSolid(room_ptr_6);
+
+
+	Solids.addSolid(new SolidCylinder(1.0, 1.0, 1.0,  18.0,  0.0,  -1.5, 0.0, 0.0, 0.0,  getColour(0, 255, 0,   0), 0,     0.5, 9.5, 36));
+
+
+	Actors.addSolid(new SolidSphere(1.0, 1.0, 1.0, 3.0, 2.0, 1.0, 0.0, 0.0, 0.0, getColour(0, 0, 31, 63), 0, 1.00, 24));
+	Actors.setAngularVelocity(0, { 0.01, 0.01, 0.01, 1.0 });
+
+
+	Actors.addSolid(new SolidSphere(1.0, 1.0, 1.0, 6.0, 4.0, 2.0, 0.0, 0.0, 0.0, getColour(0, 127, 63, 0), 0, 1.00, 24));
+	Actors.setAngularVelocity(1, { -0.01, 0.01, -0.01, 1.0 });
+
+	Actors.addSolid(new SolidCube(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 	getColour(0, 31, 31, 31),  0, 2.0));
+	Actors.setAngularVelocity(2, { -0.01, 0.02, -0.03, 1.0 });
+
+	Actors.addSolid(new SolidCone  (1.0, 1.0, 1.0, -3.0, -3.0, -4.0, 0.0, 0.0, 0.0,	getColour(0, 127, 127, 255), 0, 	1.5, 1.75, 36));

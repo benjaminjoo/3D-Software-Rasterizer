@@ -1,0 +1,30 @@
+_______________________
+The Proving Grounds CTF
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Game			: Quake 3 Arena
+Map Title		: The Proving Grounds CTF (by sst13)
+Map Filename		: 13ground.bsp
+Relase Date		: 16. January 2007
+
+Author			: Stefan Scholz "aka sst13 / [FDK]Railraver"
+e-Mail			: sst13@gmx.de
+Author Homepage		: http://www.sst13.de
+
+Description		: CTF version of q3tourney2 (The Proving Grounds)
+
+Player			: 6-8
+Gametypes		: CTF, Oneflag, Overload, Harvester, FFA*, Team*
+Modifications:		: Q3 Teamarena
+Botsupport		: Yes
+
+New Textures		: Yes, modified original Textures
+New Shaders		: Yes
+New Sounds		: No
+New Models		: banner_blue (Q3 Model, modified by sst13)
+			  eagleban_blue (Q3 Model, modified by sst13)
+
+Editor(s) used		: Q3Radiant v2.02 , Q3Map Explorer, q3map2 v2.5.14, Milkshape 3D 1.7.1
+Compile Machine		: TB/1000 with 256 MBram
+Compile Time		: 60 min
+
+Credits			: id Software, PQ Editig Forum, all Quake Zockers...

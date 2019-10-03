@@ -1,0 +1,52 @@
+	LightSource lights[] = {	LightSource(115.0, 45.0, 0.95) };
+
+	SDL_Surface* textures[] = { 				IMG_Load("Textures/blue.jpg"),
+								IMG_Load("Textures/wolf001.jpg"),
+								IMG_Load("Textures/wolf002.jpg"),
+								IMG_Load("Textures/timber.jpg"),
+								IMG_Load("Textures/tisza001.jpg"),
+								IMG_Load("Textures/vader001.jpg"),
+								IMG_Load("Textures/brick001.jpg"),
+								IMG_Load("Textures/wolf003.jpg"),
+								IMG_Load("Textures/cat001.jpg"),
+								IMG_Load("Textures/quake001.jpg"),
+								IMG_Load("Textures/quake002.jpg"),
+								IMG_Load("Textures/quake003.jpg"),
+								IMG_Load("Textures/quake004.jpg"),
+								IMG_Load("Textures/quake005.jpg"),
+								IMG_Load("Textures/world_medium.jpg"),
+								IMG_Load("Textures/world_large.jpg"),
+								IMG_Load("Textures/mars_large.jpg") };
+
+
+	Room room_01;
+	SolidBody* room_ptr_1 = &room_01;
+	room_01.setDimension(8.0, 20.0, 6.0);
+	room_01.setSideOn(1, 1, 1, 1, 1, 1);
+	room_01.setTexture(3, 9, 11, 4, 10, 13);
+	room_01.setTextureScale(1.0, 2.0, 2.0, 4.0, 2.0, 2.0);
+	room_01.addOpening(Bottom, 1.5, 1.5, 2.0, 2.0);
+	room_01.addOpening(Left, 3.0, 1.0, 4.0, 1.5);
+	room_01.addOpening(Right, 3.0, 1.0, 4.0, 1.5);
+	room_01.calculateMesh();
+	Solids.addSolid(room_ptr_1);
+
+	//Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 2.0, 4.0, 0.0, PI * 0.25, PI * 0.25, 0.0, 	getColour(0,   0,   0, 128),  12, 2.0));
+
+
+	Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 2.0, 4.0, 0.0, 0.0, 0.0, 0.0, 	getColour(0, 255,   0,   0),  12, 2.0));
+
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 5.0, 6.0, 3.0, 0.0, 0.0, 0.0, getColour(0,   0, 255,   0), 0, 0.125, 12));
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 5.0, 14.0, 3.0, 0.0, 0.0, 0.0, getColour(0,   0, 255,   0), 0, 0.125, 12));
+
+	Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 12.0, 4.0, 0.0, 0.0, 0.0, 0.0, 	getColour(0, 255,   0,   0),  2, 2.0));
+
+	Room room_02;
+	SolidBody* room_ptr_2 = &room_02;
+	room_02.setPosition(1.5, 1.5, -3.0);
+	room_02.setDimension(2.0, 2.0, 3.0);
+	room_02.setSideOn(1, 0, 1, 1, 1, 1);
+	room_02.setTexture(3, 3, 3, 3, 3, 3);
+	room_02.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	room_02.calculateMesh();
+	Solids.addSolid(room_ptr_2);
