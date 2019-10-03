@@ -1,6 +1,5 @@
 #include "Shapes.h"
 #include "Definitions.h"
-#include "Revolved.h"
 #include <vector>
 #include <iostream>
 using namespace std;

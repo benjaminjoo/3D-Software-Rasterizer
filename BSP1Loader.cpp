@@ -28,14 +28,11 @@ BSP1Loader::BSP1Loader(std::string f, vect3 s)
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
 	palette = (Uint32*)tempImage->pixels;
-
-	//textureData = nullptr;
 }
 
 
 BSP1Loader::~BSP1Loader()
 {
-	//delete[] textureData;
 }
 
 
@@ -54,7 +51,6 @@ void BSP1Loader::readData()
 	{
 		modelFile.read(version, 4);
 		int version_no = *((int*)version);
-		//std::cout << version_no << std::endl;
 
 		for (int i = 0; i < 15; i++)
 		{
@@ -62,8 +58,6 @@ void BSP1Loader::readData()
 			modelFile.read(length, 4);
 			direntry[i].offset = *((int*)offset);
 			direntry[i].length = *((int*)length);
-			//std::cout << "Offset " << i << " : " << direntry[i].offset << std::endl;
-			//std::cout << "Length " << i << " : " << direntry[i].length << std::endl;
 		}
 
 		/*
@@ -300,7 +294,6 @@ void BSP1Loader::readData()
 int BSP1Loader::getTotalText()
 {
 	return textureDataContainer.size();
-	//return nTxt;
 }
 
 
@@ -348,7 +341,6 @@ void BSP1Loader::calculateTriangles()
 	{
 		char first	= miptexContainer[faceContainer[i].texinfo_id].name[0];
 		char second = miptexContainer[faceContainer[i].texinfo_id].name[1];
-		//if (first == 't' && second == 'r') { printf("%s\n", miptexContainer[faceContainer[i].texinfo_id].name); }
 		std::string texture_name;
 		texture_name += miptexContainer[faceContainer[i].texinfo_id].name;
 

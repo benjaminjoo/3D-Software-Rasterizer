@@ -27,8 +27,6 @@ class BSP1Loader : public SolidBody
 	vect3						scale;
 
 	Uint32*						palette;
-	//int							nTxt;
-	//txt*						textureData;
 
 public:
 	BSP1Loader(std::string);

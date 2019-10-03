@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "BSP3Loader.h"
+#include "BezierPatch.h"
 
 
 
@@ -9,6 +10,7 @@ BSP3Loader::BSP3Loader(std::string f)
 {
 	fileName	= f;
 	scale		= { 1.0, 1.0, 1.0, 1.0 };
+	patchLod	= 12;
 }
 
 
@@ -16,6 +18,7 @@ BSP3Loader::BSP3Loader(std::string f, vect3 s)
 {
 	fileName	= f;
 	scale		= s;
+	patchLod	= 12;
 }
 
 
@@ -278,6 +281,12 @@ int BSP3Loader::getTotalPoly()
 		{
 			nPoly += (idFaces[i].nMeshVert / 3);
 		}
+		if (idFaces[i].type == 2)
+		{
+			int w = idFaces[i].patchSize.x;
+			int h = idFaces[i].patchSize.y;
+			nPoly += ((w - 1) / 2 * (h - 1) / 2) * patchLod * patchLod * 2;
+		}
 	}
 	return nPoly;
 }
@@ -298,6 +307,10 @@ void BSP3Loader::getTriangleData_(triangle3dV* T)
 	int nFace		= idFaces.size();
 	int nPoly		= 0;
 	int firstIndex	= 0;
+	int nCtrl		= 0;
+	int nPatchX		= 0;
+	int nPatchY		= 0;
+	int nPatch		= 0;
 	int aOffset		= 0;
 	int bOffset		= 0;
 	int cOffset		= 0;
@@ -348,6 +361,63 @@ void BSP3Loader::getTriangleData_(triangle3dV* T)
 				
 				polyContainer.push_back(temp);
 			}
+		}
+		else if (idFaces[i].type == 2)
+		{
+			int w		= idFaces[i].patchSize.x;
+			int h		= idFaces[i].patchSize.y;
+			firstIndex	= idFaces[i].firstVert;
+			nCtrl		= idFaces[i].nVert;
+			nPatchX		= (w - 1) / 2;
+			nPatchY		= (h - 1) / 2;
+			nPatch		= nPatchX * nPatchY;
+
+			std::cout << "Patch Width: " << w << "\tPatch Height: " << h << "\t- " << nCtrl << " vertices forming " 
+					  << nPatch << " patches." << std::endl;
+
+			vect3* tempCtrl = new vect3[nCtrl];
+			for (int p = 0; p < nCtrl; p++)
+			{
+				tempCtrl[p].x = idVertices[firstIndex + p].x;
+				tempCtrl[p].y = idVertices[firstIndex + p].y;
+				tempCtrl[p].z = idVertices[firstIndex + p].z;
+				tempCtrl[p].w = 1.0f;
+			}
+
+			for (int pY = 0; pY < nPatchY; pY++)
+			{
+				for (int pX = 0; pX < nPatchX; pX++)
+				{
+					BezierPatch tempPatch(patchLod, 1, getColour(0, 255, 255, 255));
+
+					tempPatch.setControlPoint(0, tempCtrl[(pY * 2 + 0) * w + (pX * 2 + 0)]);
+					tempPatch.setControlPoint(1, tempCtrl[(pY * 2 + 0) * w + (pX * 2 + 1)]);
+					tempPatch.setControlPoint(2, tempCtrl[(pY * 2 + 0) * w + (pX * 2 + 2)]);
+
+					tempPatch.setControlPoint(3, tempCtrl[(pY * 2 + 1) * w + (pX * 2 + 0)]);
+					tempPatch.setControlPoint(4, tempCtrl[(pY * 2 + 1) * w + (pX * 2 + 1)]);
+					tempPatch.setControlPoint(5, tempCtrl[(pY * 2 + 1) * w + (pX * 2 + 2)]);
+
+					tempPatch.setControlPoint(6, tempCtrl[(pY * 2 + 2) * w + (pX * 2 + 0)]);
+					tempPatch.setControlPoint(7, tempCtrl[(pY * 2 + 2) * w + (pX * 2 + 1)]);
+					tempPatch.setControlPoint(8, tempCtrl[(pY * 2 + 2) * w + (pX * 2 + 2)]);
+
+					nPoly = tempPatch.getTotalPoly();
+
+					triangle3dV* tempMesh = new triangle3dV[nPoly];
+
+					tempPatch.getTriangleData_(tempMesh);
+
+					for (int currentPoly = 0; currentPoly < nPoly; currentPoly++)
+					{
+						polyContainer.push_back(tempMesh[currentPoly]);
+					}
+
+					delete[] tempMesh;
+				}
+			}
+
+			delete[] tempCtrl;
 		}
 	}
 	polyContainer.shrink_to_fit();

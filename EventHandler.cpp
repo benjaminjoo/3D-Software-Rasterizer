@@ -1,10 +1,9 @@
 #include "EventHandler.h"
 #include "Camera.h"
 #include "Canvas.h"
-#include "RayTracer.h"
 
 
-EventHandler::EventHandler(RayTracer* R)
+EventHandler::EventHandler()
 {
 	visualStyle			= wireframe;
 
@@ -22,7 +21,6 @@ EventHandler::EventHandler(RayTracer* R)
 	event				= { 0 };
 	player				= &Camera(1.0, 1.0, 1.5, 0.1, 0.05, PI * 0.5, PI, 0.0, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, getColour(0, 255, 255, 255), 999.9);
-	RT					= R;
 
 	quit				= false;
 
@@ -45,7 +43,7 @@ EventHandler::EventHandler(RayTracer* R)
 }
 
 
-EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C, RayTracer* R)
+EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C)
 {
 	visualStyle			= wireframe;
 
@@ -63,7 +61,6 @@ EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C, RayTr
 	event				= { 0 };
 	player				= P;
 	screen				= C;
-	RT					= R;
 
 	quit				= false;
 
@@ -277,7 +274,6 @@ void EventHandler::HandleUserEvents()
 	if (state[SDL_SCANCODE_HOME])
 	{
 		turnV = -PI;
-		//turnV = 0.0;
 		tiltP = 0.0;
 	}
 	
@@ -320,9 +316,6 @@ void EventHandler::HandleUserEvents()
 			case SDLK_g:
 				gouraudShading = gouraudShading ? false : true;
 				break;
-			/*case SDLK_t:
-				torchOn = torchOn ? false : true;
-				break;*/
 			case SDLK_TAB:
 				showFPS = showFPS ? false : true;
 				showPosition = showPosition ? false : true;
@@ -332,9 +325,6 @@ void EventHandler::HandleUserEvents()
 				break;
 			case SDLK_p:
 				player->outputImage(*screen);
-				break;
-			case SDLK_r:
-				RT->calculatePixel();
 				break;
 			case SDLK_KP_PLUS:
 				if (torchIntensity < 1000.0f)
@@ -373,7 +363,7 @@ void EventHandler::HandleUserEvents()
 		{
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				//player->jump(nSupport, supports);
+
 			}
 		}
 

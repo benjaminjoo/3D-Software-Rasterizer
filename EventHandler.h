@@ -4,7 +4,7 @@
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
-#include "RayTracer.h"
+
 
 class EventHandler
 {
@@ -26,7 +26,6 @@ public:
 	SDL_Event event;
 	Camera* player;
 	Canvas* screen;
-	RayTracer* RT;
 
 	bool quit;
 
@@ -47,8 +46,8 @@ public:
 	double			torchIntensity;
 	double			maxIllumination;
 
-	EventHandler(RayTracer*);
-	EventHandler(double, double, Camera*, Canvas*, RayTracer*);
+	EventHandler();
+	EventHandler(double, double, Camera*, Canvas*);
 	~EventHandler();
 
 	void HandleUserEvents();

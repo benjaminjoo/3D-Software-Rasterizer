@@ -2,7 +2,6 @@
 
 #include "Definitions.h"
 #include "LightSource.h"
-#include "SpotLight.h"
 #include "ViewVolume.h"
 #include "Canvas.h"
 #include "ShadowVolume.h"
@@ -93,6 +92,9 @@ public:
 	void fillZBuffer(triangle3dV, triangle2dG, double*);
 
 	void drawLine(coord2, coord2, Uint32, Uint32*);
+	void drawLine(screenCoord, screenCoord, int, Uint32, Uint32*);
+
+	void drawSpot(screenCoord, Uint32, Uint32*);
 
 	textCoord getUVCoord(vect3, vect3, textCoord, textCoord, vect3);
 	textCoord interpolateUVCoord(textCoord, textCoord, int, int);

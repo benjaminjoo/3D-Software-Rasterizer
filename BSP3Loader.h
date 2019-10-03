@@ -18,7 +18,8 @@ class BSP3Loader: public SolidBody
 	std::vector<face>			idFaces;
 	std::vector<triangle3dV>	polyContainer;
 
-	vect3					scale;
+	vect3	scale;
+	int		patchLod;
 
 public:
 	BSP3Loader(std::string);

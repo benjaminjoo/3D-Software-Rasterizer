@@ -5,20 +5,20 @@
 
 Renderer::Renderer(Shapes* B, Shapes* A, LightSource* L, Camera* P, EventHandler* E)
 {
-	Solids			= B;
-	Actors			= A;
-	Sun				= L;
-	Controls		= E;
-	Player			= P;
-	Entities		= nullptr;
+	Solids = B;
+	Actors = A;
+	Sun = L;
+	Controls = E;
+	Player = P;
+	Entities = nullptr;
 
-	oldTime			= 0;
-	newTime			= 0;
-	frameTime		= 0;
-	frameCounter	= 0;
-	polyCounter		= 0;
+	oldTime = 0;
+	newTime = 0;
+	frameTime = 0;
+	frameCounter = 0;
+	polyCounter = 0;
 
-	collisionDist	= 1.0;
+	collisionDist = 1.0;
 
 	hRatio = Player->getHRatio();
 	vRatio = Player->getVRatio();
@@ -100,8 +100,8 @@ void Renderer::checkCameraCollision()
 					{
 						printf(".");
 					}
-				}				
-			}			
+				}
+			}
 		}
 	}
 }
@@ -109,11 +109,11 @@ void Renderer::checkCameraCollision()
 
 bool Renderer::checkCameraCollision(vect3 v, int* body, int* poly)
 {
-	bool collisionTakingPlace	= false;
-	int bodyCount				= Solids->getNEntities();
-	double minDist				= collisionDist;
-	int collidingBody			= 0;
-	int collidingPoly			= 0;
+	bool collisionTakingPlace = false;
+	int bodyCount = Solids->getNEntities();
+	double minDist = collisionDist;
+	int collidingBody = 0;
+	int collidingPoly = 0;
 
 	for (int i = 0; i < bodyCount; i++)
 	{
@@ -146,8 +146,8 @@ bool Renderer::checkCameraCollision(vect3 v, int* body, int* poly)
 
 	if (collisionTakingPlace)
 	{
-		*body	= collidingBody;
-		*poly	= collidingPoly;
+		*body = collidingBody;
+		*poly = collidingPoly;
 	}
 
 	return collisionTakingPlace;
@@ -183,7 +183,7 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 					vect3 cameraCurr = { Player->x, Player->y, Player->z, 1.0 };						//CAMERA POSITION - CURRENT FRAME
 					vect3 cameraNext = { Player->x + v->x, Player->y + v->y , Player->z + v->z , 1.0 };	//CAMERA POSITION - NEXT FRAME
 
-					double dist		= distPoint2Plane(cameraCurr, triangleChecked);	//DISTANCE FROM CURRENT POSITION TO POLYGON'S PLANE
+					double dist = distPoint2Plane(cameraCurr, triangleChecked);	//DISTANCE FROM CURRENT POSITION TO POLYGON'S PLANE
 
 					double sCurr = dotProduct(subVectors(triangleChecked.A, cameraCurr), triangleChecked.N);
 					double sNext = dotProduct(subVectors(triangleChecked.A, cameraNext), triangleChecked.N);
@@ -201,12 +201,12 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 						intersection.z = cameraCurr.z + t * cameraVector.z;
 						intersection.w = 1.0;		//INTERSECTION POINT
 
-						double sA = dotProduct(	subVectors(triangleChecked.A, intersection),
-												subVectors(triangleChecked.A, triangleChecked.C));
-						double sB = dotProduct(	subVectors(triangleChecked.B, intersection),
-												subVectors(triangleChecked.B, triangleChecked.A));
-						double sC = dotProduct(	subVectors(triangleChecked.C, intersection),
-												subVectors(triangleChecked.C, triangleChecked.B));
+						double sA = dotProduct(subVectors(triangleChecked.A, intersection),
+							subVectors(triangleChecked.A, triangleChecked.C));
+						double sB = dotProduct(subVectors(triangleChecked.B, intersection),
+							subVectors(triangleChecked.B, triangleChecked.A));
+						double sC = dotProduct(subVectors(triangleChecked.C, intersection),
+							subVectors(triangleChecked.C, triangleChecked.B));
 
 						if (sA >= 0.0f && sB >= 0.0f && sC >= 0.0f)
 						{
@@ -295,7 +295,7 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 							collidingBody = i;
 							collidingPoly = p;
 						}
-					}			
+					}
 				}
 			}
 		}
@@ -343,8 +343,8 @@ void Renderer::updateCameraPosition(double turnH, double turnV, double tiltP, do
 		if (this->checkCameraCollision(velocity, &bodyNo, &polyNo))
 		{
 			//printf("Colliding with body: %d poly: %d at %.2f", bodyNo, polyNo, dist);
-			vect3 collisionNormal	= solidMesh[bodyNo][polyNo].N;
-			double vMagnitude		= dotProduct(collisionNormal, velocity);
+			vect3 collisionNormal = solidMesh[bodyNo][polyNo].N;
+			double vMagnitude = dotProduct(collisionNormal, velocity);
 			if (vMagnitude < 0.0f)
 			{
 				counter.x = -collisionNormal.x * vMagnitude;
@@ -389,26 +389,26 @@ void Renderer::updateShadowVolumes(model E)
 	switch (E)
 	{
 	case solid:
-		{
-			shadowMesh	= solidMesh;
-			polyCount	= Solids->getPolyCountEntities();
-			Entities	= Solids;
-		}
-		break;
+	{
+		shadowMesh = solidMesh;
+		polyCount = Solids->getPolyCountEntities();
+		Entities = Solids;
+	}
+	break;
 	case actor:
-		{
-			shadowMesh	= actorMesh;
-			polyCount	= Actors->getPolyCountEntities();
-			Entities	= Actors;
-		}
-		break;
+	{
+		shadowMesh = actorMesh;
+		polyCount = Actors->getPolyCountEntities();
+		Entities = Actors;
+	}
+	break;
 	default:
-		{
-			shadowMesh	= solidMesh;
-			polyCount	= Solids->getPolyCountEntities();
-			Entities	= Solids;
-		}
-		break;
+	{
+		shadowMesh = solidMesh;
+		polyCount = Solids->getPolyCountEntities();
+		Entities = Solids;
+	}
+	break;
 	}
 
 	bodyCount = Entities->getNEntities();
@@ -473,26 +473,26 @@ void Renderer::updateBoundingBoxes(model E, double padding)
 	switch (E)
 	{
 	case solid:
-		Entities		= Solids;
-		polyCount		= Solids->getPolyCountEntities();
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		polyCount = Solids->getPolyCountEntities();
+		triangleMesh = solidMesh;
 		break;
 	case actor:
-		Entities		= Actors;
-		polyCount		= Actors->getPolyCountEntities();
-		triangleMesh	= actorMesh;
+		Entities = Actors;
+		polyCount = Actors->getPolyCountEntities();
+		triangleMesh = actorMesh;
 		break;
 	default:
-		Entities		= Solids;
-		polyCount		= Solids->getPolyCountEntities();
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		polyCount = Solids->getPolyCountEntities();
+		triangleMesh = solidMesh;
 		break;
 	}
 
 	int bodyCount = Entities->getNEntities();
 
 	for (int i = 0; i < bodyCount; i++)
-	{		
+	{
 		int nPoly = polyCount[i];
 		vect3 minExt = getXYZmin(nPoly, triangleMesh[i], padding);
 		vect3 maxExt = getXYZmax(nPoly, triangleMesh[i], padding);
@@ -506,35 +506,35 @@ void Renderer::updateEntities(model E)
 	switch (E)
 	{
 	case solid:
-		Entities		= Solids;
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		triangleMesh = solidMesh;
 		break;
 	case actor:
-		Entities		= Actors;
-		triangleMesh	= actorMesh;
+		Entities = Actors;
+		triangleMesh = actorMesh;
 		break;
 	default:
-		Entities		= Solids;
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		triangleMesh = solidMesh;
 		break;
 	}
 
 	if (Entities != nullptr)
 	{
 		int* polyCount = Entities->getPolyCountEntities();
-		
+
 		for (int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			vect3 velocity = Entities->getVelocity(i);
 			vect3 angVelocity = Entities->getAngularVelocity(i);
 			transformMesh(polyCount[i], triangleMesh[i], 1.0, 1.0, 1.0, velocity.x, velocity.y, velocity.z,
-																		angVelocity.x, angVelocity.y, angVelocity.z);
+				angVelocity.x, angVelocity.y, angVelocity.z);
 		}
 	}
 }
 
 
-void Renderer::renderPoints(int nPoints, point3* Points, Uint32* pixelBuffer)
+void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer)
 {
 	transform3d playerPosition = Player->getTransformation();
 	for (int i = 0; i < nPoints; i++)
@@ -545,7 +545,7 @@ void Renderer::renderPoints(int nPoints, point3* Points, Uint32* pixelBuffer)
 }
 
 
-void Renderer::renderLines(int nLines, line3d* Lines, Uint32* pixelBuffer, double* depthBuffer)
+void Renderer::renderLines(int nLines, line3d * Lines, Uint32 * pixelBuffer, double* depthBuffer)
 {
 	transform3d playerPosition = Player->getTransformation();
 	for (int i = 0; i < nLines; i++)
@@ -558,21 +558,21 @@ void Renderer::renderLines(int nLines, line3d* Lines, Uint32* pixelBuffer, doubl
 }
 
 
-void Renderer::renderEntities(model E, Uint32* pixelBuffer, double* depthBuffer)
+void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer)
 {
 	switch (E)
 	{
 	case solid:
-		Entities		= Solids;
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		triangleMesh = solidMesh;
 		break;
 	case actor:
-		Entities		= Actors;
-		triangleMesh	= actorMesh;
+		Entities = Actors;
+		triangleMesh = actorMesh;
 		break;
 	default:
-		Entities		= Solids;
-		triangleMesh	= solidMesh;
+		Entities = Solids;
+		triangleMesh = solidMesh;
 		break;
 	}
 
@@ -656,7 +656,7 @@ void Renderer::displayStats(bool crosshair, bool fps, bool position, bool polyN,
 	}
 	if (polyN)
 	{
-		Screen.displayValue(polyCounter, 1, 30, 18, getColour(0, 255, 0, 0));
+		Screen.displayValue(polyCounter, 1, 2, 53, getColour(0, 255, 0, 0));
 	}
 }
 

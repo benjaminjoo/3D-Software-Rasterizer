@@ -13,12 +13,14 @@ Canvas::Canvas()
 	//SDL_ShowCursor(SDL_DISABLE);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
-	w = 640;
-	h = 480;
-	fontSize = 8;
+	w			= 640;
+	h			= 480;
+	fontSize	= 8;
+	cursorSize	= 16;
+	iconSize	= 32;
 
-	c = 0;
-	zFar = 0.0;
+	c			= 0;
+	zFar		= 0.0;
 
 	pixelBuffer = new Uint32[w * h];
 	depthBuffer = new double[w * h];
@@ -33,12 +35,14 @@ Canvas::Canvas()
 
 Canvas::Canvas(int width, int height, Uint32 colour, double z)
 {
-	w = width;
-	h = height;
-	fontSize = 8;
+	w			= width;
+	h			= height;
+	fontSize	= 8;
+	cursorSize	= 16;
+	iconSize	= 32;
 
-	c = colour;
-	zFar = z;
+	c			= colour;
+	zFar		= z;
 
 	pixelBuffer = new Uint32[w * h];
 	depthBuffer = new double[w * h];
@@ -109,6 +113,83 @@ void Canvas::drawCrosshair(int hole, int size, Uint32 colour)
 }
 
 
+void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colour)
+{
+	switch (mode)
+	{
+		case Selection:
+		{
+			for (int j = 0; j < cursorSize; j++)
+			{
+				for (int i = 0; i < cursorSize; i++)
+				{
+					if (arrow_medium[j * cursorSize + i])
+					{
+						int currentX = position.x + i;
+						int currentY = position.y + j;
+						if ((currentX > 0 && currentX < w) && (currentY > 0 && currentY < h))
+						{
+							pixelBuffer[currentY * w + currentX] = colour;
+						}				
+					}
+				}
+			}
+		}
+		break;
+		case Placement:
+		{
+			for (int i = 0; i < w; i += 2)
+			{
+				pixelBuffer[position.y * w + i] = colour;
+			}
+			for (int j = 0; j < h; j += 2)
+			{
+				pixelBuffer[j * w + position.x] = colour;
+			}
+		}
+		break;
+		case Relocation:
+		{
+			for (int j = 0; j < cursorSize; j++)
+			{
+				for (int i = 0; i < cursorSize; i++)
+				{
+					if (move_medium[j * cursorSize + i])
+					{
+						int currentX = position.x + i;
+						int currentY = position.y + j;
+						if ((currentX > 0 && currentX < w) && (currentY > 0 && currentY < h))
+						{
+							pixelBuffer[currentY * w + currentX] = colour;
+						}
+					}
+				}
+			}
+		}
+		break;
+		case Rotation:
+		{
+			for (int j = 0; j < cursorSize; j++)
+			{
+				for (int i = 0; i < cursorSize; i++)
+				{
+					if (rot_medium[j * cursorSize + i])
+					{
+						int currentX = position.x + i;
+						int currentY = position.y + j;
+						if ((currentX > 0 && currentX < w) && (currentY > 0 && currentY < h))
+						{
+							pixelBuffer[currentY * w + currentX] = colour;
+						}
+					}
+				}
+			}
+		}
+		break;
+	}
+}
+
+
 bool* Canvas::GetSingleDigit_8(char letter_No)
 {
 	bool* currentLetter;
@@ -157,6 +238,9 @@ bool* Canvas::GetSingleDigit_8(char letter_No)
 			break;
 		case '.':
 			currentLetter = decimal_p;
+			break;
+		case '%':
+			currentLetter = percent_;
 			break;
 		case 'a':
 			currentLetter = letter_a;

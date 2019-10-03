@@ -9,6 +9,8 @@
 
 #define SCREEN_WIDTH		900
 #define SCREEN_HEIGHT		450
+#define EDITOR_WIDTH		1200
+#define EDITOR_HEIGHT		600
 #define MAX_MARGIN			200
 #define SENSITIVITY			0.01f
 #define PI					3.141592654
@@ -16,7 +18,6 @@
 
 #define MIN_ILLUMINATION	0.1
 #define MAX_ILLUMINATION	1.25
-//#define MAX_ILLUMINATION	1.125
 
 #define MAXENTITIES			1024
 
@@ -27,8 +28,28 @@
 #define MAXCYLINDERS		64
 #define MAXCONES			64
 
+#define RED			getColour(0, 255,   0,   0)
+#define GREEN		getColour(0,   0, 255,   0)
+#define BLUE		getColour(0,   0,   0, 255)
+#define YELLOW		getColour(0, 255, 255,   0)
+#define ORANGE		getColour(0, 255, 127,	 0)
+#define LIGHT_BLUE	getColour(0, 127, 127, 255)
+#define WHITE		getColour(0, 255, 255, 255)
+#define LIGHT_GRAY	getColour(0, 191, 191, 191)
+#define DARK_GRAY	getColour(0, 127, 127, 127)
+
+
 
 enum Side { Bottom, Top, Back, Front, Left, Right };
+
+
+enum editingMode { Selection, Placement, Relocation, Rotation };
+
+
+enum tool { none, arrow, cross, move, rotate, view_top, view_front, view_side };
+
+
+enum toolStatus { active, inactive };
 
 
 enum handedness { left, right };
@@ -56,6 +77,30 @@ struct light
 	double azm;
 	double alt;
 	double intensity;
+};
+
+
+struct screenCoord
+{
+	int x;
+	int y;
+};
+
+
+struct worldCoord
+{
+	double x;
+	double y;
+	double z;
+};
+
+
+struct vertex3
+{
+	int			id;
+	worldCoord	pos;
+	bool		selected;
+	bool		deleted;
 };
 
 
@@ -387,32 +432,47 @@ double dotNodes(polyNode a, polyNode b);
 
 polyNode getNormal(polyNode a, polyNode b);
 
-//bool checkPolygonForSplitting(int n, polyNode* P, polyNode a, polyNode b);
 bool checkPolygonForSplitting(int n, vect2* P, polyNode a, polyNode b);
+
 bool checkPolygonForSplitting(polygon4uv P, polyNode a, polyNode b);
 
-//void splitPolygon(polygon4uv V, polyNode p, polyNode q);
-
-//bool iSect2dLine(polyNode a, polyNode b, polyNode p, polyNode q, polyNode* r);
 bool iSect2dLine(vect2 a, vect2 b, polyNode p, polyNode q, vect2* r);
+
+void printCoord3(vect3);
+
+vect3 invertVector(vect3 a);
 
 vect3 addVectors(vect3 a, vect3 b);
 
+worldCoord addVectors2(worldCoord a, worldCoord b);
+
 inline vect3 subVectors(vect3 a, vect3 b);
+
+worldCoord subVectors2(worldCoord a, worldCoord b);
+
+vect3 halfwayPoint(vect3 a, vect3 b);
 
 double distanceSquared(vect3 a, vect3 b);
 
 vect3 unitVector(vect3 v);
 
+worldCoord unitVector2(worldCoord v);
+
 vect3 dirVector(double azm, double alt);
 
 inline double dotProduct(vect3 a, vect3 b);
+
+double dotProduct2(worldCoord a, worldCoord b);
+
+worldCoord rotate2(worldCoord target, Side view, worldCoord origin, double angle);
 
 double dotProductSquared(vect3 a, vect3 b);
 
 double distPoint2Plane(vect3, triangle3dV);
 
 vect3 crossProduct(vect3 a, vect3 b);
+
+worldCoord crossProduct(worldCoord a, worldCoord b);
 
 vect3 midPoint(vect3 a, vect3 b);
 
@@ -422,27 +482,27 @@ Uint32 getColour(unsigned char a, unsigned char r, unsigned char g, unsigned cha
 
 Uint32 modifyColour(Uint32, double, bool, bool, bool);
 
-vect3 multiplyMxV(mat4x4 m, vect3 v);					//Multiplies 4x4 matrix and 1*4 column vector
+vect3 multiplyMxV(mat4x4 m, vect3 v);									//Multiplies 4x4 matrix and 1*4 column vector
 
-vect3 multiplyVxM(mat4x4 m, vect3 v);					//Multiplies 1*4 column vector and 4x4 matrix
+vect3 multiplyVxM(mat4x4 m, vect3 v);									//Multiplies 1*4 column vector and 4x4 matrix
 
-vect3 rotXrad(double sinA, double cosA, vect3 v);		//Rotation around X - pre-calculated sin & cos values
+vect3 rotXrad(double sinA, double cosA, vect3 v);						//Rotation around X - pre-calculated sin & cos values
 
-vect3 rotYrad(double sinA, double cosA, vect3 v);		//Rotation around Y - pre-calculated sin & cos values
+vect3 rotYrad(double sinA, double cosA, vect3 v);						//Rotation around Y - pre-calculated sin & cos values
 
-vect3 rotZrad(double sinA, double cosA, vect3 v);		//Rotation around Z - pre-calculated sin & cos values
+vect3 rotZrad(double sinA, double cosA, vect3 v);						//Rotation around Z - pre-calculated sin & cos values
 
-vect3 rotX(double angle, vect3 v);						//Rotation around X
+vect3 rotX(double angle, vect3 v);										//Rotation around X
 
-vect3 rotY(double angle, vect3 v);						//Rotation around Y
+vect3 rotY(double angle, vect3 v);										//Rotation around Y
 
-vect3 rotZ(double angle, vect3 v);						//Rotation around Z
+vect3 rotZ(double angle, vect3 v);										//Rotation around Z
 
-vect3 scale(double x, double y, double z, vect3 v);		//Scaling
+vect3 scale(double x, double y, double z, vect3 v);						//Scaling
 
-vect3 scale(double s, vect3 v);
+vect3 scaleVector(double s, vect3 v);
 
-vect3 translate(double x, double y, double z, vect3 v);	//Translation
+vect3 translate(double x, double y, double z, vect3 v);					//Translation
 
 triangle3dV rotXT(double angle, triangle3dV T);							//Rotation around X
 
@@ -462,7 +522,7 @@ void transformMesh(int n, triangle3dV* object, double scX, double scY, double sc
 
 
 vect3 sun2view(double sinAzm, double cosAzm, double sinAlt, double cosAlt,
-				double sinRol, double cosRol, vect3 v);	//World-space to View space transformation of lightsources
+				double sinRol, double cosRol, vect3 v);					//World-space to View space transformation of lightsources
 
 bool onScreen(coord2 test, int w, int h);
 
@@ -473,8 +533,6 @@ int roundInt(double a);
 int GetYMin3(coord2* p);
 
 int GetYMax3(coord2* p);
-
-//double getMinN(int n, double* list);
 
 template <class T> T getMinN(int n, T* list);
 

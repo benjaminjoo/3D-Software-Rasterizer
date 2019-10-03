@@ -1,0 +1,46 @@
+#pragma once
+#include "Definitions.h"
+#include "SolidBody.h"
+#include "SolidCube.h"
+#include "SolidPrism.h"
+#include "SolidCylinder.h"
+#include "SolidCone.h"
+#include "SolidSphere.h"
+#include "SolidRevolved.h"
+#include "Room.h"
+#include "SolidSTL.h"
+#include <vector>
+#include <string>
+
+class ModelElementBuffer
+{
+	std::string			fileName;
+
+	std::vector<vertex3>	vertex3Buffer;
+
+public:
+	ModelElementBuffer(std::string);
+	~ModelElementBuffer();
+
+	void addVertex3(vertex3);
+
+	void selectVertex3byID(int);
+	void deselectVertex3byID(int);
+	void deleteVertex3byID(int);
+	void moveVertex3byID(int, worldCoord);
+	void rotVertex3byID(int, Side, worldCoord, double);
+
+	void selectVertex3byIndex(int);
+	void deselectVertex3byIndex(int);
+	void deleteVertex3byIndex(int);
+	void moveVertex3byIndex(int, worldCoord);
+	void rotVertex3byIndex(int, Side, worldCoord, double);
+
+	bool isVertex3Selected(int);
+	bool isVertex3Deleted(int);
+	int getVertex3BufferSize();
+	vertex3 getVertex3(int);
+
+	void exportTextFile();
+};
+

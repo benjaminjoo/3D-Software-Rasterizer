@@ -2,7 +2,6 @@
 
 #include "Definitions.h"
 #include "SolidBody.h"
-#include "SpotLight.h"
 #include <vector>
 
 #include <SDL.h>
@@ -15,8 +14,7 @@ class Shapes
 	std::vector<boundingBox>	boxContainer;
 	std::vector<char*>			textureNameContainer;
 	std::vector<txt>			textureDataContainer;
-	std::vector<SpotLight*>		lightContainer;
-
+	
 	txt*						textures;
 	vect3*						spotLightPositions;
 	double*						spotLightIntensities;

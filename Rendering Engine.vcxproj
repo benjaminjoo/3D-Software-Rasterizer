@@ -77,6 +77,14 @@
     <IncludePath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\include;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\lib\x86;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\include;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\lib\x86;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\include;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ben\Desktop\C++\SDL2_image-2.0.4\lib\x86;C:\Users\Ben\Desktop\C++\SDL 2.0\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -98,9 +106,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,6 +146,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,27 +156,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BezierPatch.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">6385</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6385</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6385</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="BSP1Loader.cpp" />
     <ClCompile Include="BSP3Loader.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EventHandler.cpp" />
-    <ClCompile Include="Extruded.cpp" />
+    <ClCompile Include="MessagePump.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Main.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">6385</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="PaletteMaker.cpp" />
-    <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="RayTracer.cpp" />
-    <ClCompile Include="Renderer.cpp">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">6385</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
-    </ClCompile>
-    <ClCompile Include="Revolved.cpp" />
+    <ClCompile Include="ModelElementBuffer.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
     <ClCompile Include="Shapes.cpp" />
@@ -174,11 +188,6 @@
     </ClCompile>
     <ClCompile Include="SolidCube.cpp" />
     <ClCompile Include="SolidCylinder.cpp" />
-    <ClCompile Include="SolidEgg.cpp">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">6385</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
-    </ClCompile>
-    <ClCompile Include="SolidLathe.cpp" />
     <ClCompile Include="SolidPrism.cpp" />
     <ClCompile Include="SolidRevolved.cpp" />
     <ClCompile Include="SolidSphere.cpp">
@@ -186,25 +195,24 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="SolidSTL.cpp" />
-    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="ViewVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BezierPatch.h" />
     <ClInclude Include="BSP1Loader.h" />
     <ClInclude Include="BSP3Loader.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="Editor.h" />
     <ClInclude Include="EventHandler.h" />
-    <ClInclude Include="Extruded.h" />
+    <ClInclude Include="Icons.h" />
+    <ClInclude Include="MessagePump.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="LightSource.h" />
-    <ClInclude Include="Menu.h" />
-    <ClInclude Include="PaletteMaker.h" />
-    <ClInclude Include="Projectile.h" />
-    <ClInclude Include="RayTracer.h" />
+    <ClInclude Include="ModelElementBuffer.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Revolved.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />
     <ClInclude Include="Shapes.h" />
@@ -212,13 +220,10 @@
     <ClInclude Include="SolidCone.h" />
     <ClInclude Include="SolidCube.h" />
     <ClInclude Include="SolidCylinder.h" />
-    <ClInclude Include="SolidEgg.h" />
-    <ClInclude Include="SolidLathe.h" />
     <ClInclude Include="SolidPrism.h" />
     <ClInclude Include="SolidRevolved.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="SolidSTL.h" />
-    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="ViewVolume.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

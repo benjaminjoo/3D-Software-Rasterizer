@@ -235,6 +235,25 @@ bool iSect2dLine(vect2 a, vect2 b, polyNode p, polyNode q, vect2* r)
 }
 
 
+void printCoord3(vect3 V)
+{
+	printf("x: %4.4f\ty: %4.4f\tz: %4.4f\n", V.x, V.y, V.z);
+}
+
+
+vect3 invertVector(vect3 a)
+{
+	vect3 temp;
+
+	temp.x = -a.x;
+	temp.y = -a.y;
+	temp.z = -a.z;
+	temp.x = 1.0;
+
+	return temp;
+}
+
+
 vect3 addVectors(vect3 a, vect3 b)
 {
 	vect3 temp;
@@ -243,6 +262,18 @@ vect3 addVectors(vect3 a, vect3 b)
 	temp.y = a.y + b.y;
 	temp.z = a.z + b.z;
 	temp.w = 1.0;
+
+	return temp;
+}
+
+
+worldCoord addVectors2(worldCoord a, worldCoord b)
+{
+	worldCoord temp;
+
+	temp.x = a.x + b.x;
+	temp.y = a.y + b.y;
+	temp.z = a.z + b.z;
 
 	return temp;
 }
@@ -261,6 +292,31 @@ vect3 subVectors(vect3 a, vect3 b)
 }
 
 
+worldCoord subVectors2(worldCoord a, worldCoord b)
+{
+	worldCoord temp;
+
+	temp.x = a.x - b.x;
+	temp.y = a.y - b.y;
+	temp.z = a.z - b.z;
+
+	return temp;
+}
+
+
+vect3 halfwayPoint(vect3 a, vect3 b)
+{
+	vect3 temp;
+
+	temp.x = (a.x + b.x) * 0.5;
+	temp.y = (a.y + b.y) * 0.5;
+	temp.z = (a.z + b.z) * 0.5;
+	temp.w = 1.0;
+
+	return temp;
+}
+
+
 double distanceSquared(vect3 a, vect3 b)
 {
 	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
@@ -272,6 +328,22 @@ vect3 unitVector(vect3 v)
 	vect3 temp;
 
 	double length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+	temp.x = v.x / length;
+	temp.y = v.y / length;
+	temp.z = v.z / length;
+	temp.w = 1.0;
+
+	return temp;
+}
+
+
+worldCoord unitVector2(worldCoord v)
+{
+	worldCoord temp;
+
+	double length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
 	temp.x = v.x / length;
 	temp.y = v.y / length;
 	temp.z = v.z / length;
@@ -299,6 +371,41 @@ double dotProduct(vect3 a, vect3 b)
 }
 
 
+double dotProduct2(worldCoord a, worldCoord b)
+{
+	return (a.x * b.x + a.y * b.y + a.z * b.z);
+}
+
+
+worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, double angle)
+{
+	worldCoord temp		= subVectors2(target, origin);
+	worldCoord result	= { 0.0f, 0.0f, 0.0f };
+
+	if (currentView == Top)
+	{
+		result.x = temp.x * cos(angle) - temp.y * sin(angle);
+		result.y = temp.y * cos(angle) + temp.x * sin(angle);
+	}
+	else if (currentView == Front)
+	{
+		result.x = temp.x * cos(angle) - temp.z * sin(angle);
+		result.z = temp.z * cos(angle) + temp.x * sin(angle);
+	}
+	else if (currentView == Right)
+	{
+		result.y = temp.y * cos(angle) - temp.z * sin(angle);
+		result.z = temp.z * cos(angle) + temp.y * sin(angle);
+	}
+
+	result.x += origin.x;
+	result.y += origin.y;
+	result.z += origin.z;
+
+	return result;
+}
+
+
 double dotProductSquared(vect3 a, vect3 b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z) * (a.x * b.x + a.y * b.y + a.z * b.z);
@@ -318,7 +425,20 @@ vect3 crossProduct(vect3 a, vect3 b)
 	t.x = a.y * b.z - a.z * b.y;
 	t.y = a.z * b.x - a.x * b.z;
 	t.z = a.x * b.y - a.y * b.x;
-	t.w = 0.0;
+
+	t.w = 1.0;
+
+	return t;
+}
+
+
+worldCoord crossProduct(worldCoord a, worldCoord b)
+{
+	worldCoord t;
+
+	t.x = a.y * b.z - a.z * b.y;
+	t.y = a.z * b.x - a.x * b.z;
+	t.z = a.x * b.y - a.y * b.x;
 
 	return t;
 }
@@ -461,7 +581,7 @@ vect3 scale(double scaleX, double scaleY, double scaleZ, vect3 v)
 }
 
 
-vect3 scale(double scale, vect3 v)
+vect3 scaleVector(double scale, vect3 v)
 {
 	vect3 t;
 

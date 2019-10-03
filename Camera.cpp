@@ -3,7 +3,6 @@
 #include "Definitions.h"
 #include "Camera.h"
 #include "LightSource.h"
-#include "SpotLight.h"
 #include "ViewVolume.h"
 #include "Canvas.h"
 #include "ShadowVolume.h"
@@ -579,10 +578,10 @@ void Camera::projectLine(line3d line, Uint32* pixelBuffer, double* depthBuffer, 
 	coord2 startP	= this->view2screen(line.A, hRatio, vRatio);
 	coord2 endP		= this->view2screen(line.B, hRatio, vRatio);
 
-	if ((startP.x	>= 0	&& startP.x		< SCREEN_WIDTH	)	&&
-		(startP.y	>= 0	&& startP.y		< SCREEN_HEIGHT	)	&&
-		(endP.x		>= 0	&& endP.x		< SCREEN_WIDTH	)	&&
-		(endP.y		>= 0	&& endP.y		< SCREEN_HEIGHT	))
+	if ((startP.x	>= 0	&& startP.x		< w	)	&&
+		(startP.y	>= 0	&& startP.y		< h	)	&&
+		(endP.x		>= 0	&& endP.x		< w	)	&&
+		(endP.y		>= 0	&& endP.y		< h	))
 	{
 		drawLine(startP, endP, line.colour, pixelBuffer);
 	}
@@ -592,9 +591,9 @@ void Camera::projectLine(line3d line, Uint32* pixelBuffer, double* depthBuffer, 
 void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double hRatio, double vRatio)
 {
 	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
-	if ((cp.x >= 0 && cp.x < SCREEN_WIDTH) && (cp.y >= 0 && cp.y < SCREEN_HEIGHT))
+	if ((cp.x >= 0 && cp.x < w) && (cp.y >= 0 && cp.y < h))
 	{
-		pixelBuffer[cp.y * SCREEN_WIDTH + cp.x] = P.colour;
+		pixelBuffer[cp.y * w + cp.x] = P.colour;
 	}
 }
 
@@ -836,11 +835,11 @@ inline void Camera::fillTriangleSolidColour(triangle3dV T, triangle2dG t, Uint32
 
 			for (int i = startX; i < endX + 1; i++)
 			{
-				if ((i >= 0 && i < SCREEN_WIDTH) && (hg >= 0 && hg < SCREEN_HEIGHT))
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
 					if (1 / zCurrent < depthBuffer[hg * w + i])
 					{
-						pixelBuffer[hg * SCREEN_WIDTH + i] = pixelColour;
+						pixelBuffer[hg * w + i] = pixelColour;
 						depthBuffer[hg * w + i] = 1 / zCurrent;
 					}
 					zCurrent += deltaZ;
@@ -1028,7 +1027,7 @@ inline void Camera::fillTriangleCheckerboard(triangle3dV T, triangle2dG t, Uint3
 
 			for (int i = startX; i < endX + 1; i++)
 			{
-				if ((i >= 0 && i < SCREEN_WIDTH) && (hg >= 0 && hg < SCREEN_HEIGHT))
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
 					if (1 / zCurrent < depthBuffer[hg * w + i])
 					{
@@ -1052,22 +1051,22 @@ inline void Camera::fillTriangleCheckerboard(triangle3dV T, triangle2dG t, Uint3
 						{
 							if (int(sampleYnew / 16) % 2)
 							{
-								pixelBuffer[hg * SCREEN_WIDTH + i] = white;
+								pixelBuffer[hg * w + i] = white;
 							}
 							else
 							{
-								pixelBuffer[hg * SCREEN_WIDTH + i] = blue;
+								pixelBuffer[hg * w + i] = blue;
 							}
 						}
 						else
 						{
 							if (int(sampleYnew / 16) % 2)
 							{
-								pixelBuffer[hg * SCREEN_WIDTH + i] = blue;
+								pixelBuffer[hg * w + i] = blue;
 							}
 							else
 							{
-								pixelBuffer[hg * SCREEN_WIDTH + i] = white;
+								pixelBuffer[hg * w + i] = white;
 							}
 						}
 						depthBuffer[hg * w + i] = 1 / zCurrent;
@@ -1297,7 +1296,7 @@ inline void Camera::fillTriangleGouraudShaded(triangle2dG t, Uint32* pixelBuffer
 
 			for (int i = startX; i < endX + 1; i++)
 			{
-				if ((i >= 0 && i < SCREEN_WIDTH) && (hg >= 0 && hg < SCREEN_HEIGHT))
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
 					if (1 / zCurrent < depthBuffer[hg * w + i])
 					{
@@ -1305,7 +1304,7 @@ inline void Camera::fillTriangleGouraudShaded(triangle2dG t, Uint32* pixelBuffer
 						{
 							for (int q = 0; q < m; q++)
 							{
-								pixelBuffer[(m * hg + p) * SCREEN_WIDTH + m * i + q] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
+								pixelBuffer[(m * hg + p) * w + m * i + q] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
 								currentP.x = m * i + q;
 								currentP.y = m * hg + p;
 								currentP.z = zCurrent;
@@ -2401,9 +2400,9 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 		/*No extent - draw single pixel*/
 		int xCurrent = startP.x;
 		int yCurrent = startP.y;
-		if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+		if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 		{
-			pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+			pixelBuffer[yCurrent * w + xCurrent] = colour;
 		}
 	}
 	if (!diffX && diffY)
@@ -2421,9 +2420,9 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 		}
 		for (int xCurrent = x1, yCurrent = y1; yCurrent < y2; yCurrent++)
 		{
-			if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 			{
-				pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
 			}
 		}
 	}
@@ -2442,9 +2441,9 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 		}
 		for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++)
 		{
-			if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 			{
-				pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
 			}
 		}
 	}
@@ -2469,9 +2468,9 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 			}
 			for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++, yCurrent += stepY)
 			{
-				if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+				if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 				{
-					pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+					pixelBuffer[yCurrent * w + xCurrent] = colour;
 				}
 			}
 		}
@@ -2497,9 +2496,9 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 				for (int xCurrent = x1; xCurrent < x2; xCurrent++, xCount++)
 				{
 					int yCurrent = y1 + yCount;
-					if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 					{
-						pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
 					}
 					float yIdeal = ((float)deltaY / (float)deltaX) * xCount;
 					if (abs(yIdeal - yCount) > 0.5f) { yCount += stepY; }
@@ -2524,13 +2523,190 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 				for (int yCurrent = y1; yCurrent < y2; yCurrent++, yCount++)
 				{
 					int xCurrent = x1 + xCount;
-					if ((xCurrent >= 0 && xCurrent < SCREEN_WIDTH) && (yCurrent >= 0 && yCurrent < SCREEN_HEIGHT))
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
 					{
-						pixelBuffer[yCurrent * SCREEN_WIDTH + xCurrent] = colour;
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
 					}
 					float xIdeal = ((float)deltaX / (float)deltaY) * yCount;
 					if (abs(xIdeal - xCount) > 0.5f) { xCount += stepX; }
 				}
+			}
+		}
+	}
+}
+
+
+void Camera::drawLine(screenCoord startP, screenCoord endP, int step, Uint32 colour, Uint32* pixelBuffer)
+{
+	/*No clipping takes place in this method, if either startP or endP
+	are off screen, line is discarded entirely. It is assumed that all
+	lines form sides of triangles already clipped to the view frustum*/
+
+	/*Check if line endpoints differ, and if so, see how much they do*/
+	bool diffX = (endP.x - startP.x == 0) ? false : true;
+	bool diffY = (endP.y - startP.y == 0) ? false : true;
+	int deltaX = endP.x - startP.x;
+	int deltaY = endP.y - startP.y;
+
+	int x1, y1, x2, y2;
+
+	if (!diffX && !diffY)
+	{
+		/*No extent - draw single pixel*/
+		int xCurrent = startP.x;
+		int yCurrent = startP.y;
+		if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+		{
+			pixelBuffer[yCurrent * w + xCurrent] = colour;
+		}
+	}
+	if (!diffX && diffY)
+	{
+		/*No 'X' extent - draw vertical columns of pixels*/
+		if (startP.y < endP.y)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; yCurrent < y2; yCurrent += step)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (!diffY && diffX)
+	{
+		/*No 'Y' extent - draw horizontal row of pixels*/
+		if (startP.x < endP.x)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent += step)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (diffX && diffY)
+	{
+		/*Line extends both in the 'X' and 'Y' directions*/
+		if (abs(deltaX) == abs(deltaY))
+		{
+			/*Line extends equally in both directions*/
+			int stepY = 0;
+			if (startP.x < endP.x)
+			{
+				x1 = startP.x;	y1 = startP.y;
+				x2 = endP.x;	y2 = endP.y;
+				stepY = (startP.y < endP.y) ? 1 : -1;
+			}
+			else
+			{
+				x1 = endP.x;	y1 = endP.y;
+				x2 = startP.x;	y2 = startP.y;
+				stepY = (startP.y < endP.y) ? -1 : 1;
+			}
+			for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++, yCurrent += stepY)
+			{
+				if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+				{
+					pixelBuffer[yCurrent * w + xCurrent] = colour;
+				}
+			}
+		}
+		else
+		{
+			/*Generic line*/
+			if (abs(deltaX) >= abs(deltaY))
+			{
+				/*Line is 'X'-major*/
+				int stepY = 0, xCount = 0, yCount = 0;
+				if (startP.x < endP.x)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepY = (startP.y < endP.y) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepY = (startP.y < endP.y) ? -1 : 1;
+				}
+				for (int xCurrent = x1; xCurrent < x2; xCurrent++, xCount++)
+				{
+					int yCurrent = y1 + yCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float yIdeal = ((float)deltaY / (float)deltaX) * xCount;
+					if (abs(yIdeal - yCount) > 0.5f) { yCount += stepY; }
+				}
+			}
+			else
+			{
+				/*Line is 'Y'-major*/
+				int stepX = 0, xCount = 0, yCount = 0;
+				if (startP.y < endP.y)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepX = (startP.x < endP.x) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepX = (startP.x < endP.x) ? -1 : 1;
+				}
+				for (int yCurrent = y1; yCurrent < y2; yCurrent++, yCount++)
+				{
+					int xCurrent = x1 + xCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float xIdeal = ((float)deltaX / (float)deltaY) * yCount;
+					if (abs(xIdeal - xCount) > 0.5f) { xCount += stepX; }
+				}
+			}
+		}
+	}
+}
+
+
+void Camera::drawSpot(screenCoord P, Uint32 colour, Uint32* pixelBuffer)
+{
+	const bool spot[16] = { 0, 1, 1, 0,
+							1, 1, 1, 1,
+							1, 1, 1, 1,
+							0, 1, 1, 0 };
+
+	int xStart = P.x - 2;
+	int yStart = P.y - 2;
+	for (int j = yStart, q = 0; j < yStart + 4; j++, q++)
+	{
+		for (int i = xStart, p = 0; i < xStart + 4; i++, p++)
+		{
+			if ((i >= 0 && i < w) && (j >= 0 && j < h) && spot[q * 4 + p])			
+			{
+				pixelBuffer[j * w + i] = colour;
 			}
 		}
 	}
@@ -2565,12 +2741,12 @@ void Camera::outputImage(Canvas screen)
 	else
 	{
 		fprintf(f, "P3\n");
-		fprintf(f, "%d %d\n", SCREEN_WIDTH, SCREEN_HEIGHT);
+		fprintf(f, "%d %d\n", w, h);
 		fprintf(f, "255\n");
 
 		byte r, g, b;
 		Uint32 colour;
-		for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
+		for (int i = 0; i < w * h; i++)
 		{
 			colour = screen.pixelBuffer[i];
 			r = colour >> 16	& 0xFF;

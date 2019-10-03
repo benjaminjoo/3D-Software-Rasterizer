@@ -8,11 +8,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
+#include <iostream>
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
 #include "LightSource.h"
-#include "SpotLight.h"
 #include "Shapes.h"
 #include "SolidBody.h"
 #include "SolidCube.h"
@@ -24,13 +24,73 @@
 #include "Room.h"
 #include "SolidSTL.h"
 #include "EventHandler.h"
+#include "MessagePump.h"
+#include "Editor.h"
+#include "ModelElementBuffer.h"
 #include "Renderer.h"
 #include "BSP3Loader.h"
 #include "BSP1Loader.h"
-#include "RayTracer.h"
+#include "BezierPatch.h"
 
+void editor()
+{
+	SDL_Window* window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
-void gameplay(char* mapName)
+	SDL_Renderer* screen = SDL_CreateRenderer(window, -1, 0);
+
+	SDL_Texture* sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, EDITOR_WIDTH, EDITOR_HEIGHT);
+
+	SDL_ShowCursor(SDL_DISABLE);
+
+	Camera Viewer(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+
+	Canvas Screen(EDITOR_WIDTH, EDITOR_HEIGHT, getColour(0, 255, 255, 255), 999.9);
+
+	ModelElementBuffer Drawing("test.wtf");
+
+	Editor Builder(0.05, &Viewer, &Screen, &Drawing);
+
+	MessagePump Controls(&Builder);
+
+	//SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
+	//							IMG_Load("Textures/wolf001.jpg"),			//01
+	//							IMG_Load("Textures/wolf002.jpg"),			//02
+	//							IMG_Load("Textures/mosaic001.jpg"),			//03
+	//							IMG_Load("Textures/brick001.jpg"),			//04
+	//							IMG_Load("Textures/concrete001.jpg"),		//05
+	//							IMG_Load("Textures/timber.jpg") };			//06
+
+	Shapes Solids;
+	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 127, 127, 255), 5, 5.0, 36));
+
+	while (!Controls.quit)
+	{
+		Screen.resetPixelBuffer();
+		Screen.resetDepthBuffer();
+
+		Builder.updateScreen();
+		Controls.HandleUserEvents();
+
+		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
+		SDL_RenderClear(screen);
+		SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
+		SDL_RenderPresent(screen);
+	}
+
+	printf("%d points added in total...\n", Drawing.getVertex3BufferSize());
+
+	SDL_DestroyTexture(sdl_texture);
+
+	SDL_DestroyRenderer(screen);
+
+	SDL_DestroyWindow(window);
+
+	IMG_Quit();
+
+	SDL_Quit();
+}
+
+void gameplay()
 {
 	SDL_Window*		window			= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
@@ -55,13 +115,13 @@ void gameplay(char* mapName)
 	//Camera			Player(3.0, 12.0, 1.5, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 
-	#include "quake1map.txt"
+	//#include "quake1map.txt"
 	//#include "quake3map.txt"
 	//#include "rooms.txt"
 	//#include "test.txt"
-	//#include "bbtest.txt"
-	RayTracer PoshCamera(SCREEN_WIDTH, SCREEN_HEIGHT, &Player, &Screen, &Solids);
-	EventHandler		Controls(Player.step, Player.turn, &Player, &Screen, &PoshCamera);
+	#include "bbtest.txt"
+	//RayTracer PoshCamera(SCREEN_WIDTH, SCREEN_HEIGHT, &Player, &Screen, &Solids);
+	EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 	Controls.torchIntensity = 10.0;
 
 	//#include "st_loo.txt"
@@ -75,11 +135,11 @@ void gameplay(char* mapName)
 
 
 
-	//Solids.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
+	Solids.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
-	//Actors.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
+	Actors.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
-	Renderer Game(&Solids, &Actors, &LightSource(115.0, 45.0, 0.95), &Player, &Controls);
+	Renderer Game(&Solids, &Actors, &LightSource(300.0, 45.0, 0.95), &Player, &Controls);
 
 	Game.updateShadowVolumes(solid);
 
@@ -89,6 +149,7 @@ void gameplay(char* mapName)
 	//Game.updateBoundingBoxes(solid, 0.5);
 	//Solids.activateBBox(0);
 	//Solids.activateBBox(1);
+	//Solids.activateBBox(2);
 
 
 	while (!Controls.quit)
@@ -136,7 +197,7 @@ void gameplay(char* mapName)
 		Game.updateFrameCounter();
 	}
 
-	//for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
+	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
 
 	//delete[] pointCloud;
 	//delete[] linePile;
@@ -156,14 +217,16 @@ void gameplay(char* mapName)
 
 int main(int argc, char** argv)
 {
-	if (argc > 1)
+	std::cout << "Do you want to use the Renderer <R> or the Editor <E> ?" << std::endl;
+	char userInput;
+	std::cin >> userInput;
+	if (userInput == 'r' || userInput == 'R')
 	{
-		gameplay(argv[1]);
+		gameplay();
 	}
-	else
+	else if (userInput == 'e' || userInput == 'E')
 	{
-		char map_name[] = "dm6.bsp";
-		gameplay(map_name);
+		editor();
 	}
 
 	return 0;
