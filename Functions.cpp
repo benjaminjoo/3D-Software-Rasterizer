@@ -387,14 +387,17 @@ worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, doubl
 	{
 		result.x = temp.x * cos(angle) - temp.y * sin(angle);
 		result.y = temp.y * cos(angle) + temp.x * sin(angle);
+		result.z = target.z;
 	}
 	else if (currentView == Front)
 	{
 		result.x = temp.x * cos(angle) - temp.z * sin(angle);
+		result.y = target.y;
 		result.z = temp.z * cos(angle) + temp.x * sin(angle);
 	}
 	else if (currentView == Right)
 	{
+		result.x = target.x;
 		result.y = temp.y * cos(angle) - temp.z * sin(angle);
 		result.z = temp.z * cos(angle) + temp.y * sin(angle);
 	}
@@ -422,7 +425,18 @@ double distPoint2Plane(vect3 P, triangle3dV T)
 double distPoint2Line(worldCoord P, Side view, line3 L)
 {
 	worldCoord normal = rotate2(unitVector2(subVectors2(L.vert[1], L.vert[0])), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
-	
+	switch (view)
+	{
+	case Top:
+		normal.z = 0.0f;
+		break;
+	case Front:
+		normal.y = 0.0f;
+		break;
+	case Right:
+		normal.x = 0.0f;
+		break;
+	}
 	return abs(dotProduct2(subVectors2(L.vert[0], P), normal));
 }
 
@@ -433,16 +447,25 @@ bool pointIsAroundLine(worldCoord P, Side view, line3 L)
 	switch (view)
 	{
 	case Top:
-		A.z = 0.0f;
-		B.z = 0.0f;
+		{
+			A.z = 0.0f;
+			B.z = 0.0f;
+			P.z = 0.0f;
+		}
 		break;
 	case Front:
-		A.y = 0.0f;
-		B.y = 0.0f;
+		{
+			A.y = 0.0f;
+			B.y = 0.0f;
+			P.y = 0.0f;
+		}
 		break;
 	case Right:
-		A.x = 0.0f;
-		B.x = 0.0f;
+		{
+			A.x = 0.0f;
+			B.x = 0.0f;
+			P.x = 0.0f;
+		}
 		break;
 	}
 	double sA = dotProduct2(subVectors2(B, A), subVectors2(A, P));

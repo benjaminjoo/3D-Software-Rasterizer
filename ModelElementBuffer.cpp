@@ -147,6 +147,26 @@ void ModelElementBuffer::moveLine3byIndex(int i, worldCoord move)
 }
 
 
+void ModelElementBuffer::moveLine3EndPoint(int lineIndex, int vertIndex, Side view, worldCoord move)
+{
+	switch (view)
+	{
+	case Top:
+		line3Buffer[lineIndex].vert[vertIndex].x += move.x;
+		line3Buffer[lineIndex].vert[vertIndex].y += move.y;
+		break;
+	case Front:
+		line3Buffer[lineIndex].vert[vertIndex].x += move.x;
+		line3Buffer[lineIndex].vert[vertIndex].z += move.z;
+		break;
+	case Right:
+		line3Buffer[lineIndex].vert[vertIndex].y += move.y;
+		line3Buffer[lineIndex].vert[vertIndex].z += move.z;
+		break;
+	}
+}
+
+
 void ModelElementBuffer::rotLine3byIndex(int i, Side currentView, worldCoord origin, double angle)
 {
 	line3Buffer[i].vert[0] = rotate2(line3Buffer[i].vert[0], currentView, origin, angle);

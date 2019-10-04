@@ -34,6 +34,9 @@ public:
 
 	int					currentID;
 	int					clicksInQueue;
+	int					currentEdit;
+	bool				startVertMoving;
+	bool				endVertMoving;
 
 	worldCoord			movementStart;
 	worldCoord			movementEnd;
@@ -93,6 +96,7 @@ public:
 	void switchOrthoOff();
 
 	void alignToAxis(worldCoord*);
+	void flattenVector(worldCoord*);
 	double calculateAngle(worldCoord rotStart, worldCoord rotEnd);
 
 	void deselectAll();

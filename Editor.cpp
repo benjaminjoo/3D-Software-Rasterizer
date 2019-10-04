@@ -10,8 +10,11 @@ Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
 	isGridSnapOn	= false;
 	isOrthoOn		= false;
 
-	currentID		= 0;
+	currentID		= 1;
 	clicksInQueue	= 0;
+	currentEdit		= 0;
+	startVertMoving = false;
+	endVertMoving	= false;
 
 	movementStart	= { 0.0f, 0.0f, 0.0f };
 	movementEnd		= { 0.0f, 0.0f, 0.0f };
@@ -210,15 +213,44 @@ void Editor::updateScreen()
 
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 	{
-		if (!Model->isLine3Deleted(i))							//Draw all visible lines
+		if (!Model->isLine3Deleted(i))
 		{
 			line3 tempLine = Model->getLine3(i);
 			screenCoord tempStart	= world2screen(tempLine.vert[0]);
 			screenCoord tempEnd		= world2screen(tempLine.vert[1]);
 			
-			if (Model->isLine3Selected(i))
+			if (Model->isLine3Selected(i))						
 			{
-				Cam->drawLine(tempStart, tempEnd, 1, RED,	Screen->pixelBuffer);
+				Cam->drawLine(tempStart, tempEnd, 1, RED, Screen->pixelBuffer);
+				if (clicksInQueue > 0)// && tempLine.id == currentEdit)
+				{
+					worldCoord move = subVectors2(mouseBeforeZoom, movementStart);
+					if (isOrthoOn) { this->alignToAxis(&move); }
+					screenCoord currentPosition = world2screen(addVectors2(movementStart, move));
+					if (startVertMoving)
+					{
+						Cam->drawLine(currentPosition,				tempEnd,			1, ORANGE,		Screen->pixelBuffer);
+						Cam->drawLine(world2screen(movementStart),	currentPosition,	4, DARK_GRAY,	Screen->pixelBuffer);
+					}
+					if (endVertMoving)
+					{
+						Cam->drawLine(tempStart,					currentPosition,	1, ORANGE,		Screen->pixelBuffer);
+						Cam->drawLine(world2screen(movementStart),	currentPosition,	4, DARK_GRAY,	Screen->pixelBuffer);
+					}
+				}
+				else if (clicksInQueue == 0)
+				{
+					if (abs(tempStart.x - mousePosition.x) <= 5 &&
+						abs(tempStart.y - mousePosition.y) <= 5)
+					{
+						Cam->drawSpot(tempStart, RED, Screen->pixelBuffer);
+					}
+					if (abs(tempEnd.x - mousePosition.x) <= 5 &&
+						abs(tempEnd.y - mousePosition.y) <= 5)
+					{
+						Cam->drawSpot(tempEnd, RED, Screen->pixelBuffer);
+					}
+				}
 			}
 			else
 			{
@@ -434,9 +466,9 @@ void Editor::leftMouseClick(screenCoord X)
 			{
 				if (!Model->isVertex3Deleted(i))
 				{
-					vertex3 tempVert = Model->getVertex3(i);
-					worldCoord tempCoordW = tempVert.pos;
-					screenCoord P = world2screen(tempCoordW);
+					vertex3		tempVert	= Model->getVertex3(i);
+					worldCoord	tempCoordW	= tempVert.pos;
+					screenCoord P			= world2screen(tempCoordW);
 					if (abs(P.x - X.x) <= 10 && abs(P.y - X.y) <= 10)
 					{
 						Model->selectVertex3byIndex(i);
@@ -447,12 +479,55 @@ void Editor::leftMouseClick(screenCoord X)
 			{
 				if (!Model->isLine3Deleted(i))
 				{
-					line3 tempLine = Model->getLine3(i);
-					worldCoord currentP = screen2world(X);
-					double dist = distPoint2Line(currentP, currentView, tempLine);
-					if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 2)
+					if (!Model->isLine3Selected(i))
 					{
-						Model->selectLine3byIndex(i);
+						line3		tempLine	= Model->getLine3(i);
+						worldCoord	currentP	= screen2world(X);
+						double		dist		= distPoint2Line(currentP, currentView, tempLine);
+						if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 5)
+						{
+							Model->selectLine3byIndex(i);
+						}
+					}
+					else
+					{
+						line3 		tempLine	= Model->getLine3(i);
+						screenCoord tempStart	= world2screen(tempLine.vert[0]);
+						screenCoord tempEnd		= world2screen(tempLine.vert[1]);
+
+						if (clicksInQueue > 0)// && tempLine.id == currentEdit)
+						{
+							movementEnd = screen2world(X);
+							worldCoord move = subVectors2(movementEnd, movementStart);
+							if (isOrthoOn) { this->alignToAxis(&move); }
+							if (startVertMoving	) { Model->moveLine3EndPoint(i, 0, currentView, move); }
+							if (endVertMoving	) { Model->moveLine3EndPoint(i, 1, currentView, move); }
+							startVertMoving = 0;
+							endVertMoving	= 0;
+							//currentEdit		= 0;
+							clicksInQueue	= 0;
+						}
+						else if (clicksInQueue == 0)
+						{
+							if (abs(tempStart.x - mousePosition.x) <= 5 &&
+								abs(tempStart.y - mousePosition.y) <= 5)
+							{
+								movementStart	= tempLine.vert[0];
+								startVertMoving = 1;
+								endVertMoving	= 0;
+								//currentEdit		= tempLine.id;
+								clicksInQueue++;						
+							}
+							if (abs(tempEnd.x - mousePosition.x) <= 5 &&
+								abs(tempEnd.y - mousePosition.y) <= 5)
+							{
+								movementStart	= tempLine.vert[1];
+								startVertMoving = 0;
+								endVertMoving	= 1;
+								//currentEdit		= tempLine.id;
+								clicksInQueue++;				
+							}
+						}
 					}
 				}
 			}
@@ -674,21 +749,51 @@ void Editor::switchOrthoOff()
 void Editor::alignToAxis(worldCoord* V)
 {
 	char greatest = ' ';
-	double maxExtent = abs(V->x); greatest = 'x';
-	if (abs(V->y) > maxExtent) { maxExtent = abs(V->y); greatest = 'y'; }
-	if (abs(V->z) > maxExtent) { maxExtent = abs(V->z); greatest = 'z'; }
-	
-	if (greatest == 'x')
+	double maxExtent;
+
+	switch (currentView)
 	{
-		V->y = V->z = 0.0f;
+	case Top:
+		{
+			maxExtent = abs(V->x); greatest = 'x';
+			if (abs(V->y) > maxExtent) { maxExtent = abs(V->y); greatest = 'y'; }
+			if (greatest == 'x') { V->y = 0.0f; }
+			else if (greatest == 'y') { V->x = 0.0f; }
+		}
+		break;
+	case Front:
+		{
+			maxExtent = abs(V->x); greatest = 'x';
+			if (abs(V->z) > maxExtent) { maxExtent = abs(V->z); greatest = 'z'; }
+			if (greatest == 'x') { V->z = 0.0f; }
+			else if (greatest == 'z') { V->x = 0.0f; }
+		}
+		break;
+	case Right:
+		{
+			maxExtent = abs(V->y); greatest = 'y';
+			if (abs(V->z) > maxExtent) { maxExtent = abs(V->z); greatest = 'z'; }
+			if (greatest == 'y') { V->z = 0.0f; }
+			else if (greatest == 'z') { V->y = 0.0f; }
+		}
+		break;
 	}
-	else if (greatest == 'y')
+}
+
+
+void Editor::flattenVector(worldCoord* V)
+{
+	switch (currentView)
 	{
-		V->x = V->z = 0.0f;
-	}
-	else if (greatest == 'z')
-	{
-		V->x = V->y = 0.0f;
+	case Top:
+		V->z = 0.0f;
+		break;
+	case Front:
+		V->y = 0.0f;
+		break;
+	case Right:
+		V->x = 0.0f;
+		break;
 	}
 }
 

@@ -43,6 +43,7 @@ public:
 	void deselectLine3byIndex(int);
 	void deleteLine3byIndex(int);
 	void moveLine3byIndex(int, worldCoord);
+	void moveLine3EndPoint(int, int, Side, worldCoord);
 	void rotLine3byIndex(int, Side, worldCoord, double);
 
 	bool isVertex3Selected(int);
