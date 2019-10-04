@@ -215,6 +215,7 @@ void Editor::updateScreen()
 			line3 tempLine = Model->getLine3(i);
 			screenCoord tempStart	= world2screen(tempLine.vert[0]);
 			screenCoord tempEnd		= world2screen(tempLine.vert[1]);
+			
 			if (Model->isLine3Selected(i))
 			{
 				Cam->drawLine(tempStart, tempEnd, 1, RED,	Screen->pixelBuffer);
@@ -222,6 +223,48 @@ void Editor::updateScreen()
 			else
 			{
 				Cam->drawLine(tempStart, tempEnd, 1, BLUE,	Screen->pixelBuffer);
+			}
+		}
+		if (currentMode == Relocation && clicksInQueue == 1)
+		{
+			if (Model->isLine3Selected(i))						//Draw all visible lines currently being moved
+			{
+				line3 tempLine = Model->getLine3(i);
+				worldCoord tempMove = subVectors2(movementStart, mouseBeforeZoom);
+				if (isOrthoOn) { this->alignToAxis(&tempMove); }
+
+				tempLine.vert[0].x -= tempMove.x;
+				tempLine.vert[0].y -= tempMove.y;
+				tempLine.vert[0].z -= tempMove.z;
+				tempLine.vert[1].x -= tempMove.x;
+				tempLine.vert[1].y -= tempMove.y;
+				tempLine.vert[1].z -= tempMove.z;
+
+				screenCoord tempStart	= world2screen(tempLine.vert[0]);
+				screenCoord tempEnd		= world2screen(tempLine.vert[1]);
+
+				Cam->drawLine(tempStart, tempEnd, 1, ORANGE, Screen->pixelBuffer);
+			}
+		}
+		if (currentMode == Rotation && clicksInQueue == 2)		//Draw all visible lines currently being rotated
+		{
+			if (Model->isLine3Selected(i))
+			{
+				line3 tempLine = Model->getLine3(i);
+				worldCoord startVect = unitVector2(subVectors2(rotationStart, rotationCentre));
+				if (isOrthoOn)
+				{
+					worldCoord temp = subVectors2(mouseBeforeZoom, rotationCentre);
+					this->alignToAxis(&temp);
+					mouseBeforeZoom = addVectors2(rotationCentre, temp);
+				}
+				worldCoord endVect = unitVector2(subVectors2(mouseBeforeZoom, rotationCentre));
+				double rotAngle = calculateAngle(startVect, endVect);
+				tempLine.vert[0] = rotate2(tempLine.vert[0], currentView, rotationCentre, rotAngle);
+				tempLine.vert[1] = rotate2(tempLine.vert[1], currentView, rotationCentre, rotAngle);
+				screenCoord tempStart = world2screen(tempLine.vert[0]);
+				screenCoord tempEnd = world2screen(tempLine.vert[1]);
+				Cam->drawLine(tempStart, tempEnd, 1, ORANGE, Screen->pixelBuffer);
 			}
 		}
 	}
@@ -471,6 +514,7 @@ void Editor::leftMouseClick(screenCoord X)
 			else if (clicksInQueue == 2)
 			{
 				rotationEnd = screen2world(X);
+				if (isOrthoOn)
 				{
 					worldCoord temp = subVectors2(rotationEnd, rotationCentre);
 					this->alignToAxis(&temp);
@@ -713,13 +757,20 @@ void Editor::deleteSelected()
 
 void Editor::moveSelected()
 {
+	worldCoord move = subVectors2(movementEnd, movementStart);
+	if (isOrthoOn) { this->alignToAxis(&move); }
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
-			worldCoord move = subVectors2(movementEnd, movementStart);
-			if (isOrthoOn) { this->alignToAxis(&move); }
 			Model->moveVertex3byIndex(i, move);
+		}
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
+		{
+			Model->moveLine3byIndex(i, move);
 		}
 	}
 }
@@ -727,14 +778,21 @@ void Editor::moveSelected()
 
 void Editor::rotateSelected()
 {
+	worldCoord startVect = unitVector2(subVectors2(rotationStart, rotationCentre));
+	worldCoord endVect = unitVector2(subVectors2(rotationEnd, rotationCentre));
+	rotationAngle = calculateAngle(startVect, endVect);
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
-			worldCoord startVect	= unitVector2(subVectors2(rotationStart,	rotationCentre));
-			worldCoord endVect		= unitVector2(subVectors2(rotationEnd,		rotationCentre));
-			rotationAngle			= calculateAngle(startVect, endVect);
 			Model->rotVertex3byIndex(i, currentView, rotationCentre, rotationAngle);
+		}
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
+		{
+			Model->rotLine3byIndex(i, currentView, rotationCentre, rotationAngle);
 		}
 	}
 }

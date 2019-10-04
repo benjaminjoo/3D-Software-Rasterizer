@@ -135,6 +135,25 @@ void ModelElementBuffer::deleteLine3byIndex(int i)
 }
 
 
+void ModelElementBuffer::moveLine3byIndex(int i, worldCoord move)
+{
+	line3Buffer[i].vert[0].x += move.x;
+	line3Buffer[i].vert[0].y += move.y;
+	line3Buffer[i].vert[0].z += move.z;
+
+	line3Buffer[i].vert[1].x += move.x;
+	line3Buffer[i].vert[1].y += move.y;
+	line3Buffer[i].vert[1].z += move.z;
+}
+
+
+void ModelElementBuffer::rotLine3byIndex(int i, Side currentView, worldCoord origin, double angle)
+{
+	line3Buffer[i].vert[0] = rotate2(line3Buffer[i].vert[0], currentView, origin, angle);
+	line3Buffer[i].vert[1] = rotate2(line3Buffer[i].vert[1], currentView, origin, angle);
+}
+
+
 bool ModelElementBuffer::isVertex3Selected(int n)
 {
 	return vertex3Buffer[n].selected;
