@@ -182,6 +182,32 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 }
 
 
+void Canvas::drawSnapTarget(screenCoord P, Uint32 colour)
+{
+	const bool spot[64] = { 1, 1, 1, 1, 1, 1, 1, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 1, 1, 1, 1, 1, 1, 1 };
+
+	int xStart = P.x - 4;
+	int yStart = P.y - 4;
+	for (int j = yStart, q = 0; j < yStart + 8; j++, q++)
+	{
+		for (int i = xStart, p = 0; i < xStart + 8; i++, p++)
+		{
+			if ((i >= 0 && i < w) && (j >= 0 && j < h) && spot[q * 8 + p])
+			{
+				pixelBuffer[j * w + i] = colour;
+			}
+		}
+	}
+}
+
+
 bool* Canvas::GetSingleDigit_8(char letter_No)
 {
 	bool* currentLetter;

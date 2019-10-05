@@ -32,6 +32,7 @@ public:
 
 	void drawCrosshair(int, int, Uint32);
 	void drawMouseCursor(editingMode, screenCoord position, Uint32 colour);
+	void drawSnapTarget(screenCoord position, Uint32 colour);
 	bool* GetSingleDigit_8(char letter_No);
 	void displayFps(double value, int dec, int shiftH, int shiftV);
 	void displayValue(double value, int dec, int shiftH, int shiftV, Uint32 col);

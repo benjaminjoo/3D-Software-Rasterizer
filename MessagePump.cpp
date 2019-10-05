@@ -46,6 +46,9 @@ void MessagePump::HandleUserEvents()
 			case SDLK_r:
 				E->activateRotation();
 				break;
+			case SDLK_o:
+				E->toggleObjectSnap();
+				break;
 			case SDLK_g:
 				E->toggleGridSnap();
 				break;

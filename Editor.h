@@ -29,6 +29,7 @@ public:
 	editingMode			currentMode;
 	tool				currentTool;
 
+	bool				isObjectSnapOn;
 	bool				isGridSnapOn;
 	bool				isOrthoOn;
 
@@ -95,11 +96,13 @@ public:
 	void activateFrontView();
 	void activateRightView();
 
+	void toggleObjectSnap();
 	void toggleGridSnap();
 	void toggleOrtho();
 	void switchOrthoOn();
 	void switchOrthoOff();
 
+	bool snapToVert(worldCoord*);
 	void alignToAxis(worldCoord*);
 	void flattenVector(worldCoord*);
 	double calculateAngle(worldCoord rotStart, worldCoord rotEnd);

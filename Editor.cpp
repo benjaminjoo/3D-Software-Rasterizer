@@ -7,6 +7,7 @@ Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
 	currentMode		= Placement;
 	currentTool		= cross;
 
+	isObjectSnapOn	= false;
 	isGridSnapOn	= false;
 	isOrthoOn		= false;
 
@@ -188,14 +189,35 @@ void Editor::updateUtilities()
 	if (currentView == Top)
 	{
 		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
+		if (isObjectSnapOn)
+		{
+			if (this->snapToVert(&mouseBeforeZoom))
+			{
+				Screen->drawSnapTarget(planPosition, WHITE);
+			}
+		}
 	}
 	else if (currentView == Front)
 	{
 		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
+		if (isObjectSnapOn)
+		{
+			if (this->snapToVert(&mouseBeforeZoom))
+			{
+				Screen->drawSnapTarget(frontPosition, WHITE);
+			}
+		}
 	}
 	else if (currentView == Right)
 	{
 		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
+		if (isObjectSnapOn)
+		{
+			if (this->snapToVert(&mouseBeforeZoom))
+			{
+				Screen->drawSnapTarget(rightPosition, WHITE);
+			}
+		}
 	}
 
 	//Display scale
@@ -483,6 +505,8 @@ void Editor::mouseMotion(int mx, int my)
 
 void Editor::leftMouseClick(screenCoord X)
 {
+	worldCoord P = screen2world(X);
+	if (isObjectSnapOn) { this->snapToVert(&P); }
 	if (X.y > 31)
 	{
 		if (currentMode == Selection)
@@ -493,8 +517,8 @@ void Editor::leftMouseClick(screenCoord X)
 				{
 					vertex3		tempVert	= Model->getVertex3(i);
 					worldCoord	tempCoordW	= tempVert.pos;
-					screenCoord P			= world2screen(tempCoordW);
-					if (abs(P.x - X.x) <= 10 && abs(P.y - X.y) <= 10)
+					screenCoord tempCoordS	= world2screen(tempCoordW);
+					if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
 					{
 						Model->selectVertex3byIndex(i);
 					}
@@ -507,7 +531,7 @@ void Editor::leftMouseClick(screenCoord X)
 					if (!Model->isLine3Selected(i))
 					{
 						line3		tempLine	= Model->getLine3(i);
-						worldCoord	currentP	= screen2world(X);
+						worldCoord	currentP	= P;
 						double		dist		= distPoint2Line(currentP, currentView, tempLine);
 						if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 5)
 						{
@@ -522,7 +546,7 @@ void Editor::leftMouseClick(screenCoord X)
 
 						if (clicksInQueue > 0 && tempLine.id == currentEdit)
 						{
-							movementEnd = screen2world(X);
+							movementEnd = P;
 							worldCoord move = subVectors2(movementEnd, movementStart);
 							if (isOrthoOn) { this->alignToAxis(&move); }
 							if (startVertMoving	) { Model->moveLine3EndPoint(i, 0, currentView, move); }
@@ -559,7 +583,7 @@ void Editor::leftMouseClick(screenCoord X)
 		}
 		if (currentMode == Placement)
 		{
-			worldCoord temp = screen2world(X);
+			worldCoord temp = P;
 			printf("Entity added at x: %.4f\ty: %.4f\n", temp.x, temp.y);
 			vertex3 tempVert = { currentID, temp, false, false };
 			Model->addVertex3(tempVert);
@@ -569,12 +593,12 @@ void Editor::leftMouseClick(screenCoord X)
 		{
 			if (clicksInQueue == 0)
 			{
-				movementStart = screen2world(X);
+				movementStart = P;
 				clicksInQueue++;
 			}
 			else
 			{
-				movementEnd = screen2world(X);
+				movementEnd = P;
 				this->drawLine();
 				currentID++;
 				clicksInQueue = 0;
@@ -584,12 +608,12 @@ void Editor::leftMouseClick(screenCoord X)
 		{
 			if (clicksInQueue == 0)
 			{
-				movementStart = screen2world(X);
+				movementStart = P;
 				clicksInQueue++;
 			}
 			else
 			{
-				movementEnd = screen2world(X);
+				movementEnd = P;
 				this->moveSelected();
 				clicksInQueue = 0;
 			}
@@ -598,12 +622,12 @@ void Editor::leftMouseClick(screenCoord X)
 		{
 			if (clicksInQueue == 0)
 			{
-				rotationCentre = screen2world(X);
+				rotationCentre = P;
 				clicksInQueue++;
 			}
 			else if (clicksInQueue == 1)
 			{
-				rotationStart = screen2world(X);
+				rotationStart = P;
 				if (isOrthoOn)
 				{
 					worldCoord temp = subVectors2(rotationStart, rotationCentre);
@@ -614,7 +638,7 @@ void Editor::leftMouseClick(screenCoord X)
 			}
 			else if (clicksInQueue == 2)
 			{
-				rotationEnd = screen2world(X);
+				rotationEnd = P;
 				if (isOrthoOn)
 				{
 					worldCoord temp = subVectors2(rotationEnd, rotationCentre);
@@ -748,6 +772,12 @@ void Editor::activateRightView()
 }
 
 
+void Editor::toggleObjectSnap()
+{
+	isObjectSnapOn = isObjectSnapOn ? false : true;
+}
+
+
 void Editor::toggleGridSnap()
 {
 	isGridSnapOn = isGridSnapOn ? false : true;
@@ -769,6 +799,44 @@ void Editor::switchOrthoOn()
 void Editor::switchOrthoOff()
 {
 	isOrthoOn = false;
+}
+
+
+bool Editor::snapToVert(worldCoord* P)
+{
+	bool snapped = false;
+	screenCoord tempP = world2screen(*P);
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
+	{
+		vertex3 tempW = Model->getVertex3(i);
+		screenCoord tempS = world2screen(tempW.pos);	
+		if (abs(tempP.x - tempS.x) < 10 &&
+			abs(tempP.y - tempS.y) < 10)
+		{
+			*P = tempW.pos;
+			snapped = true;
+		}
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		worldCoord	tempStart	= Model->getLine3(i).vert[0];
+		worldCoord	tempEnd		= Model->getLine3(i).vert[1];
+		screenCoord tempStartS	= world2screen(tempStart);
+		screenCoord tempEndS	= world2screen(tempEnd);
+		if (abs(tempP.x - tempStartS.x	) < 10 &&
+			abs(tempP.y - tempStartS.y	) < 10)
+		{
+			*P = tempStart;
+			snapped = true;
+		}
+		if (abs(tempP.x - tempEndS.x	) < 10 &&
+			abs(tempP.y - tempEndS.y	) < 10)
+		{
+			*P = tempEnd;
+			snapped = true;
+		}
+	}
+	return snapped;
 }
 
 
