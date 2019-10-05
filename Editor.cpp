@@ -10,6 +10,7 @@ Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
 	isGridSnapOn	= false;
 	isOrthoOn		= false;
 
+	maxUndo			= 20;
 	currentID		= 1;
 	clicksInQueue	= 0;
 	currentEdit		= 0;
@@ -144,7 +145,7 @@ void Editor::updateWorldPosition()
 }
 
 
-void Editor::updatePan()
+void Editor::compensatePan()
 {
 	SDL_GetMouseState(&dragStart.x, &dragStart.y);
 
@@ -155,7 +156,7 @@ void Editor::updatePan()
 }
 
 
-void Editor::updateZoom()
+void Editor::compensateZoom()
 {
 	mouseAfterZoom = screen2world(mousePosition);
 
@@ -177,7 +178,7 @@ void Editor::updateZoom()
 }
 
 
-void Editor::updateScreen()
+void Editor::updateUtilities()
 {
 	SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 	mouseBeforeZoom = screen2world(mousePosition);
@@ -186,15 +187,15 @@ void Editor::updateScreen()
 
 	if (currentView == Top)
 	{
-		Screen->drawMouseCursor(currentMode, planPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
 	}
 	else if (currentView == Front)
 	{
-		Screen->drawMouseCursor(currentMode, frontPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
 	}
 	else if (currentView == Right)
 	{
-		Screen->drawMouseCursor(currentMode, rightPosition,	LIGHT_BLUE);
+		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
 	}
 
 	//Display scale
@@ -202,40 +203,44 @@ void Editor::updateScreen()
 	Screen->displayString("%", 2, 2, WHITE);
 
 	//Display mouse cursor world coordinates
-	Screen->displayValue(worldPosition.x, 4, 60, 2, RED		);
-	Screen->displayValue(worldPosition.y, 4, 40, 2, GREEN	);
-	Screen->displayValue(worldPosition.z, 4, 20, 2, BLUE	);
+	Screen->displayValue(worldPosition.x, 4, 60, 2, RED);
+	Screen->displayValue(worldPosition.y, 4, 40, 2, GREEN);
+	Screen->displayValue(worldPosition.z, 4, 20, 2, BLUE);
 
 	//Draw axes
-	Cam->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED	, Screen->pixelBuffer);
-	Cam->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN	, Screen->pixelBuffer);
-	Cam->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE	, Screen->pixelBuffer);
+	Cam->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED, Screen->pixelBuffer);
+	Cam->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN, Screen->pixelBuffer);
+	Cam->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE, Screen->pixelBuffer);
+}
 
+
+void Editor::updateLines()
+{
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 	{
 		if (!Model->isLine3Deleted(i))
 		{
 			line3 tempLine = Model->getLine3(i);
-			screenCoord tempStart	= world2screen(tempLine.vert[0]);
-			screenCoord tempEnd		= world2screen(tempLine.vert[1]);
-			
-			if (Model->isLine3Selected(i))						
+			screenCoord tempStart = world2screen(tempLine.vert[0]);
+			screenCoord tempEnd = world2screen(tempLine.vert[1]);
+
+			if (Model->isLine3Selected(i))
 			{
 				Cam->drawLine(tempStart, tempEnd, 1, RED, Screen->pixelBuffer);
-				if (clicksInQueue > 0)// && tempLine.id == currentEdit)
+				if (clicksInQueue > 0 && tempLine.id == currentEdit)
 				{
 					worldCoord move = subVectors2(mouseBeforeZoom, movementStart);
 					if (isOrthoOn) { this->alignToAxis(&move); }
 					screenCoord currentPosition = world2screen(addVectors2(movementStart, move));
 					if (startVertMoving)
 					{
-						Cam->drawLine(currentPosition,				tempEnd,			1, ORANGE,		Screen->pixelBuffer);
-						Cam->drawLine(world2screen(movementStart),	currentPosition,	4, DARK_GRAY,	Screen->pixelBuffer);
+						Cam->drawLine(currentPosition, tempEnd, 1, ORANGE, Screen->pixelBuffer);
+						Cam->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY, Screen->pixelBuffer);
 					}
 					if (endVertMoving)
 					{
-						Cam->drawLine(tempStart,					currentPosition,	1, ORANGE,		Screen->pixelBuffer);
-						Cam->drawLine(world2screen(movementStart),	currentPosition,	4, DARK_GRAY,	Screen->pixelBuffer);
+						Cam->drawLine(tempStart, currentPosition, 1, ORANGE, Screen->pixelBuffer);
+						Cam->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY, Screen->pixelBuffer);
 					}
 				}
 				else if (clicksInQueue == 0)
@@ -243,21 +248,21 @@ void Editor::updateScreen()
 					if (abs(tempStart.x - mousePosition.x) <= 5 &&
 						abs(tempStart.y - mousePosition.y) <= 5)
 					{
-						Cam->drawSpot(tempStart, RED, Screen->pixelBuffer);
+						Cam->drawSpot(tempStart,	RED, Screen->pixelBuffer);
 					}
 					if (abs(tempEnd.x - mousePosition.x) <= 5 &&
 						abs(tempEnd.y - mousePosition.y) <= 5)
 					{
-						Cam->drawSpot(tempEnd, RED, Screen->pixelBuffer);
+						Cam->drawSpot(tempEnd,		RED, Screen->pixelBuffer);
 					}
 				}
 			}
 			else
 			{
-				Cam->drawLine(tempStart, tempEnd, 1, BLUE,	Screen->pixelBuffer);
+				Cam->drawLine(tempStart, tempEnd, 1, BLUE, Screen->pixelBuffer);
 			}
 		}
-		if (currentMode == Relocation && clicksInQueue == 1)
+		if (currentMode == Relocation	&& clicksInQueue == 1)
 		{
 			if (Model->isLine3Selected(i))						//Draw all visible lines currently being moved
 			{
@@ -272,13 +277,13 @@ void Editor::updateScreen()
 				tempLine.vert[1].y -= tempMove.y;
 				tempLine.vert[1].z -= tempMove.z;
 
-				screenCoord tempStart	= world2screen(tempLine.vert[0]);
-				screenCoord tempEnd		= world2screen(tempLine.vert[1]);
+				screenCoord tempStart = world2screen(tempLine.vert[0]);
+				screenCoord tempEnd = world2screen(tempLine.vert[1]);
 
 				Cam->drawLine(tempStart, tempEnd, 1, ORANGE, Screen->pixelBuffer);
 			}
 		}
-		if (currentMode == Rotation && clicksInQueue == 2)		//Draw all visible lines currently being rotated
+		if (currentMode == Rotation		&& clicksInQueue == 2)		//Draw all visible lines currently being rotated
 		{
 			if (Model->isLine3Selected(i))
 			{
@@ -300,7 +305,11 @@ void Editor::updateScreen()
 			}
 		}
 	}
+}
 
+
+void Editor::updateVertices()
+{
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
 		if (!Model->isVertex3Deleted(i))						//Draw all visible vertices
@@ -309,11 +318,11 @@ void Editor::updateScreen()
 			screenCoord temp = world2screen(tempVert.pos);
 			if (Model->isVertex3Selected(i))
 			{
-				Cam->drawSpot(temp, RED,	Screen->pixelBuffer);
+				Cam->drawSpot(temp, RED, Screen->pixelBuffer);
 			}
 			else
 			{
-				Cam->drawSpot(temp, BLUE,	Screen->pixelBuffer);
+				Cam->drawSpot(temp, BLUE, Screen->pixelBuffer);
 			}
 		}
 		if (currentMode == Relocation && clicksInQueue == 1)
@@ -321,7 +330,7 @@ void Editor::updateScreen()
 			if (Model->isVertex3Selected(i))					//Draw all visible vertices currently being moved
 			{
 				vertex3 tempVert = Model->getVertex3(i);
-				worldCoord tempMove	= subVectors2(movementStart, mouseBeforeZoom);
+				worldCoord tempMove = subVectors2(movementStart, mouseBeforeZoom);
 				if (isOrthoOn) { this->alignToAxis(&tempMove); }
 				tempVert.pos.x -= tempMove.x;
 				tempVert.pos.y -= tempMove.y;
@@ -334,23 +343,27 @@ void Editor::updateScreen()
 		{
 			if (Model->isVertex3Selected(i))
 			{
-				vertex3 tempVert		= Model->getVertex3(i);
-				worldCoord startVect	= unitVector2(subVectors2(rotationStart,	rotationCentre));
+				vertex3 tempVert = Model->getVertex3(i);
+				worldCoord startVect = unitVector2(subVectors2(rotationStart, rotationCentre));
 				if (isOrthoOn)
 				{
 					worldCoord temp = subVectors2(mouseBeforeZoom, rotationCentre);
 					this->alignToAxis(&temp);
 					mouseBeforeZoom = addVectors2(rotationCentre, temp);
 				}
-				worldCoord endVect		= unitVector2(subVectors2(mouseBeforeZoom,	rotationCentre));
-				double rotAngle			= calculateAngle(startVect, endVect);
-				tempVert.pos			= rotate2(tempVert.pos, currentView, rotationCentre, rotAngle);
-				screenCoord temp		= world2screen(tempVert.pos);
+				worldCoord endVect = unitVector2(subVectors2(mouseBeforeZoom, rotationCentre));
+				double rotAngle = calculateAngle(startVect, endVect);
+				tempVert.pos = rotate2(tempVert.pos, currentView, rotationCentre, rotAngle);
+				screenCoord temp = world2screen(tempVert.pos);
 				Cam->drawSpot(temp, ORANGE, Screen->pixelBuffer);
 			}
 		}
 	}
+}
 
+
+void Editor::hintResult()
+{
 	if (currentMode == Relocation)								//Hint line of movement
 	{
 		if (clicksInQueue == 1)
@@ -405,6 +418,18 @@ void Editor::updateScreen()
 			Cam->drawLine(world2screen(movementStart), world2screen(tempEnd), 1, BLUE, Screen->pixelBuffer);
 		}
 	}
+}
+
+
+void Editor::updateScreen()
+{
+	this->updateUtilities();
+
+	this->updateLines();
+
+	this->updateVertices();
+
+	this->hintResult();
 
 	this->drawIcons();
 }
@@ -495,7 +520,7 @@ void Editor::leftMouseClick(screenCoord X)
 						screenCoord tempStart	= world2screen(tempLine.vert[0]);
 						screenCoord tempEnd		= world2screen(tempLine.vert[1]);
 
-						if (clicksInQueue > 0)// && tempLine.id == currentEdit)
+						if (clicksInQueue > 0 && tempLine.id == currentEdit)
 						{
 							movementEnd = screen2world(X);
 							worldCoord move = subVectors2(movementEnd, movementStart);
@@ -504,7 +529,7 @@ void Editor::leftMouseClick(screenCoord X)
 							if (endVertMoving	) { Model->moveLine3EndPoint(i, 1, currentView, move); }
 							startVertMoving = 0;
 							endVertMoving	= 0;
-							//currentEdit		= 0;
+							currentEdit		= 0;
 							clicksInQueue	= 0;
 						}
 						else if (clicksInQueue == 0)
@@ -515,7 +540,7 @@ void Editor::leftMouseClick(screenCoord X)
 								movementStart	= tempLine.vert[0];
 								startVertMoving = 1;
 								endVertMoving	= 0;
-								//currentEdit		= tempLine.id;
+								currentEdit		= tempLine.id;
 								clicksInQueue++;						
 							}
 							if (abs(tempEnd.x - mousePosition.x) <= 5 &&
@@ -524,7 +549,7 @@ void Editor::leftMouseClick(screenCoord X)
 								movementStart	= tempLine.vert[1];
 								startVertMoving = 0;
 								endVertMoving	= 1;
-								//currentEdit		= tempLine.id;
+								currentEdit		= tempLine.id;
 								clicksInQueue++;				
 							}
 						}
@@ -551,6 +576,7 @@ void Editor::leftMouseClick(screenCoord X)
 			{
 				movementEnd = screen2world(X);
 				this->drawLine();
+				currentID++;
 				clicksInQueue = 0;
 			}
 		}

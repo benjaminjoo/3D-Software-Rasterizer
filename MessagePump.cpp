@@ -74,12 +74,12 @@ void MessagePump::HandleUserEvents()
 			if (event.wheel.y > 0)
 			{
 				E->scale *= 1.2f;
-				E->updateZoom();
+				E->compensateZoom();
 			}
 			else if (event.wheel.y < 0)
 			{
 				E->scale *= (1.0f / 1.2f);
-				E->updateZoom();
+				E->compensateZoom();
 			}
 		}
 
@@ -88,7 +88,7 @@ void MessagePump::HandleUserEvents()
 			mouseAiming = true;
 			if (event.button.button == SDL_BUTTON_MIDDLE)
 			{
-				E->updatePan();
+				E->compensatePan();
 			}
 		}
 	}

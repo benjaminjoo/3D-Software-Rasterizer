@@ -32,6 +32,7 @@ public:
 	bool				isGridSnapOn;
 	bool				isOrthoOn;
 
+	int					maxUndo;
 	int					currentID;
 	int					clicksInQueue;
 	int					currentEdit;
@@ -71,9 +72,13 @@ public:
 	screenCoord world2screen(worldCoord);
 
 	void updateWorldPosition();
-	void updatePan();
-	void updateZoom();
+	void compensatePan();
+	void compensateZoom();
 	void updateScreen();
+	void updateUtilities();
+	void updateLines();
+	void updateVertices();
+	void hintResult();
 
 	void drawIcons();
 
