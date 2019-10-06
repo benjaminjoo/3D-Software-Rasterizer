@@ -31,12 +31,14 @@ public:
 	void deselectVertex3byID(int);
 	void deleteVertex3byID(int);
 	void moveVertex3byID(int, worldCoord);
+	void copyVertex3byID(int, int, worldCoord);
 	void rotVertex3byID(int, Side, worldCoord, double);
 
 	void selectVertex3byIndex(int);
 	void deselectVertex3byIndex(int);
 	void deleteVertex3byIndex(int);
 	void moveVertex3byIndex(int, worldCoord);
+	void copyVertex3byIndex(int, int, worldCoord);
 	void rotVertex3byIndex(int, Side, worldCoord, double);
 
 	void selectLine3byIndex(int);

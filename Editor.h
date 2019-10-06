@@ -91,6 +91,8 @@ public:
 	void activateLineDrawing();
 	void activateRelocation();
 	void activateRotation();
+	void activateCopyRelocation();
+	void activateCopyRotation();
 
 	void activateTopView();
 	void activateFrontView();
@@ -107,13 +109,16 @@ public:
 	void flattenVector(worldCoord*);
 	double calculateAngle(worldCoord rotStart, worldCoord rotEnd);
 
+	void selectAll();
 	void deselectAll();
 
 	void drawLine();
 
 	void deleteSelected();
 	void moveSelected();
+	void copyMoveSelected();
 	void rotateSelected();
+	void copyRotateSelected();
 
 	void quickSave();
 };

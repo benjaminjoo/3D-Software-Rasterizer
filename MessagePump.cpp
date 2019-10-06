@@ -46,6 +46,9 @@ void MessagePump::HandleUserEvents()
 			case SDLK_r:
 				E->activateRotation();
 				break;
+			case SDLK_c:
+				E->activateCopyRelocation();
+				break;
 			case SDLK_o:
 				E->toggleObjectSnap();
 				break;
@@ -70,6 +73,12 @@ void MessagePump::HandleUserEvents()
 				E->switchOrthoOff();
 				break;
 			}
+		}
+
+		const Uint8* state = SDL_GetKeyboardState(nullptr);
+		if (state[SDL_SCANCODE_A] && state[SDL_SCANCODE_LCTRL])
+		{
+			E->selectAll();
 		}
 
 		if (event.type == SDL_MOUSEWHEEL)

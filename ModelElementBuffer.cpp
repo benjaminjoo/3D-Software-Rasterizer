@@ -71,6 +71,29 @@ void ModelElementBuffer::moveVertex3byID(int ID, worldCoord move)
 }
 
 
+void ModelElementBuffer::copyVertex3byID(int ID, int newID, worldCoord move)
+{
+	vertex3 newTemp;
+
+	for (auto i = 0; i < vertex3Buffer.size(); i++)
+	{
+		if (vertex3Buffer[i].id == ID)
+		{
+			newTemp.id = newID;
+			newTemp.pos = vertex3Buffer[i].pos;
+			newTemp.selected = true;
+			newTemp.deleted = false;
+
+			newTemp.pos.x += move.x;
+			newTemp.pos.y += move.y;
+			newTemp.pos.z += move.z;
+
+			vertex3Buffer.push_back(newTemp);
+		}
+	}
+}
+
+
 void ModelElementBuffer::rotVertex3byID(int ID, Side currentView, worldCoord origin, double angle)
 {
 	for (auto i = 0; i < vertex3Buffer.size(); i++)
@@ -107,6 +130,23 @@ void ModelElementBuffer::moveVertex3byIndex(int i, worldCoord move)
 	vertex3Buffer[i].pos.x += move.x;
 	vertex3Buffer[i].pos.y += move.y;
 	vertex3Buffer[i].pos.z += move.z;
+}
+
+
+void ModelElementBuffer::copyVertex3byIndex(int i, int newID, worldCoord move)
+{
+	vertex3 newTemp;
+
+	newTemp.id			= newID;
+	newTemp.pos			= vertex3Buffer[i].pos;
+	newTemp.selected	= true;
+	newTemp.deleted		= false;
+
+	newTemp.pos.x += move.x;
+	newTemp.pos.y += move.y;
+	newTemp.pos.z += move.z;
+
+	vertex3Buffer.push_back(newTemp);
 }
 
 

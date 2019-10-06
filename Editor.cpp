@@ -75,13 +75,13 @@ worldCoord Editor::screen2world(screenCoord Sc)
 		temp.y = ((double)(Sc.y) / scale) + viewportCentre.y;
 		temp.z = 0.0f;
 	}
-	if (currentView == Front)
+	else if (currentView == Front)
 	{
 		temp.x = ((double)(Sc.x) / scale) + viewportCentre.x;
 		temp.y = 0.0f;
 		temp.z = ((double)(Sc.y) / scale) + viewportCentre.y;
 	}
-	if (currentView == Right)
+	else if (currentView == Right)
 	{
 		temp.x = 0.0f;
 		temp.y = ((double)(Sc.x) / scale) + viewportCentre.x;
@@ -189,34 +189,25 @@ void Editor::updateUtilities()
 	if (currentView == Top)
 	{
 		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
-		if (isObjectSnapOn)
+		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
 		{
-			if (this->snapToVert(&mouseBeforeZoom))
-			{
-				Screen->drawSnapTarget(planPosition, WHITE);
-			}
+			Screen->drawSnapTarget(planPosition, WHITE);
 		}
 	}
 	else if (currentView == Front)
 	{
 		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
-		if (isObjectSnapOn)
+		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
 		{
-			if (this->snapToVert(&mouseBeforeZoom))
-			{
-				Screen->drawSnapTarget(frontPosition, WHITE);
-			}
+			Screen->drawSnapTarget(frontPosition, WHITE);
 		}
 	}
 	else if (currentView == Right)
 	{
 		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
-		if (isObjectSnapOn)
+		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
 		{
-			if (this->snapToVert(&mouseBeforeZoom))
-			{
-				Screen->drawSnapTarget(rightPosition, WHITE);
-			}
+			Screen->drawSnapTarget(rightPosition, WHITE);
 		}
 	}
 
@@ -347,7 +338,7 @@ void Editor::updateVertices()
 				Cam->drawSpot(temp, BLUE, Screen->pixelBuffer);
 			}
 		}
-		if (currentMode == Relocation && clicksInQueue == 1)
+		if ((currentMode == Relocation || currentMode == CopyRelocation) && clicksInQueue == 1)
 		{
 			if (Model->isVertex3Selected(i))					//Draw all visible vertices currently being moved
 			{
@@ -386,7 +377,7 @@ void Editor::updateVertices()
 
 void Editor::hintResult()
 {
-	if (currentMode == Relocation)								//Hint line of movement
+	if (currentMode == Relocation || currentMode == CopyRelocation)								//Hint line of movement
 	{
 		if (clicksInQueue == 1)
 		{
@@ -618,6 +609,21 @@ void Editor::leftMouseClick(screenCoord X)
 				clicksInQueue = 0;
 			}
 		}
+		if (currentMode == CopyRelocation)
+		{
+			if (clicksInQueue == 0)
+			{
+				movementStart = P;
+				clicksInQueue++;
+			}
+			else
+			{
+				movementEnd = P;
+				this->copyMoveSelected();
+				//currentID++;
+				clicksInQueue = 0;
+			}
+		}
 		if (currentMode == Rotation)
 		{
 			if (clicksInQueue == 0)
@@ -745,6 +751,30 @@ void Editor::activateRotation()
 }
 
 
+void Editor::activateCopyRelocation()
+{
+	currentTool = copy_move;
+	currentMode = CopyRelocation;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+}
+
+
+void Editor::activateCopyRotation()
+{
+	currentTool = copy_rotate;
+	currentMode = CopyRotation;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+}
+
+
 void Editor::activateTopView()
 {
 	currentView = Top;
@@ -810,8 +840,8 @@ bool Editor::snapToVert(worldCoord* P)
 	{
 		vertex3 tempW = Model->getVertex3(i);
 		screenCoord tempS = world2screen(tempW.pos);	
-		if (abs(tempP.x - tempS.x) < 10 &&
-			abs(tempP.y - tempS.y) < 10)
+		if (abs(tempP.x - tempS.x) < 5 &&
+			abs(tempP.y - tempS.y) < 5)
 		{
 			*P = tempW.pos;
 			snapped = true;
@@ -823,14 +853,14 @@ bool Editor::snapToVert(worldCoord* P)
 		worldCoord	tempEnd		= Model->getLine3(i).vert[1];
 		screenCoord tempStartS	= world2screen(tempStart);
 		screenCoord tempEndS	= world2screen(tempEnd);
-		if (abs(tempP.x - tempStartS.x	) < 10 &&
-			abs(tempP.y - tempStartS.y	) < 10)
+		if (abs(tempP.x - tempStartS.x	) < 5 &&
+			abs(tempP.y - tempStartS.y	) < 5)
 		{
 			*P = tempStart;
 			snapped = true;
 		}
-		if (abs(tempP.x - tempEndS.x	) < 10 &&
-			abs(tempP.y - tempEndS.y	) < 10)
+		if (abs(tempP.x - tempEndS.x	) < 5 &&
+			abs(tempP.y - tempEndS.y	) < 5)
 		{
 			*P = tempEnd;
 			snapped = true;
@@ -912,6 +942,20 @@ double Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
 }
 
 
+void Editor::selectAll()
+{
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
+	{
+		Model->selectVertex3byIndex(i);
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		Model->selectLine3byIndex(i);
+	}
+	clicksInQueue = 0;
+}
+
+
 void Editor::deselectAll()
 {
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
@@ -975,6 +1019,41 @@ void Editor::moveSelected()
 }
 
 
+void Editor::copyMoveSelected()
+{
+	worldCoord move = subVectors2(movementEnd, movementStart);
+	if (isOrthoOn) { this->alignToAxis(&move); }
+	auto nVert = Model->getVertex3BufferSize();
+	unsigned int nSelectedVert = 0;
+	for (auto i = 0; i < nVert; i++)
+		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
+			nSelectedVert++;
+
+	std::unique_ptr<vertex3[]> tempVerts(new vertex3[nSelectedVert]);
+	unsigned int vCount = 0;
+	for (auto i = 0; i < nVert; i++)
+	{
+		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
+		{
+			tempVerts[vCount].deleted = false;
+			tempVerts[vCount].selected = true;
+			tempVerts[vCount].id = currentID;
+			tempVerts[vCount].pos = Model->getVertex3(i).pos;
+
+			tempVerts[vCount].pos.x += move.x;
+			tempVerts[vCount].pos.y += move.y;
+			tempVerts[vCount].pos.z += move.z;
+
+			vCount++;
+		}
+	}
+	for (auto i = 0; i < nSelectedVert; i++)
+	{
+		Model->addVertex3(tempVerts[i]);
+	}
+}
+
+
 void Editor::rotateSelected()
 {
 	worldCoord startVect = unitVector2(subVectors2(rotationStart, rotationCentre));
@@ -994,6 +1073,12 @@ void Editor::rotateSelected()
 			Model->rotLine3byIndex(i, currentView, rotationCentre, rotationAngle);
 		}
 	}
+}
+
+
+void Editor::copyRotateSelected()
+{
+
 }
 
 
