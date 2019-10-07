@@ -77,7 +77,7 @@ BezierPatch::~BezierPatch()
 
 void BezierPatch::setControlPoint(unsigned int p, vect3 V)
 {
-	if (p < this->getTotalVert())
+	if (p < 9)
 	{
 		ctrlP[p] = V;
 	}

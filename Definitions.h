@@ -46,7 +46,7 @@ enum Side { Bottom, Top, Back, Front, Left, Right };
 enum editingMode { Selection, Placement, LineDrawing, Relocation, Rotation, CopyRelocation, CopyRotation };
 
 
-enum tool { none, arrow, cross, line, move, rotate, copy_move, copy_rotate, view_top, view_front, view_side };
+enum tool { none, arrow, cross, line, move, rotate, copy_move, copy_rotate, view_top, view_front, view_side, obj_snap, grid_snap};
 
 
 enum toolStatus { active, inactive };

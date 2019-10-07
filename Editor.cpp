@@ -40,6 +40,9 @@ Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
 	frontViewButton = { Screen, 6, 0, false,	view_front,	LIGHT_GRAY };
 	sideViewButton	= { Screen, 7, 0, false,	view_side,	LIGHT_GRAY };
 
+	objSnapButton	= { Screen, 8, 0, false,	obj_snap,	LIGHT_GRAY };
+	grdSnapButton	= { Screen, 9, 0, false,	grid_snap,	LIGHT_GRAY };
+
 	scale			= 1.0f;
 	tolerance		= toler;
 
@@ -97,7 +100,7 @@ worldCoord Editor::screen2world(screenCoord Sc)
 
 	return temp;
 }
-
+//
 
 screenCoord Editor::world2screen(worldCoord Wc)
 {
@@ -121,7 +124,7 @@ screenCoord Editor::world2screen(worldCoord Wc)
 
 	return temp;
 }
-
+//
 
 void Editor::updateWorldPosition()
 {
@@ -144,7 +147,7 @@ void Editor::updateWorldPosition()
 		worldPosition.z = -(viewportCentre.y + (double)rightPosition.y / scale);
 	}
 }
-
+//
 
 void Editor::compensatePan()
 {
@@ -155,7 +158,7 @@ void Editor::compensatePan()
 
 	mousePosition = dragStart;
 }
-
+//
 
 void Editor::compensateZoom()
 {
@@ -177,7 +180,7 @@ void Editor::compensateZoom()
 		viewportCentre.y += (mouseBeforeZoom.z - mouseAfterZoom.z);
 	}
 }
-
+//
 
 void Editor::updateUtilities()
 {
@@ -225,7 +228,7 @@ void Editor::updateUtilities()
 	Cam->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN, Screen->pixelBuffer);
 	Cam->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE, Screen->pixelBuffer);
 }
-
+//
 
 void Editor::updateLines()
 {
@@ -275,7 +278,7 @@ void Editor::updateLines()
 				Cam->drawLine(tempStart, tempEnd, 1, BLUE, Screen->pixelBuffer);
 			}
 		}
-		if (currentMode == Relocation	&& clicksInQueue == 1)
+		if ((currentMode == Relocation || currentMode == CopyRelocation)	&& clicksInQueue == 1)
 		{
 			if (Model->isLine3Selected(i))						//Draw all visible lines currently being moved
 			{
@@ -459,6 +462,9 @@ void Editor::drawIcons()
 	topViewButton.displayIcon();
 	frontViewButton.displayIcon();
 	sideViewButton.displayIcon();
+
+	objSnapButton.displayIcon();
+	grdSnapButton.displayIcon();
 }
 
 
@@ -620,7 +626,6 @@ void Editor::leftMouseClick(screenCoord X)
 			{
 				movementEnd = P;
 				this->copyMoveSelected();
-				//currentID++;
 				clicksInQueue = 0;
 			}
 		}
@@ -685,6 +690,13 @@ void Editor::leftMouseClick(screenCoord X)
 			break;
 			case 7:
 				this->activateRightView();
+			break;
+
+			case 8:
+				this->toggleObjectSnap();
+			break;
+			case 9:
+				this->toggleGridSnap();
 			break;
 		}	
 	}
@@ -805,12 +817,28 @@ void Editor::activateRightView()
 void Editor::toggleObjectSnap()
 {
 	isObjectSnapOn = isObjectSnapOn ? false : true;
+	if (isObjectSnapOn)
+	{
+		objSnapButton.turnOn();
+	}
+	else
+	{
+		objSnapButton.turnOff();
+	}
 }
 
 
 void Editor::toggleGridSnap()
 {
 	isGridSnapOn = isGridSnapOn ? false : true;
+	if (isGridSnapOn)
+	{
+		grdSnapButton.turnOn();
+	}
+	else
+	{
+		grdSnapButton.turnOff();
+	}
 }
 
 
@@ -1023,6 +1051,7 @@ void Editor::copyMoveSelected()
 {
 	worldCoord move = subVectors2(movementEnd, movementStart);
 	if (isOrthoOn) { this->alignToAxis(&move); }
+
 	auto nVert = Model->getVertex3BufferSize();
 	unsigned int nSelectedVert = 0;
 	for (auto i = 0; i < nVert; i++)
@@ -1048,9 +1077,40 @@ void Editor::copyMoveSelected()
 		}
 	}
 	for (auto i = 0; i < nSelectedVert; i++)
-	{
 		Model->addVertex3(tempVerts[i]);
+
+	auto nLine = Model->getLine3BufferSize();
+	unsigned int nSelectedLine = 0;
+	for (auto i = 0; i < nLine; i++)
+		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
+			nSelectedLine++;
+
+	std::unique_ptr<line3[]> tempLines(new line3[nSelectedLine]);
+	unsigned int lCount = 0;
+	for (auto i = 0; i < nLine; i++)
+	{
+		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
+		{
+			tempLines[lCount].deleted = false;
+			tempLines[lCount].selected = true;
+			tempLines[lCount].id = currentID;
+			tempLines[lCount].vert[0] = Model->getLine3(i).vert[0];
+			tempLines[lCount].vert[1] = Model->getLine3(i).vert[1];
+
+			tempLines[lCount].vert[0].x += move.x;
+			tempLines[lCount].vert[0].y += move.y;
+			tempLines[lCount].vert[0].z += move.z;
+
+			tempLines[lCount].vert[1].x += move.x;
+			tempLines[lCount].vert[1].y += move.y;
+			tempLines[lCount].vert[1].z += move.z;
+
+			lCount++;
+		}
 	}
+
+	for (auto i = 0; i < nSelectedLine; i++)
+		Model->addLine3(tempLines[i]);
 }
 
 

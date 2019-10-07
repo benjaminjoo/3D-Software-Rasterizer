@@ -57,6 +57,12 @@ void Button::displayIcon()
 	case view_side:
 		currentIcon = side_inactive;
 		break;
+	case obj_snap:
+		currentIcon = osnap_inactive;
+		break;
+	case grid_snap:
+		currentIcon = grdsnap_inactive;
+		break;
 	default:
 		currentIcon = blank;
 		break;

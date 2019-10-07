@@ -25,6 +25,9 @@ public:
 	Button				frontViewButton;
 	Button				sideViewButton;
 
+	Button				objSnapButton;
+	Button				grdSnapButton;
+
 	Side				currentView;
 	editingMode			currentMode;
 	tool				currentTool;
