@@ -92,6 +92,13 @@ struct worldCoord
 	double x;
 	double y;
 	double z;
+
+	worldCoord	operator + 	(const worldCoord&);
+	worldCoord	operator - 	(const worldCoord&);
+	worldCoord	operator += (const worldCoord&);
+	worldCoord	operator -= (const worldCoord&);
+	worldCoord	operator ^ 	(const worldCoord&);	//Cross Product
+	double		operator * 	(const worldCoord&);	//Dot Product
 };
 
 
@@ -493,7 +500,7 @@ coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
 
 Uint32 getColour(const unsigned char a, const unsigned char r, const unsigned char g, const unsigned char b);
 
-Uint32 modifyColour(const Uint32, const double);
+Uint32 modifyColour(const Uint32&, const double&);
 
 vect3 multiplyMxV(mat4x4 m, vect3 v);									//Multiplies 4x4 matrix and 1*4 column vector
 

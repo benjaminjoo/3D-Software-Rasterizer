@@ -49,6 +49,9 @@ void MessagePump::HandleUserEvents()
 			case SDLK_c:
 				E->activateCopyRelocation();
 				break;
+			case SDLK_e:
+				E->activateCopyRotation();
+				break;
 			case SDLK_o:
 				E->toggleObjectSnap();
 				break;

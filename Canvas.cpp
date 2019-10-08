@@ -161,6 +161,7 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 		}
 		break;
 		case Rotation:
+		case CopyRotation:
 		{
 			for (int j = 0; j < cursorSize; j++)
 			{

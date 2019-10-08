@@ -114,6 +114,8 @@ public:
 
 	void selectAll();
 	void deselectAll();
+	unsigned int nVertSelected();
+	unsigned int nLineSelected();
 
 	void drawLine();
 

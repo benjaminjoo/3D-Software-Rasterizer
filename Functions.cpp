@@ -42,7 +42,7 @@ Uint32 getColour(const unsigned char a, const unsigned char r, const unsigned ch
 }
 
 
-Uint32 modifyColour(const Uint32 inputColour, const double illumination)
+Uint32 modifyColour(const Uint32& inputColour, const double& illumination)
 {
 	bool red = true, green = true, blue = true;
 	byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
@@ -265,6 +265,42 @@ vect3 addVectors(vect3 a, vect3 b)
 	temp.w = 1.0;
 
 	return temp;
+}
+
+
+worldCoord worldCoord::operator + (const worldCoord& p)
+{
+	return { x + p.x, y + p.y, z + p.z };
+}
+
+
+worldCoord worldCoord::operator - (const worldCoord& p)
+{
+	return { x - p.x, y - p.y, z - p.z };
+}
+
+
+worldCoord worldCoord::operator += (const worldCoord& p)
+{
+	return { x += p.x, y += p.y, z += p.z };
+}
+
+
+worldCoord worldCoord::operator -= (const worldCoord& p)
+{
+	return { x -= p.x, y -= p.y, z -= p.z };
+}
+
+
+worldCoord worldCoord::operator ^ (const worldCoord& p)
+{
+	return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x };
+}
+
+
+double worldCoord::operator * (const worldCoord& p)
+{
+	return x * p.x + y * p.y + z * p.z;
 }
 
 
