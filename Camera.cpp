@@ -168,8 +168,12 @@ transform3d Camera::getTransformation()
 
 bool Camera::polyFacingCamera(triangle3dV P)
 {
+	//vect3 temp = { x, y, z, 1.0 };
+	//vect3 eyeVector = P.A - temp;
+	//return (P.N * eyeVector < 0) ? true : false;
+
 	vect3 eyeVector = subVectors(P.A, { x, y, z, 1.0 });
-	return (dotProduct(P.N, eyeVector) < 0) ? true : false;
+	return dotProduct(P.N, eyeVector) < 0.0f ? true : false;
 }
 
 
@@ -251,15 +255,15 @@ void Camera::clipLine(plane p, line3d* line)
 {
 	double t;
 
-	vect3 a		= subVectors(line->A, p.P);
-	double sA	= dotProduct(a, p.N);
-	vect3 b		= subVectors(line->B, p.P);
-	double sB	= dotProduct(b, p.N);
+	vect3 a		= line->A - p.P;
+	double sA	= a * p.N;
+	vect3 b		= line->B - p.P;
+	double sB	= b * p.N;
 
 	if (sign(sA) != sign(sB))
 	{
-		vect3 d = subVectors(line->B, line->A);
-		double dist = dotProduct(d, p.N);
+		vect3 d = line->B - line->A;
+		double dist = d * p.N;
 
 		if (sA > 0)
 		{
@@ -270,6 +274,8 @@ void Camera::clipLine(plane p, line3d* line)
 				line->B.x = line->A.x + t * (line->B.x - line->A.x);
 				line->B.y = line->A.y + t * (line->B.y - line->A.y);
 				line->B.z = line->A.z + t * (line->B.z - line->A.z);
+
+				//line->B = line->A + ((line->B - line->A) * t);
 			}
 		}
 		if (sB > 0)
@@ -281,6 +287,8 @@ void Camera::clipLine(plane p, line3d* line)
 				line->A.x = line->B.x - t * (line->A.x - line->B.x);
 				line->A.y = line->B.y - t * (line->A.y - line->B.y);
 				line->A.z = line->B.z - t * (line->A.z - line->B.z);
+
+				//line->A = line->B - ((line->A - line->B) * t);
 			}
 		}
 	}
@@ -307,7 +315,8 @@ bool Camera::insideFrustum(point3 point)
 
 bool Camera::assertPointVis(plane plane, point3 Point)
 {
-	return dotProduct(subVectors(Point.P, plane.P), plane.N) >= 0 ? true : false;
+	//return dotProduct(subVectors(Point.P, plane.P), plane.N) >= 0 ? true : false;
+	return ((Point.P - plane.P) * plane.N) >= 0.0f ? true : false;
 }
 
 
@@ -366,17 +375,24 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 {
 	double t;
 	//vect3 a = subVectors(startV, p.P);
+	//vect3 a = startV - p.P;
 	vect3 a = { startV.x - p.P.x, startV.y - p.P.y, startV.z - p.P.z, 1.0 };
 	//double sStart = dotProduct(a, p.N);
+	//double sStart = a * p.N;
 	double sStart = a.x * p.N.x + a.y * p.N.y + a.z * p.N.z;
 	//vect3 b = subVectors(endV, p.P);
+	//vect3 b = endV - p.P;
 	vect3 b = { endV.x - p.P.x, endV.y - p.P.y, endV.z - p.P.z, 1.0 };
-	//double sEnd = dotProduct(b, p.N);
+	//double sEnd = dotProduct(b, p.N);	
+	//double sEnd = b * p.N;
 	double sEnd = b.x * p.N.x + b.y * p.N.y + b.z * p.N.z;
 	if (sign(sStart) != sign(sEnd))
 	{
-		vect3 d = subVectors(endV, startV);
-		//double dist = dotProduct(d, p.N);
+		//vect3 d = subVectors(endV, startV);
+		//vect3 d = endV - startV;
+		vect3 d = { endV.x - startV.x, endV.y - startV.y, endV.z - startV.z, 1.0f };
+		//double dist = dotProduct(d, p.N);	
+		//double dist = d * p.N;
 		double dist = d.x * p.N.x + d.y * p.N.y + d.z * p.N.z;
 		
 		if(sStart < 0)
@@ -389,6 +405,8 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 				vTemp[*nResult].y = startV.y + t * (endV.y - startV.y);
 				vTemp[*nResult].z = startV.z + t * (endV.z - startV.z);
 				vTemp[*nResult].w = startV.w + t * (endV.w - startV.w);
+
+				//vTemp[*nResult] = startV + ((endV - startV) * t);
 
 				uvTemp[*nResult].u = startUV.u + t * (endUV.u - startUV.u);
 				uvTemp[*nResult].v = startUV.v + t * (endUV.v - startUV.v);
@@ -407,6 +425,8 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 				vTemp[*nResult].z = endV.z - t * (startV.z - endV.z);
 				vTemp[*nResult].w = endV.w - t * (startV.w - endV.w);
 
+				//vTemp[*nResult] = endV - ((startV - endV) * t);
+
 				uvTemp[*nResult].u = endUV.u - t * (startUV.u - endUV.u);
 				uvTemp[*nResult].v = endUV.v - t * (startUV.v - endUV.v);
 
@@ -419,6 +439,8 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 				vTemp[*nResult].y = endV.y;
 				vTemp[*nResult].z = endV.z;
 				vTemp[*nResult].w = endV.w;
+
+				//vTemp[*nResult] = endV;
 
 				uvTemp[*nResult].u = endUV.u;
 				uvTemp[*nResult].v = endUV.v;
@@ -433,6 +455,8 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 			vTemp[*nResult].y = endV.y;
 			vTemp[*nResult].z = endV.z;
 			vTemp[*nResult].w = endV.w;
+
+			//vTemp[*nResult] = endV;
 
 			uvTemp[*nResult].u = endUV.u;
 			uvTemp[*nResult].v = endUV.v;
@@ -449,6 +473,8 @@ inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startU
 			vTemp[*nResult].y = endV.y;
 			vTemp[*nResult].z = endV.z;
 			vTemp[*nResult].w = endV.w;
+
+			//vTemp[*nResult] = endV;
 
 			uvTemp[*nResult].u = endUV.u;
 			uvTemp[*nResult].v = endUV.v;
@@ -688,8 +714,10 @@ inline textCoord Camera::getUVCoord(vect3 startV, vect3 endV, textCoord startC, 
 {
 	textCoord testC;
 
-	double a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
-	double b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
+	//double a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
+	//double b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
+	double a = (testV - startV) * (endV - startV);
+	double b = (endV - startV) * (endV - startV);
 
 	double d = (b != 0.0) ? (a / b) : (0.0);
 

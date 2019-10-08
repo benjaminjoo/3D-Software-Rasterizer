@@ -107,6 +107,21 @@ void gameplay()
 	Shapes Actors;
 
 	#include "bbtest.txt"
+	/**/
+	//Camera	Player(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.1, 99999.9, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	//LightSource lights[] = { LightSource(115.0, 45.0, 1.25) };
+	//BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	//quakeMap.readData();
+	//SolidBody* map = &quakeMap;
+	//Solids.addSolid(map);
+	//int nTxt = quakeMap.getTotalText();
+	//txt* quakeTextures = new txt[nTxt];
+	//for (int i = 0; i < nTxt; i++)
+	//{
+	//	quakeTextures[i] = quakeMap.getTextureData(i);
+	//}
+	//Solids.textureLoaderQ(nTxt, quakeTextures);
+	/**/
 
 	EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 

@@ -159,6 +159,14 @@ struct vect3
 	double y;
 	double z;
 	double w;
+
+	vect3	operator + 	(const vect3&);
+	vect3	operator - 	(const vect3&);
+	vect3	operator += (const vect3&);
+	vect3	operator -= (const vect3&);
+	vect3	operator ^ 	(const vect3&);		//Cross Product
+	double	operator * 	(const vect3&);		//Dot Product
+	vect3	operator *	(const double&);	//Scale
 };
 
 
@@ -460,11 +468,7 @@ vect3 invertVector(vect3 a);
 
 vect3 addVectors(vect3 a, vect3 b);
 
-worldCoord addVectors2(worldCoord a, worldCoord b);
-
-inline vect3 subVectors(vect3 a, vect3 b);
-
-worldCoord subVectors2(worldCoord a, worldCoord b);
+vect3 subVectors(vect3 a, vect3 b);
 
 vect3 halfwayPoint(vect3 a, vect3 b);
 
@@ -476,9 +480,7 @@ worldCoord unitVector2(worldCoord v);
 
 vect3 dirVector(double azm, double alt);
 
-inline double dotProduct(vect3 a, vect3 b);
-
-double dotProduct2(worldCoord a, worldCoord b);
+double dotProduct(vect3 a, vect3 b);
 
 worldCoord rotate2(worldCoord target, Side view, worldCoord origin, double angle);
 
@@ -491,8 +493,6 @@ double distPoint2Line(worldCoord P, Side view, line3 L);
 bool pointIsAroundLine(worldCoord P, Side view, line3 L);
 
 vect3 crossProduct(vect3 a, vect3 b);
-
-worldCoord crossProduct(worldCoord a, worldCoord b);
 
 vect3 midPoint(vect3 a, vect3 b);
 

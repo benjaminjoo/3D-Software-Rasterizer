@@ -354,7 +354,7 @@ void BSP3Loader::getTriangleData_(triangle3dV* T)
 				}
 				else if (idFaces[i].type == 3)
 				{
-					temp.N = unitVector(crossProduct(subVectors(temp.A, temp.B), subVectors(temp.C, temp.B)));
+					temp.N = unitVector((temp.A - temp.B) ^ (temp.C - temp.B));
 					temp.colour = getColour(0, 255, 127, 0);
 					temp.texture = 15;
 				}

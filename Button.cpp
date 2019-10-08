@@ -68,9 +68,9 @@ void Button::displayIcon()
 		break;
 	}
 
-	for (int j = 0; j < size.y; j++)
+	for (auto j = 0; j < size.y; j++)
 	{
-		for (int i = 0; i < size.x; i++)
+		for (auto i = 0; i < size.x; i++)
 		{
 			if (isActive)
 			{

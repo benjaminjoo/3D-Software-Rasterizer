@@ -3,7 +3,7 @@
 #include "SolidBody.h"
 #include <memory>
 
-class BezierPatch: public SolidBody
+class BezierPatch : public SolidBody
 {
 	unsigned int	lod;
 	vect3			ctrlP[9];
@@ -35,4 +35,39 @@ public:
 	vect3	getPosition();
 	void	constructShadowVolume(vect3);
 };
+
+//#pragma once
+//#include "Definitions.h"
+//#include "SolidBody.h"
+//#include <memory>
+//
+//class BezierPatch: public SolidBody
+//{
+//	unsigned int	lod;
+//	vect3			ctrlP[9];
+//	bool			isInsideOut;
+//
+//	Uint32			colour;
+//	int				texture;
+//
+//public:
+//	BezierPatch(int, int, Uint32);
+//	BezierPatch(int, vect3*);
+//	BezierPatch(int, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3);
+//	~BezierPatch();
+//
+//	void	setControlPoint(unsigned int, vect3);
+//	void	turnInsideOut();
+//
+//	int		getTotalVert();
+//	int		getTotalPoly();
+//
+//	void	getSpineCoord(vect3, vect3, vect3, std::shared_ptr<vect3[]>);
+//	vect3	getTangent(vect3, vect3, vect3, int);
+//
+//	void	getVertexData_(std::shared_ptr<vect3[]>, std::shared_ptr<vect3[]>);
+//	void	getTriangleData_(triangle3dV*);
+//	vect3	getPosition();
+//	void	constructShadowVolume(vect3);
+//};
 

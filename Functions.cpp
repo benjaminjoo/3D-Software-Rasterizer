@@ -268,6 +268,48 @@ vect3 addVectors(vect3 a, vect3 b)
 }
 
 
+vect3 vect3::operator + (const vect3& p)
+{
+	return { x + p.x, y + p.y, z + p.z, 1.0f };
+}
+
+
+vect3 vect3::operator - (const vect3& p)
+{
+	return { x - p.x, y - p.y, z - p.z, 1.0f };
+}
+
+
+vect3 vect3::operator += (const vect3& p)
+{
+	return { x += p.x, y += p.y, z += p.z, 1.0f };
+}
+
+
+vect3 vect3::operator -= (const vect3& p)
+{
+	return { x -= p.x, y -= p.y, z -= p.z, 1.0f };
+}
+
+
+vect3 vect3::operator ^ (const vect3& p)
+{
+	return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x, 1.0f };
+}
+
+
+double vect3::operator * (const vect3& p)
+{
+	return x * p.x + y * p.y + z * p.z;
+}
+
+
+vect3 vect3::operator * (const double& s)
+{
+	return { x * s, y * s, z * s, 1.0f };
+}
+
+
 worldCoord worldCoord::operator + (const worldCoord& p)
 {
 	return { x + p.x, y + p.y, z + p.z };
@@ -304,18 +346,6 @@ double worldCoord::operator * (const worldCoord& p)
 }
 
 
-worldCoord addVectors2(worldCoord a, worldCoord b)
-{
-	worldCoord temp;
-
-	temp.x = a.x + b.x;
-	temp.y = a.y + b.y;
-	temp.z = a.z + b.z;
-
-	return temp;
-}
-
-
 vect3 subVectors(vect3 a, vect3 b)
 {
 	vect3 temp;
@@ -324,18 +354,6 @@ vect3 subVectors(vect3 a, vect3 b)
 	temp.y = a.y - b.y;
 	temp.z = a.z - b.z;
 	temp.w = 1.0;
-
-	return temp;
-}
-
-
-worldCoord subVectors2(worldCoord a, worldCoord b)
-{
-	worldCoord temp;
-
-	temp.x = a.x - b.x;
-	temp.y = a.y - b.y;
-	temp.z = a.z - b.z;
 
 	return temp;
 }
@@ -408,15 +426,9 @@ double dotProduct(vect3 a, vect3 b)
 }
 
 
-double dotProduct2(worldCoord a, worldCoord b)
-{
-	return (a.x * b.x + a.y * b.y + a.z * b.z);
-}
-
-
 worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, double angle)
 {
-	worldCoord temp		= subVectors2(target, origin);
+	worldCoord temp		= target - origin;
 	worldCoord result	= { 0.0f, 0.0f, 0.0f };
 
 	if (currentView == Top)
@@ -454,13 +466,13 @@ double dotProductSquared(vect3 a, vect3 b)
 
 double distPoint2Plane(vect3 P, triangle3dV T)
 {
-	return abs(dotProduct(subVectors(T.A, P), T.N));
+	return abs((T.A - P) * T.N);
 }
 
 
 double distPoint2Line(worldCoord P, Side view, line3 L)
 {
-	worldCoord normal = rotate2(unitVector2(subVectors2(L.vert[1], L.vert[0])), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
+	worldCoord normal = rotate2(unitVector2(L.vert[1] - L.vert[0]), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
 	switch (view)
 	{
 	case Top:
@@ -473,7 +485,7 @@ double distPoint2Line(worldCoord P, Side view, line3 L)
 		normal.x = 0.0f;
 		break;
 	}
-	return abs(dotProduct2(subVectors2(L.vert[0], P), normal));
+	return abs((L.vert[0] - P) * normal);
 }
 
 
@@ -504,8 +516,8 @@ bool pointIsAroundLine(worldCoord P, Side view, line3 L)
 		}
 		break;
 	}
-	double sA = dotProduct2(subVectors2(B, A), subVectors2(A, P));
-	double sB = dotProduct2(subVectors2(B, A), subVectors2(B, P));
+	double sA = (B - A) * (A - P);
+	double sB = (B - A) * (B - P);
 
 	return (sign(sA) != sign(sB)) ? true : false;
 }
@@ -520,18 +532,6 @@ vect3 crossProduct(vect3 a, vect3 b)
 	t.z = a.x * b.y - a.y * b.x;
 
 	t.w = 1.0;
-
-	return t;
-}
-
-
-worldCoord crossProduct(worldCoord a, worldCoord b)
-{
-	worldCoord t;
-
-	t.x = a.y * b.z - a.z * b.y;
-	t.y = a.z * b.x - a.x * b.z;
-	t.z = a.x * b.y - a.y * b.x;
 
 	return t;
 }

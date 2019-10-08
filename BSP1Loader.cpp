@@ -51,7 +51,7 @@ void BSP1Loader::readData()
 	{
 		modelFile.read(version, 4);
 		int version_no = *((int*)version);
-
+		std::cout << "Version: " << version_no << std::endl;
 		for (int i = 0; i < 15; i++)
 		{
 			modelFile.read(offset, 4);
@@ -285,6 +285,10 @@ void BSP1Loader::readData()
 
 		delete[] offset;
 	}
+	else
+	{
+		std::cout << "Could not read .bsp file" << std::endl;
+	}
 	modelFile.close();
 
 	this->calculateTriangles();
@@ -344,7 +348,7 @@ void BSP1Loader::calculateTriangles()
 		std::string texture_name;
 		texture_name += miptexContainer[faceContainer[i].texinfo_id].name;
 
-		std::cout << texture_name << std::endl;
+		std::cout << texture_name.c_str() << std::endl;
 
 		int nEdge = faceContainer[i].ledge_num;
 
@@ -384,16 +388,16 @@ void BSP1Loader::calculateTriangles()
 			temp.B = vertexContainer[bIndex].P;
 			temp.C = vertexContainer[cIndex].P;
 
-			temp.N = unitVector(crossProduct(subVectors(temp.A, temp.B), subVectors(temp.C, temp.B)));
+			temp.N = unitVector((temp.A - temp.B) ^ (temp.C - temp.B));
 
 			temp.An = temp.Bn = temp.Cn = temp.N;
 
-			temp.At.u = (dotProduct(temp.A, S) + distS) * 1.6;
-			temp.At.v = (dotProduct(temp.A, T) + distT) * 1.6;
-			temp.Bt.u = (dotProduct(temp.B, S) + distS) * 1.6;
-			temp.Bt.v = (dotProduct(temp.B, T) + distT) * 1.6;
-			temp.Ct.u = (dotProduct(temp.C, S) + distS) * 1.6;
-			temp.Ct.v = (dotProduct(temp.C, T) + distT) * 1.6;
+			temp.At.u = ((temp.A * S) + distS) * 1.6;
+			temp.At.v = ((temp.A * T) + distT) * 1.6;
+			temp.Bt.u = ((temp.B * S) + distS) * 1.6;
+			temp.Bt.v = ((temp.B * T) + distT) * 1.6;
+			temp.Ct.u = ((temp.C * S) + distS) * 1.6;
+			temp.Ct.v = ((temp.C * T) + distT) * 1.6;
 
 			temp.colour = getColour(0, 255, 255, 255);
 
