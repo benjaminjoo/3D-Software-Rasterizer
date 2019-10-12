@@ -160,13 +160,13 @@ struct vect3
 	double z;
 	double w;
 
-	vect3	operator + 	(const vect3&);
-	vect3	operator - 	(const vect3&);
-	vect3	operator += (const vect3&);
-	vect3	operator -= (const vect3&);
-	vect3	operator ^ 	(const vect3&);		//Cross Product
-	double	operator * 	(const vect3&);		//Dot Product
-	vect3	operator *	(const double&);	//Scale
+	//vect3	operator + 	(const vect3&);
+	//vect3	operator - 	(const vect3&);
+	//vect3	operator += (const vect3&);
+	//vect3	operator -= (const vect3&);
+	//vect3	operator ^ 	(const vect3&);		//Cross Product
+	//double	operator * 	(const vect3&);		//Dot Product
+	//vect3	operator *	(const double&);	//Scale
 };
 
 

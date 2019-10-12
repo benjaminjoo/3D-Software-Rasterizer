@@ -388,16 +388,23 @@ void BSP1Loader::calculateTriangles()
 			temp.B = vertexContainer[bIndex].P;
 			temp.C = vertexContainer[cIndex].P;
 
-			temp.N = unitVector((temp.A - temp.B) ^ (temp.C - temp.B));
+			//temp.N = unitVector((temp.A - temp.B) ^ (temp.C - temp.B));
+			temp.N = unitVector(crossProduct(subVectors(temp.A, temp.B), subVectors(temp.C, temp.B)));
 
 			temp.An = temp.Bn = temp.Cn = temp.N;
 
-			temp.At.u = ((temp.A * S) + distS) * 1.6;
-			temp.At.v = ((temp.A * T) + distT) * 1.6;
-			temp.Bt.u = ((temp.B * S) + distS) * 1.6;
-			temp.Bt.v = ((temp.B * T) + distT) * 1.6;
-			temp.Ct.u = ((temp.C * S) + distS) * 1.6;
-			temp.Ct.v = ((temp.C * T) + distT) * 1.6;
+			//temp.At.u = ((temp.A * S) + distS) * 1.6;
+			temp.At.u = (dotProduct(temp.A, S) + distS) * 1.6f;
+			//temp.At.v = ((temp.A * T) + distT) * 1.6;
+			temp.At.v = (dotProduct(temp.A, T) + distT) * 1.6f;
+			//temp.Bt.u = ((temp.B * S) + distS) * 1.6;
+			temp.Bt.u = (dotProduct(temp.B, S) + distS) * 1.6f;
+			//temp.Bt.v = ((temp.B * T) + distT) * 1.6;
+			temp.Bt.v = (dotProduct(temp.B, T) + distT) * 1.6f;
+			//temp.Ct.u = ((temp.C * S) + distS) * 1.6;
+			temp.Ct.u = (dotProduct(temp.C, S) + distS) * 1.6f;
+			//temp.Ct.v = ((temp.C * T) + distT) * 1.6;
+			temp.Ct.v = (dotProduct(temp.C, T) + distT) * 1.6f;
 
 			temp.colour = getColour(0, 255, 255, 255);
 

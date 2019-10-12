@@ -267,7 +267,7 @@ vect3 addVectors(vect3 a, vect3 b)
 	return temp;
 }
 
-
+/*
 vect3 vect3::operator + (const vect3& p)
 {
 	return { x + p.x, y + p.y, z + p.z, 1.0f };
@@ -308,7 +308,7 @@ vect3 vect3::operator * (const double& s)
 {
 	return { x * s, y * s, z * s, 1.0f };
 }
-
+*/
 
 worldCoord worldCoord::operator + (const worldCoord& p)
 {
@@ -466,7 +466,8 @@ double dotProductSquared(vect3 a, vect3 b)
 
 double distPoint2Plane(vect3 P, triangle3dV T)
 {
-	return abs((T.A - P) * T.N);
+	//return abs((T.A - P) * T.N);
+	return abs(dotProduct(subVectors(T.A, P), T.N));
 }
 
 

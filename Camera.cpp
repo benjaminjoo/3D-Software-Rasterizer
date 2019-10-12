@@ -255,15 +255,21 @@ void Camera::clipLine(plane p, line3d* line)
 {
 	double t;
 
-	vect3 a		= line->A - p.P;
-	double sA	= a * p.N;
-	vect3 b		= line->B - p.P;
-	double sB	= b * p.N;
+	//vect3 a		= line->A - p.P;
+	vect3 a			= subVectors(line->A, p.P);
+	//double sA	= a * p.N;
+	double sA		= dotProduct(a, p.N);
+	//vect3 b		= line->B - p.P;
+	vect3 b			= subVectors(line->B, p.P);
+	//double sB	= b * p.N;
+	double sB		= dotProduct(b, p.N);
 
 	if (sign(sA) != sign(sB))
 	{
-		vect3 d = line->B - line->A;
-		double dist = d * p.N;
+		//vect3 d = line->B - line->A;
+		vect3 d = subVectors(line->B, line->A);
+		//double dist = d * p.N;
+		double dist = dotProduct(d, p.N);
 
 		if (sA > 0)
 		{
@@ -315,8 +321,8 @@ bool Camera::insideFrustum(point3 point)
 
 bool Camera::assertPointVis(plane plane, point3 Point)
 {
-	//return dotProduct(subVectors(Point.P, plane.P), plane.N) >= 0 ? true : false;
-	return ((Point.P - plane.P) * plane.N) >= 0.0f ? true : false;
+	return dotProduct(subVectors(Point.P, plane.P), plane.N) >= 0 ? true : false;
+	//return ((Point.P - plane.P) * plane.N) >= 0.0f ? true : false;
 }
 
 
@@ -714,10 +720,10 @@ inline textCoord Camera::getUVCoord(vect3 startV, vect3 endV, textCoord startC, 
 {
 	textCoord testC;
 
-	//double a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
-	//double b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
-	double a = (testV - startV) * (endV - startV);
-	double b = (endV - startV) * (endV - startV);
+	double a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
+	double b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
+	//double a = (testV - startV) * (endV - startV);
+	//double b = (endV - startV) * (endV - startV);
 
 	double d = (b != 0.0) ? (a / b) : (0.0);
 
