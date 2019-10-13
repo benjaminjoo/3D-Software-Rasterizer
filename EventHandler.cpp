@@ -19,8 +19,8 @@ EventHandler::EventHandler()
 	mouseLookBlocked	= false;
 
 	event				= { 0 };
-	player				= &Camera(1.0, 1.0, 1.5, 0.1, 0.05, PI * 0.5, PI, 0.0, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
+	//player				= &Camera(1.0, 1.0, 1.5, 0.1, 0.05, PI * 0.5, PI, 0.0, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	//screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
 	quit				= false;
 
@@ -32,8 +32,8 @@ EventHandler::EventHandler()
 	strafeP				= 0.0f;
 	riseP				= 0.0f;
 	tiltP				= 0.0f;
-	stepP				= 0.0f;
-	turnP				= 0.0f;
+	stepP				= 0.1f;
+	turnP				= 0.1f;
 
 	turnVmin			= PI * 0.5f;
 	turnVmax			= 3 * PI * 0.5f;
@@ -42,7 +42,7 @@ EventHandler::EventHandler()
 	maxIllumination		= 1.0f;
 }
 
-
+/*
 EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C)
 {
 	visualStyle			= wireframe;
@@ -59,8 +59,8 @@ EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C)
 	mouseLookBlocked	= false;
 
 	event				= { 0 };
-	player				= P;
-	screen				= C;
+	//player				= P;
+	//screen				= C;
 
 	quit				= false;
 
@@ -81,7 +81,7 @@ EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C)
 	torchIntensity		= 10000.0f;	//10.0f;
 	maxIllumination		= 1.0f;
 }
-
+*/
 
 EventHandler::~EventHandler()
 {
@@ -324,7 +324,7 @@ void EventHandler::HandleUserEvents()
 				mouseLookBlocked = mouseLookBlocked ? false : true;
 				break;
 			case SDLK_p:
-				player->outputImage(*screen);
+				//player->outputImage(*screen);
 				break;
 			case SDLK_KP_PLUS:
 				if (torchIntensity < 1000.0f)

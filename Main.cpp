@@ -1,8 +1,10 @@
 #define _CRT_SECURE_NO_DEPRECATE//
 
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL/SDL.h>
+#include <SDLImage/SDL_image.h>
+#include <GLEW/glew.h>
+#include <GLM/glm.hpp>
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
@@ -31,10 +33,12 @@
 #include "BSP3Loader.h"
 #include "BSP1Loader.h"
 #include "BezierPatch.h"
+#include "OpenGLCanvas.h"
+#include "OpenGLCamera.h"
 
 void editor()
 {
-	SDL_Window* window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	SDL_Window* window = SDL_CreateWindow("Software Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
 	SDL_Renderer* screen = SDL_CreateRenderer(window, -1, 0);
 
@@ -90,7 +94,7 @@ void editor()
 	SDL_Quit();
 }
 
-void gameplay()
+void software_renderer()
 {
 	SDL_Window*		window			= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
@@ -123,7 +127,9 @@ void gameplay()
 	//Solids.textureLoaderQ(nTxt, quakeTextures);
 	/**/
 
-	EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
+	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
+
+	EventHandler Controls;
 
 	Controls.torchIntensity = 10.0;
 
@@ -200,20 +206,49 @@ void gameplay()
 	SDL_Quit();
 }
 
+void opengl_renderer()
+{
+	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
+	OpenGLCamera Player(glm::vec3(0.0f, 0.0f, 0.0f), 90.0f, Screen.getAspect(), 0.01f, 999.9f);
 
+	EventHandler Controls;
+
+	Shapes Solids;
+	Shapes Actors;
+
+	while(!Controls.quit)
+	{
+		Screen.clear(0.5f, 0.5f, 1.0f, 0.0f);
+
+		Controls.HandleUserEvents();
+
+		Screen.update();
+	}
+}
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to use the Renderer <R> or the Editor <E> ?" << std::endl;
+	std::cout << "Do you want to use the Software Renderer <S> the OpenGL Renderer <O> or the Editor <E> ?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
-	if (userInput == 'r' || userInput == 'R')
+
+	switch (userInput)
 	{
-		gameplay();
-	}
-	else if (userInput == 'e' || userInput == 'E')
-	{
+	case 's':
+	case 'S':
+		software_renderer();
+		break;
+	case 'o':
+	case 'O':
+		opengl_renderer();
+		break;
+	case 'e':
+	case 'E':
 		editor();
+		break;
+	default:
+
+		break;
 	}
 
 	return 0;

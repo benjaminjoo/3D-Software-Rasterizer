@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
@@ -24,8 +24,8 @@ public:
 	bool mouseLookBlocked;
 
 	SDL_Event event;
-	Camera* player;
-	Canvas* screen;
+	//Camera* player;
+	//Canvas* screen;
 
 	bool quit;
 
@@ -47,7 +47,7 @@ public:
 	double			maxIllumination;
 
 	EventHandler();
-	EventHandler(double, double, Camera*, Canvas*);
+	//EventHandler(double, double, Camera*, Canvas*);
 	~EventHandler();
 
 	void HandleUserEvents();

@@ -1,8 +1,8 @@
 #include "Canvas.h"
 #include "Fonts.h"
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL/SDL.h>
+#include <SDLImage/SDL_image.h>
 
 
 Canvas::Canvas()

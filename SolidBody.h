@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Definitions.h"
-//DO NOT INCLUDE DERIVED CLASSES!!!
+
 
 class SolidBody
 {

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
-#include <SDL_image.h>
+#include <SDLImage/SDL_Image.h>
 #include "BSP1Loader.h"
 
 

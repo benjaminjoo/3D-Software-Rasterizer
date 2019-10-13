@@ -1,8 +1,7 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "Definitions.h"
-//#include "Camera.h"
 #include "Canvas.h"
 #include "Editor.h"
 #include "ModelElementBuffer.h"
