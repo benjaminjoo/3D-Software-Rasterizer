@@ -9,7 +9,7 @@
 class EventHandler
 {
 public:
-	//Context variables:
+
 	projectionStyle visualStyle;
 
 	bool gouraudShading;
@@ -24,8 +24,6 @@ public:
 	bool mouseLookBlocked;
 
 	SDL_Event event;
-	//Camera* player;
-	//Canvas* screen;
 
 	bool quit;
 
@@ -36,9 +34,11 @@ public:
 	double moveP;
 	double strafeP;
 	double riseP;
+	double tiltP;
+
 	double stepP;
 	double turnP;
-	double tiltP;
+	double sensitivity;
 
 	double turnVmin;
 	double turnVmax;
@@ -46,8 +46,7 @@ public:
 	double			torchIntensity;
 	double			maxIllumination;
 
-	EventHandler();
-	//EventHandler(double, double, Camera*, Canvas*);
+	EventHandler(double step, double turn, double sens);
 	~EventHandler();
 
 	void HandleUserEvents();

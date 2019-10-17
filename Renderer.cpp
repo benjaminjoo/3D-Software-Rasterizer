@@ -5,26 +5,26 @@
 
 Renderer::Renderer(Shapes* B, Shapes* A, LightSource* L, Camera* P, EventHandler* E)
 {
-	Solids = B;
-	Actors = A;
-	Sun = L;
-	Controls = E;
-	Player = P;
-	Entities = nullptr;
+	Solids			= B;
+	Actors			= A;
+	Sun				= L;
+	Controls		= E;
+	Player			= P;
+	Entities		= nullptr;
 
-	oldTime = 0;
-	newTime = 0;
-	frameTime = 0;
-	frameCounter = 0;
-	polyCounter = 0;
+	oldTime			= 0;
+	newTime			= 0;
+	frameTime		= 0;
+	frameCounter	= 0;
+	polyCounter		= 0;
 
-	collisionDist = 1.0;
+	collisionDist	= 1.0;
 
-	hRatio = Player->getHRatio();
-	vRatio = Player->getVRatio();
+	hRatio			= Player->getHRatio();
+	vRatio			= Player->getVRatio();
 
-	solidN = Solids->getNEntities();
-	actorN = Actors->getNEntities();
+	solidN			= Solids->getNEntities();
+	actorN			= Actors->getNEntities();
 
 	solidPolyCount = new int[Solids->getNEntities()];
 	Solids->getPolyCountEntities(solidPolyCount);
@@ -309,15 +309,16 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 }
 */
 
-void Renderer::updateCameraPosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
-{
-	Player->azm = -turnH;
-	Player->alt = -turnV;
-	Player->rol = tiltP;
 
-	Player->x -= moveP * cos(Player->azm) - strafeP * cos(Player->azm + PI * 0.5);
-	Player->y += moveP * sin(Player->azm) - strafeP * sin(Player->azm + PI * 0.5);
-	Player->z += riseP;
+void Renderer::updateCameraPosition()
+{
+	Player->azm = -Controls->turnH;
+	Player->alt = -Controls->turnV;
+	Player->rol = Controls->tiltP;
+
+	Player->x -= Controls->moveP * cos(Player->azm) - Controls->strafeP * cos(Player->azm + PI * 0.5);
+	Player->y += Controls->moveP * sin(Player->azm) - Controls->strafeP * sin(Player->azm + PI * 0.5);
+	Player->z += Controls->riseP;
 }
 
 

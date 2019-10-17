@@ -326,7 +326,7 @@ bool Camera::assertPointVis(plane plane, point3 Point)
 }
 
 
-int Camera::clipToFrustum(const triangle3dV viewT, vect3* vertList, textCoord* uvList)
+int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList)
 {
 	memset(vertList, 0.0, MAXCLIPVERTS * sizeof(double));
 
@@ -377,7 +377,8 @@ inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, p
 }
 
 
-inline void Camera::clipEdge(plane p, vect3 startV, vect3 endV, textCoord startUV, textCoord endUV, int* nResult, vect3 * vTemp, textCoord * uvTemp)
+inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
+	int* nResult, vect3 * vTemp, textCoord * uvTemp)
 {
 	double t;
 	//vect3 a = subVectors(startV, p.P);
@@ -524,7 +525,7 @@ void Camera::illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV P, 
 }
 
 
-void Camera::illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV P, projectionStyle style)
+void Camera::illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV& P, const projectionStyle& style)
 {
 	double illumAll, illumA, illumB, illumC;
 	illumAll = illumA = illumB = illumC = 0.0;
@@ -558,7 +559,7 @@ void Camera::illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV P, 
 }
 
 
-inline coord2 Camera::view2screen(vect3 vertex, double hR, double vR)
+inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const double& vR)
 {
 	coord2 pixel;
 
@@ -715,8 +716,8 @@ void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 col
 	}
 }
 
-
-inline textCoord Camera::getUVCoord(vect3 startV, vect3 endV, textCoord startC, textCoord endC, vect3 testV)
+/*
+inline textCoord Camera::getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV)
 {
 	textCoord testC;
 
@@ -732,8 +733,8 @@ inline textCoord Camera::getUVCoord(vect3 startV, vect3 endV, textCoord startC, 
 
 	return testC;
 }
-
-
+*/
+/*
 inline textCoord Camera::interpolateUVCoord(textCoord startC, textCoord endC, int step, int currentP)
 {
 	textCoord testC;
@@ -743,9 +744,9 @@ inline textCoord Camera::interpolateUVCoord(textCoord startC, textCoord endC, in
 
 	return testC;
 }
+*/
 
-
-inline void Camera::fillTriangleSolidColour(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
 	Uint32 pixelColour = t.h;
 	coord2 pt[3] = { t.a, t.b, t.c };
@@ -862,7 +863,8 @@ inline void Camera::fillTriangleSolidColour(const triangle3dV T, const triangle2
 }
 
 
-inline void Camera::fillTriangleCheckerboard(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer,
+			const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1092,7 +1094,7 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV T, const triangle
 }
 
 
-inline void Camera::fillTriangleFlatShaded(const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer)
+inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1195,7 +1197,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG t, Uint32* pixelBuf
 }
 
 
-inline void Camera::fillTriangleGouraudShaded(const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1335,7 +1337,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG t, Uint32* pixel
 }
 
 
-inline void Camera::fillTriangleDepthVisualised(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1445,7 +1447,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV T, const trian
 }
 
 
-inline void Camera::fillTriangleSunlight(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1694,8 +1696,8 @@ inline void Camera::fillTriangleSunlight(const triangle3dV T, const triangle2dG 
 }
 
 
-inline void Camera::fillTriangleTorchlight(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d,
-		double lightIntensity, double maxIllumination)
+inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d,
+		const double& lightIntensity, const double& maxIllumination)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1905,8 +1907,8 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV T, const triangle2d
 }
 
 
-inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d,
-	double lightIntensity, double maxIllumination)
+inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d,
+	const double& lightIntensity, const double& maxIllumination)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -2063,7 +2065,7 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV T, const
 }
 
 
-inline void Camera::fillZBuffer(const triangle3dV T, const triangle2dG t, double* depthBuffer)
+inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, double*& depthBuffer)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -2169,7 +2171,7 @@ inline void Camera::fillZBuffer(const triangle3dV T, const triangle2dG t, double
 }
 
 
-inline void Camera::fillTriangleTest(const triangle3dV T, const triangle2dG t, Uint32* pixelBuffer, double* depthBuffer, bool d)
+inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -2393,7 +2395,7 @@ inline void Camera::fillTriangleTest(const triangle3dV T, const triangle2dG t, U
 }
 
 
-inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* pixelBuffer)
+inline void Camera::drawLine(const coord2& startP, const coord2& endP, const Uint32& colour, Uint32* pixelBuffer)
 {
 	/*No clipping takes place in this method, if either startP or endP
 	are off screen, line is discarded entirely. It is assumed that all
@@ -2548,7 +2550,7 @@ inline void Camera::drawLine(coord2 startP, coord2 endP, Uint32 colour, Uint32* 
 }
 
 
-void Camera::drawLine(screenCoord startP, screenCoord endP, int step, Uint32 colour, Uint32* pixelBuffer)
+void Camera::drawLine(const screenCoord& startP, const screenCoord& endP, const int& step, const Uint32& colour, Uint32* pixelBuffer)
 {
 	/*No clipping takes place in this method, if either startP or endP
 	are off screen, line is discarded entirely. It is assumed that all

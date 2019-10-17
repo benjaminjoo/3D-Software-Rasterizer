@@ -36,7 +36,7 @@ double distancePN(polyNode a, polyNode b)
 }
 
 
-Uint32 getColour(const unsigned char a, const unsigned char r, const unsigned char g, const unsigned char b)
+Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b)
 {
 	return (a << 24) | (r << 16) | (g << 8) | (b << 0);
 }
@@ -255,7 +255,7 @@ vect3 invertVector(vect3 a)
 }
 
 
-vect3 addVectors(vect3 a, vect3 b)
+vect3 addVectors(const vect3& a, const vect3& b)
 {
 	vect3 temp;
 
@@ -346,7 +346,7 @@ double worldCoord::operator * (const worldCoord& p)
 }
 
 
-vect3 subVectors(vect3 a, vect3 b)
+vect3 subVectors(const vect3& a, const vect3& b)
 {
 	vect3 temp;
 
@@ -420,7 +420,7 @@ vect3 dirVector(double azm, double alt)
 }
 
 
-double dotProduct(vect3 a, vect3 b)
+double dotProduct(const vect3& a, const vect3& b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
@@ -458,7 +458,7 @@ worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, doubl
 }
 
 
-double dotProductSquared(vect3 a, vect3 b)
+double dotProductSquared(const vect3& a, const vect3& b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z) * (a.x * b.x + a.y * b.y + a.z * b.z);
 }
@@ -979,7 +979,7 @@ void drawCrosshair(Uint32* pixels, int w, int h, int hole, int size, Uint32 colo
 }
 
 
-int sign(double a)
+int sign(const double& a)
 {
 	int t;
 	if (a > 0) { t = 1; }

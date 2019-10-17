@@ -189,7 +189,10 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="ModelElementBuffer.cpp" />
+    <ClCompile Include="OpenGLAdapter.cpp" />
     <ClCompile Include="OpenGLCanvas.cpp" />
+    <ClCompile Include="OpenGLMesh.cpp" />
+    <ClCompile Include="OpenGLShader.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
@@ -225,8 +228,11 @@
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="ModelElementBuffer.h" />
+    <ClInclude Include="OpenGLAdapter.h" />
     <ClInclude Include="OpenGLCamera.h" />
     <ClInclude Include="OpenGLCanvas.h" />
+    <ClInclude Include="OpenGLMesh.h" />
+    <ClInclude Include="OpenGLShader.h" />
     <ClInclude Include="OpenGLTransform.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />
@@ -240,6 +246,7 @@
     <ClInclude Include="SolidRevolved.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="SolidSTL.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewVolume.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

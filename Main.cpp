@@ -35,6 +35,10 @@
 #include "BezierPatch.h"
 #include "OpenGLCanvas.h"
 #include "OpenGLCamera.h"
+#include "OpenGLTransform.h"
+#include "OpenGLAdapter.h"
+#include "OpenGLMesh.h"
+#include "OpenGLShader.h"
 
 void editor()
 {
@@ -94,6 +98,7 @@ void editor()
 	SDL_Quit();
 }
 
+
 void software_renderer()
 {
 	SDL_Window*		window			= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
@@ -129,7 +134,7 @@ void software_renderer()
 
 	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 
-	EventHandler Controls;
+	EventHandler Controls(0.1f, 0.1f, 0.01f);
 
 	Controls.torchIntensity = 10.0;
 
@@ -162,7 +167,7 @@ void software_renderer()
 
 		//Game.checkCameraCollision();
 
-		Game.updateCameraPosition(Controls.turnH, Controls.turnV, Controls.tiltP, Controls.moveP, Controls.strafeP, Controls.riseP, true);
+		Game.updateCameraPosition();
 
 		Controls.ceaseMotion();
 
@@ -206,25 +211,83 @@ void software_renderer()
 	SDL_Quit();
 }
 
+
 void opengl_renderer()
 {
-	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
-	OpenGLCamera Player(glm::vec3(0.0f, 0.0f, 0.0f), 90.0f, Screen.getAspect(), 0.01f, 999.9f);
+	//glm::vec4* pixelBuffer = new glm::vec4[SCREEN_WIDTH * SCREEN_HEIGHT];	   
+	//for (auto i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)					   
+	//{																		   
+	//	pixelBuffer[i] = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);					   
+	//}																
+	//for (int i = 100000; i < 120000; i++)
+	//{
+	//	pixelBuffer[i] = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+	//}
+					   
 
-	EventHandler Controls;
+
+	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
+	OpenGLCamera Player(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
+	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
+	EventHandler Controls(0.01f, 0.01f, 0.001f);
 
 	Shapes Solids;
 	Shapes Actors;
+
+	//Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 255, 0, 0), 1, 2.0));
+	//Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 127, 127, 255), 1, 3.0, 36));
+
+
+	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	quakeMap.readData();
+	SolidBody* map = &quakeMap;
+	Solids.addSolid(map);
+	int nTxt = quakeMap.getTotalText();
+	txt* quakeTextures = new txt[nTxt];
+	for (int i = 0; i < nTxt; i++)
+	{
+		quakeTextures[i] = quakeMap.getTextureData(i);
+	}
+	Solids.textureLoaderQ(nTxt, quakeTextures);
+
+	//#include "glbbtest.txt"
+
+	OpenGLAdapter VertexPump(&Solids, &Actors);
+	unsigned int nVert = VertexPump.getNVert(solid, 0);
+	Vertex* vertices = new Vertex[nVert];
+	VertexPump.getVertices(solid, 0, vertices);
+	OpenGLMesh mesh_01(vertices, nVert);
+
+	OpenGLShader shader_01("./Shaders/basicShader");
+
+	//LightSource lights[] = { LightSource(150.0, 45.0, 0.95) };
+
+	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),
+								IMG_Load("Textures/timber.jpg") };
 
 	while(!Controls.quit)
 	{
 		Screen.clear(0.5f, 0.5f, 1.0f, 0.0f);
 
+		shader_01.bind();
+		shader_01.update(View, Player);
+		mesh_01.drawMesh();
+
+		//glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_INT, pixelBuffer);
+		
 		Controls.HandleUserEvents();
+		View.updateAll(Controls);
+		Controls.ceaseMotion();
 
 		Screen.update();
 	}
+
+	delete[] vertices;
+
+	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++) { SDL_FreeSurface(textures[i]); }
 }
+
 
 int main(int argc, char** argv)
 {

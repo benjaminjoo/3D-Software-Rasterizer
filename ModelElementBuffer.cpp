@@ -259,12 +259,15 @@ void ModelElementBuffer::exportTextFile()
 	}
 	else
 	{
-		int nVert = vertex3Buffer.size();
-		printf("Number of vertices: %d\n", nVert);
-		for (int i = 0; i < nVert; i++)
+		for (auto i = line3Buffer.begin(); i != line3Buffer.end(); ++i)
 		{
-			vertex3 temp = vertex3Buffer[i];
-			fprintf(f, "%4d\t%8.8f\t%8.8f\t%8.8f\t%d\n", temp.id, temp.pos.x, temp.pos.y, temp.pos.z, temp.deleted);
+			double x1, x2, y1, y2;
+			x1 = i->vert[0].x;
+			y1 = i->vert[0].y;
+			x2 = i->vert[1].x;
+			y2 = i->vert[1].y;
+
+			fprintf(f, "Space.addEdge(edge(vect2(%.1f, %.1f), vect2(%.1f, %.1f)));\n", x1, y1, x2, y2);
 		}
 		fclose(f);
 	}

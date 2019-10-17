@@ -3,7 +3,7 @@
 #include "Canvas.h"
 
 
-EventHandler::EventHandler()
+EventHandler::EventHandler(double step, double turn, double sens)
 {
 	visualStyle			= wireframe;
 
@@ -19,8 +19,6 @@ EventHandler::EventHandler()
 	mouseLookBlocked	= false;
 
 	event				= { 0 };
-	//player				= &Camera(1.0, 1.0, 1.5, 0.1, 0.05, PI * 0.5, PI, 0.0, PI * 0.5, 1.00, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	//screen				= &Canvas(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
 	quit				= false;
 
@@ -32,8 +30,10 @@ EventHandler::EventHandler()
 	strafeP				= 0.0f;
 	riseP				= 0.0f;
 	tiltP				= 0.0f;
-	stepP				= 0.1f;
-	turnP				= 0.1f;
+
+	stepP				= step;
+	turnP				= turn;
+	sensitivity			= sens;
 
 	turnVmin			= PI * 0.5f;
 	turnVmax			= 3 * PI * 0.5f;
@@ -42,46 +42,6 @@ EventHandler::EventHandler()
 	maxIllumination		= 1.0f;
 }
 
-/*
-EventHandler::EventHandler(double step, double turn, Camera* P, Canvas* C)
-{
-	visualStyle			= wireframe;
-
-	gouraudShading		= true;
-	visualiseDepth		= false;
-	torchOn				= false;
-	showCrosshair		= true;
-	showFPS				= true;
-	showPolyN			= true;
-	showPosition		= true;
-	gravityOn			= false;
-	isPaused			= true;
-	mouseLookBlocked	= false;
-
-	event				= { 0 };
-	//player				= P;
-	//screen				= C;
-
-	quit				= false;
-
-	turnH				= 0.0f;
-	turnV				= 0.0f;
-	turnR				= 0.0f;
-
-	moveP				= 0.0f;
-	strafeP				= 0.0f;
-	riseP				= 0.0f;
-	tiltP				= 0.0f;
-	stepP				= step;
-	turnP				= turn;
-
-	turnVmin			= PI * 0.5f;
-	turnVmax			= 3 * PI * 0.5f;	
-
-	torchIntensity		= 10000.0f;	//10.0f;
-	maxIllumination		= 1.0f;
-}
-*/
 
 EventHandler::~EventHandler()
 {
@@ -369,20 +329,20 @@ void EventHandler::HandleUserEvents()
 
 		if (event.type == SDL_MOUSEMOTION && !mouseLookBlocked)
 		{
-			turnH = (double)event.motion.x * SENSITIVITY;
-			turnV = (double)event.motion.y * SENSITIVITY;
-			if ((double)event.motion.y * SENSITIVITY > turnVmin &&
-				(double)event.motion.y * SENSITIVITY < turnVmax)
+			turnH = (double)event.motion.x * sensitivity;
+			turnV = (double)event.motion.y * sensitivity;
+			if ((double)event.motion.y * sensitivity > turnVmin &&
+				(double)event.motion.y * sensitivity < turnVmax)
 			{
-				turnV = (double)event.motion.y * SENSITIVITY;
+				turnV = (double)event.motion.y * sensitivity;
 			}
 			else
 			{
-				if ((double)event.motion.y * SENSITIVITY < turnVmin)
+				if ((double)event.motion.y * sensitivity < turnVmin)
 				{
 					turnV = turnVmin;
 				}
-				else if ((double)event.motion.y * SENSITIVITY > turnVmax)
+				else if ((double)event.motion.y * sensitivity > turnVmax)
 				{
 					turnV = turnVmax;
 				}

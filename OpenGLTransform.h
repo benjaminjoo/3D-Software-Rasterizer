@@ -2,6 +2,7 @@
 
 #include <GLM/glm.hpp>
 #include <GLM/gtx/transform.hpp>
+#include "EventHandler.h"
 
 class OpenGLTransform
 {
@@ -22,7 +23,7 @@ public:
 	}
 
 
-	inline glm::mat4 getModel()
+	inline glm::mat4 getModel() const
 	{
 		glm::mat4 posMatrix		= glm::translate(position);
 
@@ -38,14 +39,39 @@ public:
 	}
 
 
-	inline glm::vec3* getPos() { &position; }
-	inline glm::vec3* getRot() { &rotation; }
-	inline glm::vec3* getScl() { &scale;	}
+	inline glm::vec3* getPos() { return &position;	}
+	inline glm::vec3* getRot() { return &rotation;	}
+	inline glm::vec3* getScl() { return &scale;		}
+
+
+	//inline glm::vec3 getPos() { return position; }
+	//inline glm::vec3 getRot() { return rotation; }
+	//inline glm::vec3 getScl() { return scale;	 }
 
 
 	inline void setPos(const glm::vec3& pos) { position = pos; }
 	inline void setRot(const glm::vec3& rot) { rotation = rot; }
 	inline void setScl(const glm::vec3& scl) { scale	= scl; }
+
+
+	inline void updateAll(EventHandler& Controls)
+	{
+		//Player->azm = -Controls->turnH;
+		//Player->alt = -Controls->turnV;
+		//Player->rol = Controls->tiltP;
+		//
+		//Player->x -= Controls->moveP * cos(Player->azm) - Controls->strafeP * cos(Player->azm + PI * 0.5);
+		//Player->y += Controls->moveP * sin(Player->azm) - Controls->strafeP * sin(Player->azm + PI * 0.5);
+		//Player->z += Controls->riseP;
+		
+		rotation.x = (float)Controls.turnV;
+		rotation.y = (float)Controls.turnH;
+		rotation.z = (float)Controls.tiltP;
+
+		position.z += (float)Controls.moveP * cosf(rotation.y) - (float)Controls.strafeP * cosf(rotation.y + 90.0f);
+		position.x += (float)Controls.moveP * sinf(rotation.y) - (float)Controls.strafeP * sinf(rotation.y + 90.0f);
+		position.y += (float)Controls.riseP;
+	}
 
 
 	~OpenGLTransform()

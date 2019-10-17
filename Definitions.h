@@ -466,9 +466,9 @@ void printCoord3(vect3);
 
 vect3 invertVector(vect3 a);
 
-vect3 addVectors(vect3 a, vect3 b);
+vect3 addVectors(const vect3& a, const vect3& b);
 
-vect3 subVectors(vect3 a, vect3 b);
+vect3 subVectors(const vect3& a, const vect3& b);
 
 vect3 halfwayPoint(vect3 a, vect3 b);
 
@@ -480,11 +480,11 @@ worldCoord unitVector2(worldCoord v);
 
 vect3 dirVector(double azm, double alt);
 
-double dotProduct(vect3 a, vect3 b);
+double dotProduct(const vect3& a, const vect3& b);
 
 worldCoord rotate2(worldCoord target, Side view, worldCoord origin, double angle);
 
-double dotProductSquared(vect3 a, vect3 b);
+double dotProductSquared(const vect3& a, const vect3& b);
 
 double distPoint2Plane(vect3 P, triangle3dV T);
 
@@ -498,7 +498,7 @@ vect3 midPoint(vect3 a, vect3 b);
 
 coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
 
-Uint32 getColour(const unsigned char a, const unsigned char r, const unsigned char g, const unsigned char b);
+Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
 
 Uint32 modifyColour(const Uint32&, const double&);
 
@@ -546,7 +546,7 @@ vect3 sun2view(double sinAzm, double cosAzm, double sinAlt, double cosAlt,
 
 bool onScreen(coord2 test, int w, int h);
 
-int sign(double a);
+int sign(const double& a);
 
 int roundInt(double a);
 

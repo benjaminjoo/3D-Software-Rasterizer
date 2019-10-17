@@ -54,7 +54,7 @@ public:
 	Renderer(Shapes*, Shapes*, LightSource*, Camera*, EventHandler*);
 	~Renderer();
 
-	void updateCameraPosition(double, double, double, double, double, double);
+	void updateCameraPosition();
 	void updateCameraPosition(double, double, double, double, double, double, bool);
 	void checkCameraCollision();
 	bool checkCameraCollision(vect3, int*, int*);
