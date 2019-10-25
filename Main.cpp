@@ -165,8 +165,6 @@ void software_renderer()
 
 		Screen.resetDepthBuffer();
 
-		//Game.checkCameraCollision();
-
 		Game.updateCameraPosition();
 
 		Controls.ceaseMotion();
@@ -178,8 +176,6 @@ void software_renderer()
 		if (!Controls.isPaused) { Game.updateEntities(actor); }
 
 		Game.renderEntities(actor, Screen.pixelBuffer, Screen.depthBuffer);
-
-		//Game.renderPoints(nVert, pointCloud, Screen.pixelBuffer);
 
 		Game.displayStats(Controls.showCrosshair, Controls.showFPS, Controls.showPosition, Controls.showPolyN, Screen);
 
@@ -197,8 +193,6 @@ void software_renderer()
 	}
 
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
-
-	//delete[] pointCloud;
 
 	SDL_DestroyTexture(sdl_texture);
 
