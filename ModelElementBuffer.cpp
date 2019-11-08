@@ -268,6 +268,7 @@ void ModelElementBuffer::exportTextFile()
 			y2 = i->vert[1].y;
 
 			fprintf(f, "Space.addEdge(edge(vect2(%.1f, %.1f), vect2(%.1f, %.1f)));\n", x1, y1, x2, y2);
+			fprintf(f, "Space.addEdge(edge(vect2(%.1f, %.1f), vect2(%.1f, %.1f)));\n", x2, y2, x1, y1);
 		}
 		fclose(f);
 	}
