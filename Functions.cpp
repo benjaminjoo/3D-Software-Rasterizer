@@ -346,6 +346,21 @@ double worldCoord::operator * (const worldCoord& p)
 }
 
 
+bool match(const vect3& a, const vect3& b)
+{
+	if (abs(a.x - b.x) < 1e-10 &&
+		abs(a.y - b.y) < 1e-10 &&
+		abs(a.z - b.z) < 1e-10)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 vect3 subVectors(const vect3& a, const vect3& b)
 {
 	vect3 temp;

@@ -7,6 +7,17 @@
 
 Canvas::Canvas()
 {
+	std::cout << "-" << std::endl;
+
+	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+	
+	//screen = SDL_CreateRenderer(window, -1, 0);
+	
+	//sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, 640, 480);
+	
+	//SDL_ShowCursor(SDL_DISABLE);
+
+
 	SDL_Init(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_JPG);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -32,6 +43,16 @@ Canvas::Canvas()
 
 Canvas::Canvas(int width, int height, double z)
 {
+	std::cout << "+" << std::endl;
+
+	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+	
+	//screen = SDL_CreateRenderer(window, -1, 0);
+	
+	//sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
+	
+	//SDL_ShowCursor(SDL_DISABLE);
+
 	w			= width;
 	h			= height;
 	fontSize	= 8;
@@ -53,6 +74,33 @@ Canvas::Canvas(int width, int height, double z)
 
 Canvas::~Canvas()
 {
+	//std::cout << "p" << std::endl;
+}
+
+
+void Canvas::update()
+{
+	//std::cout << "." << std::endl;
+
+	//SDL_UpdateTexture(sdl_texture, nullptr, pixelBuffer, w * sizeof(Uint32));
+	
+	//SDL_RenderClear(screen);
+	
+	//SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
+	
+	//SDL_RenderPresent(screen);
+}
+
+
+void Canvas::cleanUp()
+{
+	//std::cout << "o" << std::endl;
+
+	//SDL_DestroyTexture(sdl_texture);
+	
+	//SDL_DestroyRenderer(screen);
+	
+	//SDL_DestroyWindow(window);
 }
 
 

@@ -25,5 +25,6 @@ public:
 	void			constructShadowVolume(vect3);
 
 	void			readSTLfile();
+	void			smoothSurfaces();
 };
 

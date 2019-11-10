@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "Definitions.h"
 
 class Canvas
@@ -15,12 +17,22 @@ class Canvas
 
 public:
 
+	//SDL_Window* window;
+	
+	//SDL_Renderer* screen;
+	
+	//SDL_Texture* sdl_texture;
+
 	Uint32* pixelBuffer;
 	double* depthBuffer;
 
 	Canvas();
 	Canvas(int, int, double);
 	~Canvas();
+
+	void update();
+
+	void cleanUp();
 
 	void resetPixelBuffer();
 

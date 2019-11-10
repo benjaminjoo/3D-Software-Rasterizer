@@ -136,6 +136,7 @@ void SolidSTL::readSTLfile()
 	for (unsigned long i = 0; i < nPolyLong; i++)
 	{
 		modelFile.read(normal, 12);
+
 		xx[0] = normal[0];		xx[1] = normal[1];		xx[2] = normal[2];		xx[3] = normal[3];
 		yy[0] = normal[4];		yy[1] = normal[5];		yy[2] = normal[6];		yy[3] = normal[7];
 		zz[0] = normal[8];		zz[1] = normal[9];		zz[2] = normal[10];		zz[3] = normal[11];
@@ -143,10 +144,13 @@ void SolidSTL::readSTLfile()
 		xf = *((float*)xx);
 		yf = *((float*)yy);
 		zf = *((float*)zz);
-		//std::cout << "\tnx: " << xf << "\tny: " << yf << "\tnz: " << zf << std::endl;
+
 		tempPoly.N = tempPoly.An = tempPoly.Bn = tempPoly.Cn = { (double)xf, (double)yf, (double)zf, 0.0f };
 
+
+
 		modelFile.read(vert_a, 12);
+
 		xx[0] = vert_a[0];		xx[1] = vert_a[1];		xx[2] = vert_a[2];		xx[3] = vert_a[3];
 		yy[0] = vert_a[4];		yy[1] = vert_a[5];		yy[2] = vert_a[6];		yy[3] = vert_a[7];
 		zz[0] = vert_a[8];		zz[1] = vert_a[9];		zz[2] = vert_a[10];		zz[3] = vert_a[11];
@@ -154,10 +158,13 @@ void SolidSTL::readSTLfile()
 		xf = *((float*)xx);
 		yf = *((float*)yy);
 		zf = *((float*)zz);
-		//std::cout << "\tax: " << xf << "\tay: " << yf << "\taz: " << zf << std::endl;
+
 		tempPoly.A = { (double)xf, (double)yf, (double)zf, 1.0f };
 
+
+
 		modelFile.read(vert_b, 12);
+
 		xx[0] = vert_b[0];		xx[1] = vert_b[1];		xx[2] = vert_b[2];		xx[3] = vert_b[3];
 		yy[0] = vert_b[4];		yy[1] = vert_b[5];		yy[2] = vert_b[6];		yy[3] = vert_b[7];
 		zz[0] = vert_b[8];		zz[1] = vert_b[9];		zz[2] = vert_b[10];		zz[3] = vert_b[11];
@@ -165,10 +172,13 @@ void SolidSTL::readSTLfile()
 		xf = *((float*)xx);
 		yf = *((float*)yy);
 		zf = *((float*)zz);
-		//std::cout << "\tbx: " << xf << "\tby: " << yf << "\tbz: " << zf << std::endl;
+
 		tempPoly.B = { (double)xf, (double)yf, (double)zf, 1.0f };
 
+
+
 		modelFile.read(vert_c, 12);
+
 		xx[0] = vert_c[0];		xx[1] = vert_c[1];		xx[2] = vert_c[2];		xx[3] = vert_c[3];
 		yy[0] = vert_c[4];		yy[1] = vert_c[5];		yy[2] = vert_c[6];		yy[3] = vert_c[7];
 		zz[0] = vert_c[8];		zz[1] = vert_c[9];		zz[2] = vert_c[10];		zz[3] = vert_c[11];
@@ -176,14 +186,62 @@ void SolidSTL::readSTLfile()
 		xf = *((float*)xx);
 		yf = *((float*)yy);
 		zf = *((float*)zz);
-		//std::cout << "\tcx: " << xf << "\tcy: " << yf << "\tcz: " << zf << std::endl;
+
 		tempPoly.C = { (double)xf, (double)yf, (double)zf, 1.0f };
+
+
+
 		tempPoly.colour		= colour;
 		tempPoly.texture	= texture;
-		//std::cout << "\v" << std::endl;
+
 		modelFile.read(attrib, 2);
 
 		polyContainer.push_back(tempPoly);
 	}
 	polyContainer.shrink_to_fit();
+}
+
+
+void SolidSTL::smoothSurfaces()
+{
+	for (auto p = polyContainer.begin(); p != polyContainer.end(); ++p)
+	{
+		vect3 accA, accB, accC;
+
+		accA = accB = accC = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		//Vertex A
+
+		for (auto a = polyContainer.begin(); a != polyContainer.end(); ++a)
+		{
+			if ((match(p->A, a->A) || match(p->A, a->B) || match(p->A, a->C)) && dotProduct(p->N, a->N) > 0.5f)
+			{
+				accA = addVectors(accA, a->N);
+			}
+		}
+
+		//Vertex B
+
+		for (auto b = polyContainer.begin(); b != polyContainer.end(); ++b)
+		{
+			if ((match(p->B, b->A) || match(p->B, b->B) || match(p->B, b->C)) && dotProduct(p->N, b->N) > 0.5f)
+			{
+				accB = addVectors(accB, b->N);
+			}
+		}
+
+		//Vertex C
+
+		for (auto c = polyContainer.begin(); c != polyContainer.end(); ++c)
+		{
+			if ((match(p->C, c->A) || match(p->C, c->B) || match(p->C, c->C)) && dotProduct(p->N, c->N) > 0.5f)
+			{
+				accC = addVectors(accC, c->N);
+			}
+		}
+
+		p->An = unitVector(accA);
+		p->Bn = unitVector(accB);
+		p->Cn = unitVector(accC);
+	}
 }

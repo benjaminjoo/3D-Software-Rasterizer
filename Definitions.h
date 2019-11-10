@@ -170,6 +170,9 @@ struct vect3
 };
 
 
+bool match(const vect3& a, const vect3& b);
+
+
 struct point3
 {
 	vect3 P;

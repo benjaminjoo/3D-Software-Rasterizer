@@ -40,6 +40,7 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 
+
 void editor()
 {
 	SDL_Window* window = SDL_CreateWindow("Software Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
@@ -50,9 +51,9 @@ void editor()
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-	Camera Viewer(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
-
 	Canvas Screen(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+
+	Camera Viewer(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
 	ModelElementBuffer Drawing("test.wtf");
 
@@ -60,16 +61,7 @@ void editor()
 
 	MessagePump Controls(&Builder);
 
-	//SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
-	//							IMG_Load("Textures/wolf001.jpg"),			//01
-	//							IMG_Load("Textures/wolf002.jpg"),			//02
-	//							IMG_Load("Textures/mosaic001.jpg"),			//03
-	//							IMG_Load("Textures/brick001.jpg"),			//04
-	//							IMG_Load("Textures/concrete001.jpg"),		//05
-	//							IMG_Load("Textures/timber.jpg") };			//06
-
 	Shapes Solids;
-	Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 127, 127, 255), 5, 5.0, 36));
 
 	while (!Controls.quit)
 	{
@@ -79,18 +71,18 @@ void editor()
 		Builder.updateScreen();
 		Controls.HandleUserEvents();
 
+		//Screen.update();
+
 		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
 		SDL_RenderClear(screen);
 		SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
 		SDL_RenderPresent(screen);
 	}
 
-	printf("%d points added in total...\n", Drawing.getVertex3BufferSize());
+	//Screen.cleanUp();
 
 	SDL_DestroyTexture(sdl_texture);
-
 	SDL_DestroyRenderer(screen);
-
 	SDL_DestroyWindow(window);
 
 	IMG_Quit();
@@ -101,11 +93,11 @@ void editor()
 
 void software_renderer()
 {
-	SDL_Window*		window			= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	SDL_Window* window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
-	SDL_Renderer*	screen			= SDL_CreateRenderer(window, -1, 0);
+	SDL_Renderer* screen = SDL_CreateRenderer(window, -1, 0);
 
-	SDL_Texture*	sdl_texture		= SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Texture* sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -115,7 +107,8 @@ void software_renderer()
 
 	Shapes Actors;
 
-	#include "bbtest.txt"
+	//#include "bbtest.txt"
+
 	/**/
 	//Camera	Player(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.1, 99999.9, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	//LightSource lights[] = { LightSource(115.0, 45.0, 1.25) };
@@ -134,9 +127,24 @@ void software_renderer()
 
 	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 
+	Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+
 	EventHandler Controls(0.1f, 0.1f, 0.01f);
 
 	Controls.torchIntensity = 10.0;
+
+	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
+	test_body.readSTLfile();
+	test_body.smoothSurfaces();
+	Solids.addSolid(&test_body);
+
+	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
+								IMG_Load("Textures/wolf001.jpg"),		//01
+								IMG_Load("Textures/wolf002.jpg"),		//02
+								IMG_Load("Textures/mosaic001.jpg"),		//03
+								IMG_Load("Textures/brick001.jpg"),		//04
+								IMG_Load("Textures/concrete001.jpg"),	//05
+								IMG_Load("Textures/timber.jpg") };		//06
 
 	Solids.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
@@ -154,6 +162,7 @@ void software_renderer()
 	//Solids.activateBBox(1);
 	//Solids.activateBBox(2);
 
+	std::cout << "Game loop starts here..." << std::endl;
 
 	while (!Controls.quit)
 	{
@@ -169,7 +178,7 @@ void software_renderer()
 
 		Controls.ceaseMotion();
 
-		Game.updateShadowVolumes(actor);
+		//Game.updateShadowVolumes(actor);
 
 		Game.renderEntities(solid, Screen.pixelBuffer, Screen.depthBuffer);	
 
@@ -180,7 +189,10 @@ void software_renderer()
 		Game.displayStats(Controls.showCrosshair, Controls.showFPS, Controls.showPosition, Controls.showPolyN, Screen);
 
 		Game.resetPolyCounter();
-				
+
+		//Screen.update();
+
+
 		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
 
 		SDL_RenderClear(screen);
@@ -194,14 +206,14 @@ void software_renderer()
 
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
 
+	//Screen.cleanUp();
+
 	SDL_DestroyTexture(sdl_texture);
-
 	SDL_DestroyRenderer(screen);
-
 	SDL_DestroyWindow(window);
-
+	
 	IMG_Quit();
-
+	
 	SDL_Quit();
 }
 
