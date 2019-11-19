@@ -1115,7 +1115,7 @@ void Room::getTriangleData_(triangle3dV* t)
 
 	int tC = 0;
 
-	for (int i = 0; i < bottomPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < bottomPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{
@@ -1126,7 +1126,7 @@ void Room::getTriangleData_(triangle3dV* t)
 		}
 	}
 
-	for (int i = 0; i < topPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < topPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{
@@ -1137,7 +1137,7 @@ void Room::getTriangleData_(triangle3dV* t)
 		}
 	}
 
-	for (int i = 0; i < backPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < backPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{
@@ -1148,7 +1148,7 @@ void Room::getTriangleData_(triangle3dV* t)
 		}
 	}
 
-	for (int i = 0; i < frontPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < frontPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{
@@ -1159,7 +1159,7 @@ void Room::getTriangleData_(triangle3dV* t)
 		}
 	}
 
-	for (int i = 0; i < leftPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < leftPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{
@@ -1170,7 +1170,7 @@ void Room::getTriangleData_(triangle3dV* t)
 		}
 	}
 
-	for (int i = 0; i < rightPolyContainer.size(); i++, tC++)
+	for (unsigned int i = 0; i < rightPolyContainer.size(); i++, tC++)
 	{
 		if (tC < tCount)
 		{

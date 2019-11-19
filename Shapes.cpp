@@ -47,7 +47,7 @@ void Shapes::addTextureData(txt t)
 }
 
 
-void Shapes::setPosition(int n, vect3 p)
+void Shapes::setPosition(unsigned int n, vect3 p)
 {
 	if (n < bodyContainer.size())
 	{
@@ -56,7 +56,7 @@ void Shapes::setPosition(int n, vect3 p)
 }
 
 
-vect3 Shapes::getPosition(int n)
+vect3 Shapes::getPosition(unsigned int n)
 {
 	vect3 temp = { 0.0, 0.0, 0.0, 1.0 };
 	if (n < bodyContainer.size())
@@ -67,7 +67,7 @@ vect3 Shapes::getPosition(int n)
 }
 
 
-void Shapes::setVelocity(int n, vect3 v)
+void Shapes::setVelocity(unsigned int n, vect3 v)
 {
 	if (n < bodyContainer.size())
 	{
@@ -76,7 +76,7 @@ void Shapes::setVelocity(int n, vect3 v)
 }
 
 
-vect3 Shapes::getVelocity(int n)
+vect3 Shapes::getVelocity(unsigned int n)
 {
 	vect3 temp = { 0.0, 0.0, 0.0, 1.0 };
 	if (n < bodyContainer.size())
@@ -87,7 +87,7 @@ vect3 Shapes::getVelocity(int n)
 }
 
 
-void Shapes::setAngularVelocity(int n, vect3 v)
+void Shapes::setAngularVelocity(unsigned int n, vect3 v)
 {
 	if (n < bodyContainer.size())
 	{
@@ -96,7 +96,7 @@ void Shapes::setAngularVelocity(int n, vect3 v)
 }
 
 
-vect3 Shapes::getAngularVelocity(int n)
+vect3 Shapes::getAngularVelocity(unsigned int n)
 {
 	vect3 temp = { 0.0, 0.0, 0.0, 1.0 };
 	if (n < bodyContainer.size())

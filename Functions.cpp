@@ -309,7 +309,7 @@ vect3 vect3::operator * (const double& s)
 	return { x * s, y * s, z * s, 1.0f };
 }
 */
-
+/*
 worldCoord worldCoord::operator + (const worldCoord& p)
 {
 	return { x + p.x, y + p.y, z + p.z };
@@ -344,13 +344,16 @@ double worldCoord::operator * (const worldCoord& p)
 {
 	return x * p.x + y * p.y + z * p.z;
 }
-
+*/
 
 bool match(const vect3& a, const vect3& b)
 {
-	if (abs(a.x - b.x) < 1e-10 &&
-		abs(a.y - b.y) < 1e-10 &&
-		abs(a.z - b.z) < 1e-10)
+	//if (abs(a.x - b.x) < 1e-10 &&
+	//	abs(a.y - b.y) < 1e-10 &&
+	//	abs(a.z - b.z) < 1e-10)
+	if (a.x - b.x == 0.0f &&
+		a.y - b.y == 0.0f &&
+		a.z - b.z == 0.0f)
 	{
 		return true;
 	}

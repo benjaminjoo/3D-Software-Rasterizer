@@ -1,4 +1,4 @@
-Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+//Camera		Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 //EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
 
 
@@ -6,7 +6,7 @@ Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, 
 
 LightSource lights[] = {	LightSource(300.0, 60.0, 1.00) };
 
-
+/*
 SDL_Surface* textures[] = { 	IMG_Load("Textures/blue.jpg"),			//00
 				IMG_Load("Textures/wolf001.jpg"),		//01
 				IMG_Load("Textures/wolf002.jpg"),		//02
@@ -14,7 +14,7 @@ SDL_Surface* textures[] = { 	IMG_Load("Textures/blue.jpg"),			//00
 				IMG_Load("Textures/brick001.jpg"),		//04
 				IMG_Load("Textures/concrete001.jpg"),		//05
 				IMG_Load("Textures/timber.jpg")};		//06
-
+*/
 
 
 Room room_01;

@@ -12,113 +12,28 @@
 
 #define PI					3.141592654
 
-Camera::Camera()
+Camera::Camera():
+	x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(320), h(200)
 {
-	x					= 0.0;
-	y					= 0.0;
-	z					= 0.0;
-
-	step				= 1.0;
-	turn				= 0.1;
-
-	azm					= 0.0;
-	alt					= 0.0;
-	rol					= 0.0;
-
-	speed				= { 0.01, 0.01, 0.01, 0.0 };
-
-	fovH				= PI * 0.5 / 90 * 85;
-	zNear				= 1.0;
-	zFar				= 99.9;
-
-	w					= 320;
-	h					= 200;
-	margin				= 0;
-	scale				= 0;
-	grainSize			= 1;
-
-	currentTexture		= { 0, 0, 0, nullptr };
-
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);
-
-	oldTime				= 0;
-	newTime				= 0;
-	frameTime			= 0;
-	frameCounter		= 0;
 }
 
 
-Camera::Camera(double cx, double cy, double cz, int width, int height, int s)
+Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
+	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
-	x					= cx;
-	y					= cy;
-	z					= cz;
-
-	step				= 1.0;
-	turn				= 0.1;
-
-	azm					= 0.0;
-	alt					= 0.0;
-	rol					= 0.0;
-
-	speed				= { 0.01, 0.01, 0.01, 0.0 };
-
-	fovH				= 90.0;
-	zNear				= 1.0;
-	zFar				= 999.0;
-
-	w					= width;
-	h					= height;
-	margin				= 0;
-	scale				= s;
-	grainSize			= 1;
-
-	currentTexture		= { 0, 0, 0, nullptr };
-
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
-
-	oldTime				= 0;
-	newTime				= 0;
-	frameTime			= 0;
-	frameCounter		= 0;
 }
 
 
 Camera::Camera(double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
-	double fov, double nr, double fr, int width, int height, int s)
+	double fov, double nr, double fr, int width, int height, int s):
+	x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
+	fovH(fov), zNear(nr), zFar(fr), w(width), h(height)
 {
-	x					= cx;
-	y					= cy;
-	z					= cz;
-
-	step				= stp;
-	turn				= trn;
-
-	azm					= az;
-	alt					= al;
-	rol					= rl;
-
-	speed				= { 0.01, 0.01, 0.01, 0.01 };
-
-	fovH				= fov;
-
-	zNear				= nr;
-	zFar				= fr;
-
-	w					= width;
-	h					= height;
-	margin				= 0;
-	scale				= s;
-	grainSize			= 1;
-
-	currentTexture		= { 0, 0, 0, nullptr };
-
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
-
-	oldTime				= 0;
-	newTime				= 0;
-	frameTime			= 0;
-	frameCounter		= 0;
 }
 
 
@@ -1103,7 +1018,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int m = pow2(scale);
+	//int m = pow2(scale);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1206,7 +1121,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int m = pow2(scale);
+	//int m = pow2(scale);
 	int dx, dy;
 	double dIllum, illum;
 	double xx, yy, zz, dz;
@@ -1227,7 +1142,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 	double corr = 0.0;
 
 	coord2 currentP, startP, endP;
-	vect3 currentV, startV, endV;
+	vect3 startV, endV;
 
 	for (int hg = yMin; hg < yMax; hg++)
 	{
@@ -1314,18 +1229,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 				{
 					if (1 / zCurrent < depthBuffer[hg * w + i])
 					{
-						for (int p = 0; p < m; p++)
-						{
-							for (int q = 0; q < m; q++)
-							{
-								pixelBuffer[(m * hg + p) * w + m * i + q] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
-								currentP.x = m * i + q;
-								currentP.y = m * hg + p;
-								currentP.z = zCurrent;
-								currentV = this->screen2view(currentP, this->getHRatio(), this->getVRatio());
-
-							}
-						}
+						pixelBuffer[hg * w + i] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
 						depthBuffer[hg * w + i] = 1 / zCurrent;
 					}
 					zCurrent += deltaZ;
@@ -1492,7 +1396,7 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 	Uint32 finalPixel;
 
 	/**/
-	byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
+	byte a = 0, r2fill = 0, g2fill = 0, b2fill = 0;
 	double illSurplus = 0.0;
 	/**/
 
@@ -1935,14 +1839,13 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 	double h_ratio, v_ratio;
 	h_ratio = this->getHRatio();
 	v_ratio = this->getVRatio();
-	double invertEndPz, invertCurrentZ, invertCurrentPz;
+	double invertCurrentZ;
 	double hCorr = w * 0.475 * h_ratio;
 	double vCorr = w * 0.475 * v_ratio;
 	double deltaZ;
 
 	coord2 currentP, startP, endP;
-	vect3 currentVert, startVert, endVert;
-	textCoord startUV, endUV;
+	vect3 currentVert;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 	double distSquared;
 	vect3 lightVector;

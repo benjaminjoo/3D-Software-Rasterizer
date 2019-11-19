@@ -36,12 +36,12 @@ public:
 	void addTextureName(char*);
 	void addTextureData(txt);
 
-	void setPosition(int, vect3);
-	vect3 getPosition(int);
-	void setVelocity(int, vect3);
-	vect3 getVelocity(int);
-	void setAngularVelocity(int, vect3);
-	vect3 getAngularVelocity(int);
+	void setPosition(unsigned int, vect3);
+	vect3 getPosition(unsigned int);
+	void setVelocity(unsigned int, vect3);
+	vect3 getVelocity(unsigned int);
+	void setAngularVelocity(unsigned int, vect3);
+	vect3 getAngularVelocity(unsigned int);
 
 	int getTotalPolyCount();
 	int getPolyCount(int);

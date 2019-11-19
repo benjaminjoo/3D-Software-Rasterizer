@@ -63,7 +63,7 @@ void BSP3Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[10].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[10].length / 44); i++)
+		for (unsigned int i = 0; i < (direntry[10].length / 44); i++)
 		{
 			char 	vertexString[4] = "";
 
@@ -113,9 +113,9 @@ void BSP3Loader::readData()
 			vertexContainer.push_back(tempPoint);
 
 			vert tempVert;
-			tempVert.x		= vert_x * scale.x;
-			tempVert.y		= vert_y * scale.y;
-			tempVert.z		= vert_z * scale.z;
+			tempVert.x		= vert_x * float(scale.x);
+			tempVert.y		= vert_y * float(scale.y);
+			tempVert.z		= vert_z * float(scale.z);
 			tempVert.u		= surface_u;
 			tempVert.v		= surface_v;
 			tempVert.m		= lightmap_u;
@@ -138,7 +138,7 @@ void BSP3Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[11].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[11].length / 4); i++)
+		for (unsigned int i = 0; i < (direntry[11].length / 4); i++)
 		{
 			char 	vertexString[4] = "";
 
@@ -154,7 +154,7 @@ void BSP3Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[13].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[13].length / 104); i++)
+		for (unsigned int i = 0; i < (direntry[13].length / 104); i++)
 		{
 			char 	vertexString[4] = "";
 

@@ -147,13 +147,13 @@ OpenGLAdapter::~OpenGLAdapter()
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
-	for (int i = 0; i < solidN; i++)
+	for (unsigned int i = 0; i < solidN; i++)
 	{
 		delete[] solidMesh[i];
 	}
 	delete[] solidMesh;
 
-	for (int i = 0; i < actorN; i++)
+	for (unsigned int i = 0; i < actorN; i++)
 	{
 		delete[] actorMesh[i];
 	}

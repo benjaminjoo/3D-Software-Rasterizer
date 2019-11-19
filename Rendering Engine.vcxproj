@@ -234,6 +234,7 @@
     <ClInclude Include="OpenGLMesh.h" />
     <ClInclude Include="OpenGLShader.h" />
     <ClInclude Include="OpenGLTransform.h" />
+    <ClInclude Include="QuakeDef.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />

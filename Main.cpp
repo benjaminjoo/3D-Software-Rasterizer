@@ -40,6 +40,9 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 
+//#define _BEZIER_PATCH_
+//#define _QUAKE_1_READER_
+#define _STL_READER_
 
 void editor()
 {
@@ -107,36 +110,170 @@ void software_renderer()
 
 	Shapes Actors;
 
-	//#include "bbtest.txt"
-
-	/**/
-	//Camera	Player(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.1, 99999.9, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	//LightSource lights[] = { LightSource(115.0, 45.0, 1.25) };
-	//BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
-	//quakeMap.readData();
-	//SolidBody* map = &quakeMap;
-	//Solids.addSolid(map);
-	//int nTxt = quakeMap.getTotalText();
-	//txt* quakeTextures = new txt[nTxt];
-	//for (int i = 0; i < nTxt; i++)
-	//{
-	//	quakeTextures[i] = quakeMap.getTextureData(i);
-	//}
-	//Solids.textureLoaderQ(nTxt, quakeTextures);
-	/**/
-
-	//EventHandler		Controls(Player.step, Player.turn, &Player, &Screen);
-
 	Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	EventHandler Controls(0.1f, 0.1f, 0.01f);
 
 	Controls.torchIntensity = 10.0;
 
+#ifdef _BEZIER_PATCH_
+
+	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
+
+	Room room_01;
+	SolidBody* room_ptr_1 = &room_01;
+	room_01.setPosition(-5.0, -5.0, -5.0);
+	room_01.setDimension(10.0, 10.0, 10.0);
+	room_01.setSideOn(1, 1, 1, 1, 1, 1);
+	room_01.setTexture(2, 3, 1, 1, 1, 1);
+	room_01.setColour(getColour(0, 255, 0, 0), getColour(0, 255, 0, 0), getColour(0, 0, 255, 0), getColour(0, 0, 255, 0),
+		getColour(0, 0, 0, 255), getColour(0, 0, 0, 255));
+	room_01.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	room_01.calculateMesh();
+	Solids.addSolid(room_ptr_1);
+
+
+	BezierPatch patch01(32, 3, getColour(0, 255, 127, 0));
+
+	patch01.setPosition({ 0.0f, 4.0f, 0.0f, 1.0f });
+
+	patch01.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch01.setControlPoint(1, { 2.0f, 0.0f, 2.0f, 1.0f });
+	patch01.setControlPoint(2, { 8.0f, 0.0f, 0.0f, 1.0f });
+
+	patch01.setControlPoint(3, { 0.0f, 0.0f, 2.0f, 1.0f });
+	patch01.setControlPoint(4, { 2.0f, 0.0f, 3.0f, 1.0f });
+	patch01.setControlPoint(5, { 8.0f, 0.0f, 2.0f, 1.0f });
+
+	patch01.setControlPoint(6, { 0.0f, 0.0f, 4.0f, 1.0f });
+	patch01.setControlPoint(7, { 2.0f, 0.0f, 4.0f, 1.0f });
+	patch01.setControlPoint(8, { 8.0f, 0.0f, 4.0f, 1.0f });
+
+	Solids.addSolid(&patch01);
+
+
+	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));;
+
+	patch02.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch02.setControlPoint(1, { 2.0f, 0.0f, 1.5f, 1.0f });
+	patch02.setControlPoint(2, { 8.0f, 0.0f, 3.0f, 1.0f });
+
+	patch02.setControlPoint(3, { 0.0f, 2.0f, 0.0f, 1.0f });
+	patch02.setControlPoint(4, { 2.0f, 2.0f, 2.5f, 1.0f });
+	patch02.setControlPoint(5, { 8.0f, 2.0f, 1.0f, 1.0f });
+
+	patch02.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch02.setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
+	patch02.setControlPoint(8, { 8.0f, 4.0f, 0.0f, 1.0f });
+
+	Solids.addSolid(&patch02);
+
+
+	BezierPatch patch03(32, 3, getColour(0, 127, 127, 255));;
+
+	patch03.setPosition({ 20.0f, 20.0f, 0.0f, 1.0f });
+
+	patch03.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch03.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
+	patch03.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
+
+	patch03.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
+	patch03.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
+	patch03.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
+
+	patch03.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch03.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
+	patch03.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
+
+	Solids.addSolid(&patch03);
+
+
+	BezierPatch patch04(32, 4, getColour(0, 127, 127, 255));;
+
+	patch04.setPosition({ 24.0f, 20.0f, 0.0f, 1.0f });
+
+	patch04.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch04.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
+	patch04.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
+
+	patch04.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
+	patch04.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
+	patch04.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
+
+	patch04.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch04.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
+	patch04.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
+
+	Solids.addSolid(&patch04);
+
+
+	BezierPatch patch05(32, 5, getColour(0, 127, 127, 255));;
+
+	patch05.setPosition({ 20.0f, 24.0f, 0.0f, 1.0f });
+
+	patch05.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch05.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
+	patch05.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
+
+	patch05.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
+	patch05.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
+	patch05.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
+
+	patch05.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch05.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
+	patch05.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
+
+	Solids.addSolid(&patch05);
+
+
+	BezierPatch patch06(32, 6, getColour(0, 127, 127, 255));;
+
+	patch06.setPosition({ 24.0f, 24.0f, 0.0f, 1.0f });
+
+	patch06.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch06.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
+	patch06.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
+
+	patch06.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
+	patch06.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
+	patch06.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
+
+	patch06.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch06.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
+	patch06.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
+
+	Solids.addSolid(&patch06);
+
+#endif //_BEZIER_PATCH_
+
+
+
+#ifdef _QUAKE_1_READER_
+
+	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	quakeMap.readData();
+	SolidBody* map = &quakeMap;
+	Solids.addSolid(map);
+	int nTxt = quakeMap.getTotalText();
+	txt* quakeTextures = new txt[nTxt];
+	for (int i = 0; i < nTxt; i++)
+	{
+		quakeTextures[i] = quakeMap.getTextureData(i);
+	}
+	Solids.textureLoaderQ(nTxt, quakeTextures);
+
+#endif //_QUAKE_1_READER_
+
+
+
+#ifdef _STL_READER_
+
 	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
 	test_body.readSTLfile();
-	test_body.smoothSurfaces();
+	//test_body.smoothSurfaces();
 	Solids.addSolid(&test_body);
+
+#endif //_STL_READER_
 
 	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
 								IMG_Load("Textures/wolf001.jpg"),		//01

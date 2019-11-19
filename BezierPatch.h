@@ -13,9 +13,9 @@ class BezierPatch : public SolidBody
 	int				texture;
 
 public:
-	BezierPatch(int, int, Uint32);
-	BezierPatch(int, vect3*);
-	BezierPatch(int, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3);
+	BezierPatch(unsigned int, int, Uint32);
+	BezierPatch(unsigned int, vect3*);
+	BezierPatch(unsigned int, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3);
 	~BezierPatch();
 
 	void	setControlPoint(unsigned int, vect3);

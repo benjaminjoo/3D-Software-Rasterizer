@@ -65,7 +65,7 @@ void BSP1Loader::readData()
 		*/
 		
 		modelFile.seekg(direntry[3].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[3].length / 12); i++)
+		for (unsigned int i = 0; i < (direntry[3].length / 12); i++)
 		{
 			char temp_4[4] = "";
 
@@ -94,7 +94,7 @@ void BSP1Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[12].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[12].length / 4); i++)
+		for (unsigned int i = 0; i < (direntry[12].length / 4); i++)
 		{
 			char temp_2[2] = "";
 
@@ -118,7 +118,7 @@ void BSP1Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[13].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[13].length / 4); i++)
+		for (unsigned int i = 0; i < (direntry[13].length / 4); i++)
 		{
 			char temp_4[4] = "";
 
@@ -136,7 +136,7 @@ void BSP1Loader::readData()
 		*/
 
 		modelFile.seekg(direntry[6].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[6].length / 40); i++)
+		for (unsigned int i = 0; i < (direntry[6].length / 40); i++)
 		{
 			char temp_2[2] = "";
 			char temp_4[4] = "";
@@ -189,7 +189,7 @@ void BSP1Loader::readData()
 		}
 		for (unsigned long i = 0; i < numtex; i++)
 		{
-			modelFile.seekg((unsigned long)direntry[2].offset + (unsigned long)offset[i], modelFile.beg);
+			modelFile.seekg(unsigned long(direntry[2].offset) + unsigned long(offset[i]), modelFile.beg);
 
 			miptex_t temp;
 
@@ -227,7 +227,7 @@ void BSP1Loader::readData()
 
 			tempTexture.pixels = new Uint32[nPixel];
 
-			modelFile.seekg((unsigned long)direntry[2].offset + (unsigned long)offset[i] + temp.offset_1, modelFile.beg);
+			modelFile.seekg(unsigned long(direntry[2].offset) + unsigned long(offset[i]) + temp.offset_1, modelFile.beg);
 			for (int p = 0; p < nPixel; p++)
 			{
 				char colour;
@@ -248,7 +248,7 @@ void BSP1Loader::readData()
 		*/
 		
 		modelFile.seekg(direntry[7].offset, modelFile.beg);
-		for (int i = 0; i < (direntry[7].length / 20); i++)
+		for (unsigned int i = 0; i < (direntry[7].length / 20); i++)
 		{
 			char temp_2[2] = "";
 			char temp_4[4] = "";
@@ -301,7 +301,7 @@ int BSP1Loader::getTotalText()
 }
 
 
-txt BSP1Loader::getTextureData(int n)
+txt BSP1Loader::getTextureData(unsigned int n)
 {
 	if (n < textureDataContainer.size())
 	{

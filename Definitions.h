@@ -67,98 +67,127 @@ typedef unsigned char byte;
 
 struct zColour
 {
-	double z;
-	Uint32 colour;
+	double z		= 0.0f;
+	Uint32 colour	= 0;
 };
 
 
 struct light
 {
-	double azm;
-	double alt;
-	double intensity;
+	double azm			= 0.0f;
+	double alt			= 0.0f;
+	double intensity	= 0.0f;
 };
 
 
 struct screenCoord
 {
-	int x;
-	int y;
+	int x = 0;
+	int y = 0;
 };
 
 
 struct worldCoord
 {
-	double x;
-	double y;
-	double z;
+	double x = 0.0f;
+	double y = 0.0f;
+	double z = 0.0f;
 
-	worldCoord	operator + 	(const worldCoord&);
-	worldCoord	operator - 	(const worldCoord&);
-	worldCoord	operator += (const worldCoord&);
-	worldCoord	operator -= (const worldCoord&);
-	worldCoord	operator ^ 	(const worldCoord&);	//Cross Product
-	double		operator * 	(const worldCoord&);	//Dot Product
+
+	worldCoord operator + (const worldCoord& p)
+	{
+		return { x + p.x, y + p.y, z + p.z };
+	}
+
+
+	worldCoord operator - (const worldCoord& p)
+	{
+		return { x - p.x, y - p.y, z - p.z };
+	}
+
+
+	worldCoord operator += (const worldCoord& p)
+	{
+		return { x += p.x, y += p.y, z += p.z };
+	}
+
+
+	worldCoord operator -= (const worldCoord& p)
+	{
+		return { x -= p.x, y -= p.y, z -= p.z };
+	}
+
+
+	worldCoord operator ^ (const worldCoord& p)	//Cross Product
+	{
+		return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x };
+	}
+
+
+	double operator * (const worldCoord& p)		//Dot Product
+	{
+		return x * p.x + y * p.y + z * p.z;
+	}
 };
 
 
 struct vertex3
 {
-	int			id;
+	int			id			= 0;
 	worldCoord	pos;
-	bool		selected;
-	bool		deleted;
+	bool		selected	= false;
+	bool		deleted		= false;
 };
 
 
 struct line3
 {
-	int			id;
+	int			id			= 0;
 	worldCoord	vert[2];
-	bool		selected;
-	bool		deleted;
+	bool		selected	= false;
+	bool		deleted		= false;
 };
 
 
 struct textCoord
 {
-	double u;
-	double v;
+	double u = 0.0f;
+	double v = 0.0f;
 };
 
 
 struct coord2
 {
-	int x = 0;
-	int y = 0;
-	double z = 0.0;
+	int x		= 0;
+	int y		= 0;
+	double z	= 0.0;
 };
 
 
 struct rect
 {
-	double xStart;
-	double yStart;
-	double xEnd;
-	double yEnd;
+	double xStart	= 0.0f;
+	double yStart	= 0.0f;
+	double xEnd		= 0.0f;
+	double yEnd		= 0.0f;
 };
 
 
 struct vect2
 {
-	double x;
-	double y;
-	double		u;
-	double		v;
+	double x = 0.0f;
+	double y = 0.0f;
+	double u = 0.0f;
+	double v = 0.0f;
 };
 
 
 struct vect3
 {
-	double x;
-	double y;
-	double z;
-	double w;
+	double x = 0.0f;
+	double y = 0.0f;
+	double z = 0.0f;
+	double w = 0.0f;
 
 	//vect3	operator + 	(const vect3&);
 	//vect3	operator - 	(const vect3&);
@@ -176,94 +205,94 @@ bool match(const vect3& a, const vect3& b);
 struct point3
 {
 	vect3 P;
-	Uint32 colour;
+	Uint32 colour = 0;
 };
 
 
 struct lump
 {
-	unsigned long offset;
-	unsigned long length;
+	unsigned long offset = 0;
+	unsigned long length = 0;
 };
 
 
 struct edge3d
 {
-	unsigned short startPoint;
-	unsigned short endPoint;
+	unsigned short startPoint	= 0;
+	unsigned short endPoint		= 0;
 };
 
 
 struct vert
 {
-	float 			x;
-	float 			y;
-	float 			z;
+	float 			x = 0.0f;
+	float 			y = 0.0f;
+	float 			z = 0.0f;
 
-	float 			u;
-	float 			v;
+	float 			u = 0.0f;
+	float 			v = 0.0f;
 
-	float 			m;
-	float 			n;
+	float 			m = 0.0f;
+	float 			n = 0.0f;
 
-	float 			nx;
-	float 			ny;
-	float 			nz;
+	float 			nx = 0.0f;
+	float 			ny = 0.0f;
+	float 			nz = 0.0f;
 
-	unsigned int 	r;
-	unsigned int 	g;
-	unsigned int 	b;
-	unsigned int 	a;
+	unsigned int 	r = 0;
+	unsigned int 	g = 0;
+	unsigned int 	b = 0;
+	unsigned int 	a = 0;
 };
 
 
 struct face_t
 {
-	unsigned short 	plane_id;
-	unsigned short 	side;
-	long			ledge_id;
-	unsigned short	ledge_num;
-	unsigned short	texinfo_id;
-	unsigned char	typelight;
-	unsigned char	baselight;
-	unsigned char	light[2];
-	long			lightmap;
+	unsigned short 	plane_id	= 0;
+	unsigned short 	side		= 0;
+	long			ledge_id	= 0;
+	unsigned short	ledge_num	= 0;
+	unsigned short	texinfo_id	= 0;
+	unsigned char	typelight	= 0;
+	unsigned char	baselight	= 0;
+	unsigned char	light[2]	= { 0, 0 };
+	long			lightmap	= 0;
 };
 
 
 struct surface_t
 {
 	vert			S;
-	float			distS;
+	float			distS		= 0.0f;
 	vert			T;
-	float			distT;
-	unsigned long	texture_id;
-	unsigned long	animated;
+	float			distT		= 0.0f;
+	unsigned long	texture_id	= 0;
+	unsigned long	animated	= 0;
 };
 
 
 struct miptex_t
 {
-	char 			name[16];
-	unsigned long 	width;
-	unsigned long 	height;
-	unsigned long 	offset_1;
-	unsigned long 	offset_2;
-	unsigned long 	offset_4;
-	unsigned long 	offset_8;
+	char 			name[16]	= { 0 };
+	unsigned long 	width		= 0;
+	unsigned long 	height		= 0;
+	unsigned long 	offset_1	= 0;
+	unsigned long 	offset_2	= 0;
+	unsigned long 	offset_4	= 0;
+	unsigned long 	offset_8	= 0;
 };
 
 
 struct face
 {
-	int			texture;
-	int			effect;
-	int			type;
-	int			firstVert;
-	int			nVert;
-	int			meshVert;
-	int			nMeshVert;
-	int			lightMap;
+	int			texture		= 0;
+	int			effect		= 0;
+	int			type		= 0;
+	int			firstVert	= 0;
+	int			nVert		= 0;
+	int			meshVert	= 0;
+	int			nMeshVert	= 0;
+	int			lightMap	= 0;
 	coord2		lmStart;
 	coord2		lmSize;
 	vect3		lmOrigin;
@@ -279,7 +308,7 @@ struct line3d
 	vect3 A;
 	vect3 B;
 
-	Uint32 colour;
+	Uint32 colour = 0;
 };
 
 
@@ -294,10 +323,10 @@ struct triangle3d
 
 struct txt
 {
-	int ID;
+	int ID	= 0;
 
-	int w;
-	int h;
+	int w	= 0;
+	int h	= 0;
 
 	Uint32* pixels;
 };
@@ -319,8 +348,8 @@ struct triangle3dV	//3D Triangle with vertex normals for Gouraud shading
 	textCoord Bt;
 	textCoord Ct;
 
-	Uint32 colour;
-	int texture;
+	Uint32 colour	= 0;
+	int texture		= 0;
 };
 
 
@@ -351,9 +380,9 @@ struct boundingBox
 
 struct polyNode
 {
-	double	x;
-	double 	y;
-	int 	s;
+	double	x = 0.0f;
+	double 	y = 0.0f;
+	int 	s = 0;
 };
 
 
@@ -389,14 +418,14 @@ struct triangle2dG	//2D Triangle for Gouraud shading
 	coord2 b;
 	coord2 c;
 
-	Uint32 h;
-	int texture;
+	Uint32 h		= 0;
+	int texture		= 0;
 
-	double illumA;
-	double illumB;
-	double illumC;
+	double illumA	= 0.0f;
+	double illumB	= 0.0f;
+	double illumC	= 0.0f;
 
-	double illumFlat;
+	double illumFlat = 0.0f;
 
 	textCoord At;
 	textCoord Bt;
@@ -406,40 +435,40 @@ struct triangle2dG	//2D Triangle for Gouraud shading
 
 struct mat4x4
 {
-	double _00;
-	double _01;
-	double _02;
-	double _03;
+	double _00 = 0.0f;
+	double _01 = 0.0f;
+	double _02 = 0.0f;
+	double _03 = 0.0f;
 
-	double _10;
-	double _11;
-	double _12;
-	double _13;
+	double _10 = 0.0f;
+	double _11 = 0.0f;
+	double _12 = 0.0f;
+	double _13 = 0.0f;
 
-	double _20;
-	double _21;
-	double _22;
-	double _23;
+	double _20 = 0.0f;
+	double _21 = 0.0f;
+	double _22 = 0.0f;
+	double _23 = 0.0f;
 
-	double _30;
-	double _31;
-	double _32;
-	double _33;
+	double _30 = 0.0f;
+	double _31 = 0.0f;
+	double _32 = 0.0f;
+	double _33 = 0.0f;
 };
 
 
 struct transform3d
 {
-	double x;
-	double y;
-	double z;
+	double x = 0.0f;
+	double y = 0.0f;
+	double z = 0.0f;
 
-	double sinAzm;
-	double cosAzm;
-	double sinAlt;
-	double cosAlt;
-	double sinRol;
-	double cosRol;
+	double sinAzm = 0.0f;
+	double cosAzm = 0.0f;
+	double sinAlt = 0.0f;
+	double cosAlt = 0.0f;
+	double sinRol = 0.0f;
+	double cosRol = 0.0f;
 };
 
 

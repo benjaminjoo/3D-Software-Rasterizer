@@ -1080,7 +1080,7 @@ void Editor::copyMoveSelected()
 			vCount++;
 		}
 	}
-	for (auto i = 0; i < nSelectedVert; i++)
+	for (unsigned int i = 0; i < nSelectedVert; i++)
 		Model->addVertex3(tempVerts[i]);
 
 	unsigned int nSelectedLine = this->nLineSelected();
@@ -1102,7 +1102,7 @@ void Editor::copyMoveSelected()
 			lCount++;
 		}
 	}
-	for (auto i = 0; i < nSelectedLine; i++)
+	for (unsigned int i = 0; i < nSelectedLine; i++)
 		Model->addLine3(tempLines[i]);
 }
 
@@ -1150,7 +1150,7 @@ void Editor::copyRotateSelected()
 			vCount++;
 		}
 	}
-	for (auto i = 0; i < nSelectedVert; i++)
+	for (unsigned int i = 0; i < nSelectedVert; i++)
 		Model->addVertex3(tempVerts[i]);
 
 	unsigned int nSelectedLine = this->nLineSelected();
@@ -1169,7 +1169,7 @@ void Editor::copyRotateSelected()
 			lCount++;
 		}
 	}
-	for (auto i = 0; i < nSelectedLine; i++)
+	for (unsigned int i = 0; i < nSelectedLine; i++)
 		Model->addLine3(tempLines[i]);
 }
 

@@ -21,8 +21,6 @@ public:
 	double			alt;
 	double			rol;
 
-	vect3			speed;
-
 	double			fovH;
 
 	double			zNear;
@@ -30,18 +28,15 @@ public:
 
 	int				w;
 	int				h;
-	int				margin;
-	int				scale;
-	int				grainSize;
 
-	txt				currentTexture;
+	txt				currentTexture	= { 0, 0, 0, nullptr };;
 
 	ViewVolume		Frustum;
 
-	clock_t			oldTime;
-	clock_t			newTime;
-	clock_t			frameTime;
-	int				frameCounter;
+	clock_t			oldTime			= 0;
+	clock_t			newTime			= 0;
+	clock_t			frameTime		= 0;
+	int				frameCounter	= 0;
 
 	Camera();
 	Camera(double, double, double, int, int, int);

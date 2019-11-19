@@ -61,13 +61,13 @@ Renderer::~Renderer()
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
-	for (int i = 0; i < solidN; i++)
+	for (unsigned int i = 0; i < solidN; i++)
 	{
 		delete[] solidMesh[i];
 	}
 	delete[] solidMesh;
 
-	for (int i = 0; i < actorN; i++)
+	for (unsigned int i = 0; i < actorN; i++)
 	{
 		delete[] actorMesh[i];
 	}
@@ -524,7 +524,7 @@ void Renderer::updateEntities(model E)
 	{
 		int* polyCount = Entities->getPolyCountEntities();
 
-		for (int i = 0; i < Entities->getNEntities(); i++)				//For every entity
+		for (unsigned int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			vect3 velocity = Entities->getVelocity(i);
 			vect3 angVelocity = Entities->getAngularVelocity(i);
@@ -570,7 +570,7 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 
 		transform3d playerPosition = Player->getTransformation();
 
-		for (int i = 0; i < Entities->getNEntities(); i++)				//For every entity
+		for (unsigned int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			int totalPoly = polyCount[i];
 			for (int k = 0; k < totalPoly; k++)
