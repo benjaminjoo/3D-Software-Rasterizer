@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
@@ -11,65 +13,67 @@
 class Editor
 {
 public:
-	Camera*				Cam;
-	Canvas*				Screen;
-	ModelElementBuffer* Model;
 
-	Button				arrowButton;
-	Button				crossButton;
-	Button				lineButton;
-	Button				moveButton;
-	Button				rotateButton;
+	std::shared_ptr<Camera>				Cam;
+	std::shared_ptr<Canvas>				Screen;
+	std::shared_ptr<ModelElementBuffer> Model;
 
-	Button				topViewButton;
-	Button				frontViewButton;
-	Button				sideViewButton;
+	Button				arrowButton		= { Screen, 0, 0, false,	arrow,		LIGHT_GRAY };
+	Button				crossButton		= { Screen, 1, 0, true,		cross,		LIGHT_GRAY };
+	Button				lineButton		= { Screen, 2, 0, false,	line,		LIGHT_GRAY };
+	Button				moveButton		= { Screen, 3, 0, false,	move,		LIGHT_GRAY };
+	Button				rotateButton	= { Screen, 4, 0, false,	rotate,		LIGHT_GRAY };
 
-	Button				objSnapButton;
-	Button				grdSnapButton;
+	Button				topViewButton	= { Screen, 5, 0, true,		view_top,	LIGHT_GRAY };
+	Button				frontViewButton = { Screen, 6, 0, false,	view_front,	LIGHT_GRAY };
+	Button				sideViewButton	= { Screen, 7, 0, false,	view_side,	LIGHT_GRAY };
 
-	Side				currentView;
-	editingMode			currentMode;
-	tool				currentTool;
+	Button				objSnapButton	= { Screen, 8, 0, false,	obj_snap,	LIGHT_GRAY };
+	Button				grdSnapButton	= { Screen, 9, 0, false,	grid_snap,	LIGHT_GRAY };
 
-	bool				isObjectSnapOn;
-	bool				isGridSnapOn;
-	bool				isOrthoOn;
+	Side				currentView		= Top;
+	editingMode			currentMode		= Placement;
+	tool				currentTool		= cross;
 
-	int					maxUndo;
-	int					currentID;
-	int					clicksInQueue;
-	int					currentEdit;
-	bool				startVertMoving;
-	bool				endVertMoving;
+	bool				isObjectSnapOn	= false;
+	bool				isGridSnapOn	= false;
+	bool				isOrthoOn		= false;
 
-	worldCoord			movementStart;
-	worldCoord			movementEnd;
+	int					maxUndo			= 20;
+	int					currentID		= 1;
+	int					clicksInQueue	= 0;
+	int					currentEdit		= 0;
+	bool				startVertMoving = false;
+	bool				endVertMoving	= false;
 
-	worldCoord			rotationCentre;
-	worldCoord			rotationStart;
-	worldCoord			rotationEnd;
-	double				rotationAngle;
+	worldCoord			movementStart	= { 0.0f, 0.0f, 0.0f };
+	worldCoord			movementEnd		= { 0.0f, 0.0f, 0.0f };
 
-	double		scale;
-	double		tolerance;
+	worldCoord			rotationCentre	= { 0.0f, 0.0f, 0.0f };
+	worldCoord			rotationStart	= { 0.0f, 0.0f, 0.0f };
+	worldCoord			rotationEnd		= { 0.0f, 0.0f, 0.0f };
+	double				rotationAngle	= 0.0f;
 
-	screenCoord planPosition;
-	screenCoord frontPosition;
-	screenCoord rightPosition;
+	double				scale			= 1.0f;
+	double				tolerance;
 
-	screenCoord mousePosition;
+	screenCoord			planPosition	= { 600, 300 };
+	screenCoord			frontPosition	= { 600, 300 };
+	screenCoord			rightPosition	= { 600, 300 };
 
-	worldCoord	mouseBeforeZoom;
-	worldCoord	mouseAfterZoom;
+	screenCoord			mousePosition	= { 0, 0 };
 
-	worldCoord	viewportCentre;
+	worldCoord			mouseBeforeZoom = { 0.0f, 0.0f, 0.0f };
+	worldCoord			mouseAfterZoom	= { 0.0f, 0.0f, 0.0f };
 
-	screenCoord	dragStart;
+	worldCoord			viewportCentre	= { -600.0f, -300.0f, 0.0f };
 
-	worldCoord	worldPosition;
+	screenCoord			dragStart		= { 0, 0 };
 
-	Editor(double, Camera*, Canvas*, ModelElementBuffer*);
+	worldCoord			worldPosition	= { 0.0f, 0.0f, 0.0f };
+
+
+	Editor(double toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer);
 	~Editor();
 
 	worldCoord screen2world(screenCoord);

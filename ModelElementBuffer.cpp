@@ -5,12 +5,15 @@
 
 ModelElementBuffer::ModelElementBuffer(std::string F)
 {
+	std::cout << "ModelElementBuffer constructor called - ModelElementBuffer::ModelElementBuffer(std::string F)" << std::endl;
+
 	fileName	= F;
 }
 
 
 ModelElementBuffer::~ModelElementBuffer()
 {
+	std::cout << "ModelElementBuffer destructor called" << std::endl;
 }
 
 

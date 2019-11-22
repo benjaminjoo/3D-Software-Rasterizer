@@ -1,30 +1,25 @@
 #include "Button.h"
 #include "Icons.h"
 
+
 Button::Button()
 {
-	S			= &Canvas(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
-	size		= { 32, 32 };
-	position	= { 0 * 32, 1 * 32 };
-	isActive	= false;
-	toolName	= none;
-	colour		= 255;
+	std::cout << "Button constructor called - Button::Button()" << std::endl;
 }
 
 
-Button::Button(Canvas* can, int posH, int posV, bool on, tool name, Uint32 col)
+Button::Button(std::shared_ptr<Canvas> canvas, int posH, int posV, bool on, tool name, Uint32 col):
+	S(canvas), isActive(on), toolName(name), colour(col)
 {
-	S			= can;
-	size		= { 32, 32 };
-	position	= { posH * 32, posV * 32 };
-	isActive	= on;
-	toolName	= name;
-	colour		= col;
+	std::cout << "Button constructor called - Button::Button(std::shared_ptr<Canvas> canvas, int posH, int posV, bool on, tool name, Uint32 col)" << std::endl;
+
+	position = { posH * 32, posV * 32 };
 }
 
 
 Button::~Button()
 {
+	std::cout << "Button destructor is called" << std::endl;
 }
 
 

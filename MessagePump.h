@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SDL/SDL.h>
+#include <memory>
+
 #include "Definitions.h"
 #include "Canvas.h"
 #include "Editor.h"
@@ -10,14 +12,14 @@ class MessagePump
 {
 public:
 
-	Editor*					E;
+	std::shared_ptr<Editor> E;
 
-	SDL_Event	event;
-	bool		quit;
+	SDL_Event	event		= { 0 };
+	bool		quit		= false;
 
-	bool		mouseAiming;
+	bool		mouseAiming = false;
 
-	MessagePump(Editor*);
+	MessagePump(std::shared_ptr<Editor> ed);
 	~MessagePump();
 
 	void HandleUserEvents();

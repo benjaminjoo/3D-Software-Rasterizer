@@ -9,6 +9,7 @@
 #include "SolidRevolved.h"
 #include "Room.h"
 #include "SolidSTL.h"
+#include <iostream>
 #include <vector>
 #include <string>
 

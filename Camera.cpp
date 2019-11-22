@@ -16,6 +16,8 @@ Camera::Camera():
 	x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(320), h(200)
 {
+	std::cout << "Camera constructor called - Camera::Camera()" << std::endl;
+
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);
 }
 
@@ -24,6 +26,8 @@ Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
 	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
+	std::cout << "Camera constructor called - Camera::Camera(double cx, double cy, double cz, int width, int height, int s)" << std::endl;
+
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
 }
 
@@ -33,12 +37,15 @@ Camera::Camera(double cx, double cy, double cz, double az, double al, double rl,
 	x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
 	fovH(fov), zNear(nr), zFar(fr), w(width), h(height)
 {
+	std::cout << "Camera constructor called - Camera::Camera(double cx, double cy, double cz, double az, double al, double rl, double stp, double trn, double fov, double nr, double fr, int width, int height, int s)" << std::endl;
+
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
 }
 
 
 Camera::~Camera()
 {
+	std::cout << "Camera destructor called" << std::endl;
 }
 
 

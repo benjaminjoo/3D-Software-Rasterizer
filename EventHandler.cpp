@@ -5,6 +5,8 @@
 
 EventHandler::EventHandler(double step, double turn, double sens)
 {
+	std::cout << "EventHandler constructor called - EventHandler::EventHandler(double step, double turn, double sens)" << std::endl;
+
 	visualStyle			= wireframe;
 
 	gouraudShading		= true;
@@ -45,6 +47,7 @@ EventHandler::EventHandler(double step, double turn, double sens)
 
 EventHandler::~EventHandler()
 {
+	std::cout << "EventHandler destructor called" << std::endl;
 }
 
 

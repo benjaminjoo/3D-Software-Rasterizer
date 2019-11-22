@@ -46,47 +46,47 @@
 
 void editor()
 {
-	SDL_Window* window = SDL_CreateWindow("Software Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	SDL_Window* sdl_window = SDL_CreateWindow("Software Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
-	SDL_Renderer* screen = SDL_CreateRenderer(window, -1, 0);
+	SDL_Renderer* sdl_screen = SDL_CreateRenderer(sdl_window, -1, 0);
 
-	SDL_Texture* sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, EDITOR_WIDTH, EDITOR_HEIGHT);
+	SDL_Texture* sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, EDITOR_WIDTH, EDITOR_HEIGHT);
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-	Canvas Screen(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	auto Screen = std::make_shared<Canvas>(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
 
-	Camera Viewer(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	auto Viewer = std::make_shared<Camera>(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
-	ModelElementBuffer Drawing("test.wtf");
+	auto Drawing = std::make_shared<ModelElementBuffer>("test.wtf");
 
-	Editor Builder(0.05, &Viewer, &Screen, &Drawing);
+	auto Builder = std::make_shared<Editor>(0.05f, Viewer, Screen, Drawing);
 
-	MessagePump Controls(&Builder);
+	auto Controls = std::make_shared<MessagePump>(Builder);
 
 	Shapes Solids;
 
-	while (!Controls.quit)
+	while (!Controls->quit)
 	{
-		Screen.resetPixelBuffer();
-		Screen.resetDepthBuffer();
+		Screen->resetPixelBuffer();
+		Screen->resetDepthBuffer();
 
-		Builder.updateScreen();
-		Controls.HandleUserEvents();
+		Builder->updateScreen();
+		Controls->HandleUserEvents();
 
 		//Screen.update();
 
-		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
-		SDL_RenderClear(screen);
-		SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
-		SDL_RenderPresent(screen);
+		SDL_UpdateTexture(sdl_texture, nullptr, Screen->pixelBuffer, Screen->getWidth() * sizeof(Uint32));
+		SDL_RenderClear(sdl_screen);
+		SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
+		SDL_RenderPresent(sdl_screen);
 	}
 
 	//Screen.cleanUp();
 
 	SDL_DestroyTexture(sdl_texture);
-	SDL_DestroyRenderer(screen);
-	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(sdl_screen);
+	SDL_DestroyWindow(sdl_window);
 
 	IMG_Quit();
 
@@ -96,11 +96,11 @@ void editor()
 
 void software_renderer()
 {
-	SDL_Window* window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	SDL_Window* sdl_window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
-	SDL_Renderer* screen = SDL_CreateRenderer(window, -1, 0);
+	SDL_Renderer* sdl_screen = SDL_CreateRenderer(sdl_window, -1, 0);
 
-	SDL_Texture* sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Texture* sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -332,11 +332,11 @@ void software_renderer()
 
 		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
 
-		SDL_RenderClear(screen);
+		SDL_RenderClear(sdl_screen);
 
-		SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
+		SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
 
-		SDL_RenderPresent(screen);
+		SDL_RenderPresent(sdl_screen);
 
 		Game.updateFrameCounter();
 	}
@@ -346,8 +346,8 @@ void software_renderer()
 	//Screen.cleanUp();
 
 	SDL_DestroyTexture(sdl_texture);
-	SDL_DestroyRenderer(screen);
-	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(sdl_screen);
+	SDL_DestroyWindow(sdl_window);
 	
 	IMG_Quit();
 	

@@ -1,21 +1,24 @@
 #pragma once
 
+#include <memory>
+#include <iostream>
+
 #include "Definitions.h"
 #include "Canvas.h"
 
 
 class Button
 {
-	Canvas*			S;
-	screenCoord		size;
-	screenCoord		position;
-	bool			isActive;
-	tool			toolName;
-	Uint32			colour;
+	std::shared_ptr<Canvas> S			= std::make_shared<Canvas>(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	screenCoord				size		= { 32, 32 };
+	screenCoord				position	= { 0 * 32, 1 * 32 };;
+	bool					isActive	= false;
+	tool					toolName	= none;
+	Uint32					colour		= BLUE;
 
 public:
 	Button();
-	Button(Canvas*, int, int, bool, tool, Uint32);
+	Button(std::shared_ptr<Canvas> canvas, int posH, int posV, bool on, tool name, Uint32 col);
 	~Button();
 
 	void turnOn();

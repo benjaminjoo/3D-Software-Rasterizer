@@ -1,70 +1,16 @@
 #include "Editor.h"
 
 
-Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)
+Editor::Editor(double toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer):
+	tolerance(toler), Cam(camera), Screen(screen), Model(buffer)
 {
-	currentView		= Top;
-	currentMode		= Placement;
-	currentTool		= cross;
-
-	isObjectSnapOn	= false;
-	isGridSnapOn	= false;
-	isOrthoOn		= false;
-
-	maxUndo			= 20;
-	currentID		= 1;
-	clicksInQueue	= 0;
-	currentEdit		= 0;
-	startVertMoving = false;
-	endVertMoving	= false;
-
-	movementStart	= { 0.0f, 0.0f, 0.0f };
-	movementEnd		= { 0.0f, 0.0f, 0.0f };
-
-	rotationCentre	= { 0.0f, 0.0f, 0.0f };
-	rotationStart	= { 0.0f, 0.0f, 0.0f };
-	rotationEnd		= { 0.0f, 0.0f, 0.0f };
-	rotationAngle	= 0.0f;
-
-	Cam				= ca;	//Camera
-	Screen			= sc;	//Canvas
-	Model			= buff;	//Model elements
-
-	arrowButton		= { Screen, 0, 0, false,	arrow,		LIGHT_GRAY };
-	crossButton		= { Screen, 1, 0, true,		cross,		LIGHT_GRAY };
-	lineButton		= { Screen, 2, 0, false,	line,		LIGHT_GRAY };
-	moveButton		= { Screen, 3, 0, false,	move,		LIGHT_GRAY };
-	rotateButton	= { Screen, 4, 0, false,	rotate,		LIGHT_GRAY };
-
-	topViewButton	= { Screen, 5, 0, true,		view_top,	LIGHT_GRAY };
-	frontViewButton = { Screen, 6, 0, false,	view_front,	LIGHT_GRAY };
-	sideViewButton	= { Screen, 7, 0, false,	view_side,	LIGHT_GRAY };
-
-	objSnapButton	= { Screen, 8, 0, false,	obj_snap,	LIGHT_GRAY };
-	grdSnapButton	= { Screen, 9, 0, false,	grid_snap,	LIGHT_GRAY };
-
-	scale			= 1.0f;
-	tolerance		= toler;
-
-	planPosition	= { 600, 300 };
-	frontPosition	= { 600, 300 };
-	rightPosition	= { 600, 300 };
-
-	mousePosition	= { 0, 0 };
-
-	mouseBeforeZoom = { 0.0f, 0.0f, 0.0f };
-	mouseAfterZoom	= { 0.0f, 0.0f, 0.0f };
-
-	viewportCentre	= { -600.0f, -300.0f, 0.0f };;
-
-	dragStart		= { 0, 0 };
-
-	worldPosition	= { 0.0f, 0.0f, 0.0f };
+	std::cout << "Editor constructor called - Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)" << std::endl;
 }
 
 
 Editor::~Editor()
 {
+	std::cout << "Editor destructor called" << std::endl;
 }
 
 

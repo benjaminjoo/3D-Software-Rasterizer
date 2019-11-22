@@ -2,20 +2,15 @@
 #include "stdio.h"
 
 
-MessagePump::MessagePump(Editor* ed)
+MessagePump::MessagePump(std::shared_ptr<Editor> ed):
+	E(ed)
 {
-	E			= ed;
-
-	event		= { 0 };
-
-	quit		= false;
-
-	mouseAiming = false;
 }
 
 
 MessagePump::~MessagePump()
 {
+	std::cout << "MessagePump destructor called" << std::endl;
 }
 
 

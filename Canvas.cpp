@@ -7,7 +7,7 @@
 
 Canvas::Canvas()
 {
-	std::cout << "-" << std::endl;
+	std::cout << "Canvas constructor called - Canvas::Canvas()" << std::endl;
 
 	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
 	
@@ -43,7 +43,7 @@ Canvas::Canvas()
 
 Canvas::Canvas(int width, int height, double z)
 {
-	std::cout << "+" << std::endl;
+	std::cout << "Canvas constructor called - Canvas::Canvas(int width, int height, double z)" << std::endl;
 
 	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
 	
@@ -74,7 +74,7 @@ Canvas::Canvas(int width, int height, double z)
 
 Canvas::~Canvas()
 {
-	//std::cout << "p" << std::endl;
+	std::cout << "Canvas destructor called" << std::endl;
 }
 
 
