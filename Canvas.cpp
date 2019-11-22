@@ -9,26 +9,13 @@ Canvas::Canvas()
 {
 	std::cout << "Canvas constructor called - Canvas::Canvas()" << std::endl;
 
-	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
-	
-	//screen = SDL_CreateRenderer(window, -1, 0);
-	
-	//sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, 640, 480);
-	
-	//SDL_ShowCursor(SDL_DISABLE);
+	sdl_window	= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
 
+	sdl_screen	= SDL_CreateRenderer(sdl_window, -1, 0);
 
-	SDL_Init(SDL_INIT_VIDEO);
-	IMG_Init(IMG_INIT_JPG);
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+	sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, w, h);
 
-	w			= 640;
-	h			= 480;
-	fontSize	= 8;
-	cursorSize	= 16;
-	iconSize	= 32;
-
-	zFar		= 0.0;
+	SDL_ShowCursor(SDL_DISABLE);
 
 	pixelBuffer = new Uint32[w * h];
 	depthBuffer = new double[w * h];
@@ -41,25 +28,18 @@ Canvas::Canvas()
 }
 
 
-Canvas::Canvas(int width, int height, double z)
+Canvas::Canvas(int width, int height, double z):
+	w(width), h(height), zFar(z)
 {
 	std::cout << "Canvas constructor called - Canvas::Canvas(int width, int height, double z)" << std::endl;
 
-	//window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
-	
-	//screen = SDL_CreateRenderer(window, -1, 0);
-	
-	//sdl_texture = SDL_CreateTexture(screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
-	
-	//SDL_ShowCursor(SDL_DISABLE);
+	sdl_window	= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
 
-	w			= width;
-	h			= height;
-	fontSize	= 8;
-	cursorSize	= 16;
-	iconSize	= 32;
+	sdl_screen	= SDL_CreateRenderer(sdl_window, -1, 0);
 
-	zFar		= z;
+	sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, w, h);
+
+	SDL_ShowCursor(SDL_DISABLE);
 
 	pixelBuffer = new Uint32[w * h];
 	depthBuffer = new double[w * h];
@@ -80,27 +60,23 @@ Canvas::~Canvas()
 
 void Canvas::update()
 {
-	//std::cout << "." << std::endl;
+	SDL_UpdateTexture(sdl_texture, nullptr, pixelBuffer, getWidth() * sizeof(Uint32));
 
-	//SDL_UpdateTexture(sdl_texture, nullptr, pixelBuffer, w * sizeof(Uint32));
-	
-	//SDL_RenderClear(screen);
-	
-	//SDL_RenderCopy(screen, sdl_texture, nullptr, nullptr);
-	
-	//SDL_RenderPresent(screen);
+	SDL_RenderClear(sdl_screen);
+
+	SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
+
+	SDL_RenderPresent(sdl_screen);
 }
 
 
 void Canvas::cleanUp()
 {
-	//std::cout << "o" << std::endl;
+	SDL_DestroyTexture(sdl_texture);
 
-	//SDL_DestroyTexture(sdl_texture);
-	
-	//SDL_DestroyRenderer(screen);
-	
-	//SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(sdl_screen);
+
+	SDL_DestroyWindow(sdl_window);
 }
 
 

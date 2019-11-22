@@ -3,28 +3,18 @@
 #include <stdio.h>
 
 
-Renderer::Renderer(Shapes* B, Shapes* A, LightSource* L, Camera* P, EventHandler* E)
+Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors, std::shared_ptr<LightSource> sun,
+	std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls):
+	Solids(solids), Actors(actors), Sun(sun), Player(player), Controls(controls)
 {
-	Solids			= B;
-	Actors			= A;
-	Sun				= L;
-	Controls		= E;
-	Player			= P;
-	Entities		= nullptr;
+	std::cout << "Renderer constructor called - Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors,"
+				<< "std::shared_ptr<LightSource> sun, std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls)" << std::endl;
 
-	oldTime			= 0;
-	newTime			= 0;
-	frameTime		= 0;
-	frameCounter	= 0;
-	polyCounter		= 0;
+	hRatio = Player->getHRatio();
+	vRatio = Player->getVRatio();
 
-	collisionDist	= 1.0;
-
-	hRatio			= Player->getHRatio();
-	vRatio			= Player->getVRatio();
-
-	solidN			= Solids->getNEntities();
-	actorN			= Actors->getNEntities();
+	solidN = Solids->getNEntities();
+	actorN = Actors->getNEntities();
 
 	solidPolyCount = new int[Solids->getNEntities()];
 	Solids->getPolyCountEntities(solidPolyCount);
@@ -52,12 +42,13 @@ Renderer::Renderer(Shapes* B, Shapes* A, LightSource* L, Camera* P, EventHandler
 	vShadows = nullptr;
 
 	sunVector = Sun->getVector();
-
 }
 
 
 Renderer::~Renderer()
 {
+	std::cout << "Renderer destructor called" << std::endl;
+
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
@@ -137,7 +128,6 @@ bool Renderer::checkCameraCollision(vect3 v, int* body, int* poly)
 					{
 						collisionTakingPlace = true;
 						if (dist < minDist) { minDist = dist; collidingBody = i; collidingPoly = p; }
-						//printf(".");
 					}
 				}
 			}
@@ -600,26 +590,23 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 }
 
 
-void Renderer::displayStats(bool crosshair, bool fps, bool position, bool polyN, Canvas Screen)
+void Renderer::displayStats(bool crosshair, bool fps, bool position, bool polyN, std::shared_ptr<Canvas> Screen)
 {
 	double azmToShow, altToShow, rolToShow;
-	if (crosshair) { Screen.drawCrosshair(2, 6, getColour(0, 127, 127, 127)); }
+	if (crosshair) { Screen->drawCrosshair(2, 6, getColour(0, 127, 127, 127)); }
 	if (position)
 	{
-		//Screen.displayString("AaBbCcDdEeFfGgHhIiJjKkLlMm", 30, 18, getColour(0, 0, 255, 0));
-		//Screen.displayString("NnOoPpQqRrSsTtUuVvWwXxYyZz", 30, 16, getColour(0, 0, 255, 0));
+		Screen->displayString("MAX ILLUMINATION", 30, 12, getColour(0, 255, 255, 255));
+		Screen->displayValue(Controls->maxIllumination, 2, 2, 12, getColour(0, 255, 255, 255));
+		Screen->displayString("TORCH INTENSITY", 30, 11, getColour(0, 255, 255, 255));
+		Screen->displayValue(Controls->torchIntensity, 2, 2, 11, getColour(0, 255, 255, 255));
 
-		Screen.displayString("MAX ILLUMINATION", 30, 12, getColour(0, 255, 255, 255));
-		Screen.displayValue(Controls->maxIllumination, 2, 2, 12, getColour(0, 255, 255, 255));
-		Screen.displayString("TORCH INTENSITY", 30, 11, getColour(0, 255, 255, 255));
-		Screen.displayValue(Controls->torchIntensity, 2, 2, 11, getColour(0, 255, 255, 255));
-
-		Screen.displayString("POSITION X", 30, 9, getColour(0, 255, 127, 127));
-		Screen.displayValue((double)Player->x, 1, 2, 9, getColour(0, 255, 127, 127));
-		Screen.displayString("POSITION Y", 30, 8, getColour(0, 127, 255, 127));
-		Screen.displayValue((double)Player->y, 1, 2, 8, getColour(0, 127, 255, 127));
-		Screen.displayString("POSITION Z", 30, 7, getColour(0, 127, 127, 255));
-		Screen.displayValue((double)Player->z, 1, 2, 7, getColour(0, 127, 127, 255));
+		Screen->displayString("POSITION X", 30, 9, getColour(0, 255, 127, 127));
+		Screen->displayValue((double)Player->x, 1, 2, 9, getColour(0, 255, 127, 127));
+		Screen->displayString("POSITION Y", 30, 8, getColour(0, 127, 255, 127));
+		Screen->displayValue((double)Player->y, 1, 2, 8, getColour(0, 127, 255, 127));
+		Screen->displayString("POSITION Z", 30, 7, getColour(0, 127, 127, 255));
+		Screen->displayValue((double)Player->z, 1, 2, 7, getColour(0, 127, 127, 255));
 
 		azmToShow = Player->azm * 180.0 / PI;
 		if (azmToShow > 360.0) { azmToShow -= 360.0; }
@@ -631,20 +618,20 @@ void Renderer::displayStats(bool crosshair, bool fps, bool position, bool polyN,
 		if (rolToShow > 360.0) { rolToShow -= 360.0; }
 		if (rolToShow < -360.0) { rolToShow += 360.0; }
 
-		Screen.displayString("ROTATION X", 30, 5, getColour(0, 255, 63, 63));
-		Screen.displayValue(azmToShow, 1, 2, 5, getColour(0, 255, 63, 63));
-		Screen.displayString("ROTATION Y", 30, 4, getColour(0, 63, 255, 63));
-		Screen.displayValue(altToShow, 1, 2, 4, getColour(0, 63, 255, 63));
-		Screen.displayString("ROTATION Z", 30, 3, getColour(0, 63, 63, 255));
-		Screen.displayValue(rolToShow, 1, 2, 3, getColour(0, 63, 63, 255));
+		Screen->displayString("ROTATION X", 30, 5, getColour(0, 255, 63, 63));
+		Screen->displayValue(azmToShow, 1, 2, 5, getColour(0, 255, 63, 63));
+		Screen->displayString("ROTATION Y", 30, 4, getColour(0, 63, 255, 63));
+		Screen->displayValue(altToShow, 1, 2, 4, getColour(0, 63, 255, 63));
+		Screen->displayString("ROTATION Z", 30, 3, getColour(0, 63, 63, 255));
+		Screen->displayValue(rolToShow, 1, 2, 3, getColour(0, 63, 63, 255));
 	}
 	if (fps)
 	{
-		Screen.displayFps((double)(30000.0 / frameTime), 1, 2, 0);
+		Screen->displayFps((double)(30000.0 / frameTime), 1, 2, 0);
 	}
 	if (polyN)
 	{
-		Screen.displayValue(polyCounter, 1, 2, 53, getColour(0, 255, 0, 0));
+		Screen->displayValue(polyCounter, 1, 2, 53, getColour(0, 255, 0, 0));
 	}
 }
 

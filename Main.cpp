@@ -40,20 +40,9 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 
-//#define _BEZIER_PATCH_
-//#define _QUAKE_1_READER_
-#define _STL_READER_
 
 void editor()
 {
-	SDL_Window* sdl_window = SDL_CreateWindow("Software Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
-
-	SDL_Renderer* sdl_screen = SDL_CreateRenderer(sdl_window, -1, 0);
-
-	SDL_Texture* sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, EDITOR_WIDTH, EDITOR_HEIGHT);
-
-	SDL_ShowCursor(SDL_DISABLE);
-
 	auto Screen = std::make_shared<Canvas>(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
 
 	auto Viewer = std::make_shared<Camera>(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
@@ -74,19 +63,10 @@ void editor()
 		Builder->updateScreen();
 		Controls->HandleUserEvents();
 
-		//Screen.update();
-
-		SDL_UpdateTexture(sdl_texture, nullptr, Screen->pixelBuffer, Screen->getWidth() * sizeof(Uint32));
-		SDL_RenderClear(sdl_screen);
-		SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
-		SDL_RenderPresent(sdl_screen);
+		Screen->update();
 	}
 
-	//Screen.cleanUp();
-
-	SDL_DestroyTexture(sdl_texture);
-	SDL_DestroyRenderer(sdl_screen);
-	SDL_DestroyWindow(sdl_window);
+	Screen->cleanUp();
 
 	IMG_Quit();
 
@@ -96,25 +76,23 @@ void editor()
 
 void software_renderer()
 {
-	SDL_Window* sdl_window = SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
-	SDL_Renderer* sdl_screen = SDL_CreateRenderer(sdl_window, -1, 0);
+//#define _BEZIER_PATCH_
+//#define _QUAKE_1_READER_
+#define _STL_READER_
 
-	SDL_Texture* sdl_texture = SDL_CreateTexture(sdl_screen, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
+	auto Screen = std::make_shared<Canvas>(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
-	SDL_ShowCursor(SDL_DISABLE);
+	auto Solids = std::make_shared<Shapes>();
 
-	Canvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
+	auto Actors = std::make_shared<Shapes>();
 
-	Shapes Solids;
+	auto Player = std::make_shared<Camera>(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
-	Shapes Actors;
+	auto Controls = std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+	Controls->torchIntensity = 10.0;
 
-	Camera			Player(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-
-	EventHandler Controls(0.1f, 0.1f, 0.01f);
-
-	Controls.torchIntensity = 10.0;
+	auto Sun = std::make_shared<LightSource>(300.0, 45.0, 0.95);
 
 #ifdef _BEZIER_PATCH_
 
@@ -130,7 +108,7 @@ void software_renderer()
 		getColour(0, 0, 0, 255), getColour(0, 0, 0, 255));
 	room_01.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
 	room_01.calculateMesh();
-	Solids.addSolid(room_ptr_1);
+	Solids->addSolid(room_ptr_1);
 
 
 	BezierPatch patch01(32, 3, getColour(0, 255, 127, 0));
@@ -149,7 +127,7 @@ void software_renderer()
 	patch01.setControlPoint(7, { 2.0f, 0.0f, 4.0f, 1.0f });
 	patch01.setControlPoint(8, { 8.0f, 0.0f, 4.0f, 1.0f });
 
-	Solids.addSolid(&patch01);
+	Solids->addSolid(&patch01);
 
 
 	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));;
@@ -166,7 +144,7 @@ void software_renderer()
 	patch02.setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
 	patch02.setControlPoint(8, { 8.0f, 4.0f, 0.0f, 1.0f });
 
-	Solids.addSolid(&patch02);
+	Solids->addSolid(&patch02);
 
 
 	BezierPatch patch03(32, 3, getColour(0, 127, 127, 255));;
@@ -185,7 +163,7 @@ void software_renderer()
 	patch03.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
 	patch03.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
 
-	Solids.addSolid(&patch03);
+	Solids->addSolid(&patch03);
 
 
 	BezierPatch patch04(32, 4, getColour(0, 127, 127, 255));;
@@ -204,7 +182,7 @@ void software_renderer()
 	patch04.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
 	patch04.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
 
-	Solids.addSolid(&patch04);
+	Solids->addSolid(&patch04);
 
 
 	BezierPatch patch05(32, 5, getColour(0, 127, 127, 255));;
@@ -223,7 +201,7 @@ void software_renderer()
 	patch05.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
 	patch05.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
 
-	Solids.addSolid(&patch05);
+	Solids->addSolid(&patch05);
 
 
 	BezierPatch patch06(32, 6, getColour(0, 127, 127, 255));;
@@ -242,10 +220,9 @@ void software_renderer()
 	patch06.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
 	patch06.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
 
-	Solids.addSolid(&patch06);
+	Solids->addSolid(&patch06);
 
 #endif //_BEZIER_PATCH_
-
 
 
 #ifdef _QUAKE_1_READER_
@@ -253,17 +230,16 @@ void software_renderer()
 	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
 	quakeMap.readData();
 	SolidBody* map = &quakeMap;
-	Solids.addSolid(map);
+	Solids->addSolid(map);
 	int nTxt = quakeMap.getTotalText();
 	txt* quakeTextures = new txt[nTxt];
 	for (int i = 0; i < nTxt; i++)
 	{
 		quakeTextures[i] = quakeMap.getTextureData(i);
 	}
-	Solids.textureLoaderQ(nTxt, quakeTextures);
+	Solids->textureLoaderQ(nTxt, quakeTextures);
 
 #endif //_QUAKE_1_READER_
-
 
 
 #ifdef _STL_READER_
@@ -271,9 +247,10 @@ void software_renderer()
 	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
 	test_body.readSTLfile();
 	//test_body.smoothSurfaces();
-	Solids.addSolid(&test_body);
+	Solids->addSolid(&test_body);
 
 #endif //_STL_READER_
+
 
 	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
 								IMG_Load("Textures/wolf001.jpg"),		//01
@@ -283,71 +260,57 @@ void software_renderer()
 								IMG_Load("Textures/concrete001.jpg"),	//05
 								IMG_Load("Textures/timber.jpg") };		//06
 
-	Solids.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
+	Solids->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
+	Actors->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
-	Actors.textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
+	auto Game = std::make_shared<Renderer>(Solids, Actors, Sun, Player, Controls);
 
-	Renderer Game(&Solids, &Actors, &LightSource(300.0, 45.0, 0.95), &Player, &Controls);
+	Game->updateShadowVolumes(solid);
 
-	Game.updateShadowVolumes(solid);
-
-	Game.updateShadowVolumes(actor);
+	Game->updateShadowVolumes(actor);
 
 
-	//Game.updateBoundingBoxes(solid, 0.5);
-	//Solids.activateBBox(0);
-	//Solids.activateBBox(1);
-	//Solids.activateBBox(2);
+	//Game->updateBoundingBoxes(solid, 0.5);
+	//Solids->activateBBox(0);
+	//Solids->activateBBox(1);
+	//Solids->activateBBox(2);
 
 	std::cout << "Game loop starts here..." << std::endl;
 
-	while (!Controls.quit)
+	while (!Controls->quit)
 	{
-		Game.calculateFrametime();
+		Game->calculateFrametime();
 
-		Controls.HandleUserEvents();
+		Controls->HandleUserEvents();
 
-		Screen.resetPixelBuffer();
+		Screen->resetPixelBuffer();
 
-		Screen.resetDepthBuffer();
+		Screen->resetDepthBuffer();
 
-		Game.updateCameraPosition();
+		Game->updateCameraPosition();
 
-		Controls.ceaseMotion();
+		Controls->ceaseMotion();
 
-		//Game.updateShadowVolumes(actor);
+		//Game->updateShadowVolumes(actor);
 
-		Game.renderEntities(solid, Screen.pixelBuffer, Screen.depthBuffer);	
+		Game->renderEntities(solid, Screen->pixelBuffer, Screen->depthBuffer);
 
-		if (!Controls.isPaused) { Game.updateEntities(actor); }
+		if (!Controls->isPaused) { Game->updateEntities(actor); }
 
-		Game.renderEntities(actor, Screen.pixelBuffer, Screen.depthBuffer);
+		Game->renderEntities(actor, Screen->pixelBuffer, Screen->depthBuffer);
 
-		Game.displayStats(Controls.showCrosshair, Controls.showFPS, Controls.showPosition, Controls.showPolyN, Screen);
+		Game->displayStats(Controls->showCrosshair, Controls->showFPS, Controls->showPosition, Controls->showPolyN, Screen);
 
-		Game.resetPolyCounter();
+		Game->resetPolyCounter();
 
-		//Screen.update();
+		Screen->update();
 
-
-		SDL_UpdateTexture(sdl_texture, nullptr, Screen.pixelBuffer, Screen.getWidth() * sizeof(Uint32));
-
-		SDL_RenderClear(sdl_screen);
-
-		SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
-
-		SDL_RenderPresent(sdl_screen);
-
-		Game.updateFrameCounter();
+		Game->updateFrameCounter();
 	}
 
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
 
-	//Screen.cleanUp();
-
-	SDL_DestroyTexture(sdl_texture);
-	SDL_DestroyRenderer(sdl_screen);
-	SDL_DestroyWindow(sdl_window);
+	Screen->cleanUp();
 	
 	IMG_Quit();
 	
@@ -378,9 +341,6 @@ void opengl_renderer()
 	Shapes Solids;
 	Shapes Actors;
 
-	//Solids.addSolid(new SolidCube(1.0, 1.0, 1.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 255, 0, 0), 1, 2.0));
-	//Solids.addSolid(new SolidSphere(1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, getColour(0, 127, 127, 255), 1, 3.0, 36));
-
 
 	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
 	quakeMap.readData();
@@ -394,7 +354,6 @@ void opengl_renderer()
 	}
 	Solids.textureLoaderQ(nTxt, quakeTextures);
 
-	//#include "glbbtest.txt"
 
 	OpenGLAdapter VertexPump(&Solids, &Actors);
 	unsigned int nVert = VertexPump.getNVert(solid, 0);
@@ -403,8 +362,6 @@ void opengl_renderer()
 	OpenGLMesh mesh_01(vertices, nVert);
 
 	OpenGLShader shader_01("./Shaders/basicShader");
-
-	//LightSource lights[] = { LightSource(150.0, 45.0, 0.95) };
 
 	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),
 								IMG_Load("Textures/timber.jpg") };
@@ -416,8 +373,6 @@ void opengl_renderer()
 		shader_01.bind();
 		shader_01.update(View, Player);
 		mesh_01.drawMesh();
-
-		//glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_INT, pixelBuffer);
 		
 		Controls.HandleUserEvents();
 		View.updateAll(Controls);

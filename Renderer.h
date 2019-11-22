@@ -6,21 +6,22 @@
 #include "EventHandler.h"
 #include "Camera.h"
 #include <time.h>
+#include <memory>
 
 
 class Renderer
 {
-	Shapes*			Solids;
+	std::shared_ptr<Shapes>			Solids;
 
-	Shapes*			Actors;
+	std::shared_ptr<Shapes>			Actors;
 
-	Shapes*			Entities;
+	std::shared_ptr<Shapes>			Entities;
 
-	LightSource*	Sun;
+	std::shared_ptr<LightSource>	Sun;
 
-	Camera*			Player;
+	std::shared_ptr<Camera>			Player;
 
-	EventHandler*	Controls;
+	std::shared_ptr<EventHandler>	Controls;
 
 	unsigned int	solidN;
 	unsigned int	actorN;
@@ -41,17 +42,18 @@ class Renderer
 	double			hRatio;
 	double			vRatio;
 
-	clock_t			oldTime;
-	clock_t			newTime;
-	clock_t			frameTime;
-	int				frameCounter;
-	int				polyCounter;
+	clock_t			oldTime			= 0;
+	clock_t			newTime			= 0;
+	clock_t			frameTime		= 0;
+	int				frameCounter	= 0;
+	int				polyCounter		= 0;
 
-	double			collisionDist;
+	double			collisionDist	= 1.0f;
 
 public:
 
-	Renderer(Shapes*, Shapes*, LightSource*, Camera*, EventHandler*);
+	Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors, std::shared_ptr<LightSource> sun,
+				std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls);
 	~Renderer();
 
 	void updateCameraPosition();
@@ -66,7 +68,7 @@ public:
 	void updateEntities(model);
 	void renderPoints(int, point3*, Uint32*);
 	void renderEntities(model, Uint32*, double*);
-	void displayStats(bool, bool, bool, bool, Canvas);
+	void displayStats(bool, bool, bool, bool, std::shared_ptr<Canvas>);
 
 	void updateFrameCounter();
 	void resetPolyCounter();

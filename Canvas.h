@@ -6,22 +6,22 @@
 
 class Canvas
 {
-	int w;
-	int h;
+	int w			= 1000;
+	int h			= 500;
 
-	int fontSize;
-	int cursorSize;
-	int iconSize;
+	int fontSize	= 8;
+	int cursorSize	= 16;
+	int iconSize	= 32;
 
-	double zFar;
+	double zFar		= 100.0f;
 
 public:
 
-	//SDL_Window* window;
+	SDL_Window*		sdl_window	= nullptr;
 	
-	//SDL_Renderer* screen;
+	SDL_Renderer*	sdl_screen	= nullptr;
 	
-	//SDL_Texture* sdl_texture;
+	SDL_Texture*	sdl_texture = nullptr;
 
 	Uint32* pixelBuffer;
 	double* depthBuffer;
