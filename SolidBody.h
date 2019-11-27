@@ -11,10 +11,6 @@ protected:
 	vect3			position		= { 0.0, 0.0, 0.0, 1.0 };
 	vect3			rotation		= { 0.0, 0.0, 0.0, 1.0 };
 
-	//vect3			scale;
-	//vect3			position;
-	//vect3			rotation;
-
 	vect3			velocity		= { 0.0, 0.0, 0.0, 1.0 };
 	vect3			angularVelocity = { 0.0, 0.0, 0.0, 1.0 };
 
@@ -46,6 +42,8 @@ public:
 
 	void setVelocity(vect3);
 	void setAngularVelocity(vect3);
+
+	void setTexture(int);
 
 	vect3 getVelocity();
 	vect3 getAngularVelocity();

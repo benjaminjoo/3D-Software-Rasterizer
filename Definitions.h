@@ -323,12 +323,12 @@ struct triangle3d
 
 struct txt
 {
-	int ID	= 0;
+	int ID			= 0;
 
-	int w	= 0;
-	int h	= 0;
+	int w			= 0;
+	int h			= 0;
 
-	Uint32* pixels;
+	Uint32* pixels	= nullptr;
 };
 
 
@@ -531,8 +531,6 @@ vect3 midPoint(vect3 a, vect3 b);
 coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
 
 Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
-
-Uint32 modifyColour(const Uint32&, const double&);
 
 vect3 multiplyMxV(mat4x4 m, vect3 v);									//Multiplies 4x4 matrix and 1*4 column vector
 

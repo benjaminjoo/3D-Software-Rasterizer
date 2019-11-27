@@ -105,6 +105,9 @@
     <ClCompile Include="OpenGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SolidModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h">
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="QuakeDef.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidModel.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

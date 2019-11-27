@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include <time.h>
 #include <memory>
+#include <fstream>
 
 
 class Renderer
@@ -26,13 +27,10 @@ class Renderer
 	unsigned int	solidN;
 	unsigned int	actorN;
 
-	int*			solidPolyCount;
-	int*			actorPolyCount;
-
-	triangle3dV**	solidMesh;
-	triangle3dV**	actorMesh;
-	triangle3dV**	triangleMesh;
-	triangle3dV**	shadowMesh;
+	triangle3dV**	solidMesh		= nullptr;
+	triangle3dV**	actorMesh		= nullptr;
+	triangle3dV**	triangleMesh	= nullptr;
+	triangle3dV**	shadowMesh		= nullptr;
 
 	vect3			sunVector;
 
@@ -74,5 +72,9 @@ public:
 	void resetPolyCounter();
 	void incrementPolyCounter();
 	void calculateFrametime();
+
+	//void importMesh(const std::string& fileName);
+	//void importMesh(const std::string& fileName);
+	void exportMesh(const std::string& fileName);
 };
 

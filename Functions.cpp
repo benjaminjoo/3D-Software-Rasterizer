@@ -42,36 +42,6 @@ Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned 
 }
 
 
-Uint32 modifyColour(const Uint32& inputColour, const double& illumination)
-{
-	bool red = true, green = true, blue = true;
-	byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
-	double illSurplus = 0.0;
-
-	if (illumination <= 1.0)
-	{
-		r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
-		g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
-		b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
-	}
-	else if(illumination > 1.0)
-	{
-		illSurplus = illumination - 1.0;
-
-		r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
-		g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
-		b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
-		
-		r2fill = 255 - r;	g2fill = 255 - g;	b2fill = 255 - b;
-		r += (byte)((double(r2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-		g += (byte)((double(g2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-		b += (byte)((double(b2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-	}
-
-	return (a << 24) | (r << 16) | (g << 8) | (b << 0);
-}
-
-
 polyNode subNodes(polyNode a, polyNode b)
 {
 	polyNode t;

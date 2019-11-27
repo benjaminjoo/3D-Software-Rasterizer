@@ -146,7 +146,7 @@ int* Shapes::getPolyCountEntities()
 }
 
 
-void Shapes::getPolyCountEntities(int* polyCountEntities)
+void Shapes::getPolyCountEntities(std::shared_ptr<int[]> polyCountEntities)
 {
 	int n = bodyContainer.size();
 	for (int i = 0; i < n; i++)

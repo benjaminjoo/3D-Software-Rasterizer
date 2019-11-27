@@ -24,7 +24,7 @@ class BSP1Loader : public SolidBody
 	std::vector<face>			idFaces;
 	std::vector<triangle3dV>	polyContainer;
 
-	vect3						scale;
+	vect3						scale = { 1.0, 1.0, 1.0, 1.0 };
 
 	Uint32*						palette;
 

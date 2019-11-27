@@ -7,6 +7,7 @@
 #include "ShadowVolume.h"
 #include <time.h>
 
+
 class Camera
 {
 public:
@@ -92,8 +93,7 @@ public:
 
 	void drawSpot(screenCoord, Uint32, Uint32*);
 
-	//textCoord getUVCoord(const vect3&, const vect3&, const textCoord&, const textCoord&, const vect3&);
-	//textCoord getUVCoord(vect3, vect3, textCoord, textCoord, vect3);
+
 	inline textCoord getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV)
 	{
 		textCoord testC;
@@ -107,7 +107,8 @@ public:
 
 		return testC;
 	}
-	//textCoord interpolateUVCoord(textCoord, textCoord, int, int);
+
+
 	inline textCoord interpolateUVCoord(const textCoord& startC, const textCoord& endC, const int& step, const int& currentP)
 	{
 		textCoord testC;
@@ -116,6 +117,36 @@ public:
 		testC.v = startC.v + (endC.v - startC.v) / step * currentP;
 
 		return testC;
+	}
+
+
+	inline Uint32 modifyColour(const Uint32& inputColour, const double& illumination)
+	{
+		bool red = true, green = true, blue = true;
+		byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
+		double illSurplus = 0.0;
+
+		if (illumination <= 1.0)
+		{
+			r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
+			g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
+			b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
+		}
+		else if (illumination > 1.0)
+		{
+			illSurplus = illumination - 1.0;
+
+			r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
+			g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
+			b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
+
+			r2fill = 255 - r;	g2fill = 255 - g;	b2fill = 255 - b;
+			r += (byte)((double(r2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+			g += (byte)((double(g2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+			b += (byte)((double(b2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+		}
+
+		return (a << 24) | (r << 16) | (g << 8) | (b << 0);
 	}
 
 	void outputImage(Canvas);

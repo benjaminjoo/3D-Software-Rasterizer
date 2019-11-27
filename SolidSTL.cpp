@@ -7,18 +7,6 @@
 SolidSTL::SolidSTL(std::string fn):
 	fileName(fn)
 {
-	//scale			= { 1.0, 1.0, 1.0, 1.0 };
-	//position		= { 0.0, 0.0, 0.0, 1.0 };
-	//rotation		= { 0.0, 0.0, 0.0, 1.0 };
-	//
-	//colour			= 255;
-	//texture			= 0;
-	//txU				= 1.0;
-	//
-	//castsShadows	= true;
-	//
-	//fileName		= fn;
-
 	modelFile = std::ifstream(fileName.c_str(), std::ifstream::in | std::ifstream::binary);
 	if (modelFile) { std::cout << "Model file succesfully opened..." << std::endl; }
 }

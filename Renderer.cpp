@@ -16,9 +16,10 @@ Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actor
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
-	solidPolyCount = new int[Solids->getNEntities()];
+	std::shared_ptr<int[]> solidPolyCount(new int[Solids->getNEntities()]);
 	Solids->getPolyCountEntities(solidPolyCount);
-	actorPolyCount = new int[Actors->getNEntities()];
+
+	std::shared_ptr<int[]> actorPolyCount(new int[Actors->getNEntities()]);
 	Actors->getPolyCountEntities(actorPolyCount);
 
 	solidMesh = new triangle3dV * [solidN];
@@ -376,7 +377,7 @@ void Renderer::updateShadowVolumes(model E)
 		delete[] vShadows;	//printf("-\n");
 		vShadows = nullptr;
 	}
-
+	   
 	switch (E)
 	{
 	case solid:
@@ -554,9 +555,10 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 		break;
 	}
 
-	if (Entities != nullptr)
+	if(Entities->getNEntities())
 	{
-		int* polyCount = Entities->getPolyCountEntities();
+		std::shared_ptr<int[]> polyCount(new int[Entities->getNEntities()]);
+		Entities->getPolyCountEntities(polyCount);
 
 		transform3d playerPosition = Player->getTransformation();
 
@@ -569,7 +571,7 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 				{
 					Uint32 colour = triangleMesh[i][k].colour;
 
-					triangle3dV viewT = Player->world2viewT(playerPosition, triangleMesh[i][k]);
+					triangle3dV viewT = Player->world2viewT(playerPosition, triangleMesh[i][k]);					
 
 					Player->illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
 
@@ -663,4 +665,43 @@ void Renderer::calculateFrametime()
 		frameTime = newTime - oldTime;
 		frameCounter = 0;
 	}
+}
+
+
+void Renderer::exportMesh(const std::string& fileName)
+{
+	std::ofstream exportFile(fileName, std::ios_base::binary);
+
+	if (exportFile.is_open())
+	{
+		exportFile.write((char*) &solidN, sizeof(solidN));
+
+		unsigned int tempCount = 0;
+		std::shared_ptr<int[]> solidPolyCount(new int[solidN]);
+		Solids->getPolyCountEntities(solidPolyCount);
+
+		for (unsigned int j = 0; j < solidN; j++)
+		{
+			int nCurrent = solidPolyCount[j];
+
+			exportFile.write((char*) &nCurrent, sizeof(int));
+
+			for (int i = 0; i < nCurrent; i++)
+			{
+				triangle3dV temp = solidMesh[j][i];
+
+				temp.colour = getColour(0, 127, 127, 255);
+				temp.texture = 0;
+
+				exportFile.write((char*)& temp, sizeof(triangle3dV));
+			}
+		}
+
+		std::cout << "Model file saved..." << std::endl;
+	}
+	else
+	{
+		std::cout << "Could not write model file " << fileName << std::endl;
+	}
+
 }

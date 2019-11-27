@@ -204,6 +204,7 @@
     </ClCompile>
     <ClCompile Include="SolidCube.cpp" />
     <ClCompile Include="SolidCylinder.cpp" />
+    <ClCompile Include="SolidModel.cpp" />
     <ClCompile Include="SolidPrism.cpp" />
     <ClCompile Include="SolidRevolved.cpp" />
     <ClCompile Include="SolidSphere.cpp">
@@ -243,6 +244,7 @@
     <ClInclude Include="SolidCone.h" />
     <ClInclude Include="SolidCube.h" />
     <ClInclude Include="SolidCylinder.h" />
+    <ClInclude Include="SolidModel.h" />
     <ClInclude Include="SolidPrism.h" />
     <ClInclude Include="SolidRevolved.h" />
     <ClInclude Include="SolidSphere.h" />

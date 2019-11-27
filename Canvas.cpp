@@ -5,11 +5,11 @@
 #include <SDLImage/SDL_image.h>
 
 
-Canvas::Canvas()
+Canvas::Canvas(const std::string& windowTitle)
 {
 	std::cout << "Canvas constructor called - Canvas::Canvas()" << std::endl;
 
-	sdl_window	= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
+	sdl_window	= SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
 
 	sdl_screen	= SDL_CreateRenderer(sdl_window, -1, 0);
 
@@ -28,12 +28,12 @@ Canvas::Canvas()
 }
 
 
-Canvas::Canvas(int width, int height, double z):
+Canvas::Canvas(const std::string& windowTitle, int width, int height, double z):
 	w(width), h(height), zFar(z)
 {
 	std::cout << "Canvas constructor called - Canvas::Canvas(int width, int height, double z)" << std::endl;
 
-	sdl_window	= SDL_CreateWindow("Rendering Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
+	sdl_window	= SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
 
 	sdl_screen	= SDL_CreateRenderer(sdl_window, -1, 0);
 

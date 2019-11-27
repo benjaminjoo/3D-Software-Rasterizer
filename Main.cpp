@@ -1,6 +1,3 @@
-#define _CRT_SECURE_NO_DEPRECATE//
-
-
 #include <SDL/SDL.h>
 #include <SDLImage/SDL_image.h>
 #include <GLEW/glew.h>
@@ -25,6 +22,7 @@
 #include "SolidRevolved.h"
 #include "Room.h"
 #include "SolidSTL.h"
+#include "SolidModel.h"
 #include "EventHandler.h"
 #include "MessagePump.h"
 #include "Editor.h"
@@ -43,15 +41,15 @@
 
 void editor()
 {
-	auto Screen = std::make_shared<Canvas>(EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	auto Screen		= std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
 
-	auto Viewer = std::make_shared<Camera>(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	auto Viewer		= std::make_shared<Camera>(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
-	auto Drawing = std::make_shared<ModelElementBuffer>("test.wtf");
+	auto Drawing	= std::make_shared<ModelElementBuffer>("test.wtf");
 
-	auto Builder = std::make_shared<Editor>(0.05f, Viewer, Screen, Drawing);
+	auto Builder	= std::make_shared<Editor>(0.05f, Viewer, Screen, Drawing);
 
-	auto Controls = std::make_shared<MessagePump>(Builder);
+	auto Controls	= std::make_shared<MessagePump>(Builder);
 
 	Shapes Solids;
 
@@ -74,14 +72,15 @@ void editor()
 }
 
 
-void software_renderer()
+void software_renderer(bool exportFile, const std::string& fileName)
 {
 
-//#define _BEZIER_PATCH_
+//#define _CUBE_
+#define _BEZIER_PATCH_
 //#define _QUAKE_1_READER_
-#define _STL_READER_
+//#define _STL_READER_
 
-	auto Screen = std::make_shared<Canvas>(SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
+	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
 	auto Solids = std::make_shared<Shapes>();
 
@@ -93,6 +92,16 @@ void software_renderer()
 	Controls->torchIntensity = 10.0;
 
 	auto Sun = std::make_shared<LightSource>(300.0, 45.0, 0.95);
+
+#ifdef _CUBE_
+
+	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
+	SolidCube cube_01;
+	cube_01.setTexture(2);
+	Solids->addSolid(&cube_01);
+
+#endif //_CUBE_
+
 
 #ifdef _BEZIER_PATCH_
 
@@ -130,19 +139,21 @@ void software_renderer()
 	Solids->addSolid(&patch01);
 
 
-	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));;
+	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));
 
-	patch02.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
+	patch02.setPosition({ -20.0f, -10.0f, 0.0f, 0.0f });
+
+	patch02.setControlPoint(0, { 0.0f, -0.5f, 0.0f, 1.0f });
 	patch02.setControlPoint(1, { 2.0f, 0.0f, 1.5f, 1.0f });
-	patch02.setControlPoint(2, { 8.0f, 0.0f, 3.0f, 1.0f });
+	patch02.setControlPoint(2, { 8.0f, 0.5f, 3.0f, 1.0f });
 
 	patch02.setControlPoint(3, { 0.0f, 2.0f, 0.0f, 1.0f });
 	patch02.setControlPoint(4, { 2.0f, 2.0f, 2.5f, 1.0f });
 	patch02.setControlPoint(5, { 8.0f, 2.0f, 1.0f, 1.0f });
 
-	patch02.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
+	patch02.setControlPoint(6, { 0.0f, 4.5f, 0.0f, 1.0f });
 	patch02.setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
-	patch02.setControlPoint(8, { 8.0f, 4.0f, 0.0f, 1.0f });
+	patch02.setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
 
 	Solids->addSolid(&patch02);
 
@@ -246,10 +257,18 @@ void software_renderer()
 
 	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
 	test_body.readSTLfile();
-	//test_body.smoothSurfaces();
+	test_body.smoothSurfaces();
 	Solids->addSolid(&test_body);
 
 #endif //_STL_READER_
+
+	SolidModel test_model(10.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 127, 127, 255), 0);
+	
+	if (exportFile)
+	{
+		test_model.readModelFile(fileName);
+		Solids->addSolid(&test_model);
+	}
 
 
 	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
@@ -275,7 +294,7 @@ void software_renderer()
 	//Solids->activateBBox(1);
 	//Solids->activateBBox(2);
 
-	std::cout << "Game loop starts here..." << std::endl;
+	//Game->importMesh("export_test.dat");
 
 	while (!Controls->quit)
 	{
@@ -292,7 +311,7 @@ void software_renderer()
 		Controls->ceaseMotion();
 
 		//Game->updateShadowVolumes(actor);
-
+		
 		Game->renderEntities(solid, Screen->pixelBuffer, Screen->depthBuffer);
 
 		if (!Controls->isPaused) { Game->updateEntities(actor); }
@@ -307,6 +326,12 @@ void software_renderer()
 
 		Game->updateFrameCounter();
 	}
+
+	char saveModel;
+	std::cout << "Do you want to save model? (Y/N)" << std::flush;
+	std::cin >> saveModel;
+	if(saveModel == 'y' || saveModel == 'Y')
+		Game->exportMesh("export_test.dat");
 
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
 
@@ -336,7 +361,7 @@ void opengl_renderer()
 	OpenGLCamera Player(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
 	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-	EventHandler Controls(0.01f, 0.01f, 0.001f);
+	EventHandler Controls(0.01f, 0.01f, 0.01f);
 
 	Shapes Solids;
 	Shapes Actors;
@@ -393,11 +418,26 @@ int main(int argc, char** argv)
 	char userInput;
 	std::cin >> userInput;
 
+	std::string importFileName = "";
+	if (argc == 2)
+	{
+		importFileName += argv[1];
+	}
+
 	switch (userInput)
 	{
 	case 's':
 	case 'S':
-		software_renderer();
+		{
+			if (argc == 2)
+			{
+				software_renderer(true, argv[1]);
+			}
+			else
+			{
+				software_renderer(false, "");
+			}			
+		}		
 		break;
 	case 'o':
 	case 'O':

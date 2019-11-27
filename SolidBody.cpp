@@ -78,6 +78,12 @@ void SolidBody::setAngularVelocity(vect3 av)
 }
 
 
+void SolidBody::setTexture(int t)
+{
+	texture = t;
+}
+
+
 vect3 SolidBody::getPosition()
 {
 	return position;

@@ -9,21 +9,21 @@
 
 
 
-BSP1Loader::BSP1Loader(std::string f)
+BSP1Loader::BSP1Loader(std::string f):
+	fileName(f)
 {
-	fileName	= f;
-	scale		= { 1.0, 1.0, 1.0, 1.0 };
-	
+	std::cout << "BSP1Loader constructor called - BSP1Loader::BSP1Loader(std::string f)" << std::endl;
+
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
 	palette = (Uint32*)tempImage->pixels;
 }
 
 
-BSP1Loader::BSP1Loader(std::string f, vect3 s)
+BSP1Loader::BSP1Loader(std::string f, vect3 s):
+	fileName(f), scale(s)
 {
-	fileName	= f;
-	scale		= s;
+	std::cout << "BSP1Loader constructor called - BSP1Loader::BSP1Loader(std::string f, vect3 s)" << std::endl;
 
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
@@ -33,6 +33,7 @@ BSP1Loader::BSP1Loader(std::string f, vect3 s)
 
 BSP1Loader::~BSP1Loader()
 {
+	std::cout << "BSP1Loader destructor called" << std::endl;
 }
 
 
@@ -194,7 +195,7 @@ void BSP1Loader::readData()
 			miptex_t temp;
 
 			modelFile.read(temp.name, 16);
-			std::cout << temp.name << std::endl;
+			//std::cout << temp.name << std::endl;
 
 			modelFile.read(temp_4, 4);
 			temp.width = *((unsigned long*)temp_4);

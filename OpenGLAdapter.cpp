@@ -2,27 +2,25 @@
 #include "Definitions.h"
 
 
-OpenGLAdapter::OpenGLAdapter(Shapes* B, Shapes* A)
+OpenGLAdapter::OpenGLAdapter(Shapes* B, Shapes* A):
+	Solids(B), Actors(A)
 {
-	Solids = B;
-	Actors = A;
-
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
-	solidPolyCount = new int[Solids->getNEntities()];
+	std::shared_ptr<int[]> solidPolyCount(new int[Solids->getNEntities()]);
 	Solids->getPolyCountEntities(solidPolyCount);
-	actorPolyCount = new int[Actors->getNEntities()];
+	std::shared_ptr<int[]> actorPolyCount(new int[Actors->getNEntities()]);
 	Actors->getPolyCountEntities(actorPolyCount);
 
-	solidMesh = new triangle3dV * [solidN];
+	solidMesh = new triangle3dV* [solidN];
 	for (unsigned int i = 0; i < solidN; i++)
 	{
 		solidMesh[i] = new triangle3dV[solidPolyCount[i]];
 	}
 	Solids->getPolyData_(solidN, solidMesh);
 
-	actorMesh = new triangle3dV * [actorN];
+	actorMesh = new triangle3dV* [actorN];
 	for (unsigned int i = 0; i < actorN; i++)
 	{
 		actorMesh[i] = new triangle3dV[actorPolyCount[i]];

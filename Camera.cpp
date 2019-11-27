@@ -638,35 +638,6 @@ void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 col
 	}
 }
 
-/*
-inline textCoord Camera::getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV)
-{
-	textCoord testC;
-
-	double a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
-	double b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
-	//double a = (testV - startV) * (endV - startV);
-	//double b = (endV - startV) * (endV - startV);
-
-	double d = (b != 0.0) ? (a / b) : (0.0);
-
-	testC.u = startC.u + d * (endC.u - startC.u);
-	testC.v = startC.v + d * (endC.v - startC.v);
-
-	return testC;
-}
-*/
-/*
-inline textCoord Camera::interpolateUVCoord(textCoord startC, textCoord endC, int step, int currentP)
-{
-	textCoord testC;
-
-	testC.u = startC.u + (endC.u - startC.u) / step * currentP;
-	testC.v = startC.v + (endC.v - startC.v) / step * currentP;
-
-	return testC;
-}
-*/
 
 inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
 {
@@ -1569,32 +1540,6 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 						sampleYold = sampleYnew;
 
 						pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
-
-						/*
-						//TO SAVE COST OF FUNCTION CALL--------------------------------------------------V
-						if (illCurrent <= 1.0)
-						{
-							r = (byte)(double(finalPixel >> 16 & 255) * illCurrent);
-							g = (byte)(double(finalPixel >> 8 & 255) * illCurrent);
-							b = (byte)(double(finalPixel & 255) * illCurrent);
-						}
-						else
-						{
-							illSurplus = illCurrent - 1.0;
-
-							r = (byte)(double(finalPixel >> 16 & 255) * illCurrent);
-							g = (byte)(double(finalPixel >> 8 & 255) * illCurrent);
-							b = (byte)(double(finalPixel & 255) * illCurrent);
-
-							r2fill = 255 - r;	g2fill = 255 - g;	b2fill = 255 - b;
-							r += (byte)((double(r2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-							g += (byte)((double(g2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-							b += (byte)((double(b2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-						}
-
-						pixelBuffer[hgw + i] = (a << 24) | (r << 16) | (g << 8) | (b << 0);
-						//TO SAVE COST OF FUNCTION CALL--------------------------------------------------^
-						*/
 
 						depthBuffer[hgw + i] = invertCurrentZ;
 					}

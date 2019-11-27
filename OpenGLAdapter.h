@@ -2,6 +2,7 @@
 
 #include <GLM/glm.hpp>
 #include <vector>
+#include <memory>
 #include "Definitions.h"
 #include "Shapes.h"
 #include "Vertex.h"
@@ -17,14 +18,9 @@ private:
 	unsigned int solidN;
 	unsigned int actorN;
 
-	int* solidPolyCount;
-	int* actorPolyCount;
-
 	triangle3dV** solidMesh;
 	triangle3dV** actorMesh;
 	triangle3dV** triangleMesh;
-
-	//std::vector
 
 public:
 

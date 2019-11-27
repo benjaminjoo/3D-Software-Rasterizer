@@ -35,7 +35,8 @@ public:
 
 		glm::mat4 scaleMatrix	= glm::scale(scale);
 
-		return posMatrix * rotMatrix * scaleMatrix;
+		//return posMatrix * rotMatrix * scaleMatrix;
+		return rotMatrix * posMatrix * scaleMatrix;
 	}
 
 

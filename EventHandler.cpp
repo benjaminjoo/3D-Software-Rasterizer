@@ -3,45 +3,10 @@
 #include "Canvas.h"
 
 
-EventHandler::EventHandler(double step, double turn, double sens)
+EventHandler::EventHandler(double step, double turn, double sens):
+	stepP(step), turnP(turn), sensitivity(sens)
 {
 	std::cout << "EventHandler constructor called - EventHandler::EventHandler(double step, double turn, double sens)" << std::endl;
-
-	visualStyle			= wireframe;
-
-	gouraudShading		= true;
-	visualiseDepth		= false;
-	torchOn				= false;
-	showCrosshair		= true;
-	showFPS				= true;
-	showPolyN			= true;
-	showPosition		= true;
-	gravityOn			= false;
-	isPaused			= true;
-	mouseLookBlocked	= false;
-
-	event				= { 0 };
-
-	quit				= false;
-
-	turnH				= 0.0f;
-	turnV				= 0.0f;
-	turnR				= 0.0f;
-
-	moveP				= 0.0f;
-	strafeP				= 0.0f;
-	riseP				= 0.0f;
-	tiltP				= 0.0f;
-
-	stepP				= step;
-	turnP				= turn;
-	sensitivity			= sens;
-
-	turnVmin			= PI * 0.5f;
-	turnVmax			= 3 * PI * 0.5f;
-
-	torchIntensity		= 10.0f;
-	maxIllumination		= 1.0f;
 }
 
 

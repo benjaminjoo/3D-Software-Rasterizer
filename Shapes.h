@@ -3,6 +3,7 @@
 #include "Definitions.h"
 #include "SolidBody.h"
 #include <vector>
+#include <memory>
 #include <SDL/SDL.h>
 
 class Shapes
@@ -13,16 +14,16 @@ class Shapes
 	std::vector<boundingBox>	boxContainer;
 	std::vector<char*>			textureNameContainer;
 	std::vector<txt>			textureDataContainer;
-	
-	txt*						textures;
-	vect3*						spotLightPositions;
-	double*						spotLightIntensities;
+
+	txt* textures;
+	vect3* spotLightPositions;
+	double* spotLightIntensities;
 
 public:
 
 	vect3						vertexList[MAXCLIPVERTS];
 	textCoord					uvList[MAXCLIPVERTS];
-	
+
 public:
 
 	Shapes();
@@ -30,7 +31,7 @@ public:
 
 	unsigned int getNEntities();
 	int* getPolyCountEntities();
-	void getPolyCountEntities(int*);
+	void getPolyCountEntities(std::shared_ptr<int[]>);
 
 	void addSolid(SolidBody*);
 	void addTextureName(char*);

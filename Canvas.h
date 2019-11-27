@@ -26,8 +26,8 @@ public:
 	Uint32* pixelBuffer;
 	double* depthBuffer;
 
-	Canvas();
-	Canvas(int, int, double);
+	Canvas(const std::string& windowTitle);
+	Canvas(const std::string& windowTitle, int, int, double);
 	~Canvas();
 
 	void update();
