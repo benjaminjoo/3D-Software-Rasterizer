@@ -6,51 +6,51 @@
 class Room: public SolidBody
 {
 
-	double			sizeX;
-	double			sizeY;
-	double			sizeZ;
+	double			sizeX				= 2.0f;
+	double			sizeY				= 2.0f;
+	double			sizeZ				= 2.0f;
 
-	Uint32			colBottom;
-	Uint32			colTop;
-	Uint32			colBack;
-	Uint32			colFront;
-	Uint32			colLeft;
-	Uint32			colRight;
+	Uint32			colBottom			= 0x000000ff;
+	Uint32			colTop				= 0x000000ff;
+	Uint32			colBack				= 0x000000ff;
+	Uint32			colFront			= 0x000000ff;
+	Uint32			colLeft				= 0x000000ff;
+	Uint32			colRight			= 0x000000ff;
 
-	int				txtBottom;
-	int				txtTop;
-	int				txtBack;
-	int				txtFront;
-	int				txtLeft;
-	int				txtRight;
+	int				txtBottom			= 1;
+	int				txtTop				= 1;
+	int				txtBack				= 1;
+	int				txtFront			= 1;
+	int				txtLeft				= 1;
+	int				txtRight			= 1;
 
-	double			txUBottom;
-	double			txUTop;
-	double			txUBack;
-	double			txUFront;
-	double			txULeft;
-	double			txURight;
+	double			txUBottom			= 1.0f;
+	double			txUTop				= 1.0f;
+	double			txUBack				= 1.0f;
+	double			txUFront			= 1.0f;
+	double			txULeft				= 1.0f;
+	double			txURight			= 1.0f;
 
-	bool			isBottomOn;
-	bool			isTopOn;
-	bool			isBackOn;
-	bool			isFrontOn;
-	bool			isLeftOn;
-	bool			isRightOn;
+	bool			isBottomOn			= true;
+	bool			isTopOn				= true;
+	bool			isBackOn			= true;
+	bool			isFrontOn			= true;
+	bool			isLeftOn			= true;
+	bool			isRightOn			= true;
 
-	bool			openingOnBottom;
-	bool			openingOnTop;
-	bool			openingOnBack;
-	bool			openingOnFront;
-	bool			openingOnLeft;
-	bool			openingOnRight;
+	bool			openingOnBottom		= false;
+	bool			openingOnTop		= false;
+	bool			openingOnBack		= false;
+	bool			openingOnFront		= false;
+	bool			openingOnLeft		= false;
+	bool			openingOnRight		= false;
 
-	vect3*			openingBottom;
-	vect3*			openingTop;
-	vect3*			openingBack;
-	vect3*			openingFront;
-	vect3*			openingLeft;
-	vect3*			openingRight;
+	vect3*			openingBottom		= nullptr;
+	vect3*			openingTop			= nullptr;
+	vect3*			openingBack			= nullptr;
+	vect3*			openingFront		= nullptr;
+	vect3*			openingLeft			= nullptr;
+	vect3*			openingRight		= nullptr;
 
 	std::vector<triangle3dV> bottomPolyContainer;
 	std::vector<triangle3dV> topPolyContainer;
@@ -62,7 +62,7 @@ class Room: public SolidBody
 public:
 
 	Room();
-	Room(double, double, double, double, double, double, double, double, double, Uint32*, int*);
+	Room(double, double, double, double, double, double);
 	~Room();
 
 	void setPosition(double, double, double);

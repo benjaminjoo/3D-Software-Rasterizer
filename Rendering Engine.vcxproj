@@ -193,6 +193,7 @@
     <ClCompile Include="OpenGLCanvas.cpp" />
     <ClCompile Include="OpenGLMesh.cpp" />
     <ClCompile Include="OpenGLShader.cpp" />
+    <ClCompile Include="Pong.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="OpenGLMesh.h" />
     <ClInclude Include="OpenGLShader.h" />
     <ClInclude Include="OpenGLTransform.h" />
+    <ClInclude Include="Pong.h" />
     <ClInclude Include="QuakeDef.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />

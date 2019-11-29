@@ -12,7 +12,7 @@
 BSP1Loader::BSP1Loader(std::string f):
 	fileName(f)
 {
-	std::cout << "BSP1Loader constructor called - BSP1Loader::BSP1Loader(std::string f)" << std::endl;
+	std::cout << "BSP1Loader constructor called" << std::endl;
 
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
@@ -23,7 +23,7 @@ BSP1Loader::BSP1Loader(std::string f):
 BSP1Loader::BSP1Loader(std::string f, vect3 s):
 	fileName(f), scale(s)
 {
-	std::cout << "BSP1Loader constructor called - BSP1Loader::BSP1Loader(std::string f, vect3 s)" << std::endl;
+	std::cout << "BSP1Loader constructor called" << std::endl;
 
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);

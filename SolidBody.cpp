@@ -78,6 +78,24 @@ void SolidBody::setAngularVelocity(vect3 av)
 }
 
 
+void SolidBody::updateVelocity(vect3 v)
+{
+	velocity.x += v.x;
+	velocity.y += v.y;
+	velocity.z += v.z;
+	velocity.w += v.w;
+}
+
+
+void SolidBody::updateAngularVelocity(vect3 av)
+{
+	angularVelocity.x += av.x;
+	angularVelocity.y += av.y;
+	angularVelocity.z += av.z;
+	angularVelocity.w += av.w;
+}
+
+
 void SolidBody::setTexture(int t)
 {
 	texture = t;
@@ -105,6 +123,13 @@ vect3 SolidBody::getAngularVelocity()
 void SolidBody::updatePosition()
 {
 	vect3 temp = addVectors(position, velocity);
+	position = temp;
+}
+
+
+void SolidBody::updatePosition(vect3 m)
+{
+	vect3 temp = addVectors(position, m);
 	position = temp;
 }
 
@@ -140,4 +165,16 @@ void SolidBody::updatebBBox(vect3 min_ext, vect3 max_ext)
 boundingBox SolidBody::getBB()
 {
 	return BB;
+}
+
+
+bool SolidBody::isInMotion()
+{
+	return inMotion;
+}
+
+
+void SolidBody::setInMotion()
+{
+	inMotion = true;
 }

@@ -73,8 +73,6 @@ public:
 	void incrementPolyCounter();
 	void calculateFrametime();
 
-	//void importMesh(const std::string& fileName);
-	//void importMesh(const std::string& fileName);
 	void exportMesh(const std::string& fileName);
 };
 

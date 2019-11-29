@@ -455,7 +455,7 @@ double dotProductSquared(const vect3& a, const vect3& b)
 double distPoint2Plane(vect3 P, triangle3dV T)
 {
 	//return abs((T.A - P) * T.N);
-	return abs(dotProduct(subVectors(T.A, P), T.N));
+	return -dotProduct(subVectors(T.A, P), T.N);
 }
 
 
@@ -665,15 +665,17 @@ vect3 scale(double scaleX, double scaleY, double scaleZ, vect3 v)
 
 vect3 scaleVector(double scale, vect3 v)
 {
-	vect3 t;
+	//vect3 t;
+	//
+	//mat4x4 m = {	scale,          0,         0,          0,
+	//					0,		scale,         0,          0,
+	//					0,          0,	   scale,          0,
+	//					0,          0,         0,          1 };
+	//t = multiplyMxV(m, v);
+	//
+	//return t;
 
-	mat4x4 m = {	scale,          0,         0,          0,
-						0,		scale,         0,          0,
-						0,          0,	   scale,          0,
-						0,          0,         0,          1 };
-	t = multiplyMxV(m, v);
-
-	return t;
+	return { v.x * scale, v.y * scale, v.z * scale, 1.0f };
 }
 
 
@@ -782,6 +784,24 @@ triangle3dV* transformObject(int nPoly, triangle3dV* object, double scX, double 
 
 	return target;
 	delete[] target;
+}
+
+
+void transformMesh(int n, triangle3dV* object, vect3 mv)
+{
+	for (int i = 0; i < n; i++)
+	{
+		object[i] = translateT(mv.x, mv.y, mv.z, object[i]);
+	}
+}
+
+
+void transformMesh(int n, triangle3dV* object, double mvX, double mvY, double mvZ)
+{
+	for (int i = 0; i < n; i++)
+	{
+		object[i] = translateT(mvX, mvY, mvZ, object[i]);
+	}
 }
 
 

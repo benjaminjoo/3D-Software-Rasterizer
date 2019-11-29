@@ -5,6 +5,7 @@
 MessagePump::MessagePump(std::shared_ptr<Editor> ed):
 	E(ed)
 {
+	std::cout << "MessagePump constructor called" << std::endl;
 }
 
 

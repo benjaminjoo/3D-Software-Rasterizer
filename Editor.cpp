@@ -4,7 +4,7 @@
 Editor::Editor(double toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer):
 	tolerance(toler), Cam(camera), Screen(screen), Model(buffer)
 {
-	std::cout << "Editor constructor called - Editor::Editor(double toler, Camera* ca, Canvas* sc, ModelElementBuffer* buff)" << std::endl;
+	std::cout << "Editor constructor called" << std::endl;
 }
 
 

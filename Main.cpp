@@ -37,6 +37,7 @@
 #include "OpenGLAdapter.h"
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
+#include "Pong.h"
 
 
 void editor()
@@ -70,6 +71,59 @@ void editor()
 
 	SDL_Quit();
 }
+
+
+void pong3d()
+{
+	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+
+	auto Eye		= std::make_shared<Camera>(0.0f, -3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+
+	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+
+	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
+
+	auto Ball		= std::make_shared<SolidSphere>(5.0f, 2.125f, 15.0f, 0xffffffff);
+	Ball->setRadius(0.5f);
+
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Ball);
+
+	auto box = std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
+	box->calculateMesh();
+	auto pedestal = std::make_shared<SolidPrism>(5.0f, 5.0f, 0.0f, 0x0000ff00, 20.0f, 30.0f, 5.0f);
+	auto wall = std::make_shared<SolidPrism>(5.0f, 19.5f, 5.0f, 0x00ff0000, 20.0f, 1.0f, 7.5f);
+
+	Game->addEntity(box);
+	Game->addEntity(pedestal);
+	Game->addEntity(wall);
+	
+	Ball->setInMotion();
+	Ball->setVelocity({ 0.2f, 0.2f, -0.2f, 1.0f });
+
+	Game->addTexture(IMG_Load("Textures/blue.jpg"));
+	Game->addTexture(IMG_Load("Textures/wolf001.jpg"));
+	Game->addTexture(IMG_Load("Textures/wolf002.jpg"));
+	Game->addTexture(IMG_Load("Textures/mosaic001.jpg"));
+	Game->addTexture(IMG_Load("Textures/brick001.jpg"));
+	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
+	Game->addTexture(IMG_Load("Textures/timber.jpg"));
+
+	Game->buildMesh();
+
+	while (!Controls->quit)
+	{
+		Game->updateAll();
+	}
+
+	Game->destroyMesh();
+
+	Screen->cleanUp();
+
+	IMG_Quit();
+
+	SDL_Quit();
+}
+
 
 
 void software_renderer(bool exportFile, const std::string& fileName)
@@ -107,15 +161,9 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
 
-	Room room_01;
+	Room room_01(-5.0, -5.0, -5.0, 10.0, 10.0, 10.0);
 	SolidBody* room_ptr_1 = &room_01;
-	room_01.setPosition(-5.0, -5.0, -5.0);
-	room_01.setDimension(10.0, 10.0, 10.0);
-	room_01.setSideOn(1, 1, 1, 1, 1, 1);
 	room_01.setTexture(2, 3, 1, 1, 1, 1);
-	room_01.setColour(getColour(0, 255, 0, 0), getColour(0, 255, 0, 0), getColour(0, 0, 255, 0), getColour(0, 0, 255, 0),
-		getColour(0, 0, 0, 255), getColour(0, 0, 0, 255));
-	room_01.setTextureScale(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
 	room_01.calculateMesh();
 	Solids->addSolid(room_ptr_1);
 
@@ -414,7 +462,7 @@ void opengl_renderer()
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to use the Software Renderer <S> the OpenGL Renderer <O> or the Editor <E> ?" << std::endl;
+	std::cout << "Do you want to use the Software Renderer <S> the OpenGL Renderer <O> or the Editor <E> or play Pong <P> ?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
@@ -446,6 +494,10 @@ int main(int argc, char** argv)
 	case 'e':
 	case 'E':
 		editor();
+		break;
+	case 'p':
+	case 'P':
+		pong3d();
 		break;
 	default:
 

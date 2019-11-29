@@ -6,7 +6,7 @@
 EventHandler::EventHandler(double step, double turn, double sens):
 	stepP(step), turnP(turn), sensitivity(sens)
 {
-	std::cout << "EventHandler constructor called - EventHandler::EventHandler(double step, double turn, double sens)" << std::endl;
+	std::cout << "EventHandler constructor called" << std::endl;
 }
 
 
@@ -242,7 +242,7 @@ void EventHandler::HandleUserEvents()
 				visualStyle = test;
 				break;
 			case SDLK_g:
-				gouraudShading = gouraudShading ? false : true;
+				gravityOn = gravityOn ? false : true;
 				break;
 			case SDLK_TAB:
 				showFPS = showFPS ? false : true;

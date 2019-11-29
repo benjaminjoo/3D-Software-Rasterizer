@@ -5,7 +5,7 @@
 
 ModelElementBuffer::ModelElementBuffer(std::string F)
 {
-	std::cout << "ModelElementBuffer constructor called - ModelElementBuffer::ModelElementBuffer(std::string F)" << std::endl;
+	std::cout << "ModelElementBuffer constructor called" << std::endl;
 
 	fileName	= F;
 }

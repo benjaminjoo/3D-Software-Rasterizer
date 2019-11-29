@@ -567,6 +567,10 @@ triangle3dV translateT(double x, double y, double z, triangle3dV T);	//Translati
 triangle3dV* transformObject(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
 						double rX, double rY, double rZ);
 
+void transformMesh(int n, triangle3dV* object, vect3 m);
+
+void transformMesh(int n, triangle3dV* object, double mvX, double mvY, double mvZ);
+
 void transformMesh(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
 	double rX, double rY, double rZ);
 

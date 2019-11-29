@@ -7,12 +7,12 @@ class SolidBody
 {
 protected:
 
-	vect3			scale			= { 1.0, 1.0, 1.0, 1.0 };
-	vect3			position		= { 0.0, 0.0, 0.0, 1.0 };
-	vect3			rotation		= { 0.0, 0.0, 0.0, 1.0 };
+	vect3			scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
+	vect3			position		= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			rotation		= { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	vect3			velocity		= { 0.0, 0.0, 0.0, 1.0 };
-	vect3			angularVelocity = { 0.0, 0.0, 0.0, 1.0 };
+	vect3			velocity		= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			angularVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	Uint32			colour			= 255;
 	int				texture			= 0;
@@ -21,6 +21,9 @@ protected:
 	bool			castsShadows	= false;
 
 	bool			bBoxActive		= false;
+
+	bool			inMotion		= false;
+
 	boundingBox		BB;
 
 public:
@@ -43,17 +46,25 @@ public:
 	void setVelocity(vect3);
 	void setAngularVelocity(vect3);
 
-	void setTexture(int);
+	void updateVelocity(vect3);
+	void updateAngularVelocity(vect3);
 
 	vect3 getVelocity();
 	vect3 getAngularVelocity();
 
-	void updatePosition();
+	void updatePosition();	
 	void updateRotation();
+
+	void updatePosition(vect3);
+
+	void setTexture(int);
 
 	bool getBBState();
 	void activateBBox();
 	void updatebBBox(vect3, vect3);
 	boundingBox getBB();
+
+	bool isInMotion();
+	void setInMotion();
 };
 

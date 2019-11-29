@@ -3,112 +3,16 @@
 
 Room::Room()
 {
-
-	position	= { 0.0, 0.0, 0.0, 1.0 };
-	rotation	= { 0.0, 0.0, 0.0, 1.0 };
-
-	sizeX		= 5.0;
-	sizeY		= 4.0;
-	sizeZ		= 3.0;
-
-	colBottom	= 255;
-	colTop		= 255;
-	colBack		= 255;
-	colFront	= 255;
-	colLeft		= 255;
-	colRight	= 255;
-
-	txtBottom	= 0;
-	txtTop		= 0;
-	txtBack		= 0;
-	txtFront	= 0;
-	txtLeft		= 0;
-	txtRight	= 0;
-
-	txUBottom	= 1.0;
-	txUTop		= 1.0;
-	txUBack		= 1.0;
-	txUFront	= 1.0;
-	txULeft		= 1.0;
-	txURight	= 1.0;
-
-	isBottomOn	= true;
-	isTopOn		= true;
-	isBackOn	= true;
-	isFrontOn	= true;
-	isLeftOn	= true;
-	isRightOn	= true;
-
-	openingOnBottom		= false;
-	openingOnTop		= false;
-	openingOnBack		= false;
-	openingOnFront		= false;
-	openingOnLeft		= false;
-	openingOnRight		= false;
-
-	openingBottom		= nullptr;
-	openingTop			= nullptr;
-	openingBack			= nullptr;
-	openingFront		= nullptr;
-	openingLeft			= nullptr;
-	openingRight		= nullptr;
-
-	castsShadows		= false;
+	position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 }
 
 
-Room::Room(double pX, double pY, double pZ, double sX, double sY, double sZ, double rX, double rY, double rZ, Uint32* col, int* txt)
+Room::Room(double pX, double pY, double pZ, double sX, double sY, double sZ):
+	sizeX(sX), sizeY(sY), sizeZ(sZ)
 {
-	position	= { pX, pY, pZ, 1.0 };
-	rotation	= { rX, rY, rZ, 1.0 };
-
-	sizeX		= sX;
-	sizeY		= sY;
-	sizeZ		= sZ;
-
-	colBottom	= 255;
-	colTop		= 255;
-	colBack		= 255;
-	colFront	= 255;
-	colLeft		= 255;
-	colRight	= 255;
-
-	txtBottom	= 0;
-	txtTop		= 0;
-	txtBack		= 0;
-	txtFront	= 0;
-	txtLeft		= 0;
-	txtRight	= 0;
-
-	txUBottom	= 1.0;
-	txUTop		= 1.0;
-	txUBack		= 1.0;
-	txUFront	= 1.0;
-	txULeft		= 1.0;
-	txURight	= 1.0;
-
-	isBottomOn	= true;
-	isTopOn		= true;
-	isBackOn	= true;
-	isFrontOn	= true;
-	isLeftOn	= true;
-	isRightOn	= true;
-
-	openingOnBottom		= false;
-	openingOnTop		= false;
-	openingOnBack		= false;
-	openingOnFront		= false;
-	openingOnLeft		= false;
-	openingOnRight		= false;
-
-	openingBottom		= nullptr;
-	openingTop			= nullptr;
-	openingBack			= nullptr;
-	openingFront		= nullptr;
-	openingLeft			= nullptr;
-	openingRight		= nullptr;
-
-	castsShadows		= false;
+	position = { pX, pY, pZ, 1.0f };
+	rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 }
 
 

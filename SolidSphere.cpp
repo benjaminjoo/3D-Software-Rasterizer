@@ -52,6 +52,18 @@ SolidSphere::~SolidSphere()
 }
 
 
+void SolidSphere::setRadius(double r)
+{
+	radius = r;
+}
+
+
+double SolidSphere::getRadius()
+{
+	return radius;
+}
+
+
 int	SolidSphere::getTotalVert()
 {
 	return 2 * resol* (resol - 1) + 2;

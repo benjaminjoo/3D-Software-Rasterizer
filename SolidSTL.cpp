@@ -148,7 +148,7 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.A = { (double)xf, (double)yf, (double)zf, 1.0f };
+			tempPoly.A = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
 
 
 
@@ -162,7 +162,7 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.B = { (double)xf, (double)yf, (double)zf, 1.0f };
+			tempPoly.B = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
 
 
 
@@ -176,7 +176,7 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.C = { (double)xf, (double)yf, (double)zf, 1.0f };
+			tempPoly.C = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
 
 
 

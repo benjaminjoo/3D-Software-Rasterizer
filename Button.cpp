@@ -4,14 +4,14 @@
 
 Button::Button()
 {
-	std::cout << "Button constructor called - Button::Button()" << std::endl;
+	std::cout << "Button constructor called" << std::endl;
 }
 
 
 Button::Button(std::shared_ptr<Canvas> canvas, int posH, int posV, bool on, tool name, Uint32 col):
 	S(canvas), isActive(on), toolName(name), colour(col)
 {
-	std::cout << "Button constructor called - Button::Button(std::shared_ptr<Canvas> canvas, int posH, int posV, bool on, tool name, Uint32 col)" << std::endl;
+	std::cout << "Button constructor called" << std::endl;
 
 	position = { posH * 32, posV * 32 };
 }

@@ -7,8 +7,7 @@ Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actor
 	std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls):
 	Solids(solids), Actors(actors), Sun(sun), Player(player), Controls(controls)
 {
-	std::cout << "Renderer constructor called - Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors,"
-				<< "std::shared_ptr<LightSource> sun, std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls)" << std::endl;
+	std::cout << "Renderer constructor called" << std::endl;
 
 	hRatio = Player->getHRatio();
 	vRatio = Player->getVRatio();
