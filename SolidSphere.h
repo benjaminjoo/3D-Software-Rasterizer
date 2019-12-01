@@ -6,14 +6,16 @@
 class SolidSphere: public SolidBody
 {
 
-	double			radius;
-	int				resol;
+	double			radius	= 0.5f;
+	int				resol	= 12;
 
 public:
 
 	SolidSphere();
 	SolidSphere(double, double, double, Uint32);
+	//SolidSphere(vect3, Uint32);
 	SolidSphere(double, double, double, double, double, double, double, double, double, Uint32, int, double, int);
+	//SolidSphere(vect3, vect3, vect3, Uint32, int, double, int);
 	~SolidSphere();
 
 	void			setRadius(double);

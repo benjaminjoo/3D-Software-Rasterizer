@@ -308,6 +308,10 @@ txt BSP1Loader::getTextureData(unsigned int n)
 	{
 		return textureDataContainer[n];
 	}
+	else
+	{
+		return textureDataContainer[0];
+	}
 }
 
 

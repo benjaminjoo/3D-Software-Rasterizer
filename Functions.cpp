@@ -787,6 +787,12 @@ triangle3dV* transformObject(int nPoly, triangle3dV* object, double scX, double 
 }
 
 
+void moveMeshToLocation(int n, triangle3dV* object, vect3 p)
+{
+
+}
+
+
 void transformMesh(int n, triangle3dV* object, vect3 mv)
 {
 	for (int i = 0; i < n; i++)

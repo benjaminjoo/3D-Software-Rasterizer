@@ -57,13 +57,13 @@ public:
 
 	inline void updateAll(EventHandler& Controls)
 	{
-		//Player->azm = -Controls->turnH;
-		//Player->alt = -Controls->turnV;
-		//Player->rol = Controls->tiltP;
+		//Eye->azm = -Controls->turnH;
+		//Eye->alt = -Controls->turnV;
+		//Eye->rol = Controls->tiltP;
 		//
-		//Player->x -= Controls->moveP * cos(Player->azm) - Controls->strafeP * cos(Player->azm + PI * 0.5);
-		//Player->y += Controls->moveP * sin(Player->azm) - Controls->strafeP * sin(Player->azm + PI * 0.5);
-		//Player->z += Controls->riseP;
+		//Eye->x -= Controls->moveP * cos(Eye->azm) - Controls->strafeP * cos(Eye->azm + PI * 0.5);
+		//Eye->y += Controls->moveP * sin(Eye->azm) - Controls->strafeP * sin(Eye->azm + PI * 0.5);
+		//Eye->z += Controls->riseP;
 		
 		rotation.x = (float)Controls.turnV;
 		rotation.y = (float)Controls.turnH;

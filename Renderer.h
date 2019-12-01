@@ -20,7 +20,7 @@ class Renderer
 
 	std::shared_ptr<LightSource>	Sun;
 
-	std::shared_ptr<Camera>			Player;
+	std::shared_ptr<Camera>			Eye;
 
 	std::shared_ptr<EventHandler>	Controls;
 
@@ -51,7 +51,7 @@ class Renderer
 public:
 
 	Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors, std::shared_ptr<LightSource> sun,
-				std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls);
+				std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls);
 	~Renderer();
 
 	void updateCameraPosition();

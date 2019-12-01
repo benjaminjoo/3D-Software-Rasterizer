@@ -10,17 +10,22 @@
 
 class Camera
 {
-public:
+	friend class Renderer;
+	friend class Editor;
+	friend class Pong;
+
+private:
+
 	double			x;
 	double			y;
 	double			z;
 
-	double			step;
-	double			turn;
-
 	double			azm;
 	double			alt;
 	double			rol;
+
+	double			step;
+	double			turn;
 
 	double			fovH;
 
@@ -39,10 +44,14 @@ public:
 	clock_t			frameTime		= 0;
 	int				frameCounter	= 0;
 
+public:
+
 	Camera();
 	Camera(double, double, double, int, int, int);
 	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
 	~Camera();
+
+private:
 
 	double getFovH();
 	double getFovV();
@@ -152,5 +161,6 @@ public:
 	void outputImage(Canvas);
 
 	void updatePosition(double, double, double, double, double, double);
+	vect3 getPosition();
 	void centreLook();
 };

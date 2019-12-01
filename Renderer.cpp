@@ -4,13 +4,13 @@
 
 
 Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actors, std::shared_ptr<LightSource> sun,
-	std::shared_ptr<Camera> player, std::shared_ptr<EventHandler> controls):
-	Solids(solids), Actors(actors), Sun(sun), Player(player), Controls(controls)
+	std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls):
+	Solids(solids), Actors(actors), Sun(sun), Eye(eye), Controls(controls)
 {
 	std::cout << "Renderer constructor called" << std::endl;
 
-	hRatio = Player->getHRatio();
-	vRatio = Player->getVRatio();
+	hRatio = Eye->getHRatio();
+	vRatio = Eye->getVRatio();
 
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
@@ -74,18 +74,18 @@ void Renderer::checkCameraCollision()
 		if (Solids->getBBState(i))
 		{
 			boundingBox tempBB = Solids->getBB(i);
-			if ((Player->x >= tempBB.minExt.x) &&
-				(Player->y >= tempBB.minExt.y) &&
-				(Player->z >= tempBB.minExt.z) &&
-				(Player->x <= tempBB.maxExt.x) &&
-				(Player->y <= tempBB.maxExt.y) &&
-				(Player->z <= tempBB.maxExt.z))
+			if ((Eye->x >= tempBB.minExt.x) &&
+				(Eye->y >= tempBB.minExt.y) &&
+				(Eye->z >= tempBB.minExt.z) &&
+				(Eye->x <= tempBB.maxExt.x) &&
+				(Eye->y <= tempBB.maxExt.y) &&
+				(Eye->z <= tempBB.maxExt.z))
 			{
 				int nPoly = Solids->getPolyCount(i);
 				for (int p = 0; p < nPoly; p++)
 				{
 					triangle3dV triangleChecked = solidMesh[i][p];
-					vect3 pointChecked = { Player->x, Player->y, Player->z, 1.0 };
+					vect3 pointChecked = { Eye->x, Eye->y, Eye->z, 1.0 };
 					double dist = distPoint2Plane(pointChecked, triangleChecked);
 					if (distPoint2Plane(pointChecked, triangleChecked) <= collisionDist)
 					{
@@ -111,18 +111,18 @@ bool Renderer::checkCameraCollision(vect3 v, int* body, int* poly)
 		if (Solids->getBBState(i))
 		{
 			boundingBox tempBB = Solids->getBB(i);
-			if ((Player->x >= tempBB.minExt.x) &&
-				(Player->y >= tempBB.minExt.y) &&
-				(Player->z >= tempBB.minExt.z) &&
-				(Player->x <= tempBB.maxExt.x) &&
-				(Player->y <= tempBB.maxExt.y) &&
-				(Player->z <= tempBB.maxExt.z))
+			if ((Eye->x >= tempBB.minExt.x) &&
+				(Eye->y >= tempBB.minExt.y) &&
+				(Eye->z >= tempBB.minExt.z) &&
+				(Eye->x <= tempBB.maxExt.x) &&
+				(Eye->y <= tempBB.maxExt.y) &&
+				(Eye->z <= tempBB.maxExt.z))
 			{
 				int nPoly = Solids->getPolyCount(i);
 				for (int p = 0; p < nPoly; p++)
 				{
 					triangle3dV polyChecked = solidMesh[i][p];
-					vect3 pointChecked = { Player->x + v.x, Player->y + v.y, Player->z + v.z, 1.0 };
+					vect3 pointChecked = { Eye->x + v.x, Eye->y + v.y, Eye->z + v.z, 1.0 };
 					double dist = distPoint2Plane(pointChecked, polyChecked);
 					if (dist <= collisionDist)
 					{
@@ -158,20 +158,20 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 		if (Solids->getBBState(i))													//CHECK IF CURRENT BODY HAS ACTIVE BOUNDING BOX
 		{
 			boundingBox tempBB = Solids->getBB(i);
-			if ((Player->x >= tempBB.minExt.x) &&									//CHECK IF CAMERA IS INSIDE BOUNDING BOX
-				(Player->y >= tempBB.minExt.y) &&
-				(Player->z >= tempBB.minExt.z) &&
-				(Player->x <= tempBB.maxExt.x) &&
-				(Player->y <= tempBB.maxExt.y) &&
-				(Player->z <= tempBB.maxExt.z))
+			if ((Eye->x >= tempBB.minExt.x) &&									//CHECK IF CAMERA IS INSIDE BOUNDING BOX
+				(Eye->y >= tempBB.minExt.y) &&
+				(Eye->z >= tempBB.minExt.z) &&
+				(Eye->x <= tempBB.maxExt.x) &&
+				(Eye->y <= tempBB.maxExt.y) &&
+				(Eye->z <= tempBB.maxExt.z))
 			{
 				int nPoly = Solids->getPolyCount(i);								//POLY COUNT OF CURRENT BODY
 				for (int p = 0; p < nPoly; p++)										//FOR EACH POLYGONS
 				{
 					triangle3dV triangleChecked = solidMesh[i][p];					//TRIANGLE TO CHECK WITH
 
-					vect3 cameraCurr = { Player->x, Player->y, Player->z, 1.0 };						//CAMERA POSITION - CURRENT FRAME
-					vect3 cameraNext = { Player->x + v->x, Player->y + v->y , Player->z + v->z , 1.0 };	//CAMERA POSITION - NEXT FRAME
+					vect3 cameraCurr = { Eye->x, Eye->y, Eye->z, 1.0 };						//CAMERA POSITION - CURRENT FRAME
+					vect3 cameraNext = { Eye->x + v->x, Eye->y + v->y , Eye->z + v->z , 1.0 };	//CAMERA POSITION - NEXT FRAME
 
 					double dist = distPoint2Plane(cameraCurr, triangleChecked);	//DISTANCE FROM CURRENT POSITION TO POLYGON'S PLANE
 
@@ -233,20 +233,20 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 		if (Solids->getBBState(i))													//CHECK IF CURRENT BODY HAS ACTIVE BOUNDING BOX
 		{
 			boundingBox tempBB = Solids->getBB(i);
-			if ((Player->x >= tempBB.minExt.x) &&									//CHECK IF CAMERA IS INSIDE BOUNDING BOX
-				(Player->y >= tempBB.minExt.y) &&
-				(Player->z >= tempBB.minExt.z) &&
-				(Player->x <= tempBB.maxExt.x) &&
-				(Player->y <= tempBB.maxExt.y) &&
-				(Player->z <= tempBB.maxExt.z))
+			if ((Eye->x >= tempBB.minExt.x) &&									//CHECK IF CAMERA IS INSIDE BOUNDING BOX
+				(Eye->y >= tempBB.minExt.y) &&
+				(Eye->z >= tempBB.minExt.z) &&
+				(Eye->x <= tempBB.maxExt.x) &&
+				(Eye->y <= tempBB.maxExt.y) &&
+				(Eye->z <= tempBB.maxExt.z))
 			{
 				int nPoly = Solids->getPolyCount(i);								//POLY COUNT OF CURRENT BODY
 				for (int p = 0; p < nPoly; p++)										//FOR EACH POLYGONS
 				{
 					triangle3dV polyChecked = solidMesh[i][p];					//TRIANGLE TO CHECK WITH
-					vect3 cameraCurr = { Player->x, Player->y, Player->z, 1.0 };						//CAMERA POSITION IN THE CURRENT FRAME
-					vect3 cameraPlus1 = { Player->x + v->x, Player->y + v->y , Player->z + v->z , 1.0 };//CAMERA POSITION IN THE NEXT FRAME
-					vect3 cameraPlus2 = { Player->x + 2 * v->x, Player->y + 2 * v->y, Player->z + 2 * v->z, 1.0 };
+					vect3 cameraCurr = { Eye->x, Eye->y, Eye->z, 1.0 };						//CAMERA POSITION IN THE CURRENT FRAME
+					vect3 cameraPlus1 = { Eye->x + v->x, Eye->y + v->y , Eye->z + v->z , 1.0 };//CAMERA POSITION IN THE NEXT FRAME
+					vect3 cameraPlus2 = { Eye->x + 2 * v->x, Eye->y + 2 * v->y, Eye->z + 2 * v->z, 1.0 };
 
 					double dCurr = distPoint2Plane(cameraCurr, polyChecked);
 					double dPlus1 = distPoint2Plane(cameraPlus1, polyChecked);
@@ -302,25 +302,25 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 
 void Renderer::updateCameraPosition()
 {
-	Player->azm = -Controls->turnH;
-	Player->alt = -Controls->turnV;
-	Player->rol = Controls->tiltP;
+	Eye->azm = -Controls->turnH;
+	Eye->alt = -Controls->turnV;
+	Eye->rol = Controls->tiltP;
 
-	Player->x -= Controls->moveP * cos(Player->azm) - Controls->strafeP * cos(Player->azm + PI * 0.5);
-	Player->y += Controls->moveP * sin(Player->azm) - Controls->strafeP * sin(Player->azm + PI * 0.5);
-	Player->z += Controls->riseP;
+	Eye->x -= Controls->moveP * cos(Eye->azm) - Controls->strafeP * cos(Eye->azm + PI * 0.5);
+	Eye->y += Controls->moveP * sin(Eye->azm) - Controls->strafeP * sin(Eye->azm + PI * 0.5);
+	Eye->z += Controls->riseP;
 }
 
 
 void Renderer::updateCameraPosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP, bool collisionCheck)
 {
-	Player->azm = -turnH;
-	Player->alt = -turnV;
-	Player->rol = tiltP;
+	Eye->azm = -turnH;
+	Eye->alt = -turnV;
+	Eye->rol = tiltP;
 
 	vect3 velocity;
-	velocity.x = -(moveP * cos(Player->azm) - strafeP * cos(Player->azm + PI * 0.5));
-	velocity.y = (moveP * sin(Player->azm) - strafeP * sin(Player->azm + PI * 0.5));
+	velocity.x = -(moveP * cos(Eye->azm) - strafeP * cos(Eye->azm + PI * 0.5));
+	velocity.y = (moveP * sin(Eye->azm) - strafeP * sin(Eye->azm + PI * 0.5));
 	velocity.z = riseP;
 	velocity.w = 1.0;
 
@@ -346,9 +346,9 @@ void Renderer::updateCameraPosition(double turnH, double turnV, double tiltP, do
 		}
 	}
 
-	Player->x += (velocity.x + counter.x);
-	Player->y += (velocity.y + counter.y);
-	Player->z += (velocity.z + counter.z);
+	Eye->x += (velocity.x + counter.x);
+	Eye->y += (velocity.y + counter.y);
+	Eye->z += (velocity.z + counter.z);
 }
 
 
@@ -367,7 +367,7 @@ void Renderer::updateShadowVolumes(model E)
 
 	vect3 sunInView;
 
-	transform3d T = Player->getTransformation();
+	transform3d T = Eye->getTransformation();
 	sunInView = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, sunVector)));
 	//sunInView = sunVector;
 
@@ -408,7 +408,7 @@ void Renderer::updateShadowVolumes(model E)
 		if (polyCount != nullptr)
 			for (int i = 0; i < polyCount[j]; i++)
 			{
-				triangle3dV tempPoly = Player->world2viewT(T, shadowMesh[j][i]);
+				triangle3dV tempPoly = Eye->world2viewT(T, shadowMesh[j][i]);
 				//triangle3dV tempPoly = shadowMesh[j][i];
 				if (Entities->assertShadowCasting(j) && this->polyFacingLightsource(sunInView, tempPoly))
 					nShadows++;
@@ -421,7 +421,7 @@ void Renderer::updateShadowVolumes(model E)
 		{
 			for (int i = 0; i < polyCount[j]; i++)
 			{
-				triangle3dV tempPoly = Player->world2viewT(T, shadowMesh[j][i]);
+				triangle3dV tempPoly = Eye->world2viewT(T, shadowMesh[j][i]);
 				//triangle3dV tempPoly = shadowMesh[j][i];
 				if (Entities->assertShadowCasting(j) && this->polyFacingLightsource(sunInView, tempPoly))
 				{
@@ -527,11 +527,11 @@ void Renderer::updateEntities(model E)
 
 void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer)
 {
-	transform3d playerPosition = Player->getTransformation();
+	transform3d eyePosition = Eye->getTransformation();
 	for (int i = 0; i < nPoints; i++)
 	{
-		point3 viewP = Player->world2viewP(playerPosition, Points[i]);
-		if (Player->insideFrustum(viewP)) { Player->projectPoint(viewP, pixelBuffer, hRatio, vRatio); }
+		point3 viewP = Eye->world2viewP(eyePosition, Points[i]);
+		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer, hRatio, vRatio); }
 	}
 }
 
@@ -559,28 +559,28 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 		std::shared_ptr<int[]> polyCount(new int[Entities->getNEntities()]);
 		Entities->getPolyCountEntities(polyCount);
 
-		transform3d playerPosition = Player->getTransformation();
+		transform3d eyePosition = Eye->getTransformation();
 
 		for (unsigned int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			int totalPoly = polyCount[i];
 			for (int k = 0; k < totalPoly; k++)
 			{
-				if (Player->polyFacingCamera(triangleMesh[i][k]))		//Backface culling is performed here
+				if (Eye->polyFacingCamera(triangleMesh[i][k]))		//Backface culling is performed here
 				{
 					Uint32 colour = triangleMesh[i][k].colour;
 
-					triangle3dV viewT = Player->world2viewT(playerPosition, triangleMesh[i][k]);					
+					triangle3dV viewT = Eye->world2viewT(eyePosition, triangleMesh[i][k]);					
 
-					Player->illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
+					Eye->illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
 
-					int nVert = Player->clipToFrustum(viewT, Entities->vertexList, Entities->uvList);
+					int nVert = Eye->clipToFrustum(viewT, Entities->vertexList, Entities->uvList);
 
 					int textureID = triangleMesh[i][k].texture;
 
-					Player->currentTexture = Entities->getTextureData(textureID);
+					Eye->currentTexture = Entities->getTextureData(textureID);
 
-					Player->projectPoly(nVert, Entities->vertexList, Entities->uvList, colour, pixelBuffer, depthBuffer, nShadows, vShadows,
+					Eye->projectPoly(nVert, Entities->vertexList, Entities->uvList, colour, pixelBuffer, depthBuffer, nShadows, vShadows,
 						hRatio, vRatio, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination, viewT);
 
 					this->incrementPolyCounter();
@@ -603,19 +603,19 @@ void Renderer::displayStats(bool crosshair, bool fps, bool position, bool polyN,
 		Screen->displayValue(Controls->torchIntensity, 2, 2, 11, getColour(0, 255, 255, 255));
 
 		Screen->displayString("POSITION X", 30, 9, getColour(0, 255, 127, 127));
-		Screen->displayValue((double)Player->x, 1, 2, 9, getColour(0, 255, 127, 127));
+		Screen->displayValue((double)Eye->x, 1, 2, 9, getColour(0, 255, 127, 127));
 		Screen->displayString("POSITION Y", 30, 8, getColour(0, 127, 255, 127));
-		Screen->displayValue((double)Player->y, 1, 2, 8, getColour(0, 127, 255, 127));
+		Screen->displayValue((double)Eye->y, 1, 2, 8, getColour(0, 127, 255, 127));
 		Screen->displayString("POSITION Z", 30, 7, getColour(0, 127, 127, 255));
-		Screen->displayValue((double)Player->z, 1, 2, 7, getColour(0, 127, 127, 255));
+		Screen->displayValue((double)Eye->z, 1, 2, 7, getColour(0, 127, 127, 255));
 
-		azmToShow = Player->azm * 180.0 / PI;
+		azmToShow = Eye->azm * 180.0 / PI;
 		if (azmToShow > 360.0) { azmToShow -= 360.0; }
 		if (azmToShow < -360.0) { azmToShow += 360.0; }
-		altToShow = Player->alt * 180.0 / PI - 180.0;
+		altToShow = Eye->alt * 180.0 / PI - 180.0;
 		if (altToShow > 360.0) { altToShow -= 360.0; }
 		if (altToShow < -360.0) { altToShow += 360.0; }
-		rolToShow = Player->rol * 180.0 / PI;
+		rolToShow = Eye->rol * 180.0 / PI;
 		if (rolToShow > 360.0) { rolToShow -= 360.0; }
 		if (rolToShow < -360.0) { rolToShow += 360.0; }
 

@@ -62,7 +62,7 @@ void Canvas::update()
 {
 	SDL_UpdateTexture(sdl_texture, nullptr, pixelBuffer, getWidth() * sizeof(Uint32));
 
-	SDL_RenderClear(sdl_screen);
+	//SDL_RenderClear(sdl_screen);
 
 	SDL_RenderCopy(sdl_screen, sdl_texture, nullptr, nullptr);
 
@@ -562,14 +562,17 @@ void Canvas::displayValue(double value, int dec, int shiftH, int shiftV, Uint32 
 
 	posH = w - 1 - (dec + 2 + shiftH) * fontSize;
 
-	bool* currentMap = this->GetSingleDigit_8('.');
-	for (int j = 0; j < fontSize; j++)
+	if (dec > 0)
 	{
-		for (int i = 0; i < fontSize; i++)
+		bool* currentMap = this->GetSingleDigit_8('.');
+		for (int j = 0; j < fontSize; j++)
 		{
-			if (currentMap[j * fontSize + i])
+			for (int i = 0; i < fontSize; i++)
 			{
-				pixelBuffer[(posV + j) * w + posH + i] = colour;
+				if (currentMap[j * fontSize + i])
+				{
+					pixelBuffer[(posV + j) * w + posH + i] = colour;
+				}
 			}
 		}
 	}
@@ -590,20 +593,20 @@ void Canvas::displayValue(double value, int dec, int shiftH, int shiftV, Uint32 
 			}
 		}
 	}
-	else
-	{
-		bool* currentMap = plus_sign;
-		for (int j = 0; j < fontSize; j++)
-		{
-			for (int i = 0; i < fontSize; i++)
-			{
-				if (currentMap[j * fontSize + i])
-				{
-					pixelBuffer[(posV + j) * w + posH + i] = colour;
-				}
-			}
-		}
-	}
+	//else
+	//{
+	//	bool* currentMap = plus_sign;
+	//	for (int j = 0; j < fontSize; j++)
+	//	{
+	//		for (int i = 0; i < fontSize; i++)
+	//		{
+	//			if (currentMap[j * fontSize + i])
+	//			{
+	//				pixelBuffer[(posV + j) * w + posH + i] = colour;
+	//			}
+	//		}
+	//	}
+	//}
 
 	delete[] fract;
 	delete[] dInt;

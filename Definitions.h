@@ -62,6 +62,9 @@ enum projectionStyle { wireframe, solid_colour, checkerboard, flat_shaded, goura
 enum model { solid, actor };
 
 
+enum hit_response { penetrate, stick, bounce, slide };
+
+
 typedef unsigned char byte;
 
 
@@ -566,6 +569,8 @@ triangle3dV translateT(double x, double y, double z, triangle3dV T);	//Translati
 
 triangle3dV* transformObject(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
 						double rX, double rY, double rZ);
+
+void moveMeshToLocation(int n, triangle3dV* object, vect3 p);
 
 void transformMesh(int n, triangle3dV* object, vect3 m);
 

@@ -2582,6 +2582,12 @@ void Camera::drawSpot(screenCoord P, Uint32 colour, Uint32* pixelBuffer)
 }
 
 
+vect3 Camera::getPosition()
+{
+	return { x, y, z, 1.0f };
+}
+
+
 void Camera::updatePosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
 {
 	azm = -turnH;

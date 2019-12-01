@@ -19,8 +19,10 @@ EventHandler::~EventHandler()
 void EventHandler::HandleUserEvents()
 {
 	const Uint8* state = SDL_GetKeyboardState(nullptr);
+	if (state[SDL_SCANCODE_LCTRL])
+		isFiring = true;	
 	if (state[SDL_SCANCODE_Q] && !state[SDL_SCANCODE_E])
-	{
+	{		
 		if ((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && state[SDL_SCANCODE_SPACE])
 		{
 			riseP = stepP * 8;
@@ -245,14 +247,13 @@ void EventHandler::HandleUserEvents()
 				gravityOn = gravityOn ? false : true;
 				break;
 			case SDLK_TAB:
-				showFPS = showFPS ? false : true;
-				showPosition = showPosition ? false : true;
+				showFPS			= showFPS ? false : true;
+				showPosition	= showPosition ? false : true;
+				showPolyN		= showPolyN ? false : true;
+				showAmmo		= showAmmo ? false : true;
 				break;
 			case SDLK_KP_5:
 				mouseLookBlocked = mouseLookBlocked ? false : true;
-				break;
-			case SDLK_p:
-				//player->outputImage(*screen);
 				break;
 			case SDLK_KP_PLUS:
 				if (torchIntensity < 1000.0f)
@@ -289,9 +290,9 @@ void EventHandler::HandleUserEvents()
 
 		if (SDL_MOUSEBUTTONDOWN)
 		{
-			if (event.button.button == SDL_BUTTON_RIGHT)
+			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-
+				isFiring = true;
 			}
 		}
 
@@ -324,7 +325,8 @@ void EventHandler::HandleUserEvents()
 
 void EventHandler::ceaseMotion()
 {
-	moveP = 0.0;
-	strafeP = 0.0;
-	riseP = 0.0;
+	moveP		= 0.0f;
+	strafeP		= 0.0f;
+	riseP		= 0.0f;
+	isFiring	= false;
 }

@@ -4,21 +4,6 @@
 
 SolidBody::SolidBody()
 {
-	scale				= { 1.0, 1.0, 1.0, 1.0 };
-	position			= { 0.0, 0.0, 0.0, 1.0 };
-	rotation			= { 0.0, 0.0, 0.0, 1.0 };
-
-	velocity			= { 0.0, 0.0, 0.0, 1.0 };
-	angularVelocity		= { 0.0, 0.0, 0.0, 1.0 };
-
-	colour				= 255;
-	texture				= 0;
-	txU					= 1.0;
-
-	castsShadows		= false;
-
-	bBoxActive			= false;
-	BB					= { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0) };
 }
 
 
@@ -150,8 +135,6 @@ bool SolidBody::getBBState()
 void SolidBody::activateBBox()
 {
 	bBoxActive = true;
-	/*printf("BB minExt\tx: %4.4f\ty: %4.4f\tz: %4.4f\t\tmaxExt\tx: %4.4f\ty: %4.4f\tz: %4.4f\n",
-			BB.minExt.x, BB.minExt.y, BB.minExt.z, BB.maxExt.x, BB.maxExt.y, BB.maxExt.z);*/
 }
 
 
@@ -168,6 +151,12 @@ boundingBox SolidBody::getBB()
 }
 
 
+double SolidBody::getBBRadius()
+{
+	return bbRadius;
+}
+
+
 bool SolidBody::isInMotion()
 {
 	return inMotion;
@@ -177,4 +166,23 @@ bool SolidBody::isInMotion()
 void SolidBody::setInMotion()
 {
 	inMotion = true;
+}
+
+
+void SolidBody::stop()
+{
+	inMotion = false;
+	//position = { 0.0f, 0.0f, 0.0f, 1.0f };
+}
+
+
+bool SolidBody::isVisible()
+{
+	return visible;
+}
+
+
+void SolidBody::setVisibility(bool vis)
+{
+	visible = vis;
 }

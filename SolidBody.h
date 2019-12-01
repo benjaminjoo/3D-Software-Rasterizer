@@ -19,12 +19,14 @@ protected:
 	double			txU				= 1.0f;
 
 	bool			castsShadows	= false;
-
 	bool			bBoxActive		= false;
-
 	bool			inMotion		= false;
+	bool			visible			= true;
 
-	boundingBox		BB;
+	boundingBox		BB				= { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0) };
+	double			bbRadius		= 0.25f;
+
+	hit_response	behaviour		= penetrate;
 
 public:
 
@@ -63,8 +65,13 @@ public:
 	void activateBBox();
 	void updatebBBox(vect3, vect3);
 	boundingBox getBB();
+	double getBBRadius();
 
 	bool isInMotion();
 	void setInMotion();
+	void stop();
+
+	bool isVisible();
+	void setVisibility(bool);
 };
 

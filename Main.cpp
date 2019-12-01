@@ -38,13 +38,14 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 #include "Pong.h"
+#include "Player.h"
 
 
 void editor()
 {
-	auto Screen		= std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	auto Screen		= std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9f);
 
-	auto Viewer		= std::make_shared<Camera>(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 999.0, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	auto Viewer		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.01f, 999.0f, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
 	auto Drawing	= std::make_shared<ModelElementBuffer>("test.wtf");
 
@@ -77,25 +78,28 @@ void pong3d()
 {
 	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
-	auto Eye		= std::make_shared<Camera>(0.0f, -3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Ball		= std::make_shared<SolidSphere>(5.0f, 2.125f, 15.0f, 0xffffffff);
-	Ball->setRadius(0.5f);
+	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);
 
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Ball);
+	auto Ball		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 5.0f, 2.125f, 15.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 1, 0.3f, 24);
+	
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Ball);
 
-	auto box = std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
+	auto pedestal	= std::make_shared<SolidPrism>(5.0f, 5.0f, 0.0f, 0x0000ff00, 20.0f, 30.0f, 5.0f);
+	auto wall		= std::make_shared<SolidPrism>(5.0f, 19.5f, 5.0f, 0x00ff0000, 20.0f, 1.0f, 7.5f);
+	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 5.0f, 24);
+	auto box		= std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
 	box->calculateMesh();
-	auto pedestal = std::make_shared<SolidPrism>(5.0f, 5.0f, 0.0f, 0x0000ff00, 20.0f, 30.0f, 5.0f);
-	auto wall = std::make_shared<SolidPrism>(5.0f, 19.5f, 5.0f, 0x00ff0000, 20.0f, 1.0f, 7.5f);
 
 	Game->addEntity(box);
 	Game->addEntity(pedestal);
 	Game->addEntity(wall);
+	Game->addEntity(dome);
 	
 	Ball->setInMotion();
 	Ball->setVelocity({ 0.2f, 0.2f, -0.2f, 1.0f });
@@ -107,6 +111,8 @@ void pong3d()
 	Game->addTexture(IMG_Load("Textures/brick001.jpg"));
 	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
 	Game->addTexture(IMG_Load("Textures/timber.jpg"));
+
+	Game->loadProjectile(150);
 
 	Game->buildMesh();
 
@@ -130,9 +136,9 @@ void software_renderer(bool exportFile, const std::string& fileName)
 {
 
 //#define _CUBE_
-#define _BEZIER_PATCH_
+//#define _BEZIER_PATCH_
 //#define _QUAKE_1_READER_
-//#define _STL_READER_
+#define _STL_READER_
 
 	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
@@ -140,7 +146,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 	auto Actors = std::make_shared<Shapes>();
 
-	auto Player = std::make_shared<Camera>(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Eye	= std::make_shared<Camera>(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	auto Controls = std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
 	Controls->torchIntensity = 10.0;
@@ -303,7 +309,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 #ifdef _STL_READER_
 
-	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
+	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "cockpit.stl");
 	test_body.readSTLfile();
 	test_body.smoothSurfaces();
 	Solids->addSolid(&test_body);
@@ -330,7 +336,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 	Solids->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 	Actors->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 
-	auto Game = std::make_shared<Renderer>(Solids, Actors, Sun, Player, Controls);
+	auto Game = std::make_shared<Renderer>(Solids, Actors, Sun, Eye, Controls);
 
 	Game->updateShadowVolumes(solid);
 
@@ -406,7 +412,7 @@ void opengl_renderer()
 
 
 	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
-	OpenGLCamera Player(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
+	OpenGLCamera Eye(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
 	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	EventHandler Controls(0.01f, 0.01f, 0.01f);
@@ -444,7 +450,7 @@ void opengl_renderer()
 		Screen.clear(0.5f, 0.5f, 1.0f, 0.0f);
 
 		shader_01.bind();
-		shader_01.update(View, Player);
+		shader_01.update(View, Eye);
 		mesh_01.drawMesh();
 		
 		Controls.HandleUserEvents();
