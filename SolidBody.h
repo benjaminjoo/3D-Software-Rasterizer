@@ -17,11 +17,15 @@ protected:
 	Uint32			colour			= 255;
 	int				texture			= 0;
 	double			txU				= 1.0f;
-
+	
 	bool			castsShadows	= false;
 	bool			bBoxActive		= false;
-	bool			inMotion		= false;
+	bool			gravitating		= false;
+	bool			inMotion		= false;	
 	bool			visible			= true;
+	bool			breakable		= false;
+	bool			destroyed		= false;
+	bool			vanished		= false;
 
 	boundingBox		BB				= { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0) };
 	double			bbRadius		= 0.25f;
@@ -65,13 +69,31 @@ public:
 	void activateBBox();
 	void updatebBBox(vect3, vect3);
 	boundingBox getBB();
+
 	double getBBRadius();
+	void setBBRadius(double);
+
+	bool isGravitating();
+	void setGravity(bool);
 
 	bool isInMotion();
-	void setInMotion();
-	void stop();
+	void setMotion(bool);
 
 	bool isVisible();
 	void setVisibility(bool);
+
+	bool isBreakable();
+	void setBreakability(bool);
+
+	bool isDestroyed();
+	void destroy();
+
+	bool isVanished();
+	void vanish();
+
+	hit_response getBehaviour();
+	void setBehaviour(hit_response);
+
+	void updateColour(Uint32);
 };
 

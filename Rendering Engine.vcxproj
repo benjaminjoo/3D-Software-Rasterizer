@@ -176,6 +176,7 @@
     </ClCompile>
     <ClCompile Include="BSP1Loader.cpp" />
     <ClCompile Include="BSP3Loader.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Canvas.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="BezierPatch.h" />
     <ClInclude Include="BSP1Loader.h" />
     <ClInclude Include="BSP3Loader.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Canvas.h" />

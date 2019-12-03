@@ -509,6 +509,8 @@ vect3 halfwayPoint(vect3 a, vect3 b);
 
 double distanceSquared(vect3 a, vect3 b);
 
+double lengthSquared(vect3 v);
+
 vect3 unitVector(vect3 v);
 
 worldCoord unitVector2(worldCoord v);
@@ -524,6 +526,8 @@ double dotProductSquared(const vect3& a, const vect3& b);
 double distPoint2Plane(vect3 P, triangle3dV T);
 
 double distPoint2Line(worldCoord P, Side view, line3 L);
+
+double distPoint2LineSquared(vect3 p, vect3 a, vect3 b);
 
 bool pointIsAroundLine(worldCoord P, Side view, line3 L);
 
@@ -570,9 +574,11 @@ triangle3dV translateT(double x, double y, double z, triangle3dV T);	//Translati
 triangle3dV* transformObject(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
 						double rX, double rY, double rZ);
 
-void moveMeshToLocation(int n, triangle3dV* object, vect3 p);
+void movePoly(vect3 m, triangle3dV& poly);
 
 void transformMesh(int n, triangle3dV* object, vect3 m);
+
+void rotateMesh(int n, triangle3dV* object, double rx, double ry, double rz);
 
 void transformMesh(int n, triangle3dV* object, double mvX, double mvY, double mvZ);
 

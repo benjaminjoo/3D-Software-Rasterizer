@@ -19,7 +19,7 @@ EventHandler::~EventHandler()
 void EventHandler::HandleUserEvents()
 {
 	const Uint8* state = SDL_GetKeyboardState(nullptr);
-	if (state[SDL_SCANCODE_LCTRL])
+	if (state[SDL_SCANCODE_RETURN])
 		isFiring = true;	
 	if (state[SDL_SCANCODE_Q] && !state[SDL_SCANCODE_E])
 	{		

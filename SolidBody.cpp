@@ -157,22 +157,33 @@ double SolidBody::getBBRadius()
 }
 
 
+void SolidBody::setBBRadius(double r)
+{
+	bbRadius = r;
+}
+
+
+bool SolidBody::isGravitating()
+{
+	return gravitating;
+}
+
+
+void SolidBody::setGravity(bool g)
+{
+	gravitating = g;
+}
+
+
 bool SolidBody::isInMotion()
 {
 	return inMotion;
 }
 
 
-void SolidBody::setInMotion()
+void SolidBody::setMotion(bool m)
 {
-	inMotion = true;
-}
-
-
-void SolidBody::stop()
-{
-	inMotion = false;
-	//position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	inMotion = m;
 }
 
 
@@ -185,4 +196,58 @@ bool SolidBody::isVisible()
 void SolidBody::setVisibility(bool vis)
 {
 	visible = vis;
+}
+
+
+bool SolidBody::isBreakable()
+{
+	return breakable;
+}
+
+
+void SolidBody::setBreakability(bool b)
+{
+	breakable = b;
+}
+
+
+bool SolidBody::isDestroyed()
+{
+	return destroyed;
+}
+
+
+void SolidBody::destroy()
+{
+	destroyed = true;
+}
+
+
+bool SolidBody::isVanished()
+{
+	return vanished;
+}
+
+
+void SolidBody::vanish()
+{
+	vanished = true;
+}
+
+
+hit_response SolidBody::getBehaviour()
+{
+	return behaviour;
+}
+
+
+void SolidBody::setBehaviour(hit_response b)
+{
+	behaviour = b;
+}
+
+
+void SolidBody::updateColour(Uint32 c)
+{
+	colour = c;
 }

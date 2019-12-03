@@ -366,6 +366,12 @@ double distanceSquared(vect3 a, vect3 b)
 }
 
 
+double lengthSquared(vect3 v)
+{
+	return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+
 vect3 unitVector(vect3 v)
 {
 	vect3 temp;
@@ -475,6 +481,12 @@ double distPoint2Line(worldCoord P, Side view, line3 L)
 		break;
 	}
 	return abs((L.vert[0] - P) * normal);
+}
+
+
+double distPoint2LineSquared(vect3 p, vect3 a, vect3 b)
+{
+	return lengthSquared(crossProduct(subVectors(p, a), subVectors(p, b))) / lengthSquared(subVectors(b, a));
 }
 
 
@@ -665,16 +677,6 @@ vect3 scale(double scaleX, double scaleY, double scaleZ, vect3 v)
 
 vect3 scaleVector(double scale, vect3 v)
 {
-	//vect3 t;
-	//
-	//mat4x4 m = {	scale,          0,         0,          0,
-	//					0,		scale,         0,          0,
-	//					0,          0,	   scale,          0,
-	//					0,          0,         0,          1 };
-	//t = multiplyMxV(m, v);
-	//
-	//return t;
-
 	return { v.x * scale, v.y * scale, v.z * scale, 1.0f };
 }
 
@@ -787,9 +789,11 @@ triangle3dV* transformObject(int nPoly, triangle3dV* object, double scX, double 
 }
 
 
-void moveMeshToLocation(int n, triangle3dV* object, vect3 p)
+void movePoly(vect3 m, triangle3dV& poly)
 {
-
+	poly.A = addVectors(poly.A, m);
+	poly.B = addVectors(poly.B, m);
+	poly.C = addVectors(poly.C, m);
 }
 
 
@@ -798,6 +802,21 @@ void transformMesh(int n, triangle3dV* object, vect3 mv)
 	for (int i = 0; i < n; i++)
 	{
 		object[i] = translateT(mv.x, mv.y, mv.z, object[i]);
+	}
+}
+
+
+void rotateMesh(int n, triangle3dV* object, double rx, double ry, double rz)
+{
+	for (int i = 0; i < n; i++)
+	{
+		triangle3dV temp = object[i];
+	
+		temp = rotXT(rx, temp);
+		temp = rotYT(ry, temp);
+		temp = rotZT(rz, temp);
+
+		object[i] = temp;
 	}
 }
 

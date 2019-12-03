@@ -19,24 +19,35 @@ Player::~Player()
 }
 
 
+void Player::setAmmo(unsigned int a)
+{
+	ammo = a;
+}
+
+
 void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned int* polyCount, triangle3dV** mesh)
 {
-	double muzzleVelocity = 1.0f;
+	double muzzleVelocity = 5.0f;
 	for (unsigned int i = 0; i < Projectiles.size(); i++)
 	{
 		if (Projectiles[i]->isVisible() == false)
 		{
-			vect3 origin = { x, y, z, 1.0f };
-			vect3 velocity = {	cos(-alt) * cos(-azm)	* muzzleVelocity,
-								cos(-alt) * sin(-azm)	* muzzleVelocity,
-								sin(-alt)				* muzzleVelocity, 0.0f };
+			vect3 origin	= { x, y, z, 1.0f };
+			vect3 rotation	= { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };			
+			vect3 velocity	= scaleVector(muzzleVelocity, rotation);
+
+			rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
+
 			Projectiles[i]->setPosition(origin);
 			Projectiles[i]->setVelocity(velocity);
-			Projectiles[i]->setInMotion();
 			Projectiles[i]->setVisibility(true);
+			Projectiles[i]->setMotion(true);
+
+			transformMesh(polyCount[i], mesh[i], origin);
+
 			lastShot = 0;
 			ammo--;
-			transformMesh(polyCount[i], mesh[i], origin);
+
 			break;
 		}
 	}

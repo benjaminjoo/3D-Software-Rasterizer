@@ -84,25 +84,42 @@ void pong3d()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);
-
-	auto Ball		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 5.0f, 2.125f, 15.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 1, 0.3f, 24);
+	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);	
 	
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Ball);
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero);
 
 	auto pedestal	= std::make_shared<SolidPrism>(5.0f, 5.0f, 0.0f, 0x0000ff00, 20.0f, 30.0f, 5.0f);
 	auto wall		= std::make_shared<SolidPrism>(5.0f, 19.5f, 5.0f, 0x00ff0000, 20.0f, 1.0f, 7.5f);
 	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 5.0f, 24);
 	auto box		= std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
-	box->calculateMesh();
+	box->calculateMesh();	
+
+	srand(unsigned int(time(NULL)));
+	for (int i = 0; i < 10; i++)
+	{
+		double x = double(rand() % 30) * 1.0f;
+		double y = double(rand() % 40) * 1.0f;
+		double z = double(rand() % 20) * 1.0f;
+
+		double vx = (-5.0f + double(rand() % 10)) * 0.05f;
+		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
+		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
+
+		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 12);
+
+		ball->setBBRadius(1.0f);
+		ball->setMotion(true);
+		ball->setVelocity({ vx, vy, vz, 1.0f });
+		ball->setBehaviour(bounce);
+		ball->setBreakability(true);
+
+		Game->addBall(ball);
+	}
 
 	Game->addEntity(box);
 	Game->addEntity(pedestal);
 	Game->addEntity(wall);
-	Game->addEntity(dome);
-	
-	Ball->setInMotion();
-	Ball->setVelocity({ 0.2f, 0.2f, -0.2f, 1.0f });
+	//Game->addEntity(dome);
 
 	Game->addTexture(IMG_Load("Textures/blue.jpg"));
 	Game->addTexture(IMG_Load("Textures/wolf001.jpg"));
@@ -112,7 +129,7 @@ void pong3d()
 	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
 	Game->addTexture(IMG_Load("Textures/timber.jpg"));
 
-	Game->loadProjectile(150);
+	Game->loadProjectile(250);
 
 	Game->buildMesh();
 

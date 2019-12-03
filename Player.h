@@ -38,6 +38,7 @@ public:
 
 private:
 
+	void setAmmo(unsigned int);
 	void shoot(std::vector<std::shared_ptr<SolidBody>>, unsigned int*, triangle3dV**);
 };
 

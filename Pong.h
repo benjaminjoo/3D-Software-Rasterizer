@@ -13,6 +13,7 @@
 #include "SolidBody.h"
 #include "SolidSphere.h"
 #include "SolidCube.h"
+#include "Bullet.h"
 
 
 class Pong
@@ -24,11 +25,11 @@ private:
 	std::shared_ptr<EventHandler>				Controls		= nullptr;
 	std::shared_ptr<LightSource>				Sun				= nullptr;
 	std::shared_ptr<Player>						Hero			= nullptr;
-	std::shared_ptr<SolidSphere>				Ball			= nullptr;
 
 	std::vector<txt>							textureData;
 
 	std::vector<std::shared_ptr<SolidBody>>		Entities;
+	std::vector<std::shared_ptr<SolidBody>>		Balls;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
 
 	std::shared_ptr<SolidBody>					Bar;
@@ -45,12 +46,12 @@ private:
 	triangle3dV*								playerMesh			= nullptr;
 	unsigned int								playerPolyCount		= 0;
 
-	triangle3dV*								ballMesh			= nullptr;
-	unsigned int								ballPolyCount		= 0;
-	double										ballRadius			= 0.0f;
+	triangle3dV**								ballMesh			= nullptr;
+	unsigned int*								ballPolyCount		= 0;
 
 	triangle3dV**								projectileMesh		= nullptr;
 	unsigned int*								projectilePolyCount = nullptr;
+
 	unsigned int								ammo				= 0;
 
 	clock_t			lastShot		= 0;
@@ -65,12 +66,16 @@ private:
 	void updateCameraPosition(const std::shared_ptr<Player>&);
 	void updatePlayerPosition();
 	void updateEntities();
+	void updateBalls();
 	void updateProjectiles();
 
-	void updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
-	bool objectApproachingWall(vect3 p, vect3 v, const unsigned int& i, const unsigned int& j);
+	void hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 
-	void renderMesh(transform3d eyePosition, int nPoly, triangle3dV* mesh);
+	void updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
+	bool objectApproachingWall(vect3, vect3, const unsigned int&, const unsigned int&);
+
+	void explodeMesh(vect3, int, triangle3dV*);
+	void renderMesh(transform3d, int, triangle3dV*);
 	void renderAll();
 
 	void updateFrameCounter();
@@ -82,12 +87,12 @@ private:
 
 public:
 
-	Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls,
-			std::shared_ptr<LightSource> sun, std::shared_ptr<Player> hero, std::shared_ptr<SolidSphere> ball);
+	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<EventHandler>, std::shared_ptr<LightSource>, std::shared_ptr<Player>);
 	~Pong();
 
 	void addTexture(SDL_Surface*);
 	void addEntity(std::shared_ptr<SolidBody>);
+	void addBall(std::shared_ptr<SolidBody>);
 	void loadProjectile(unsigned int);
 	void buildMesh();
 	void destroyMesh();
