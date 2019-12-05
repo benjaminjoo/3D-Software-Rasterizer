@@ -6,6 +6,7 @@
 
 
 #include "Canvas.h"
+//#include "Speaker.h"
 #include "Camera.h"
 #include "EventHandler.h"
 #include "LightSource.h"
@@ -21,6 +22,7 @@ class Pong
 private:
 
 	std::shared_ptr<Canvas>						Screen			= nullptr;
+	//std::shared_ptr<Speaker>					SoundSystem		= nullptr;
 	std::shared_ptr<Camera>						Eye				= nullptr;
 	std::shared_ptr<EventHandler>				Controls		= nullptr;
 	std::shared_ptr<LightSource>				Sun				= nullptr;
@@ -43,11 +45,14 @@ private:
 	triangle3dV**								triangleMesh		= nullptr;
 	unsigned int*								polyCount			= nullptr;
 
-	triangle3dV*								playerMesh			= nullptr;
-	unsigned int								playerPolyCount		= 0;
+	triangle3dV**								playerMesh			= nullptr;
+	unsigned int*								playerPolyCount		= nullptr;
 
 	triangle3dV**								ballMesh			= nullptr;
-	unsigned int*								ballPolyCount		= 0;
+	unsigned int*								ballPolyCount		= nullptr;
+
+	triangle3dV**								explosionMesh		= nullptr;
+	unsigned int*								explosionPolyCount	= nullptr;
 
 	triangle3dV**								projectileMesh		= nullptr;
 	unsigned int*								projectilePolyCount = nullptr;
@@ -69,12 +74,13 @@ private:
 	void updateBalls();
 	void updateProjectiles();
 
-	void hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
+	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 
-	void updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
+	bool updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
 	bool objectApproachingWall(vect3, vect3, const unsigned int&, const unsigned int&);
 
-	void explodeMesh(vect3, int, triangle3dV*);
+	void explodeMesh(double, vect3, int, triangle3dV*);
+	void explodeDebris(double, vect3, int, triangle3dV*);
 	void renderMesh(transform3d, int, triangle3dV*);
 	void renderAll();
 
@@ -87,7 +93,8 @@ private:
 
 public:
 
-	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<EventHandler>, std::shared_ptr<LightSource>, std::shared_ptr<Player>);
+	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>,
+			std::shared_ptr<EventHandler>, std::shared_ptr<LightSource>, std::shared_ptr<Player>);
 	~Pong();
 
 	void addTexture(SDL_Surface*);

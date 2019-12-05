@@ -68,6 +68,14 @@ enum hit_response { penetrate, stick, bounce, slide };
 typedef unsigned char byte;
 
 
+struct soundBite
+{
+	SDL_AudioSpec	wavSpec;
+	Uint32			wavLength;
+	Uint8*			wavBuffer;
+};
+
+
 struct zColour
 {
 	double z		= 0.0f;
@@ -192,13 +200,39 @@ struct vect3
 	double z = 0.0f;
 	double w = 0.0f;
 
-	//vect3	operator + 	(const vect3&);
-	//vect3	operator - 	(const vect3&);
-	//vect3	operator += (const vect3&);
-	//vect3	operator -= (const vect3&);
-	//vect3	operator ^ 	(const vect3&);		//Cross Product
-	//double	operator * 	(const vect3&);		//Dot Product
-	//vect3	operator *	(const double&);	//Scale
+	vect3	operator + 	(const vect3& p)
+	{
+		return { x + p.x, y + p.y, z + p.z, 1.0f };
+	}
+
+	vect3	operator - 	(const vect3& p)
+	{
+		return { x - p.x, y - p.y, z - p.z, 1.0f };
+	}
+
+	vect3	operator += (const vect3& p)
+	{
+		return { x += p.x, y += p.y, z += p.z, 1.0f };
+	}
+
+	vect3	operator -= (const vect3& p)
+	{
+		return { x -= p.x, y -= p.y, z -= p.z, 1.0f };
+	}
+
+	vect3	operator ^ (const vect3& p)				//Cross Product
+	{
+		return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x, 1.0f };
+	}
+
+	double	operator * (const vect3& p)				//Dot Product
+	{
+		return x * p.x + y * p.y + z * p.z;
+	}
+	vect3	operator *	(const double& s)			//Scale
+	{
+		return { x * s, y * s, z * s, 1.0f };
+	}
 };
 
 

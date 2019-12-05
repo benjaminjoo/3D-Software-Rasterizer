@@ -6,9 +6,7 @@
 #include "ViewVolume.h"
 #include "Canvas.h"
 #include "ShadowVolume.h"
-#include <math.h>
-#include <stdio.h>
-#include <time.h>
+
 
 #define PI					3.141592654
 
@@ -250,7 +248,7 @@ bool Camera::assertPointVis(plane plane, point3 Point)
 
 int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList)
 {
-	memset(vertList, 0.0, MAXCLIPVERTS * sizeof(double));
+	memset(vertList, 0, MAXCLIPVERTS * sizeof(double));
 
 	vertList[0] = viewT.A;	uvList[0] = viewT.At;
 	vertList[1] = viewT.B;	uvList[1] = viewT.Bt;
@@ -682,7 +680,7 @@ inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -696,7 +694,7 @@ inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -710,7 +708,7 @@ inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -766,8 +764,8 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double dIllum, illum;
 	double xx, yy, zz, dz;
@@ -809,7 +807,7 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
 			illum = t.illumA + dIllum * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -830,7 +828,7 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
 			illum = t.illumB + dIllum * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -851,7 +849,7 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
 			illum = t.illumC + dIllum * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -996,7 +994,6 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	//int m = pow2(scale);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1023,7 +1020,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1036,7 +1033,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1049,7 +1046,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1099,7 +1096,6 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	//int m = pow2(scale);
 	int dx, dy;
 	double dIllum, illum;
 	double xx, yy, zz, dz;
@@ -1131,7 +1127,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * ((yy + corr) / (double)dy);
 			illum = t.illumA + dIllum * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1146,7 +1142,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * ((yy + corr) / (double)dy);
 			illum = t.illumB + dIllum * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1161,7 +1157,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * ((yy + corr) / (double)dy);
 			illum = t.illumC + dIllum * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1228,8 +1224,6 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1238,12 +1232,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 	int endIndex;
 	int startX, endX;
 	double startZ, endZ, zCurrent;
-	double h_ratio, v_ratio;
-	h_ratio = this->getHRatio();
-	v_ratio = this->getVRatio();
 	double invertCurrentZ;
-	double hCorr = w * 0.475 * h_ratio;
-	double vCorr = w * 0.475 * v_ratio;
 	double deltaZ;
 	coord2 currentP, startP, endP;
 
@@ -1255,7 +1244,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1268,7 +1257,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1281,7 +1270,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1317,7 +1306,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 				{
 					invertCurrentZ = 1 / zCurrent;
 					if (invertCurrentZ < depthBuffer[hg * w + i])
-					{
+					{						
 						pixelBuffer[hg * w + i] = getColour(0, (byte)(255 * zCurrent), (byte)(255 * zCurrent), (byte)(255 * zCurrent));
 						depthBuffer[hg * w + i] = invertCurrentZ;
 					}
@@ -1338,8 +1327,8 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double dIllum, illum;
 	double xx, yy, zz, dz;
@@ -1388,7 +1377,7 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
 			illum = t.illumA + dIllum * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1409,7 +1398,7 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
 			illum = t.illumB + dIllum * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1430,7 +1419,7 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
 			illum = t.illumC + dIllum * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1562,8 +1551,8 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1605,7 +1594,7 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1623,7 +1612,7 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1641,7 +1630,7 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1773,8 +1762,8 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1810,7 +1799,7 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1826,7 +1815,7 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1842,7 +1831,7 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1929,8 +1918,8 @@ inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, doub
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1955,7 +1944,7 @@ inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, doub
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1968,7 +1957,7 @@ inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, doub
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1981,7 +1970,7 @@ inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, doub
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -2035,8 +2024,8 @@ inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t,
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = (int)(w * 0.5);
-	int halfH = (int)(h * 0.5);
+	int halfW = std::round(w * 0.5);
+	int halfH = std::round(h * 0.5);
 	int dx, dy;
 	double dIllum, illum;
 	double xx, yy, zz, dz;
@@ -2079,7 +2068,7 @@ inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t,
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (double)dy);
 			illum = t.illumA + dIllum * (yy / (double)dy);
-			wd = t.a.x + int(xx);
+			wd = t.a.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -2100,7 +2089,7 @@ inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t,
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (double)dy);
 			illum = t.illumB + dIllum * (yy / (double)dy);
-			wd = t.b.x + int(xx);
+			wd = t.b.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -2121,7 +2110,7 @@ inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t,
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (double)dy);
 			illum = t.illumC + dIllum * (yy / (double)dy);
-			wd = t.c.x + int(xx);
+			wd = t.c.x + std::round(xx);
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;

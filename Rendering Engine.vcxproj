@@ -215,6 +215,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="SolidSTL.cpp" />
+    <ClCompile Include="Speaker.cpp" />
     <ClCompile Include="ViewVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -241,7 +242,6 @@
     <ClInclude Include="OpenGLTransform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pong.h" />
-    <ClInclude Include="QuakeDef.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />
@@ -255,6 +255,7 @@
     <ClInclude Include="SolidRevolved.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="SolidSTL.h" />
+    <ClInclude Include="Speaker.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewVolume.h" />
   </ItemGroup>

@@ -31,6 +31,9 @@ protected:
 	double			bbRadius		= 0.25f;
 
 	hit_response	behaviour		= penetrate;
+	unsigned int	ticksSinceHit	= 0;
+
+	int				nBounces		= 0;
 
 public:
 
@@ -94,6 +97,12 @@ public:
 	hit_response getBehaviour();
 	void setBehaviour(hit_response);
 
+	unsigned int getTicksSinceHit();
+	void incrementTicksSinceHit();
+
 	void updateColour(Uint32);
+
+	void incrementBounceCount();
+	int getBounceCount();
 };
 

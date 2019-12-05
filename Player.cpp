@@ -19,6 +19,12 @@ Player::~Player()
 }
 
 
+void Player::addPart(std::shared_ptr<SolidBody> p)
+{
+	Parts.push_back(p);
+}
+
+
 void Player::setAmmo(unsigned int a)
 {
 	ammo = a;

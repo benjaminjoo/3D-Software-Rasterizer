@@ -2,15 +2,12 @@
 #include <SDLImage/SDL_image.h>
 #include <GLEW/glew.h>
 #include <GLM/glm.hpp>
-#include <stdio.h>
-#include <conio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <vector>
-#include <iostream>
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
+//#include "Speaker.h"
 #include "LightSource.h"
 #include "Shapes.h"
 #include "SolidBody.h"
@@ -78,6 +75,8 @@ void pong3d()
 {
 	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
+	//auto Sound		= std::make_shared<Speaker>();
+
 	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
@@ -85,6 +84,8 @@ void pong3d()
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
 	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);	
+	auto Gun		= std::make_shared<SolidPrism>(0.0f, 0.0f, 0.5f, 0x00ffffff, 0.25f, 1.25f, 0.25f);
+	Hero->addPart(Gun);
 	
 	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero);
 
@@ -95,7 +96,7 @@ void pong3d()
 	box->calculateMesh();	
 
 	srand(unsigned int(time(NULL)));
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		double x = double(rand() % 30) * 1.0f;
 		double y = double(rand() % 40) * 1.0f;
@@ -105,9 +106,10 @@ void pong3d()
 		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
 		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
 
-		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 12);
+		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 6);
 
 		ball->setBBRadius(1.0f);
+		ball->setGravity(true);
 		ball->setMotion(true);
 		ball->setVelocity({ vx, vy, vz, 1.0f });
 		ball->setBehaviour(bounce);
@@ -129,7 +131,7 @@ void pong3d()
 	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
 	Game->addTexture(IMG_Load("Textures/timber.jpg"));
 
-	Game->loadProjectile(250);
+	Game->loadProjectile(500);
 
 	Game->buildMesh();
 
@@ -154,8 +156,8 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 //#define _CUBE_
 //#define _BEZIER_PATCH_
-//#define _QUAKE_1_READER_
-#define _STL_READER_
+#define _QUAKE_1_READER_
+//#define _STL_READER_
 
 	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 

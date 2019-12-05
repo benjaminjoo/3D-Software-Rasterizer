@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <vector>
 
 #include "Definitions.h"
 #include "SolidBody.h"
@@ -30,14 +31,18 @@ private:
 	std::shared_ptr<SolidBody>	boundingVolume	= nullptr;
 	double						bbRadius		= 0.25f;
 
+	std::vector<std::shared_ptr<SolidBody>>		Parts;
+
 public:
 
 	Player();
 	Player(double, double, double, double, double, double, int, int);
 	~Player();
 
-private:
+	void addPart(std::shared_ptr<SolidBody>);
 
+private:
+	
 	void setAmmo(unsigned int);
 	void shoot(std::vector<std::shared_ptr<SolidBody>>, unsigned int*, triangle3dV**);
 };

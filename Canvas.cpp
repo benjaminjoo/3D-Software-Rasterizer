@@ -87,10 +87,8 @@ void Canvas::resetPixelBuffer()
 
 void Canvas::resetDepthBuffer()
 {
-	for (int i = 0; i < w * h; i++)
-	{
-		depthBuffer[i] = zFar;
-	}
+	for (double* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
+		* i = zFar;
 }
 
 

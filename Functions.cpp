@@ -238,48 +238,6 @@ vect3 addVectors(const vect3& a, const vect3& b)
 }
 
 /*
-vect3 vect3::operator + (const vect3& p)
-{
-	return { x + p.x, y + p.y, z + p.z, 1.0f };
-}
-
-
-vect3 vect3::operator - (const vect3& p)
-{
-	return { x - p.x, y - p.y, z - p.z, 1.0f };
-}
-
-
-vect3 vect3::operator += (const vect3& p)
-{
-	return { x += p.x, y += p.y, z += p.z, 1.0f };
-}
-
-
-vect3 vect3::operator -= (const vect3& p)
-{
-	return { x -= p.x, y -= p.y, z -= p.z, 1.0f };
-}
-
-
-vect3 vect3::operator ^ (const vect3& p)
-{
-	return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x, 1.0f };
-}
-
-
-double vect3::operator * (const vect3& p)
-{
-	return x * p.x + y * p.y + z * p.z;
-}
-
-
-vect3 vect3::operator * (const double& s)
-{
-	return { x * s, y * s, z * s, 1.0f };
-}
-*/
-/*
 worldCoord worldCoord::operator + (const worldCoord& p)
 {
 	return { x + p.x, y + p.y, z + p.z };

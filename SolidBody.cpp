@@ -247,7 +247,31 @@ void SolidBody::setBehaviour(hit_response b)
 }
 
 
+unsigned int SolidBody::getTicksSinceHit()
+{
+	return ticksSinceHit;
+}
+
+
+void SolidBody::incrementTicksSinceHit()
+{
+	ticksSinceHit++;
+}
+
+
 void SolidBody::updateColour(Uint32 c)
 {
 	colour = c;
+}
+
+
+void SolidBody::incrementBounceCount()
+{
+	nBounces++;
+}
+
+
+int SolidBody::getBounceCount()
+{
+	return nBounces;
 }

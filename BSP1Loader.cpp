@@ -8,7 +8,6 @@
 #include "BSP1Loader.h"
 
 
-
 BSP1Loader::BSP1Loader(std::string f):
 	fileName(f)
 {
@@ -308,10 +307,7 @@ txt BSP1Loader::getTextureData(unsigned int n)
 	{
 		return textureDataContainer[n];
 	}
-	else
-	{
-		return textureDataContainer[0];
-	}
+	return { 0, 0, 0, nullptr };
 }
 
 

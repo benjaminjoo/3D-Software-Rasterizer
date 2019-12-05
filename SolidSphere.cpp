@@ -3,16 +3,6 @@
 
 SolidSphere::SolidSphere()
 {
-	//scale			= { 1.0, 1.0, 1.0, 1.0 };
-	//position		= { 0.0, 0.0, 0.0, 1.0 };
-	//rotation		= { 0.0, 0.0, 0.0, 1.0 };
-	//
-	//colour			= 255;
-	//texture			= 0;
-	//castsShadows	= false;
-	//
-	//radius			= 1.0;
-	//resol			= 24;
 }
 
 
@@ -30,22 +20,6 @@ SolidSphere::SolidSphere(double px, double py, double pz, Uint32 c)
 	resol			= 24;
 }
 
-/*
-SolidSphere::SolidSphere(vect3 pos, Uint32 col)
-
-{
-	//scale = { 1.0, 1.0, 1.0, 1.0 };
-	position = pos;
-	//rotation = { 0.0, 0.0, 0.0, 1.0 };
-	//
-	colour = col;
-	//texture = 0;
-	//castsShadows = false;
-	//
-	//radius = 1.0;
-	//resol = 24;
-}
-*/
 
 SolidSphere::SolidSphere(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz,
 							Uint32 c, int t, double r, int res)
@@ -62,21 +36,6 @@ SolidSphere::SolidSphere(double sx, double sy, double sz, double px, double py, 
 	resol			= res;
 }
 
-/*
-SolidSphere::SolidSphere(vect3 scl, vect3 pos, vect3 rot, Uint32 col, int tex, double rad, int res)
-{
-	scale			= scl;
-	position		= pos;
-	rotation		= rot;
-
-	colour			= col;
-	texture			= tex;
-	castsShadows	= false;
-
-	radius			= rad;
-	resol			= res;
-}
-*/
 
 SolidSphere::~SolidSphere()
 {
@@ -200,7 +159,7 @@ void SolidSphere::getTriangleData_(triangle3dV* t)
 		{
 			if (tCount < totalPoly)
 			{
-				t[tCount].A = s[0];		t[tCount].B = s[1];		t[tCount].C = s[i];
+				t[tCount].A = s[0];		t[tCount].B = s[1];		t[tCount].C = s[i + 1];
 				vect3 temp = crossProduct(subVectors(t[tCount].B, t[tCount].A), subVectors(t[tCount].C, t[tCount].A));
 				t[tCount].N = unitVector(temp);
 				t[tCount].An = unitVector(subVectors(t[tCount].A, centreV));
