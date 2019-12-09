@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Definitions.h"
-#include "SolidBody.h"		//Base class
+#include "SolidBody.h"
 
 class SolidRevolved: public SolidBody
 {
@@ -37,7 +37,6 @@ public:
 	vect3*			getVertexData();
 	triangle3dV*	getTriangleDataFlat();
 	void			getTriangleData_(triangle3dV*);
-	vect3			getPosition();
 	void			constructShadowVolume(vect3);
 };
 

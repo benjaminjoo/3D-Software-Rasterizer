@@ -77,14 +77,6 @@ void Bullet::getTriangleData_(triangle3dV* t)
 	t[3].colour = colour;
 
 	delete[] p;
-
-	transformMesh(this->getTotalPoly(), t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-vect3 Bullet::getPosition()
-{
-	return position;
 }
 
 

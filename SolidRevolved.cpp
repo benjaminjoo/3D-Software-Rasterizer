@@ -519,15 +519,6 @@ void SolidRevolved::getTriangleData_(triangle3dV* t)
 	}
 
 	delete[] n;
-
-	//transformMesh(this->getTotalPoly(), t, scaleX, scaleY, scaleZ, position.x, position.y, position.z, rotX, rotY, rotZ);
-	transformMesh(this->getTotalPoly(), t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-vect3 SolidRevolved::getPosition()
-{
-	return position;
 }
 
 

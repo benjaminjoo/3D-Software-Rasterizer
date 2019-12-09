@@ -573,15 +573,15 @@ coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
 
 Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
 
-vect3 multiplyMxV(mat4x4 m, vect3 v);									//Multiplies 4x4 matrix and 1*4 column vector
+vect3 multiplyMxV(const mat4x4& m, const vect3& v);						//Multiplies 4x4 matrix and 1*4 column vector
 
-vect3 multiplyVxM(mat4x4 m, vect3 v);									//Multiplies 1*4 column vector and 4x4 matrix
+vect3 multiplyVxM(const mat4x4& m, const vect3& v);						//Multiplies 1*4 column vector and 4x4 matrix
 
-vect3 rotXrad(double sinA, double cosA, vect3 v);						//Rotation around X - pre-calculated sin & cos values
+vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around X - pre-calculated sin & cos values
 
-vect3 rotYrad(double sinA, double cosA, vect3 v);						//Rotation around Y - pre-calculated sin & cos values
+vect3 rotYrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around Y - pre-calculated sin & cos values
 
-vect3 rotZrad(double sinA, double cosA, vect3 v);						//Rotation around Z - pre-calculated sin & cos values
+vect3 rotZrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around Z - pre-calculated sin & cos values
 
 vect3 rotX(double angle, vect3 v);										//Rotation around X
 
@@ -629,9 +629,9 @@ int sign(const double& a);
 
 int roundInt(double a);
 
-int GetYMin3(coord2* p);
+//int GetYMin3(coord2* p);
 
-int GetYMax3(coord2* p);
+//int GetYMax3(coord2* p);
 
 template <class T> T getMinN(int n, T* list);
 

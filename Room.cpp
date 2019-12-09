@@ -33,12 +33,6 @@ void Room::setPosition(double  px, double py, double pz)
 }
 
 
-vect3 Room::getPosition()
-{
-	return position;
-}
-
-
 void Room::setDimension(double sx, double sy, double sz)
 {
 	sizeX		= sx;

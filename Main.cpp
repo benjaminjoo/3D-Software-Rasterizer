@@ -20,6 +20,7 @@
 #include "Room.h"
 #include "SolidSTL.h"
 #include "SolidModel.h"
+#include "SolidFrustum.h"
 #include "EventHandler.h"
 #include "MessagePump.h"
 #include "Editor.h"
@@ -36,6 +37,7 @@
 #include "OpenGLShader.h"
 #include "Pong.h"
 #include "Player.h"
+#include "PelvisBone.h"
 
 
 void editor()
@@ -73,9 +75,9 @@ void editor()
 
 void pong3d()
 {
-	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+	PelvisBone pelvis;
 
-	//auto Sound		= std::make_shared<Speaker>();
+	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
 	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
@@ -84,10 +86,10 @@ void pong3d()
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
 	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);	
-	auto Gun		= std::make_shared<SolidPrism>(0.0f, 0.0f, 0.5f, 0x00ffffff, 0.25f, 1.25f, 0.25f);
-	Hero->addPart(Gun);
+
+	auto Enemy		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 100, 100);
 	
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero);
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Enemy);
 
 	auto pedestal	= std::make_shared<SolidPrism>(5.0f, 5.0f, 0.0f, 0x0000ff00, 20.0f, 30.0f, 5.0f);
 	auto wall		= std::make_shared<SolidPrism>(5.0f, 19.5f, 5.0f, 0x00ff0000, 20.0f, 1.0f, 7.5f);
@@ -112,6 +114,7 @@ void pong3d()
 		ball->setGravity(true);
 		ball->setMotion(true);
 		ball->setVelocity({ vx, vy, vz, 1.0f });
+		ball->setAngularVelocity({ 0.01f, 0.0f, 0.0f, 1.0f });
 		ball->setBehaviour(bounce);
 		ball->setBreakability(true);
 
@@ -156,8 +159,9 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 //#define _CUBE_
 //#define _BEZIER_PATCH_
-#define _QUAKE_1_READER_
-//#define _STL_READER_
+//#define _QUAKE_1_READER_
+//#define _QUAKE_3_READER_
+#define _STL_READER_
 
 	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
@@ -326,9 +330,20 @@ void software_renderer(bool exportFile, const std::string& fileName)
 #endif //_QUAKE_1_READER_
 
 
+#ifdef _QUAKE_3_READER_
+
+	BSP3Loader quakeMap("13ground.bsp", { 0.01, 0.01, 0.01, 1.0 });
+
+	quakeMap.readData();
+	SolidBody* map = &quakeMap;
+	Solids->addSolid(map);
+
+#endif //_QUAKE_3_READER_
+
+
 #ifdef _STL_READER_
 
-	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "cockpit.stl");
+	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
 	test_body.readSTLfile();
 	test_body.smoothSurfaces();
 	Solids->addSolid(&test_body);

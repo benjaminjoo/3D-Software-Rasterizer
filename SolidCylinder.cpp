@@ -264,14 +264,6 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 	}
 
 	delete[] s;
-
-	transformMesh(this->getTotalPoly(), t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-vect3 SolidCylinder::getPosition()
-{
-	return position;
 }
 
 

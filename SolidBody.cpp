@@ -45,6 +45,24 @@ void SolidBody::setRotation(vect3 r)
 }
 
 
+vect3 SolidBody::getScale()
+{
+	return scale;
+}
+
+
+vect3 SolidBody::getPosition()
+{
+	return position;
+}
+
+
+vect3 SolidBody::getRotation()
+{
+	return rotation;
+}
+
+
 void SolidBody::setVelocity(vect3 v)
 {
 	velocity.x = v.x;
@@ -87,12 +105,6 @@ void SolidBody::setTexture(int t)
 }
 
 
-vect3 SolidBody::getPosition()
-{
-	return position;
-}
-
-
 vect3 SolidBody::getVelocity()
 {
 	return velocity;
@@ -121,7 +133,7 @@ void SolidBody::updatePosition(vect3 m)
 
 void SolidBody::updateRotation()
 {
-	vect3 temp = addVectors(position, angularVelocity);
+	vect3 temp = addVectors(rotation, angularVelocity);
 	rotation = temp;
 }
 

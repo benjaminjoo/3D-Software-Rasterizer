@@ -509,7 +509,7 @@ vect3 midPoint(vect3 a, vect3 b)
 }
 
 
-vect3 multiplyMxV(mat4x4 m, vect3 v)
+vect3 multiplyMxV(const mat4x4& m, const vect3& v)
 {
 	vect3 t;
 
@@ -522,7 +522,7 @@ vect3 multiplyMxV(mat4x4 m, vect3 v)
 }
 
 
-vect3 multiplyVxM(mat4x4 m, vect3 v)
+vect3 multiplyVxM(const mat4x4& m, const vect3& v)
 {
 	vect3 t;
 
@@ -535,7 +535,7 @@ vect3 multiplyVxM(mat4x4 m, vect3 v)
 }
 
 
-vect3 rotXrad(double sinA, double cosA, vect3 v)
+vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v)
 {
 	vect3 t;
 
@@ -543,13 +543,14 @@ vect3 rotXrad(double sinA, double cosA, vect3 v)
 						0,       cosA,      sinA,          0,
 						0,      -sinA,      cosA,          0,
 						0,          0,         0,          1 };
+
 	t = multiplyVxM(m, v);
 
 	return t;
 }
 
 
-vect3 rotYrad(double sinA, double cosA, vect3 v)
+vect3 rotYrad(const double& sinA, const double& cosA, const vect3& v)
 {
 	vect3 t;
 
@@ -557,13 +558,14 @@ vect3 rotYrad(double sinA, double cosA, vect3 v)
 						0,          1,         0,          0,
 				     sinA,          0,      cosA,          0,
 						0,          0,         0,          1 };
+
 	t = multiplyVxM(m, v);
 
 	return t;
 }
 
 
-vect3 rotZrad(double sinA, double cosA, vect3 v)
+vect3 rotZrad(const double& sinA, const double& cosA, const vect3& v)
 {
 	vect3 t;
 
@@ -571,6 +573,7 @@ vect3 rotZrad(double sinA, double cosA, vect3 v)
 				    -sinA,       cosA,         0,          0,
 						0,          0,         1,          0,
 						0,          0,         0,          1 };
+
 	t = multiplyVxM(m, v);
 
 	return t;
@@ -658,13 +661,24 @@ vect3 translate(double x, double y, double z, vect3 v)
 
 triangle3dV rotXT(double angle, triangle3dV T)
 {
-	T.A		= rotX(angle, T.A);
-	T.B		= rotX(angle, T.B);
-	T.C		= rotX(angle, T.C);
-	T.An	= rotX(angle, T.An);
-	T.Bn	= rotX(angle, T.Bn);
-	T.Cn	= rotX(angle, T.Cn);
-	T.N		= rotX(angle, T.N);
+	double sin_a = sin(angle);
+	double cos_a = cos(angle);
+
+	//T.A		= rotX(angle, T.A);
+	//T.B		= rotX(angle, T.B);
+	//T.C		= rotX(angle, T.C);
+	//T.An		= rotX(angle, T.An);
+	//T.Bn		= rotX(angle, T.Bn);
+	//T.Cn		= rotX(angle, T.Cn);
+	//T.N		= rotX(angle, T.N);
+
+	T.A		= rotXrad(sin_a, cos_a, T.A);
+	T.B		= rotXrad(sin_a, cos_a, T.B);
+	T.C		= rotXrad(sin_a, cos_a, T.C);
+	T.An	= rotXrad(sin_a, cos_a, T.An);
+	T.Bn	= rotXrad(sin_a, cos_a, T.Bn);
+	T.Cn	= rotXrad(sin_a, cos_a, T.Cn);
+	T.N		= rotXrad(sin_a, cos_a, T.N);
 
 	return T;
 }
@@ -672,13 +686,24 @@ triangle3dV rotXT(double angle, triangle3dV T)
 
 triangle3dV rotYT(double angle, triangle3dV T)
 {
-	T.A		= rotY(angle, T.A);
-	T.B		= rotY(angle, T.B);
-	T.C		= rotY(angle, T.C);
-	T.An	= rotY(angle, T.An);
-	T.Bn	= rotY(angle, T.Bn);
-	T.Cn	= rotY(angle, T.Cn);
-	T.N		= rotY(angle, T.N);
+	double sin_a = sin(angle);
+	double cos_a = cos(angle);
+
+	//T.A		= rotY(angle, T.A);
+	//T.B		= rotY(angle, T.B);
+	//T.C		= rotY(angle, T.C);
+	//T.An		= rotY(angle, T.An);
+	//T.Bn		= rotY(angle, T.Bn);
+	//T.Cn		= rotY(angle, T.Cn);
+	//T.N		= rotY(angle, T.N);
+
+	T.A		= rotYrad(sin_a, cos_a, T.A);
+	T.B		= rotYrad(sin_a, cos_a, T.B);
+	T.C		= rotYrad(sin_a, cos_a, T.C);
+	T.An	= rotYrad(sin_a, cos_a, T.An);
+	T.Bn	= rotYrad(sin_a, cos_a, T.Bn);
+	T.Cn	= rotYrad(sin_a, cos_a, T.Cn);
+	T.N		= rotYrad(sin_a, cos_a, T.N);
 
 	return T;
 }
@@ -686,13 +711,24 @@ triangle3dV rotYT(double angle, triangle3dV T)
 
 triangle3dV rotZT(double angle, triangle3dV T)
 {
-	T.A		= rotZ(angle, T.A);
-	T.B		= rotZ(angle, T.B);
-	T.C		= rotZ(angle, T.C);
-	T.An	= rotZ(angle, T.An);
-	T.Bn	= rotZ(angle, T.Bn);
-	T.Cn	= rotZ(angle, T.Cn);
-	T.N		= rotZ(angle, T.N);
+	double sin_a = sin(angle);
+	double cos_a = cos(angle);
+
+	//T.A		= rotZ(angle, T.A);
+	//T.B		= rotZ(angle, T.B);
+	//T.C		= rotZ(angle, T.C);
+	//T.An		= rotZ(angle, T.An);
+	//T.Bn		= rotZ(angle, T.Bn);
+	//T.Cn		= rotZ(angle, T.Cn);
+	//T.N		= rotZ(angle, T.N);
+
+	T.A		= rotZrad(sin_a, cos_a, T.A);
+	T.B		= rotZrad(sin_a, cos_a, T.B);
+	T.C		= rotZrad(sin_a, cos_a, T.C);
+	T.An	= rotZrad(sin_a, cos_a, T.An);
+	T.Bn	= rotZrad(sin_a, cos_a, T.Bn);
+	T.Cn	= rotZrad(sin_a, cos_a, T.Cn);
+	T.N		= rotZrad(sin_a, cos_a, T.N);
 
 	return T;
 }
@@ -828,7 +864,7 @@ coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR)
 	return pixel;
 }
 
-
+/*
 int GetYMax3(coord2* p)
 {
 	int yMax = p[0].y;
@@ -849,7 +885,7 @@ int GetYMin3(coord2* p)
 	}
 	return yMin;
 }
-
+*/
 
 /*double getMinN(int n, double* list)
 {

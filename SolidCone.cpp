@@ -76,7 +76,7 @@ int	SolidCone::getTotalPoly()
 void SolidCone::getVertexData_(vect3* s)
 {
 	double angleH, stepH;
-	stepH = 360.0 / (double(resol) * 2);	//degrees
+	stepH = 360.0 / (double(resol) * 2);
 	int cnt = 0;
 	int total;
 	total = 2 * resol + 1;
@@ -193,14 +193,6 @@ void SolidCone::getTriangleData_(triangle3dV* t)
 	}
 
 	delete[] s;
-
-	transformMesh(this->getTotalPoly(), t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-vect3 SolidCone::getPosition()
-{
-	return position;
 }
 
 

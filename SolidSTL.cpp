@@ -81,12 +81,6 @@ void SolidSTL::getTriangleData_(triangle3dV* P)
 }
 
 
-vect3 SolidSTL::getPosition()
-{
-	return position;
-}
-
-
 void SolidSTL::constructShadowVolume(vect3)
 {
 

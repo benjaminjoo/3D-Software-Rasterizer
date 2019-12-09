@@ -91,7 +91,6 @@ public:
 	void traversePolygonTree(Side, polygon4uv*, vect3, Uint32, int);
 	void calculateMesh();
 	void getTriangleData_(triangle3dV*);	
-	vect3 getPosition();
 
 	void constructShadowVolume(vect3);
 };

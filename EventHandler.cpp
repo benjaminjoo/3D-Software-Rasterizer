@@ -206,6 +206,43 @@ void EventHandler::HandleUserEvents()
 		turnV = -PI;
 		tiltP = 0.0;
 	}
+
+	if (state[SDL_SCANCODE_Y] && !state[SDL_SCANCODE_I])
+	{
+
+		riseE = stepP;
+
+	}
+	if (state[SDL_SCANCODE_I] && !state[SDL_SCANCODE_Y])
+	{
+
+		riseE = -stepP;
+
+	}
+	if (state[SDL_SCANCODE_U] && !state[SDL_SCANCODE_J])
+	{
+
+		moveE = stepP;
+
+	}
+	if (state[SDL_SCANCODE_J] && !state[SDL_SCANCODE_U])
+	{
+
+		moveE = -stepP;
+
+	}
+	if (state[SDL_SCANCODE_H] && !state[SDL_SCANCODE_K])
+	{
+
+		strafeE = stepP;
+
+	}
+	if (state[SDL_SCANCODE_K] && !state[SDL_SCANCODE_H])
+	{
+
+		strafeE = -stepP;
+
+	}
 	
 	while (SDL_PollEvent(&event))
 	{
@@ -251,6 +288,10 @@ void EventHandler::HandleUserEvents()
 				showPosition	= showPosition ? false : true;
 				showPolyN		= showPolyN ? false : true;
 				showAmmo		= showAmmo ? false : true;
+				break;
+			case SDLK_END:
+				playerControlled	= playerControlled ? false : true;
+				enemyControlled		= enemyControlled ? false : true;
 				break;
 			case SDLK_KP_5:
 				mouseLookBlocked = mouseLookBlocked ? false : true;
@@ -328,5 +369,10 @@ void EventHandler::ceaseMotion()
 	moveP		= 0.0f;
 	strafeP		= 0.0f;
 	riseP		= 0.0f;
+
+	moveE		= 0.0f;
+	strafeE		= 0.0f;
+	riseE		= 0.0f;
+
 	isFiring	= false;
 }

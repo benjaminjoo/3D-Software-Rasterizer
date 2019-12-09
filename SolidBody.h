@@ -43,7 +43,6 @@ public:
 	virtual int				getTotalVert()					= 0;
 	virtual int				getTotalPoly()					= 0;
 	virtual void			getTriangleData_(triangle3dV*)	= 0;
-	virtual vect3			getPosition()					= 0;
 	virtual void			constructShadowVolume(vect3)	= 0;
 
 	bool assertShadowCasting();
@@ -51,6 +50,10 @@ public:
 	void setScale(vect3);
 	void setPosition(vect3);
 	void setRotation(vect3);
+
+	vect3 getScale();
+	vect3 getPosition();
+	vect3 getRotation();
 
 	void setVelocity(vect3);
 	void setAngularVelocity(vect3);

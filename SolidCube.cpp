@@ -143,14 +143,6 @@ void SolidCube::getTriangleData_(triangle3dV* t)
 	t[11].colour = colour;
 
 	delete[] p;
-
-	transformMesh(this->getTotalPoly(), t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-vect3 SolidCube::getPosition()
-{
-	return position;
 }
 
 

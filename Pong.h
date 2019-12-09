@@ -27,6 +27,7 @@ private:
 	std::shared_ptr<EventHandler>				Controls		= nullptr;
 	std::shared_ptr<LightSource>				Sun				= nullptr;
 	std::shared_ptr<Player>						Hero			= nullptr;
+	std::shared_ptr<Player>						Enemy			= nullptr;
 
 	std::vector<txt>							textureData;
 
@@ -47,6 +48,9 @@ private:
 
 	triangle3dV**								playerMesh			= nullptr;
 	unsigned int*								playerPolyCount		= nullptr;
+
+	triangle3dV**								enemyMesh			= nullptr;
+	unsigned int*								enemyPolyCount		= nullptr;
 
 	triangle3dV**								ballMesh			= nullptr;
 	unsigned int*								ballPolyCount		= nullptr;
@@ -70,6 +74,7 @@ private:
 
 	void updateCameraPosition(const std::shared_ptr<Player>&);
 	void updatePlayerPosition();
+	void updateEnemyPosition();
 	void updateEntities();
 	void updateBalls();
 	void updateProjectiles();
@@ -77,11 +82,11 @@ private:
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 
 	bool updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
-	bool objectApproachingWall(vect3, vect3, const unsigned int&, const unsigned int&);
+	bool objectApproachingWall(vect3, vect3, triangle3dV);
 
 	void explodeMesh(double, vect3, int, triangle3dV*);
 	void explodeDebris(double, vect3, int, triangle3dV*);
-	void renderMesh(transform3d, int, triangle3dV*);
+	void renderMesh(const transform3d&, const vect3&, const vect3&, const vect3&, const int&, triangle3dV*);
 	void renderAll();
 
 	void updateFrameCounter();
@@ -93,8 +98,8 @@ private:
 
 public:
 
-	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>,
-			std::shared_ptr<EventHandler>, std::shared_ptr<LightSource>, std::shared_ptr<Player>);
+	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<EventHandler>,
+		std::shared_ptr<LightSource>, std::shared_ptr<Player>, std::shared_ptr<Player>);
 	~Pong();
 
 	void addTexture(SDL_Surface*);

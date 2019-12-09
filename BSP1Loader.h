@@ -42,7 +42,6 @@ public:
 	void	calculateTriangles();
 	void	getTriangleData_(triangle3dV*);
 	txt		getTextureData(unsigned int);
-	vect3	getPosition();
 	void	constructShadowVolume(vect3);
 	line3d	getLine(unsigned int);
 };

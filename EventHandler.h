@@ -26,6 +26,8 @@ public:
 	bool isPaused					= true;
 	bool isFiring					= false;
 	bool mouseLookBlocked			= false;
+	bool playerControlled			= true;
+	bool enemyControlled			= false;
 
 	SDL_Event event					= { 0 };
 
@@ -39,6 +41,15 @@ public:
 	double strafeP					= 0.0f;
 	double riseP					= 0.0f;
 	double tiltP					= 0.0f;
+
+	double turnHe					= 0.0f;
+	double turnVe					= 0.0f;
+	double turnRe					= 0.0f;
+
+	double moveE					= 0.0f;
+	double strafeE					= 0.0f;
+	double riseE					= 0.0f;
+	double tiltE					= 0.0f;
 
 	double turnVmin					= PI * 0.5f;
 	double turnVmax					= 3 * PI * 0.5f;

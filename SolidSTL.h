@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "Definitions.h"
-#include "SolidBody.h"		//Base class
+#include "SolidBody.h"
 
 class SolidSTL: public SolidBody
 {
@@ -23,7 +23,6 @@ public:
 	virtual int				getTotalVert();
 	virtual int				getTotalPoly();
 	virtual void			getTriangleData_(triangle3dV*);
-	virtual vect3			getPosition();
 	virtual void			constructShadowVolume(vect3);
 
 	void			readSTLfile();

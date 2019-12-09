@@ -24,7 +24,6 @@ public:
 	virtual int				getTotalVert();
 	virtual int				getTotalPoly();
 	virtual void			getTriangleData_(triangle3dV*);
-	virtual vect3			getPosition();
 	virtual void			constructShadowVolume(vect3);
 
 	void			readModelFile(const std::string& fileName);

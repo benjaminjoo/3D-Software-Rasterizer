@@ -49,8 +49,6 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 			Projectiles[i]->setVisibility(true);
 			Projectiles[i]->setMotion(true);
 
-			transformMesh(polyCount[i], mesh[i], origin);
-
 			lastShot = 0;
 			ammo--;
 

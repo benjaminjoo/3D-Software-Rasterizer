@@ -61,12 +61,6 @@ void SolidModel::getTriangleData_(triangle3dV* P)
 }
 
 
-vect3 SolidModel::getPosition()
-{
-	return position;
-}
-
-
 void SolidModel::constructShadowVolume(vect3)
 {
 

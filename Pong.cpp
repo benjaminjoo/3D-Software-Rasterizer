@@ -2,10 +2,9 @@
 
 
 
-Pong::Pong(std::shared_ptr<Canvas> screen,
-			std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls,
-			std::shared_ptr<LightSource> sun, std::shared_ptr<Player> hero):
-	Screen(screen), Eye(eye), Controls(controls), Sun(sun), Hero(hero)
+Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls,
+			std::shared_ptr<LightSource> sun, std::shared_ptr<Player> hero, std::shared_ptr<Player> enemy):
+	Screen(screen), Eye(eye), Controls(controls), Sun(sun), Hero(hero), Enemy(enemy)
 {
 	for (int v = 0; v < MAXCLIPVERTS; v++)
 	{
@@ -83,18 +82,32 @@ void Pong::buildMesh()
 		Entities[i]->getTriangleData_(triangleMesh[i]);
 	}
 
-	size_t nPlayerParts = Hero->Parts.size();
-	playerMesh = new triangle3dV* [nPlayerParts];
-	playerPolyCount = new unsigned int[nPlayerParts];
-	for (unsigned int i = 0; i < nPlayerParts; i++)
+	if (Hero != nullptr)
 	{
-		unsigned int nCurrent = Hero->Parts[i]->getTotalPoly();
-		playerMesh[i] = new triangle3dV[nCurrent];
-		playerPolyCount[i] = nCurrent;
-		Hero->Parts[i]->getTriangleData_(playerMesh[i]);
+		size_t nPlayerParts = Hero->Parts.size();
+		playerMesh = new triangle3dV * [nPlayerParts];
+		playerPolyCount = new unsigned int[nPlayerParts];
+		for (unsigned int i = 0; i < nPlayerParts; i++)
+		{
+			unsigned int nCurrent = Hero->Parts[i]->getTotalPoly();
+			playerMesh[i] = new triangle3dV[nCurrent];
+			playerPolyCount[i] = nCurrent;
+			Hero->Parts[i]->getTriangleData_(playerMesh[i]);
+		}
+	}
 
-		transformMesh(playerPolyCount[i], playerMesh[i], 1.0f, 1.0f, 1.0f, Hero->x, Hero->y, Hero->z,
-			-Hero->alt, Hero->rol, -(Hero->azm + PI * 0.5f));
+	if (Enemy != nullptr)
+	{
+		size_t nEnemyParts = Enemy->Parts.size();
+		enemyMesh = new triangle3dV * [nEnemyParts];
+		enemyPolyCount = new unsigned int[nEnemyParts];
+		for (unsigned int i = 0; i < nEnemyParts; i++)
+		{
+			unsigned int nCurrent = Enemy->Parts[i]->getTotalPoly();
+			enemyMesh[i] = new triangle3dV[nCurrent];
+			enemyPolyCount[i] = nCurrent;
+			Enemy->Parts[i]->getTriangleData_(enemyMesh[i]);
+		}
 	}
 
 	size_t nProjectiles = Projectiles.size();
@@ -137,7 +150,6 @@ void Pong::buildMesh()
 		ball_2->getTriangleData_(mesh_2);
 
 		unsigned int nCurrent = n_1 + n_2;
-		//unsigned int nCurrent = n_1;
 		explosionMesh[i] = new triangle3dV[nCurrent];
 		explosionPolyCount[i] = nCurrent;
 
@@ -154,8 +166,7 @@ void Pong::buildMesh()
 			r = 128 + rand() % 127;
 			g = 128 + rand() % 127;
 
-			//explosionMesh[i][p].colour = getColour(0, r, g, 0);
-			explosionMesh[i][p].colour = getColour(0, 220, g, 255);
+			explosionMesh[i][p].colour = getColour(0, r, g, 0);
 		}
 		for (unsigned int q = n_1; q < n_1 + n_2; q++)
 		{
@@ -182,13 +193,27 @@ void Pong::destroyMesh()
 	delete[] triangleMesh;
 	delete polyCount;
 
-	size_t nPlayerParts = Hero->Parts.size();
-	for (unsigned int i = 0; i < nPlayerParts; i++)
+	if (Hero != nullptr)
 	{
-		delete playerMesh[i];
+		size_t nPlayerParts = Hero->Parts.size();
+		for (unsigned int i = 0; i < nPlayerParts; i++)
+		{
+			delete playerMesh[i];
+		}
+		delete[] playerMesh;
+		delete playerPolyCount;
 	}
-	delete[] playerMesh;
-	delete playerPolyCount;
+	
+	if (Enemy != nullptr)
+	{
+		size_t nEnemyParts = Enemy->Parts.size();
+		for (unsigned int i = 0; i < nEnemyParts; i++)
+		{
+			delete enemyMesh[i];
+		}
+		delete[] enemyMesh;
+		delete enemyPolyCount;
+	}
 
 	size_t nProjectiles = Projectiles.size();
 	for (unsigned int i = 0; i < nProjectiles; i++)
@@ -238,30 +263,29 @@ void Pong::updatePlayerPosition()
 	Hero->y += Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5);
 	Hero->z += Controls->riseP;
 
-	//vect3 playerVelocity = {   -Controls->moveP * cos(Hero->azm) - Controls->strafeP * cos(Hero->azm + PI * 0.5),
-	//							Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5),
-	//							Controls->riseP,
-	//							1.0f };
-	//
-	//Hero->boundingVolume->setVelocity(playerVelocity);
-	//
-	//updateMovingObject(Hero->boundingVolume, playerPolyCount, playerMesh);
-	//
-	//vect3 playerPosition = Hero->boundingVolume->getPosition();
-	//
-	//Hero->x = playerPosition.x;
-	//Hero->y = playerPosition.y;
-	//Hero->z = playerPosition.z;
+	for (unsigned int i = 0; i < Hero->Parts.size(); i++)
+	{
+		Hero->Parts[i]->setPosition({ Hero->x, Hero->y, Hero->z, 1.0f });
+		Hero->Parts[i]->setRotation({ Hero->alt, Hero->rol, Hero->azm, 1.0f });
+	}
+}
 
-	//for (unsigned int i = 0; i < Hero->Parts.size(); i++)
-	//{
-	//	transformMesh(playerPolyCount[i], playerMesh[i],
-	//		-(Controls->moveP * cos(Hero->azm) - Controls->strafeP * cos(Hero->azm + PI * 0.5)),
-	//		(Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5)),
-	//		Controls->riseP);
-	//	//transformMesh(playerPolyCount[i], playerMesh[i], 1.0f, 1.0f, 1.0f, Hero->x, Hero->y, Hero->z,
-	//	//	Controls->turnV, Controls->tiltP, Controls->turnH);
-	//}
+
+void Pong::updateEnemyPosition()
+{
+	Enemy->azm = -Controls->turnH;
+	Enemy->alt = -Controls->turnV;
+	Enemy->rol = Controls->tiltP;
+
+	Enemy->x -= Controls->moveP * cos(Enemy->azm) - Controls->strafeP * cos(Enemy->azm + PI * 0.5);
+	Enemy->y += Controls->moveP * sin(Enemy->azm) - Controls->strafeP * sin(Enemy->azm + PI * 0.5);
+	Enemy->z += Controls->riseP;
+
+	for (unsigned int i = 0; i < Enemy->Parts.size(); i++)
+	{
+		Enemy->Parts[i]->setPosition({ Enemy->x, Enemy->y, Enemy->z, 1.0f });
+		Enemy->Parts[i]->setRotation({ Enemy->alt, Enemy->rol, Enemy->azm, 1.0f });
+	}
 }
 
 
@@ -277,7 +301,6 @@ void Pong::updateEntities()
 			vect3 velocity = Entities[i]->getVelocity();
 			vect3 angVelocity = Entities[i]->getAngularVelocity();
 			unsigned int nCurrent = Entities[i]->getTotalPoly();
-			transformMesh(nCurrent, triangleMesh[i], velocity);
 		}
 	}
 }
@@ -316,9 +339,6 @@ void Pong::updateProjectiles()
 				Projectiles[i]->setMotion(false);
 			if (updateMovingObject(Projectiles[i], Projectiles[i]->getTotalPoly(), projectileMesh[i]))
 			{
-				//Projectiles[i]->incrementBounceCount();
-				//if (Projectiles[i]->getBounceCount() >= 2)
-				//	Projectiles[i]->setBehaviour(stick);
 			}			
 			if (hitTest(Projectiles[i], Balls))
 				std::cout << "+" << std::flush;
@@ -331,7 +351,6 @@ bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 {
 	vect3 displacement = bullet->getVelocity();
 	vect3 oldPos = bullet->getPosition();
-	//vect3 newPos = addVectors(oldPos, displacement);
 	vect3 newPos = oldPos + displacement;
 
 	for (unsigned int i = 0; i < targets.size(); i++)
@@ -340,11 +359,8 @@ bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 		{
 			double targetRadius = targets[i]->getBBRadius();
 			vect3 targetPosition = targets[i]->getPosition();
-			//vect3 currentV = subVectors(newPos, oldPos);
 			vect3 currentV = newPos - oldPos;
-			//double sOld = dotProduct(subVectors(oldPos, targetPosition), currentV);
 			double sOld = (oldPos - targetPosition) * currentV;
-			//double sNew = dotProduct(subVectors(newPos, targetPosition), currentV);
 			double sNew = (newPos - targetPosition) * currentV;
 			if (distPoint2LineSquared(targetPosition, oldPos, newPos) <= targetRadius * targetRadius &&
 				sign(sOld) != sign(sNew))
@@ -352,8 +368,6 @@ bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 				targets[i]->destroy();
 				targets[i]->setMotion(false);
 				targets[i]->setBehaviour(penetrate);
-
-				transformMesh(explosionPolyCount[i], explosionMesh[i], targets[i]->getPosition());	//Moving explosion mesh to postion of ball when hit
 
 				return true;
 			}
@@ -371,7 +385,6 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 
 	vect3 displacement = object->getVelocity();
 	vect3 oldPos = object->getPosition();
-	//vect3 newPos = addVectors(oldPos, displacement);
 	vect3 newPos = oldPos + displacement;
 
 	double radius = object->getBBRadius();
@@ -379,26 +392,26 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 	{
+		vect3 sc = Entities[i]->getScale();
+		vect3 mv = Entities[i]->getPosition();
+		vect3 rt = Entities[i]->getRotation();
 		for (unsigned int j = 0; j < polyCount[i]; j++)
 		{
-			if (objectApproachingWall(oldPos, displacement, i, j))
-			{
-				triangle3dV tempWall = triangleMesh[i][j];
+			triangle3dV tempWall = Eye->object2worldT(sc, mv, rt, triangleMesh[i][j]);
 
+			if (objectApproachingWall(oldPos, displacement, tempWall))
+			{
 				double oldDistWall = distPoint2Plane(oldPos, tempWall);
 				double newDistWall = distPoint2Plane(newPos, tempWall);
 
 				if (newDistWall <= radius)
 				{
 					double x = oldDistWall - radius;
-					//double v2n = -dotProduct(displacement, tempWall.N);
 					double v2n = -(displacement * tempWall.N);
 					double safePercentage = x / v2n;
 
-					//vect3 toIntersection = scaleVector(safePercentage, displacement);
 					vect3 toIntersection = displacement * safePercentage;
 					object->updatePosition(toIntersection);
-					transformMesh(nPoly, objectMesh, toIntersection);
 
 					vect3 oldVelocity = object->getVelocity();
 
@@ -420,13 +433,11 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 						{
 							if (Controls->gravityOn)
 							{
-								//vect3 newVelocity = subVectors(oldVelocity, scaleVector(1.50f * dotProduct(oldVelocity, tempWall.N), tempWall.N));
 								vect3 newVelocity = oldVelocity - (tempWall.N * (1.50f * (oldVelocity * tempWall.N)));
 								object->setVelocity(newVelocity);
 							}
 							else
 							{
-								//vect3 newVelocity = subVectors(oldVelocity, scaleVector(2.00f * dotProduct(oldVelocity, tempWall.N), tempWall.N));
 								vect3 newVelocity = oldVelocity - (tempWall.N * (2.00f * (oldVelocity * tempWall.N)));
 								object->setVelocity(newVelocity);
 							}
@@ -448,28 +459,23 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 	}
 
 	object->updatePosition();
-	transformMesh(nPoly, objectMesh, displacement);
+	object->updateRotation();
 
 	return false;
 }
 
 
-bool Pong::objectApproachingWall(vect3 p, vect3 v, const unsigned int& i, const unsigned int& j)
+bool Pong::objectApproachingWall(vect3 p, vect3 v, triangle3dV T)
 {
-	triangle3dV T = triangleMesh[i][j];
-	//double v2n = dotProduct(v, T.N);				//Magnitude of velocity projected to plane normal
-	double v2n = v * T.N;
+	double v2n = v * T.N;							//Magnitude of velocity projected to plane normal
 	double dist = distPoint2Plane(p, T);			//Distance from point to plane
 	if (dist >= 0.0f && v2n < 0.0f)
 	{
 		double t = dist / -v2n;
 		vect3 intersection{ p.x + v.x * t, p.y + v.y * t, p.z + v.z * t, 1.0f };
 
-		//double sA = dotProduct(crossProduct(subVectors(T.A, T.C), T.N), subVectors(T.A, intersection));
 		double sA = ((T.A - T.C) ^ T.N) * (T.A - intersection);
-		//double sB = dotProduct(crossProduct(subVectors(T.B, T.A), T.N), subVectors(T.B, intersection));
 		double sB = ((T.B - T.A) ^ T.N) * (T.B - intersection);
-		//double sC = dotProduct(crossProduct(subVectors(T.C, T.B), T.N), subVectors(T.C, intersection));
 		double sC = ((T.C - T.B) ^ T.N) * (T.C - intersection);
 
 		if ((sA <= 0.0f && sB <= 0.0f && sC <= 0.0f) ||
@@ -486,22 +492,6 @@ void Pong::explodeMesh(double velocity, vect3 centre, int nPoly, triangle3dV* me
 {
 	for (int i = 0; i < nPoly; i++)
 	{
-		//vect3 temp = mesh[i].A;
-		//
-		//double x = double(rand() % 10) * 0.025f;
-		//double y = double(rand() % 20) * 0.025f;
-		//double z = double(rand() % 30) * 0.025f;
-		//
-		//vect3 mod = { x, y, z, 1.0f };
-
-		//vect3 displacement = scaleVector(velocity, subVectors(temp, addVectors(centre, mod)));
-		//vect3 displacement = (temp - (centre + mod)) * velocity;
-
-		//if (Controls->gravityOn)
-		//	displacement = addVectors(displacement, gravity);
-
-		//movePoly(displacement, mesh[i]);
-
 		vect3 dA = (mesh[i].A - centre) * velocity;
 		vect3 dB = (mesh[i].B - centre) * velocity;
 		vect3 dC = (mesh[i].C - centre) * velocity;
@@ -524,8 +514,7 @@ void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* 
 		double z = double(rand() % 30) * 0.025f;
 		
 		vect3 mod = { x, y, z, 1.0f };
-
-		vect3 displacement = (temp - (centre + mod)) * velocity;
+		vect3 displacement = (temp + mod) * velocity;
 
 		if (Controls->gravityOn)
 			displacement = addVectors(displacement, gravity);
@@ -535,17 +524,18 @@ void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* 
 }
 
 
-void Pong::renderMesh(transform3d eyePosition, int nPoly, triangle3dV* mesh)
+void Pong::renderMesh(const transform3d& eyePosition, const vect3& sc, const vect3& mv, const vect3& rt, const int& nPoly, triangle3dV* mesh)
 {
 	for (int i = 0; i < nPoly; i++)
 	{
-		if (Eye->polyFacingCamera(mesh[i]))
+		triangle3dV worldT = Eye->object2worldT(sc, mv, rt, mesh[i]);
+		if (Eye->polyFacingCamera(worldT))
 		{
 			Uint32 colour = mesh[i].colour;
 
-			triangle3dV viewT = Eye->world2viewT(eyePosition, mesh[i]);
+			triangle3dV viewT = Eye->world2viewT(eyePosition, worldT);
 
-			Eye->illuminatePoly(*Sun, &viewT, mesh[i], Controls->visualStyle);
+			Eye->illuminatePoly(*Sun, &viewT, worldT, Controls->visualStyle);
 
 			int nVert = Eye->clipToFrustum(viewT, vertexList, uvList);
 
@@ -566,34 +556,72 @@ void Pong::renderAll()
 	polyCounter = 0;
 
 	transform3d eyePosition = Eye->getTransformation();
+
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 	{
-		if(Entities[i]->isVisible())
-			renderMesh(eyePosition, polyCount[i], triangleMesh[i]);
+		if (Entities[i]->isVisible())
+		{
+			vect3 sc = Entities[i]->getScale();
+			vect3 mv = Entities[i]->getPosition();
+			vect3 rt = Entities[i]->getRotation();
+			renderMesh(eyePosition, sc, mv, rt, polyCount[i], triangleMesh[i]);
+		}			
 	}
-	//size_t nPlayerParts = Hero->Parts.size();
-	//for (unsigned int i = 0; i < nPlayerParts; i++)
-	//{
-	//	if (Hero->Parts[i]->isVisible())
-	//		renderMesh(eyePosition, playerPolyCount[i], playerMesh[i]);
-	//}
+
+	if (Hero != nullptr)
+	{
+		size_t nPlayerParts = Hero->Parts.size();
+		for (unsigned int i = 0; i < nPlayerParts; i++)
+		{
+			if (Hero->Parts[i]->isVisible())
+			{
+				vect3 sc = Hero->Parts[i]->getScale();
+				vect3 mv = Hero->Parts[i]->getPosition();
+				vect3 rt = Hero->Parts[i]->getRotation();
+				renderMesh(eyePosition, sc, mv, rt, playerPolyCount[i], playerMesh[i]);
+			}			
+		}
+	}
+
+	if (Enemy != nullptr)
+	{
+		size_t nEnemyParts = Enemy->Parts.size();
+		for (unsigned int i = 0; i < nEnemyParts; i++)
+		{
+			if (Enemy->Parts[i]->isVisible())
+			{
+				vect3 sc = Enemy->Parts[i]->getScale();
+				vect3 mv = Enemy->Parts[i]->getPosition();
+				vect3 rt = Enemy->Parts[i]->getRotation();
+				renderMesh(eyePosition, sc, mv, rt, enemyPolyCount[i], enemyMesh[i]);
+			}			
+		}
+	}
+
 	size_t nProjectiles = Projectiles.size();
 	for (unsigned int i = 0; i < nProjectiles; i++)
 	{
-		vect3 currentPos = Projectiles[i]->getPosition();
-		if(Projectiles[i]->isVisible()) // && currentPos.z >= 0.0f
-			renderMesh(eyePosition, projectilePolyCount[i], projectileMesh[i]);
+		if (Projectiles[i]->isVisible())
+		{
+			vect3 sc = Projectiles[i]->getScale();
+			vect3 mv = Projectiles[i]->getPosition();
+			vect3 rt = Projectiles[i]->getRotation();
+			renderMesh(eyePosition, sc, mv, rt, projectilePolyCount[i], projectileMesh[i]);
+		}			
 	}
+
 	size_t nBalls = Balls.size();
 	for (unsigned int i = 0; i < nBalls; i++)
 	{
-		vect3 currentPos = Balls[i]->getPosition();
-		if (Balls[i]->isVisible() && !Balls[i]->isVanished() && currentPos.z >= 0.0f)
+		if (Balls[i]->isVisible() && !Balls[i]->isVanished())
 		{
-			renderMesh(eyePosition, ballPolyCount[i], ballMesh[i]);
+			vect3 sc = Balls[i]->getScale();
+			vect3 mv = Balls[i]->getPosition();
+			vect3 rt = Balls[i]->getRotation();
+			renderMesh(eyePosition, sc, mv, rt, ballPolyCount[i], ballMesh[i]);
 			if(Balls[i]->isDestroyed())
-				renderMesh(eyePosition, explosionPolyCount[i], explosionMesh[i]);
+				renderMesh(eyePosition, sc, mv, rt, explosionPolyCount[i], explosionMesh[i]);
 		}
 			
 	}
@@ -610,7 +638,14 @@ void Pong::updateAll()
 
 	Screen->resetDepthBuffer();
 
-	this->updatePlayerPosition();
+	if (Controls->playerControlled)
+	{
+		this->updatePlayerPosition();
+	}
+	else if (Controls->enemyControlled)
+	{
+		this->updateEnemyPosition();
+	}
 
 	this->updateCameraPosition(Hero);
 

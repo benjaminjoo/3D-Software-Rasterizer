@@ -61,8 +61,9 @@ private:
 
 	transform3d getTransformation();
 
-	bool polyFacingCamera(triangle3dV);
-	triangle3dV world2viewT(transform3d, triangle3dV);
+	bool polyFacingCamera(const triangle3dV&);
+	triangle3dV object2worldT(const vect3&, const vect3&, const vect3&, const triangle3dV&);
+	triangle3dV world2viewT(const transform3d&, const triangle3dV&);
 	line3d world2viewL(transform3d, line3d);
 	point3 world2viewP(transform3d, point3);
 	vect3 world2view(const transform3d, const vect3);
@@ -103,6 +104,26 @@ private:
 	void drawSpot(screenCoord, Uint32, Uint32*);
 
 
+	inline int GetYMax3(coord2* p)
+	{
+		int yMax = p[0].y;
+		for (int i = 1; i < 3; i++)
+			if (p[i].y > yMax)
+				yMax = p[i].y;
+		return yMax;
+	}
+
+
+	inline int GetYMin3(coord2* p)
+	{
+		int yMin = p[0].y;
+		for (int i = 1; i < 3; i++)
+			if (p[i].y < yMin)
+				yMin = p[i].y;
+		return yMin;
+	}
+
+
 	inline textCoord getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV)
 	{
 		textCoord testC;
@@ -122,8 +143,10 @@ private:
 	{
 		textCoord testC;
 
-		testC.u = startC.u + (endC.u - startC.u) / step * currentP;
-		testC.v = startC.v + (endC.v - startC.v) / step * currentP;
+		double s = 1.0f / (step * currentP);
+
+		testC.u = startC.u + (endC.u - startC.u) * s;
+		testC.v = startC.v + (endC.v - startC.v) * s;
 
 		return testC;
 	}
@@ -137,22 +160,37 @@ private:
 
 		if (illumination <= 1.0)
 		{
-			r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
-			g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
-			b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
+			//r = red	? (byte)(double(inputColour >> 16	& 255) * illumination) : 0;
+			//g = green	? (byte)(double(inputColour >> 8	& 255) * illumination) : 0;
+			//b = blue	? (byte)(double(inputColour			& 255) * illumination) : 0;
+
+			r = (byte)(double(inputColour >> 16 & 255) * illumination);
+			g = (byte)(double(inputColour >> 8	& 255) * illumination);
+			b = (byte)(double(inputColour		& 255) * illumination);
 		}
 		else if (illumination > 1.0)
 		{
 			illSurplus = illumination - 1.0;
 
-			r = red ? (byte)(double(inputColour >> 16 & 255) * illumination) : 0;
-			g = green ? (byte)(double(inputColour >> 8 & 255) * illumination) : 0;
-			b = blue ? (byte)(double(inputColour & 255) * illumination) : 0;
+			//r = red	? (byte)(double(inputColour >> 16	& 255) * illumination) : 0;
+			//g = green	? (byte)(double(inputColour >> 8	& 255) * illumination) : 0;
+			//b = blue	? (byte)(double(inputColour			& 255) * illumination) : 0;
+
+			r = (byte)(double(inputColour >> 16 & 255) * illumination);
+			g = (byte)(double(inputColour >> 8	& 255) * illumination);
+			b = (byte)(double(inputColour		& 255) * illumination);
 
 			r2fill = 255 - r;	g2fill = 255 - g;	b2fill = 255 - b;
-			r += (byte)((double(r2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-			g += (byte)((double(g2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
-			b += (byte)((double(b2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+
+			//r += (byte)((double(r2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+			//g += (byte)((double(g2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+			//b += (byte)((double(b2fill) / (MAX_ILLUMINATION - 1.0)) * illSurplus);
+
+			double s = 1.0f / (MAX_ILLUMINATION - 1.0) * illSurplus;
+
+			r += byte(double(r2fill) * s);
+			g += byte(double(g2fill) * s);
+			b += byte(double(b2fill) * s);
 		}
 
 		return (a << 24) | (r << 16) | (g << 8) | (b << 0);

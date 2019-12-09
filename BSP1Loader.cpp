@@ -427,12 +427,6 @@ void BSP1Loader::getTriangleData_(triangle3dV* T)
 }
 
 
-vect3 BSP1Loader::getPosition()
-{
-	return position;
-}
-
-
 void BSP1Loader::constructShadowVolume(vect3)
 {
 

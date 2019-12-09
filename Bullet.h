@@ -20,7 +20,6 @@ public:
 	int		getTotalVert();
 	int		getTotalPoly();
 	void	getTriangleData_(triangle3dV*);
-	vect3	getPosition();
 	void	constructShadowVolume(vect3);
 };
 
