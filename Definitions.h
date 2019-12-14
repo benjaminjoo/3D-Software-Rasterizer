@@ -509,8 +509,6 @@ struct transform3d
 };
 
 
-float quickSqrt(float number);
-
 void clampValue(double* value, double lower, double upper);
 
 double distancePN(polyNode a, polyNode b);

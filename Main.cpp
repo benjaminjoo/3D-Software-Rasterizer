@@ -21,6 +21,7 @@
 #include "SolidSTL.h"
 #include "SolidModel.h"
 #include "SolidFrustum.h"
+#include "Bullet.h"
 #include "EventHandler.h"
 #include "MessagePump.h"
 #include "Editor.h"
@@ -38,6 +39,7 @@
 #include "Pong.h"
 #include "Player.h"
 #include "PelvisBone.h"
+#include "LongBone.h"
 
 
 void editor()
@@ -75,7 +77,15 @@ void editor()
 
 void pong3d()
 {
-	PelvisBone pelvis;
+	//auto pelvis = std::make_shared<PelvisBone>("Pelvis", 0.75f, 0.5f, 0.1f);
+	//LongBone left_femur = LongBone("Left Femur", left, 1.0f, 0.0f, 0.09f);
+	//LongBone right_femur = LongBone("Right Femur", right, 1.0f, 0.0f, 0.09f);
+	//pelvis->attachBoneLeft(&left_femur);
+	//pelvis->attachBoneRight(&right_femur);
+	//LongBone left_tibia = LongBone("Left Tibia", left, 1.0f, 0.0f, 0.08f);
+	//LongBone right_tibia = LongBone("Right Tibia", right, 1.0f, 0.0f, 0.08f);
+	//pelvis->attachBoneLeft(&left_tibia);
+	//pelvis->attachBoneRight(&right_tibia);
 
 	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
@@ -85,9 +95,23 @@ void pong3d()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 100, 100);	
+	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
 
-	auto Enemy		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 100, 100);
+	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
+
+	Hero->addPart(weapon);
+
+	auto Enemy		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	
+	auto e_01	= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 12);
+	auto e_02	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 12);
+	auto e_03	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff00ff00, 7, 0.25f, 3.0f, 12);
+	auto e_04	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 12);
+	
+	Enemy->addPart(e_01);
+	Enemy->addPart(e_02);
+	Enemy->addPart(e_03);
+	Enemy->addPart(e_04);
 	
 	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Enemy);
 
@@ -100,16 +124,16 @@ void pong3d()
 	srand(unsigned int(time(NULL)));
 	for (int i = 0; i < 20; i++)
 	{
-		double x = double(rand() % 30) * 1.0f;
-		double y = double(rand() % 40) * 1.0f;
-		double z = double(rand() % 20) * 1.0f;
-
+		double x = double(rand() % 20) * 1.0f + 5.0f;
+		double y = double(rand() % 30) * 1.0f + 5.0f;
+		double z = double(rand() % 10) * 1.0f + 5.0f;
+	
 		double vx = (-5.0f + double(rand() % 10)) * 0.05f;
 		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
 		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
-
+	
 		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 6);
-
+	
 		ball->setBBRadius(1.0f);
 		ball->setGravity(true);
 		ball->setMotion(true);
@@ -117,14 +141,13 @@ void pong3d()
 		ball->setAngularVelocity({ 0.01f, 0.0f, 0.0f, 1.0f });
 		ball->setBehaviour(bounce);
 		ball->setBreakability(true);
-
+	
 		Game->addBall(ball);
 	}
 
 	Game->addEntity(box);
 	Game->addEntity(pedestal);
 	Game->addEntity(wall);
-	//Game->addEntity(dome);
 
 	Game->addTexture(IMG_Load("Textures/blue.jpg"));
 	Game->addTexture(IMG_Load("Textures/wolf001.jpg"));
@@ -133,6 +156,7 @@ void pong3d()
 	Game->addTexture(IMG_Load("Textures/brick001.jpg"));
 	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
 	Game->addTexture(IMG_Load("Textures/timber.jpg"));
+	Game->addTexture(IMG_Load("Textures/metal.jpg"));
 
 	Game->loadProjectile(500);
 

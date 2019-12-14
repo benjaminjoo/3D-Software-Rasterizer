@@ -108,6 +108,16 @@ void Pong::buildMesh()
 			enemyPolyCount[i] = nCurrent;
 			Enemy->Parts[i]->getTriangleData_(enemyMesh[i]);
 		}
+
+		if (Enemy->skeleton != nullptr)
+		{
+			int nSkeletonMesh = Enemy->skeleton->getNMesh();
+
+			skeletonMesh = new triangle3dV* [nSkeletonMesh];
+			skeletonPolyCount = new unsigned int[nSkeletonMesh];
+
+			Enemy->skeleton->getPoly(skeletonPolyCount, skeletonMesh);
+		}
 	}
 
 	size_t nProjectiles = Projectiles.size();
@@ -213,6 +223,18 @@ void Pong::destroyMesh()
 		}
 		delete[] enemyMesh;
 		delete enemyPolyCount;
+
+		if (Enemy->skeleton != nullptr)
+		{
+			int nSkeletonMesh = Enemy->skeleton->getNMesh();
+
+			for (int i = 0; i < nSkeletonMesh; i++)
+			{
+				delete skeletonMesh[i];
+			}
+			delete[] skeletonMesh;
+			delete skeletonPolyCount;
+		}
 	}
 
 	size_t nProjectiles = Projectiles.size();
@@ -266,7 +288,7 @@ void Pong::updatePlayerPosition()
 	for (unsigned int i = 0; i < Hero->Parts.size(); i++)
 	{
 		Hero->Parts[i]->setPosition({ Hero->x, Hero->y, Hero->z, 1.0f });
-		Hero->Parts[i]->setRotation({ Hero->alt, Hero->rol, Hero->azm, 1.0f });
+		Hero->Parts[i]->setRotation({ -Hero->rol, Hero->alt, -Hero->azm, 1.0f });
 	}
 }
 
@@ -284,7 +306,22 @@ void Pong::updateEnemyPosition()
 	for (unsigned int i = 0; i < Enemy->Parts.size(); i++)
 	{
 		Enemy->Parts[i]->setPosition({ Enemy->x, Enemy->y, Enemy->z, 1.0f });
-		Enemy->Parts[i]->setRotation({ Enemy->alt, Enemy->rol, Enemy->azm, 1.0f });
+		Enemy->Parts[i]->setRotation({ -Enemy->rol, Enemy->alt, -Enemy->azm, 1.0f });
+	}
+}
+
+
+void Pong::updateEnemyPositionAI()
+{
+	if (Enemy->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f }, 10.0f))
+		Enemy->isFiring = true;
+	else
+		Enemy->isFiring = false;
+
+	for (unsigned int i = 0; i < Enemy->Parts.size(); i++)
+	{
+		Enemy->Parts[i]->setPosition({ Enemy->x, Enemy->y, Enemy->z, 1.0f });
+		Enemy->Parts[i]->setRotation({ -Enemy->rol, Enemy->alt, -Enemy->azm, 1.0f });
 	}
 }
 
@@ -342,8 +379,38 @@ void Pong::updateProjectiles()
 			}			
 			if (hitTest(Projectiles[i], Balls))
 				std::cout << "+" << std::flush;
+			if (hitTest(Projectiles[i], Hero))
+				std::cout << "YOU'RE HIT!" << std::endl;
+			if (hitTest(Projectiles[i], Enemy))
+				std::cout << "NICE SHOT!" << std::endl;
 		}
 	}
+}
+
+
+bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::shared_ptr<Player> actor)
+{
+	vect3 displacement = bullet->getVelocity();
+	vect3 oldPos = bullet->getPosition();
+	vect3 newPos = oldPos + displacement;
+
+	if (!actor->isDestroyed())
+	{
+		double targetRadius = actor->getBBRadius();
+		vect3 targetPosition = actor->getPosition();
+		vect3 currentV = newPos - oldPos;
+		double sOld = (oldPos - targetPosition) * currentV;
+		double sNew = (newPos - targetPosition) * currentV;
+		if (distPoint2LineSquared(targetPosition, oldPos, newPos) <= targetRadius * targetRadius &&
+			sign(sOld) != sign(sNew))
+		{
+			actor->takeDamage(1);
+		
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -597,6 +664,26 @@ void Pong::renderAll()
 				renderMesh(eyePosition, sc, mv, rt, enemyPolyCount[i], enemyMesh[i]);
 			}			
 		}
+
+		if (Enemy->skeleton != nullptr)
+		{
+			int nSkeletonMesh = Enemy->skeleton->getNMesh();
+
+			vect3* sc = new vect3[nSkeletonMesh];
+			vect3* mv = new vect3[nSkeletonMesh];
+			vect3* rt = new vect3[nSkeletonMesh];
+
+			Enemy->skeleton->getBonePosition(sc, mv, rt);
+
+			for (int i = 0; i < nSkeletonMesh; i++)
+			{
+				renderMesh(eyePosition, sc[i], mv[i], rt[i], skeletonPolyCount[i], skeletonMesh[i]);
+			}
+
+			delete[] sc;
+			delete[] mv;
+			delete[] rt;
+		}
 	}
 
 	size_t nProjectiles = Projectiles.size();
@@ -639,25 +726,47 @@ void Pong::updateAll()
 	Screen->resetDepthBuffer();
 
 	if (Controls->playerControlled)
-	{
 		this->updatePlayerPosition();
-	}
-	else if (Controls->enemyControlled)
-	{
+	else
 		this->updateEnemyPosition();
-	}
 
 	this->updateCameraPosition(Hero);
 
 	if (!Controls->isPaused)
 	{
 		this->updateEntities();
-		this->updateProjectiles();
 		this->updateBalls();
+		if (Controls->playerControlled)
+			this->updateEnemyPositionAI();
+		this->updateProjectiles();
+
 		if (Hero->lastShot < 5)
 			Hero->lastShot++;
-		if (Controls->isFiring && Hero->lastShot >= 5)
-			Hero->shoot(Projectiles, projectilePolyCount, projectileMesh);		
+		if (Controls->isFiring)
+		{
+			if (Controls->playerControlled && Hero->lastShot >= 5)
+			{
+				Hero->shoot(Projectiles, projectilePolyCount, projectileMesh);
+			}
+		}
+
+		if (Enemy->lastShot < 5)
+			Enemy->lastShot++;
+		if (Controls->playerControlled)
+		{
+			if (Enemy->isFiring && Enemy->lastShot >= 5)
+			{
+				Enemy->shoot(Projectiles, projectilePolyCount, projectileMesh);
+			}
+		}
+		if (Controls->enemyControlled)
+		{
+			if (Controls->isFiring && Enemy->lastShot >= 5)
+			{
+				Enemy->shoot(Projectiles, projectilePolyCount, projectileMesh);
+			}
+		}
+
 	}
 
 	Controls->ceaseMotion();
@@ -751,6 +860,9 @@ void Pong::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 	{
 		Screen->displayValue(Hero->ammo, 0, 100, 3, 0x007f7f00);
 	}
+
+	Screen->displayValue(Hero->health, 0, 90, 3, 0x000000ff);
+	Screen->displayValue(Enemy->health, 0, 80, 3, 0x0000ff00);
 }
 
 

@@ -7,8 +7,8 @@ Player::Player()
 }
 
 
-Player::Player(double px, double py, double pz, double rx, double ry, double rz, int hlt, int amm):
-	x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), health(hlt), ammo(amm)
+Player::Player(double px, double py, double pz, double rx, double ry, double rz, double rad, int hlt, int amm, std::shared_ptr<PelvisBone> sk):
+	x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm), skeleton(sk)
 {
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, px, py, pz, rx, ry, rz, 0xffffff00, 1, 0.5f, 24);
 }
@@ -19,9 +19,79 @@ Player::~Player()
 }
 
 
+bool Player::isDestroyed()
+{
+	return destroyed;
+}
+
+
+void Player::destroy()
+{
+	destroyed = true;
+}
+
+
+double Player::getBBRadius()
+{
+	return bbRadius;
+}
+
+
+vect3 Player::getPosition()
+{
+	return { x, y, z, 1.0f };
+}
+
+
+void Player::takeDamage(unsigned int damage)
+{
+	health -= damage;
+}
+
+
+unsigned int Player::getHealth()
+{
+	return health;
+}
+
+
 void Player::addPart(std::shared_ptr<SolidBody> p)
 {
 	Parts.push_back(p);
+}
+
+
+void Player::incrementWalkPhase()
+{
+	currentPhase += walkingSpeed;
+	if (currentPhase >= 1.0f)
+		currentPhase = 0.0f;
+}
+
+
+void Player::updateSkeleton()
+{
+	incrementWalkPhase();
+	std::cout << currentPhase * 100.0f << "%" << std::endl;
+	if (currentPhase < 0.5f)
+		this->updateLeftLimb();
+	else
+		this->updateRightLimb();
+
+}
+
+
+void Player::updateLeftLimb()
+{
+	if(skeleton != nullptr)
+		skeleton->initiateUpdateLeft();
+}
+
+
+void Player::updateRightLimb()
+{
+	if(skeleton != nullptr)
+		skeleton->initiateUpdateRight();
 }
 
 
@@ -33,12 +103,12 @@ void Player::setAmmo(unsigned int a)
 
 void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned int* polyCount, triangle3dV** mesh)
 {
-	double muzzleVelocity = 5.0f;
+	double muzzleVelocity = 1.0f;
 	for (unsigned int i = 0; i < Projectiles.size(); i++)
 	{
 		if (Projectiles[i]->isVisible() == false)
 		{
-			vect3 origin	= { x, y, z, 1.0f };
+			vect3 origin	= this->getPosition();
 			vect3 rotation	= { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };			
 			vect3 velocity	= scaleVector(muzzleVelocity, rotation);
 
@@ -56,3 +126,70 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 		}
 	}
 }
+
+
+bool Player::lockOnTarget(vect3 targetPos, double dReq)
+{
+	bool result = false;
+
+	vect3 currentPos = this->getPosition();
+	vect3 currentRot = unitVector({ cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f });
+	vect3 target = unitVector(targetPos - currentPos);
+
+	double dz = targetPos.z - z;
+	double dist2 = sqrt((targetPos.x - x) * (targetPos.x - x) + (targetPos.y - y) * (targetPos.y - y));
+	
+	double targetAlt = -atan2(dz, dist2);
+	double targetAzm = -atan2((targetPos.y - y), (targetPos.x - x));
+
+	double deltaAzm = targetAzm - azm;
+	double deltaAlt = targetAlt - alt;
+	
+	if (deltaAzm < 0.0f)
+	{
+		if (abs(deltaAzm) > turningSpeed)
+			azm -= turningSpeed;
+		else
+			azm = targetAzm;
+	}			
+	if (deltaAzm > 0.0f)
+	{
+		if (abs(deltaAzm) > turningSpeed)
+			azm += turningSpeed;
+		else
+			azm = targetAzm;
+	}
+	
+	if (deltaAlt < 0.0f)
+	{
+		if (abs(deltaAlt) > turningSpeed)
+			alt -= turningSpeed;
+		else
+			alt = targetAlt;
+	}
+	if (deltaAlt > 0.0f)
+	{
+		if (abs(deltaAlt) > turningSpeed)
+			alt += turningSpeed;
+		else
+			alt = targetAlt;
+	}
+
+	double dSquared = distanceSquared(currentPos, targetPos);
+
+	if (dSquared >= dReq * dReq)
+	{
+		currentPos += target * 0.1f;
+		x = currentPos.x;
+		y = currentPos.y;
+		z = currentPos.z;
+	}
+
+	if (dSquared <= dReq * dReq * 10.0f && azm == targetAzm && alt == targetAlt)
+		result = true;
+
+	return result;
+}
+
+
+

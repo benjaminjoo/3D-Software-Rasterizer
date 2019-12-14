@@ -52,6 +52,9 @@ private:
 	triangle3dV**								enemyMesh			= nullptr;
 	unsigned int*								enemyPolyCount		= nullptr;
 
+	triangle3dV**								skeletonMesh		= nullptr;
+	unsigned int*								skeletonPolyCount	= nullptr;
+
 	triangle3dV**								ballMesh			= nullptr;
 	unsigned int*								ballPolyCount		= nullptr;
 
@@ -75,10 +78,12 @@ private:
 	void updateCameraPosition(const std::shared_ptr<Player>&);
 	void updatePlayerPosition();
 	void updateEnemyPosition();
+	void updateEnemyPositionAI();
 	void updateEntities();
 	void updateBalls();
 	void updateProjectiles();
 
+	bool hitTest(const std::shared_ptr<SolidBody>&, std::shared_ptr<Player>);
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 
 	bool updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);

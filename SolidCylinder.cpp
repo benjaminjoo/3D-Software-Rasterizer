@@ -263,6 +263,8 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 		}
 	}
 
+	transformMesh(tCount, t, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
+
 	delete[] s;
 }
 
