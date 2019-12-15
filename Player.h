@@ -27,13 +27,20 @@ private:
 	double						alt				= 0.0f;
 	double						rol				= 0.0f;
 
+	double						runningSpeed	= 0.1f;
 	double						turningSpeed	= 0.1f;
+
+	double						range			= 25.0f;
+	double						closeQuarters	= 10.0f;
 
 	unsigned int				health			= 100;
 	unsigned int				ammo			= 100;
 
 	unsigned int				lastShot		= 0;
 	bool						isFiring		= false;
+
+	unsigned int				idlePhase		= 1;
+	double						amplitude		= 0.5f;
 
 	std::shared_ptr<SolidBody>	boundingVolume	= nullptr;
 	double						bbRadius		= 0.25f;
@@ -58,6 +65,7 @@ public:
 	void destroy();
 	double getBBRadius();
 	vect3 getPosition();
+	double getRange();
 	void takeDamage(unsigned int);
 	unsigned int getHealth();
 
@@ -69,10 +77,14 @@ private:
 	
 	void setAmmo(unsigned int);
 	void shoot(std::vector<std::shared_ptr<SolidBody>>, unsigned int*, triangle3dV**);
-	void incrementWalkPhase();
+	void incrementWalkPhase();	
 	void updateLeftLimb();
 	void updateRightLimb();
 
-	bool lockOnTarget(vect3, double);
+	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);
+	bool lockOnTarget(vect3);
+
+	void incrementIdlePhase();
+	void idle();
 };
 

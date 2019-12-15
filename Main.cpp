@@ -7,7 +7,6 @@
 #include "Definitions.h"
 #include "Camera.h"
 #include "Canvas.h"
-//#include "Speaker.h"
 #include "LightSource.h"
 #include "Shapes.h"
 #include "SolidBody.h"
@@ -77,16 +76,6 @@ void editor()
 
 void pong3d()
 {
-	//auto pelvis = std::make_shared<PelvisBone>("Pelvis", 0.75f, 0.5f, 0.1f);
-	//LongBone left_femur = LongBone("Left Femur", left, 1.0f, 0.0f, 0.09f);
-	//LongBone right_femur = LongBone("Right Femur", right, 1.0f, 0.0f, 0.09f);
-	//pelvis->attachBoneLeft(&left_femur);
-	//pelvis->attachBoneRight(&right_femur);
-	//LongBone left_tibia = LongBone("Left Tibia", left, 1.0f, 0.0f, 0.08f);
-	//LongBone right_tibia = LongBone("Right Tibia", right, 1.0f, 0.0f, 0.08f);
-	//pelvis->attachBoneLeft(&left_tibia);
-	//pelvis->attachBoneRight(&right_tibia);
-
 	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
 	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
@@ -183,9 +172,9 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 //#define _CUBE_
 //#define _BEZIER_PATCH_
-//#define _QUAKE_1_READER_
+#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
-#define _STL_READER_
+//#define _STL_READER_
 
 	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 

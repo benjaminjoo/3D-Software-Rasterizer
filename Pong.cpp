@@ -275,7 +275,7 @@ void Pong::updateCameraPosition(const std::shared_ptr<Player>& player)
 }
 
 
-void Pong::updatePlayerPosition()
+void Pong::updateHeroPosition()
 {
 	Hero->azm = -Controls->turnH;
 	Hero->alt = -Controls->turnV;
@@ -285,11 +285,10 @@ void Pong::updatePlayerPosition()
 	Hero->y += Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5);
 	Hero->z += Controls->riseP;
 
-	for (unsigned int i = 0; i < Hero->Parts.size(); i++)
-	{
-		Hero->Parts[i]->setPosition({ Hero->x, Hero->y, Hero->z, 1.0f });
-		Hero->Parts[i]->setRotation({ -Hero->rol, Hero->alt, -Hero->azm, 1.0f });
-	}
+	if (!Controls->isFiring)
+		Hero->idle();
+
+	updatePlayerModel(Hero);
 }
 
 
@@ -303,25 +302,89 @@ void Pong::updateEnemyPosition()
 	Enemy->y += Controls->moveP * sin(Enemy->azm) - Controls->strafeP * sin(Enemy->azm + PI * 0.5);
 	Enemy->z += Controls->riseP;
 
-	for (unsigned int i = 0; i < Enemy->Parts.size(); i++)
-	{
-		Enemy->Parts[i]->setPosition({ Enemy->x, Enemy->y, Enemy->z, 1.0f });
-		Enemy->Parts[i]->setRotation({ -Enemy->rol, Enemy->alt, -Enemy->azm, 1.0f });
-	}
+	updatePlayerModel(Enemy);
 }
 
 
-void Pong::updateEnemyPositionAI()
+void Pong::updateEnemyPositionAI(aiGoal goal)
 {
-	if (Enemy->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f }, 10.0f))
-		Enemy->isFiring = true;
-	else
-		Enemy->isFiring = false;
-
-	for (unsigned int i = 0; i < Enemy->Parts.size(); i++)
+	switch (goal)
 	{
-		Enemy->Parts[i]->setPosition({ Enemy->x, Enemy->y, Enemy->z, 1.0f });
-		Enemy->Parts[i]->setRotation({ -Enemy->rol, Enemy->alt, -Enemy->azm, 1.0f });
+		case be_idle:
+		{
+			Enemy->isFiring = false;
+			Enemy->idle();
+			break;
+		}
+		case follow_player:
+		{
+			Enemy->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f });
+			Enemy->idle();
+			break;
+		}
+		case kill_player:
+		{
+			if (Enemy->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f }))
+				Enemy->isFiring = true;
+			else
+			{
+				Enemy->isFiring = false;
+				Enemy->idle();
+			}				
+			break;
+		}
+		case follow_others:
+		{
+			Enemy->isFiring = false;
+			unsigned int targetIndex = Enemy->pickTarget(Balls);
+			if (targetIndex < Balls.size())
+			{
+				Enemy->lockOnTarget(Balls[targetIndex]->getPosition());
+				Enemy->idle();
+			}			
+			else
+				Enemy->idle();
+			break;
+		}
+		case kill_others:
+		{
+			unsigned int targetIndex = Enemy->pickTarget(Balls);
+			
+			if (targetIndex < Balls.size())
+			{
+				if (Enemy->lockOnTarget(Balls[targetIndex]->getPosition()))
+					Enemy->isFiring = true;
+				else
+				{
+					Enemy->isFiring = false;
+					Enemy->idle();
+				}
+			}
+			else
+			{
+				Enemy->isFiring = false;
+				Enemy->idle();
+			}					
+			break;
+		}
+		default:
+		{
+			Enemy->isFiring = false;
+			Enemy->idle();
+			break;
+		}
+	}
+
+	updatePlayerModel(Enemy);
+}
+
+
+void Pong::updatePlayerModel(std::shared_ptr<Player> character)
+{
+	for (unsigned int i = 0; i < character->Parts.size(); i++)
+	{
+		character->Parts[i]->setPosition({ character->x, character->y, character->z, 1.0f });
+		character->Parts[i]->setRotation({ -character->rol, character->alt, -character->azm, 1.0f });
 	}
 }
 
@@ -378,11 +441,11 @@ void Pong::updateProjectiles()
 			{
 			}			
 			if (hitTest(Projectiles[i], Balls))
-				std::cout << "+" << std::flush;
+				std::cout << "o" << std::flush;
 			if (hitTest(Projectiles[i], Hero))
-				std::cout << "YOU'RE HIT!" << std::endl;
+				std::cout << "+" << std::flush;
 			if (hitTest(Projectiles[i], Enemy))
-				std::cout << "NICE SHOT!" << std::endl;
+				std::cout << "-" << std::flush;
 		}
 	}
 }
@@ -726,7 +789,7 @@ void Pong::updateAll()
 	Screen->resetDepthBuffer();
 
 	if (Controls->playerControlled)
-		this->updatePlayerPosition();
+		this->updateHeroPosition();
 	else
 		this->updateEnemyPosition();
 
@@ -737,7 +800,7 @@ void Pong::updateAll()
 		this->updateEntities();
 		this->updateBalls();
 		if (Controls->playerControlled)
-			this->updateEnemyPositionAI();
+			this->updateEnemyPositionAI(Controls->purposeOfAI);
 		this->updateProjectiles();
 
 		if (Hero->lastShot < 5)
@@ -747,6 +810,7 @@ void Pong::updateAll()
 			if (Controls->playerControlled && Hero->lastShot >= 5)
 			{
 				Hero->shoot(Projectiles, projectilePolyCount, projectileMesh);
+				ammo--;
 			}
 		}
 
@@ -757,6 +821,7 @@ void Pong::updateAll()
 			if (Enemy->isFiring && Enemy->lastShot >= 5)
 			{
 				Enemy->shoot(Projectiles, projectilePolyCount, projectileMesh);
+				ammo--;
 			}
 		}
 		if (Controls->enemyControlled)
@@ -764,6 +829,7 @@ void Pong::updateAll()
 			if (Controls->isFiring && Enemy->lastShot >= 5)
 			{
 				Enemy->shoot(Projectiles, projectilePolyCount, projectileMesh);
+				ammo--;
 			}
 		}
 
@@ -858,11 +924,35 @@ void Pong::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 	}
 	if (amm)
 	{
-		Screen->displayValue(Hero->ammo, 0, 100, 3, 0x007f7f00);
+		Screen->displayValue(ammo, 0, 100, 3, 0x007f7f00);
 	}
 
 	Screen->displayValue(Hero->health, 0, 90, 3, 0x000000ff);
 	Screen->displayValue(Enemy->health, 0, 80, 3, 0x0000ff00);
+
+	switch (Controls->purposeOfAI)
+	{
+		case follow_player:
+		{
+			Screen->displayString("<FOLLOW PLAYER>", 60, 3, 0x000000ff);
+			break;
+		}
+		case kill_player:
+		{
+			Screen->displayString("<KILL PLAYER>", 60, 3, 0x00ff0000);
+			break;
+		}
+		case follow_others:
+		{
+			Screen->displayString("<FOLLOW BALLS>", 60, 3, 0x000000ff);
+			break;
+		}
+		case kill_others:
+		{
+			Screen->displayString("<SHOOT BALLS>", 60, 3, 0x00ff0000);
+			break;
+		}
+	}	
 }
 
 

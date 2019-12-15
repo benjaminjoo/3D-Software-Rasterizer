@@ -43,6 +43,12 @@ vect3 Player::getPosition()
 }
 
 
+double Player::getRange()
+{
+	return range;
+}
+
+
 void Player::takeDamage(unsigned int damage)
 {
 	health -= damage;
@@ -103,7 +109,7 @@ void Player::setAmmo(unsigned int a)
 
 void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned int* polyCount, triangle3dV** mesh)
 {
-	double muzzleVelocity = 1.0f;
+	double muzzleVelocity = 5.0f;
 	for (unsigned int i = 0; i < Projectiles.size(); i++)
 	{
 		if (Projectiles[i]->isVisible() == false)
@@ -128,7 +134,37 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 }
 
 
-bool Player::lockOnTarget(vect3 targetPos, double dReq)
+unsigned int Player::pickTarget(const std::vector<std::shared_ptr<SolidBody>>& targets)
+{
+	double minDist = range * range;
+	unsigned int targetIndex = targets.size();
+
+	for (unsigned int i = 0; i < targets.size(); i++)
+	{
+		if (!targets[i]->isDestroyed())
+		{
+			minDist = distanceSquared({ x, y, z, 1.0f }, targets[i]->getPosition());
+			break;
+		}
+	}
+	for (unsigned int i = 0; i < targets.size(); i++)
+	{
+		if (!targets[i]->isDestroyed())
+		{
+			double dist2Target = distanceSquared({ x, y, z, 1.0f }, targets[i]->getPosition());
+			if (dist2Target <= minDist)
+			{
+				minDist = dist2Target;
+				targetIndex = i;
+			}
+		}
+	}
+
+	return targetIndex;
+}
+
+
+bool Player::lockOnTarget(vect3 targetPos)
 {
 	bool result = false;
 
@@ -177,18 +213,43 @@ bool Player::lockOnTarget(vect3 targetPos, double dReq)
 
 	double dSquared = distanceSquared(currentPos, targetPos);
 
-	if (dSquared >= dReq * dReq)
+	if (dSquared >= closeQuarters * closeQuarters)				//If target is too far away
 	{
-		currentPos += target * 0.1f;
+		currentPos += target * runningSpeed;
+
 		x = currentPos.x;
 		y = currentPos.y;
 		z = currentPos.z;
 	}
 
-	if (dSquared <= dReq * dReq * 10.0f && azm == targetAzm && alt == targetAlt)
+	if (dSquared < closeQuarters * closeQuarters * 0.9f)		//If target is too close
+	{
+		currentPos -= target * runningSpeed;
+		x = currentPos.x;
+		y = currentPos.y;
+		z = currentPos.z;
+	}
+
+	if (dSquared <= range * range && azm == targetAzm && alt == targetAlt) //if (dSquared <= dReq * dReq * 10.0f && azm == targetAzm && alt == targetAlt)
 		result = true;
 
 	return result;
+}
+
+
+void Player::incrementIdlePhase()
+{
+	idlePhase = idlePhase < 121 ? idlePhase + 1 : 1;
+}
+
+
+void Player::idle()
+{
+	double zCurr = amplitude * sin(((2 * PI) / 120) * idlePhase);
+	double zPrev = amplitude * sin(((2 * PI) / 120) * (idlePhase - 1));
+	double deltaZ = zCurr - zPrev;
+	z += deltaZ;
+	incrementIdlePhase();
 }
 
 

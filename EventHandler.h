@@ -12,7 +12,8 @@ public:
 	double turnP;
 	double sensitivity;
 
-	projectionStyle visualStyle		= wireframe;;
+	projectionStyle visualStyle		= wireframe;
+	aiGoal			purposeOfAI		= be_idle;
 
 	bool gouraudShading				= true;
 	bool visualiseDepth				= false;
@@ -61,6 +62,7 @@ public:
 	EventHandler(double step, double turn, double sens);
 	~EventHandler();
 
+	void toggleAIGoal();
 	void HandleUserEvents();
 	void ceaseMotion();
 };

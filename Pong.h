@@ -76,9 +76,10 @@ private:
 	vect3			gravity			= { 0.0f, 0.0f, -0.01f, 0.0f };
 
 	void updateCameraPosition(const std::shared_ptr<Player>&);
-	void updatePlayerPosition();
+	void updateHeroPosition();
 	void updateEnemyPosition();
-	void updateEnemyPositionAI();
+	void updateEnemyPositionAI(aiGoal);
+	void updatePlayerModel(std::shared_ptr<Player>);
 	void updateEntities();
 	void updateBalls();
 	void updateProjectiles();

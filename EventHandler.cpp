@@ -284,14 +284,18 @@ void EventHandler::HandleUserEvents()
 				gravityOn = gravityOn ? false : true;
 				break;
 			case SDLK_TAB:
-				showFPS			= showFPS ? false : true;
-				showPosition	= showPosition ? false : true;
-				showPolyN		= showPolyN ? false : true;
-				showAmmo		= showAmmo ? false : true;
+				showFPS				= showFPS ? false : true;
+				showPosition		= showPosition ? false : true;
+				showPolyN			= showPolyN ? false : true;
+				showAmmo			= showAmmo ? false : true;
 				break;
 			case SDLK_END:
 				playerControlled	= playerControlled ? false : true;
 				enemyControlled		= enemyControlled ? false : true;
+				break;
+			case SDLK_KP_0:
+			case SDLK_0:
+				toggleAIGoal();			
 				break;
 			case SDLK_KP_5:
 				mouseLookBlocked = mouseLookBlocked ? false : true;
@@ -360,6 +364,29 @@ void EventHandler::HandleUserEvents()
 		}
 
 		if (event.type == SDL_QUIT) { quit = true; }
+	}
+}
+
+
+void EventHandler::toggleAIGoal()
+{
+	switch (purposeOfAI)
+	{
+	case be_idle:
+		purposeOfAI = follow_player;
+		break;
+	case follow_player:
+		purposeOfAI = kill_player;
+		break;
+	case kill_player:
+		purposeOfAI = follow_others;
+		break;
+	case follow_others:
+		purposeOfAI = kill_others;
+		break;
+	case kill_others:
+		purposeOfAI = be_idle;
+		break;
 	}
 }
 

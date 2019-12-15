@@ -65,6 +65,9 @@ enum model { solid, actor };
 enum hit_response { penetrate, stick, bounce, slide };
 
 
+enum aiGoal { be_idle, follow_player, kill_player, follow_others, kill_others };
+
+
 typedef unsigned char byte;
 
 
