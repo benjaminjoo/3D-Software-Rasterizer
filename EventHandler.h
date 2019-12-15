@@ -24,7 +24,7 @@ public:
 	bool showPolyN					= true;
 	bool showAmmo					= true;
 	bool gravityOn					= false;
-	bool isPaused					= true;
+	bool isPaused					= false;
 	bool isFiring					= false;
 	bool mouseLookBlocked			= false;
 	bool playerControlled			= true;

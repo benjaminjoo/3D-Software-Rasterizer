@@ -33,6 +33,7 @@ private:
 
 	std::vector<std::shared_ptr<SolidBody>>		Entities;
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
+	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
 
 	std::shared_ptr<SolidBody>					Bar;
@@ -51,6 +52,11 @@ private:
 
 	triangle3dV**								enemyMesh			= nullptr;
 	unsigned int*								enemyPolyCount		= nullptr;
+
+	triangle3dV**								enemiesMesh			= nullptr;
+	unsigned int*								enemiesPartCount	= nullptr;
+	unsigned int**								enemiesPolyCount	= nullptr;
+	unsigned int**								enemiesMeshIndices  = nullptr;
 
 	triangle3dV**								skeletonMesh		= nullptr;
 	unsigned int*								skeletonPolyCount	= nullptr;
@@ -79,6 +85,7 @@ private:
 	void updateHeroPosition();
 	void updateEnemyPosition();
 	void updateEnemyPositionAI(aiGoal);
+	void updateEnemiesPositionsAI(aiGoal);
 	void updatePlayerModel(std::shared_ptr<Player>);
 	void updateEntities();
 	void updateBalls();
@@ -111,6 +118,7 @@ public:
 	void addTexture(SDL_Surface*);
 	void addEntity(std::shared_ptr<SolidBody>);
 	void addBall(std::shared_ptr<SolidBody>);
+	void addEnemy(std::shared_ptr<Player>);
 	void loadProjectile(unsigned int);
 	void buildMesh();
 	void destroyMesh();

@@ -53,6 +53,12 @@ void Pong::addBall(std::shared_ptr<SolidBody> ball)
 }
 
 
+void Pong::addEnemy(std::shared_ptr<Player> enemy)
+{
+	Enemies.push_back(enemy);
+}
+
+
 void Pong::loadProjectile(unsigned int n)
 {
 	for (unsigned int i = 0; i < n; i++)
@@ -117,6 +123,40 @@ void Pong::buildMesh()
 			skeletonPolyCount = new unsigned int[nSkeletonMesh];
 
 			Enemy->skeleton->getPoly(skeletonPolyCount, skeletonMesh);
+		}
+	}
+
+	size_t nEnemies = Enemies.size();										//Total number of enemies
+	enemiesPartCount = new unsigned int[nEnemies];							//Number of parts per individual enemy [enemyIndex]
+	enemiesPolyCount = new unsigned int* [nEnemies];						//Number of polygons per individual part [enemyIndex][partIndex]
+	enemiesMeshIndices = new unsigned int* [nEnemies];						//Indexes into enemiesMesh [partIndex][meshIndex]
+	size_t nAllEnemyParts = 0;												//Total number of parts
+	unsigned int partIndex = 0;
+	for (unsigned int i = 0; i < nEnemies; i++)								//For each enemy
+	{
+		size_t nParts = Enemies[i]->Parts.size();							//Number of parts in current enemy
+		nAllEnemyParts += nParts;											//Number of parts added to total
+		enemiesPartCount[i] = nParts;										//Number of parts written into enemiesPartCount[enemyIndex]
+		enemiesPolyCount[i] = new unsigned int[nParts];						//Storage allocated for enemiesPolyCount[][]
+		enemiesMeshIndices[i] = new unsigned int[nParts];					//Storage allocated for enemiesMeshIndices[][]
+		for (unsigned int j = 0; j < nParts; j++)							//For each part in current enemy
+		{
+			size_t nPoly = Enemies[i]->Parts[j]->getTotalPoly();			//Number of polygons in current part
+			enemiesPolyCount[i][j] = nPoly;									//Number written into enemiesPolyCount[enemyIndex][partIndex]
+			enemiesMeshIndices[i][j] = partIndex;							//partIndex written into enemiesMeshIndices[enemyIndex][partIndex]
+			partIndex++;													//Increment partIndex
+		}
+	}
+	enemiesMesh = new triangle3dV* [nAllEnemyParts];						//Polygon storage for all parts [partIndex][polyIndex]
+	partIndex = 0;															//Set partIndex to 0
+	for (unsigned int i = 0; i < nEnemies; i++)								//For each enemy
+	{
+		for (unsigned int j = 0; j < Enemies[i]->Parts.size(); j++)			//For each part in current enemy
+		{
+			int nCurrentPoly = Enemies[i]->Parts[j]->getTotalPoly();		//Number of polygons in current part
+			enemiesMesh[partIndex] = new triangle3dV[nCurrentPoly];			//Storage allocated for nCurrentPoly number of polygons
+			Enemies[i]->Parts[j]->getTriangleData_(enemiesMesh[partIndex]);	//enemiesMesh[partIndex][] filled up with polygon data
+			partIndex++;													//Increment partIndex
 		}
 	}
 
@@ -236,6 +276,23 @@ void Pong::destroyMesh()
 			delete skeletonPolyCount;
 		}
 	}
+
+	delete enemiesPartCount;
+	size_t nEnemies = Enemies.size();
+	size_t nAllEnemyParts = 0;
+	for (unsigned int i = 0; i < nEnemies; i++)
+	{
+		delete enemiesPolyCount[i];
+		delete enemiesMeshIndices[i];
+		nAllEnemyParts += Enemies[i]->Parts.size();
+	}
+	delete[] enemiesPolyCount;
+	delete[] enemiesMeshIndices;
+	for (unsigned int i = 0; i < nAllEnemyParts; i++)
+	{
+		delete enemiesMesh[i];
+	}	
+	delete[] enemiesMesh;
 
 	size_t nProjectiles = Projectiles.size();
 	for (unsigned int i = 0; i < nProjectiles; i++)
@@ -379,6 +436,82 @@ void Pong::updateEnemyPositionAI(aiGoal goal)
 }
 
 
+void Pong::updateEnemiesPositionsAI(aiGoal goal)
+{
+	for (unsigned int i = 0; i < Enemies.size(); i++)
+	{
+		switch (goal)
+		{
+		case be_idle:
+		{
+			Enemies[i]->isFiring = false;
+			Enemies[i]->idle();
+			break;
+		}
+		case follow_player:
+		{
+			Enemies[i]->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f });
+			Enemies[i]->idle();
+			break;
+		}
+		case kill_player:
+		{
+			if (Enemies[i]->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f }))
+				Enemies[i]->isFiring = true;
+			else
+			{
+				Enemies[i]->isFiring = false;
+				Enemies[i]->idle();
+			}
+			break;
+		}
+		case follow_others:
+		{
+			Enemies[i]->isFiring = false;
+			unsigned int targetIndex = Enemies[i]->pickTarget(Balls);
+			if (targetIndex < Balls.size())
+			{
+				Enemies[i]->lockOnTarget(Balls[targetIndex]->getPosition());
+				Enemies[i]->idle();
+			}
+			else
+				Enemies[i]->idle();
+			break;
+		}
+		case kill_others:
+		{
+			unsigned int targetIndex = Enemies[i]->pickTarget(Balls);
+
+			if (targetIndex < Balls.size())
+			{
+				if (Enemies[i]->lockOnTarget(Balls[targetIndex]->getPosition()))
+					Enemies[i]->isFiring = true;
+				else
+				{
+					Enemies[i]->isFiring = false;
+					Enemies[i]->idle();
+				}
+			}
+			else
+			{
+				Enemies[i]->isFiring = false;
+				Enemies[i]->idle();
+			}
+			break;
+		}
+		default:
+		{
+			Enemies[i]->isFiring = false;
+			Enemies[i]->idle();
+			break;
+		}
+		}
+
+		updatePlayerModel(Enemies[i]);
+	}
+}
+
+
 void Pong::updatePlayerModel(std::shared_ptr<Player> character)
 {
 	for (unsigned int i = 0; i < character->Parts.size(); i++)
@@ -446,6 +579,11 @@ void Pong::updateProjectiles()
 				std::cout << "+" << std::flush;
 			if (hitTest(Projectiles[i], Enemy))
 				std::cout << "-" << std::flush;
+			for (unsigned int p = 0; p < Enemies.size(); p++)
+			{
+				if (hitTest(Projectiles[i], Enemies[p]))
+					std::cout << "*" << std::flush;
+			}
 		}
 	}
 }
@@ -714,6 +852,26 @@ void Pong::renderAll()
 		}
 	}
 
+	size_t nEnemies = Enemies.size();
+	for (unsigned int i = 0; i < nEnemies; i++)
+	{
+		size_t nEnemyParts = Enemies[i]->Parts.size();
+		for (unsigned int j = 0; j < nEnemyParts; j++)
+		{
+			if (Enemies[i]->Parts[j]->isVisible())
+			{
+				vect3 sc = Enemies[i]->Parts[j]->getScale();
+				vect3 mv = Enemies[i]->Parts[j]->getPosition();
+				vect3 rt = Enemies[i]->Parts[j]->getRotation();
+
+				unsigned int partIndex = enemiesMeshIndices[i][j];
+				unsigned int nPoly = enemiesPolyCount[i][j];
+
+				renderMesh(eyePosition, sc, mv, rt, enemiesPolyCount[i][j], enemiesMesh[partIndex]);
+			}
+		}
+	}
+
 	if (Enemy != nullptr)
 	{
 		size_t nEnemyParts = Enemy->Parts.size();
@@ -799,8 +957,14 @@ void Pong::updateAll()
 	{
 		this->updateEntities();
 		this->updateBalls();
+
 		if (Controls->playerControlled)
-			this->updateEnemyPositionAI(Controls->purposeOfAI);
+		{
+			
+			//this->updateEnemyPositionAI(Controls->purposeOfAI);
+			this->updateEnemiesPositionsAI(Controls->purposeOfAI);
+		}
+
 		this->updateProjectiles();
 
 		if (Hero->lastShot < 5)
@@ -821,9 +985,27 @@ void Pong::updateAll()
 			if (Enemy->isFiring && Enemy->lastShot >= 5)
 			{
 				Enemy->shoot(Projectiles, projectilePolyCount, projectileMesh);
+				std::cout << "Regular is firing" << std::endl;
 				ammo--;
 			}
 		}
+
+		for (unsigned int i = 0; i < Enemies.size(); i++)
+		{
+			if (Enemies[i]->lastShot < 5)
+				Enemies[i]->lastShot++;
+			if (Controls->playerControlled)
+
+			{
+				if (Enemies[i]->isFiring && Enemies[i]->lastShot >= 5)
+				{
+					Enemies[i]->shoot(Projectiles, projectilePolyCount, projectileMesh);
+					std::cout << "Number " << i << " is firing" << std::endl;
+					ammo--;
+				}
+			}
+		}
+
 		if (Controls->enemyControlled)
 		{
 			if (Controls->isFiring && Enemy->lastShot >= 5)
