@@ -30,14 +30,21 @@ private:
 	double						runningSpeed	= 0.1f;
 	double						turningSpeed	= 0.1f;
 
-	double						range			= 25.0f;
-	double						closeQuarters	= 10.0f;
+	bool						gravitating		= false;
+
+	double						range			= 50.0f;	//25.0f;
+	double						closeQuarters	= 50.0f;	//10.0f;
+	double						safeDistance	= 50.0f;	//25.0f;
 
 	unsigned int				health			= 100;
 	unsigned int				ammo			= 100;
 
 	unsigned int				lastShot		= 0;
 	bool						isFiring		= false;
+
+	unsigned int				lastHit			= 0;
+	vect3						hitFrom			= { 0.0f, 0.0f, 0.0f, 1.0f };
+	bool						underAttack		= false;
 
 	unsigned int				idlePhase		= 1;
 	double						amplitude		= 0.5f;
@@ -63,6 +70,10 @@ public:
 
 	bool isDestroyed();
 	void destroy();
+	bool isUnderAttack();
+	void setUnderAttack(bool);
+	void gotHitFrom(vect3);
+	void moveOutOfHarmsWay();
 	double getBBRadius();
 	vect3 getPosition();
 	double getRange();
@@ -82,7 +93,9 @@ private:
 	void updateRightLimb();
 
 	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);
+	unsigned int pickTarget(const std::vector<std::shared_ptr<Player>>&, const unsigned int&);
 	bool lockOnTarget(vect3);
+	void keepDistanceFrom(vect3);
 
 	void incrementIdlePhase();
 	void idle();

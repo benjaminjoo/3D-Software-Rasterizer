@@ -31,6 +31,46 @@ void Player::destroy()
 }
 
 
+bool Player::isUnderAttack()
+{
+	return underAttack;
+}
+
+
+void Player::setUnderAttack(bool a)
+{
+	underAttack = a;
+}
+
+
+void Player::gotHitFrom(vect3 hit)
+{
+	hitFrom += hit;
+}
+
+
+void Player::moveOutOfHarmsWay()
+{
+	lastHit++;
+	if (lastHit <= 30)
+	{
+		vect3 currentPos = this->getPosition();
+		vect3 safety = unitVector(unitVector(hitFrom ^ vect3{ 0.0f, 0.0f, -1.0f, 1.0f }) + hitFrom);
+		//vect3 safety = unitVector(hitFrom ^ currentPos + hitFrom * -1.0f);
+		currentPos += safety * (2.0f * runningSpeed);
+		x = currentPos.x;
+		y = currentPos.y;
+		z = currentPos.z;
+	}
+	else
+	{
+		lastHit = 0;
+		underAttack = false;
+		hitFrom = { 0.0f, 0.0f, 0.0f, 1.0f };
+	}
+}
+
+
 double Player::getBBRadius()
 {
 	return bbRadius;
@@ -52,6 +92,11 @@ double Player::getRange()
 void Player::takeDamage(unsigned int damage)
 {
 	health -= damage;
+	if (health < 1)
+	{
+		destroyed = true;
+		isFiring = false;
+	}		
 }
 
 
@@ -120,10 +165,13 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 
 			rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
 
+			Projectiles[i]->setFired(true);
 			Projectiles[i]->setPosition(origin);
-			Projectiles[i]->setVelocity(velocity);
+			Projectiles[i]->setVelocity(velocity);			
 			Projectiles[i]->setVisibility(true);
 			Projectiles[i]->setMotion(true);
+			Projectiles[i]->setGravity(true);
+			Projectiles[i]->setTicksSinceFired(0);
 
 			lastShot = 0;
 			ammo--;
@@ -164,12 +212,42 @@ unsigned int Player::pickTarget(const std::vector<std::shared_ptr<SolidBody>>& t
 }
 
 
+unsigned int Player::pickTarget(const std::vector<std::shared_ptr<Player>>& targets, const unsigned int& self)
+{
+	double minDist = range * range;
+	unsigned int targetIndex = targets.size();
+
+	for (unsigned int i = 0; i < targets.size(); i++)
+	{
+		if (!targets[i]->isDestroyed() && i != self)
+		{
+			minDist = distanceSquared({ x, y, z, 1.0f }, targets[i]->getPosition());
+			break;
+		}
+	}
+	for (unsigned int i = 0; i < targets.size(); i++)
+	{
+		if (!targets[i]->isDestroyed() && i != self)
+		{
+			double dist2Target = distanceSquared({ x, y, z, 1.0f }, targets[i]->getPosition());
+			if (dist2Target <= minDist)
+			{
+				minDist = dist2Target;
+				targetIndex = i;
+			}
+		}
+	}
+
+	return targetIndex;
+}
+
+
 bool Player::lockOnTarget(vect3 targetPos)
 {
 	bool result = false;
 
 	vect3 currentPos = this->getPosition();
-	vect3 currentRot = unitVector({ cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f });
+	//vect3 currentRot = unitVector({ cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f });
 	vect3 target = unitVector(targetPos - currentPos);
 
 	double dz = targetPos.z - z;
@@ -234,6 +312,23 @@ bool Player::lockOnTarget(vect3 targetPos)
 		result = true;
 
 	return result;
+}
+
+
+void Player::keepDistanceFrom(vect3 targetPos)
+{
+	vect3 currentPos = this->getPosition();
+	vect3 target = unitVector(targetPos - currentPos);
+
+	double dSquared = distanceSquared(currentPos, targetPos);
+
+	if (dSquared < safeDistance * safeDistance * 0.9f)
+	{
+		currentPos -= target * runningSpeed;
+		x = currentPos.x;
+		y = currentPos.y;
+		z = currentPos.z;
+	}
 }
 
 

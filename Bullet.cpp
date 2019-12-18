@@ -84,3 +84,9 @@ void Bullet::constructShadowVolume(vect3)
 {
 
 }
+
+
+double Bullet::getMuzzleVelocity()
+{
+	return muzzleVelocity;
+}

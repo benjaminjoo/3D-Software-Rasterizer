@@ -21,6 +21,7 @@ protected:
 	bool			castsShadows	= false;
 	bool			bBoxActive		= false;
 	bool			gravitating		= false;
+	bool			fired			= false;
 	bool			inMotion		= false;	
 	bool			visible			= true;
 	bool			breakable		= false;
@@ -32,6 +33,7 @@ protected:
 
 	hit_response	behaviour		= penetrate;
 	unsigned int	ticksSinceHit	= 0;
+	unsigned int	ticksSinceFired	= 0;
 
 	int				nBounces		= 0;
 
@@ -59,7 +61,9 @@ public:
 	void setAngularVelocity(vect3);
 
 	void updateVelocity(vect3);
+	void updateVelocity(double);
 	void updateAngularVelocity(vect3);
+	bool stoppedMoving();
 
 	vect3 getVelocity();
 	vect3 getAngularVelocity();
@@ -82,6 +86,9 @@ public:
 	bool isGravitating();
 	void setGravity(bool);
 
+	bool isFired();
+	void setFired(bool);
+
 	bool isInMotion();
 	void setMotion(bool);
 
@@ -102,6 +109,10 @@ public:
 
 	unsigned int getTicksSinceHit();
 	void incrementTicksSinceHit();
+
+	unsigned int getTicksSinceFired();
+	void setTicksSinceFired(unsigned int);
+	void incrementTicksSinceFired();
 
 	void updateColour(Uint32);
 

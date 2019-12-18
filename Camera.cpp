@@ -88,26 +88,17 @@ transform3d Camera::getTransformation()
 
 bool Camera::polyFacingCamera(const triangle3dV& P)
 {
-	//vect3 temp = { x, y, z, 1.0 };
-	//vect3 eyeVector = P.A - temp;
-	//return (P.N * eyeVector < 0) ? true : false;
-
 	vect3 eyeVector = subVectors(P.A, { x, y, z, 1.0 });
 	return dotProduct(P.N, eyeVector) < 0.0f ? true : false;
 }
 
 
-triangle3dV Camera::object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, const triangle3dV& T)
+void Camera::object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T)
 {
-	triangle3dV temp = T;
-
-	temp = scaleT(sc.x, sc.y, sc.z, temp);
-	temp = rotXT(rt.x, temp);
-	temp = rotYT(rt.y, temp);
-	temp = rotZT(rt.z, temp);
-	temp = translateT(mv.x, mv.y, mv.z, temp);
-
-	return  temp;
+	T = rotXT(rt.x, T);
+	T = rotYT(rt.y, T);
+	T = rotZT(rt.z, T);
+	T = translateT(mv.x, mv.y, mv.z, T);
 }
 
 
@@ -130,6 +121,19 @@ triangle3dV Camera::world2viewT(const transform3d& T, const triangle3dV& tr)
 	t.colour = tr.colour;
 
 	return t;
+}
+
+
+void Camera::world2view(const transform3d& T, triangle3dV& tr)
+{
+	tr.A	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.A))));
+	tr.B	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.B))));
+	tr.C	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.C))));
+	tr.An	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.An)));
+	tr.Bn	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Bn)));
+	tr.Cn	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Cn)));
+
+	tr.N	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.N)));
 }
 
 

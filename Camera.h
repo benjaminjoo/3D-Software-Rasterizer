@@ -62,8 +62,9 @@ private:
 	transform3d getTransformation();
 
 	bool polyFacingCamera(const triangle3dV&);
-	triangle3dV object2worldT(const vect3&, const vect3&, const vect3&, const triangle3dV&);
+	void object2worldT(const vect3&, const vect3&, const vect3&, triangle3dV&);
 	triangle3dV world2viewT(const transform3d&, const triangle3dV&);
+	void world2view(const transform3d&, triangle3dV&);
 	line3d world2viewL(transform3d, line3d);
 	point3 world2viewP(transform3d, point3);
 	vect3 world2view(const transform3d, const vect3);

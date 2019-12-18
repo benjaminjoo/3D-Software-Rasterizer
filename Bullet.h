@@ -21,5 +21,6 @@ public:
 	int		getTotalPoly();
 	void	getTriangleData_(triangle3dV*);
 	void	constructShadowVolume(vect3);
+	double	getMuzzleVelocity();
 };
 

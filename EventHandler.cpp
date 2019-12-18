@@ -385,6 +385,12 @@ void EventHandler::toggleAIGoal()
 		purposeOfAI = kill_others;
 		break;
 	case kill_others:
+		purposeOfAI = follow_each_other;
+		break;
+	case follow_each_other:
+		purposeOfAI = kill_each_other;
+		break;
+	case kill_each_other:
 		purposeOfAI = be_idle;
 		break;
 	}

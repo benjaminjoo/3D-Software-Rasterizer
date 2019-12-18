@@ -90,12 +90,29 @@ void SolidBody::updateVelocity(vect3 v)
 }
 
 
+void SolidBody::updateVelocity(double drag)
+{
+	velocity = velocity * drag;
+}
+
+
 void SolidBody::updateAngularVelocity(vect3 av)
 {
 	angularVelocity.x += av.x;
 	angularVelocity.y += av.y;
 	angularVelocity.z += av.z;
 	angularVelocity.w += av.w;
+}
+
+
+bool SolidBody::stoppedMoving()
+{
+	bool result = false;
+
+	if (velocity.x < 0.01f && velocity.y < 0.01f && velocity.z < 0.01f)
+		result = true;
+
+	return result;
 }
 
 
@@ -187,6 +204,18 @@ void SolidBody::setGravity(bool g)
 }
 
 
+bool SolidBody::isFired()
+{
+	return fired;
+}
+
+
+void SolidBody::setFired(bool f)
+{
+	fired = f;
+}
+
+
 bool SolidBody::isInMotion()
 {
 	return inMotion;
@@ -268,6 +297,24 @@ unsigned int SolidBody::getTicksSinceHit()
 void SolidBody::incrementTicksSinceHit()
 {
 	ticksSinceHit++;
+}
+
+
+unsigned int SolidBody::getTicksSinceFired()
+{
+	return ticksSinceFired;
+}
+
+
+void SolidBody::setTicksSinceFired(unsigned int t)
+{
+	ticksSinceFired = t;
+}
+
+
+void SolidBody::incrementTicksSinceFired()
+{
+	ticksSinceFired++;
 }
 
 

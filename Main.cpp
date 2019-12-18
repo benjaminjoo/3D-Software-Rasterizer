@@ -84,25 +84,19 @@ void pong3d()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
+	auto Hero		= std::make_shared<Player>(-15.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
 
 	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
 
 	Hero->addPart(weapon);
 
-	auto Enemy		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Observer	= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+
+	auto cone		= std::make_shared<SolidCone>(0.0f, 0.0f, 0.0f, 0x000000ff);
+
+	Observer->addPart(cone);
 	
-	auto e_01	= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 12);
-	auto e_02	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 12);
-	auto e_03	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff00ff00, 7, 0.25f, 3.0f, 12);
-	auto e_04	= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 12);
-	
-	Enemy->addPart(e_01);
-	Enemy->addPart(e_02);
-	Enemy->addPart(e_03);
-	Enemy->addPart(e_04);
-	
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Enemy);
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Observer);
 
 	auto pedestal	= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x0000ff00, 6, 20.0f, 30.0f, 5.0f);
 	auto wall		= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 19.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0x00ff0000, 4, 20.0f, 1.0f, 7.5f);
@@ -111,20 +105,20 @@ void pong3d()
 	box->calculateMesh();	
 
 	srand(unsigned int(time(NULL)));
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		double x = double(rand() % 20) * 1.0f + 5.0f;
 		double y = double(rand() % 30) * 1.0f + 5.0f;
 		double z = double(rand() % 10) * 1.0f + 5.0f;
 	
-		double vx = (-5.0f + double(rand() % 10)) * 0.05f;
-		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
-		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
+		double vx = (-5.0f + double(rand() % 10)) * 0.01f;
+		double vy = (-5.0f + double(rand() % 10)) * 0.01f;
+		double vz = (-5.0f + double(rand() % 10)) * 0.01f;
 	
-		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 6);
+		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 2);
 	
 		ball->setBBRadius(1.0f);
-		ball->setGravity(true);
+		ball->setGravity(false);
 		ball->setMotion(true);
 		ball->setVelocity({ vx, vy, vz, 1.0f });
 		ball->setAngularVelocity({ 0.01f, 0.0f, 0.0f, 1.0f });
@@ -147,14 +141,28 @@ void pong3d()
 	Game->addTexture(IMG_Load("Textures/timber.jpg"));
 	Game->addTexture(IMG_Load("Textures/metal.jpg"));
 
-	Game->loadProjectile(500);
+	Game->loadProjectile(200);
+
+	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+
+	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
+	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4);
+	auto e_031		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff00ff00, 7, 0.25f, 3.0f, 4);
+	auto e_041		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
+
+	Enemy1->addPart(e_011);
+	Enemy1->addPart(e_021);
+	Enemy1->addPart(e_031);
+	Enemy1->addPart(e_041);
+
+	Game->addEnemy(Enemy1);
 
 	auto Enemy2		= std::make_shared<Player>(40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
-	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, 7, 1.5f, 12);
-	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 12);
-	auto e_032		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 12);
-	auto e_042		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 12);
+	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 7, 1.5f, 8);
+	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
+	auto e_032		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
+	auto e_042		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
 
 	Enemy2->addPart(e_012);
 	Enemy2->addPart(e_022);
@@ -165,10 +173,10 @@ void pong3d()
 
 	auto Enemy3 = std::make_shared<Player>(-40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
-	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 12);
-	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 12);
-	auto e_033 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 12);
-	auto e_043 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xffff0000, 7, 0.25f, 3.0f, 12);
+	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 8);
+	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
+	auto e_033 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
+	auto e_043 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xffffff00, 7, 0.25f, 3.0f, 4);
 
 	Enemy3->addPart(e_013);
 	Enemy3->addPart(e_023);
