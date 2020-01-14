@@ -39,6 +39,7 @@
 #include "Player.h"
 #include "PelvisBone.h"
 #include "LongBone.h"
+#include "ParticleSystem.h"
 
 
 void editor()
@@ -98,24 +99,73 @@ void pong3d()
 	
 	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Observer);
 
+	//Load textures
+	Game->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/wolf002.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/mosaic001.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/brick001.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/concrete001.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/timber.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/metal.jpg"));
+
+//#define _PLANETS_
+#define _SHOOTER_
+//#define _PARTICLES_
+
+#ifdef _PLANETS_
+
+	Game->addTexture(IMG_Load("Assets/Textures/earth_large.jpg"));
+	Game->addTexture(IMG_Load("Assets/Textures/mars_large.jpg"));
+
+	auto Earth = std::make_shared<SolidSphere>(	1.0f, 1.0f, 1.0f,
+												0.0f, 0.5f, 0.0f,
+												0.0f, 0.0f, 0.0f,
+												0xffffff00, 8, 6.0f, 24);
+
+	Earth->setMotion(true);
+	Earth->setAngularVelocity({ 0.0f, 0.0f, -0.001f, 1.0f });
+
+	Game->addBall(Earth);
+
+	auto Mars = std::make_shared<SolidSphere>(	1.0f, 1.0f, 1.0f,
+												15.0f, 12.5f, 5.0f,
+												0.0f, 0.0f, 0.0f,
+												0xffffff00, 9, 3.0f, 24);
+
+	Mars->setMotion(true);
+	Mars->setAngularVelocity({ 0.0f, 0.0f, -0.0005f, 1.0f });
+
+	Game->addBall(Mars);
+
+#endif//_PLANETS_
+
+#ifdef _SHOOTER_
+
+	//Add some basic shapes
 	auto pedestal	= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x0000ff00, 6, 20.0f, 30.0f, 5.0f);
 	auto wall		= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 19.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0x00ff0000, 4, 20.0f, 1.0f, 7.5f);
-	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 5.0f, 24);
+	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 9, 5.0f, 24);
 	auto box		= std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
 	box->calculateMesh();	
 
+	Game->addEntity(box);
+	Game->addEntity(pedestal);
+	Game->addEntity(wall);
+
+	//Add some spheres floating around
 	srand(unsigned int(time(NULL)));
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		double x = double(rand() % 20) * 1.0f + 5.0f;
 		double y = double(rand() % 30) * 1.0f + 5.0f;
 		double z = double(rand() % 10) * 1.0f + 5.0f;
 	
-		double vx = (-5.0f + double(rand() % 10)) * 0.01f;
-		double vy = (-5.0f + double(rand() % 10)) * 0.01f;
-		double vz = (-5.0f + double(rand() % 10)) * 0.01f;
+		double vx = (-5.0f + double(rand() % 10)) * 0.05f;
+		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
+		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
 	
-		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 2);
+		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 8);
 	
 		ball->setBBRadius(1.0f);
 		ball->setGravity(false);
@@ -128,21 +178,10 @@ void pong3d()
 		Game->addBall(ball);
 	}
 
-	Game->addEntity(box);
-	Game->addEntity(pedestal);
-	Game->addEntity(wall);
-
-	Game->addTexture(IMG_Load("Textures/blue.jpg"));
-	Game->addTexture(IMG_Load("Textures/wolf001.jpg"));
-	Game->addTexture(IMG_Load("Textures/wolf002.jpg"));
-	Game->addTexture(IMG_Load("Textures/mosaic001.jpg"));
-	Game->addTexture(IMG_Load("Textures/brick001.jpg"));
-	Game->addTexture(IMG_Load("Textures/concrete001.jpg"));
-	Game->addTexture(IMG_Load("Textures/timber.jpg"));
-	Game->addTexture(IMG_Load("Textures/metal.jpg"));
-
+	//Fill up bullet pool
 	Game->loadProjectile(200);
 
+	//Create enemies
 	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
@@ -185,13 +224,32 @@ void pong3d()
 
 	Game->addEnemy(Enemy3);
 
+#endif//_SHOOTER_
+
+#ifdef _PARTICLES_
+
+	//Add particle emitter
+	auto smokeMachine = std::make_shared<ParticleSystem>(0.25f, 2000, 5, 0x007f7fff);
+	smokeMachine->setOrigin({ -10.0f, -10.0f, 0.0f, 1.0f });
+	smokeMachine->setDirection({ 0.0f, 1.0f, 1.0f, 1.0f });
+	smokeMachine->setDispersion(0.01f);
+	smokeMachine->activate();
+	smokeMachine->setGravity(false);
+
+	Game->addEmitter(smokeMachine);
+
+#endif//_PARTICLES_
+
+	//Build geometry
 	Game->buildMesh();
 
+	//Main loop
 	while (!Controls->quit)
 	{
 		Game->updateAll();
 	}
 
+	//Destroy geometry
 	Game->destroyMesh();
 
 	Screen->cleanUp();
@@ -207,7 +265,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 {
 
 //#define _CUBE_
-//#define _BEZIER_PATCH_
+//#define _BEZIER_PATCH_;
 #define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
 //#define _STL_READER_
@@ -364,7 +422,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 #ifdef _QUAKE_1_READER_
 
-	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	BSP1Loader quakeMap("Assets/QuakeMaps/dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
 	quakeMap.readData();
 	SolidBody* map = &quakeMap;
 	Solids->addSolid(map);
@@ -381,7 +439,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 #ifdef _QUAKE_3_READER_
 
-	BSP3Loader quakeMap("13ground.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	BSP3Loader quakeMap("Assets/QuakeMaps/13ground.bsp", { 0.01, 0.01, 0.01, 1.0 });
 
 	quakeMap.readData();
 	SolidBody* map = &quakeMap;
@@ -392,7 +450,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 #ifdef _STL_READER_
 
-	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "naval_gun.stl");
+	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/naval_gun.stl");
 	test_body.readSTLfile();
 	test_body.smoothSurfaces();
 	Solids->addSolid(&test_body);
@@ -408,13 +466,13 @@ void software_renderer(bool exportFile, const std::string& fileName)
 	}
 
 
-	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),			//00
-								IMG_Load("Textures/wolf001.jpg"),		//01
-								IMG_Load("Textures/wolf002.jpg"),		//02
-								IMG_Load("Textures/mosaic001.jpg"),		//03
-								IMG_Load("Textures/brick001.jpg"),		//04
-								IMG_Load("Textures/concrete001.jpg"),	//05
-								IMG_Load("Textures/timber.jpg") };		//06
+	SDL_Surface* textures[] = { IMG_Load("Assets/Textures/blue.jpg"),			//00
+								IMG_Load("Assets/Textures/wolf001.jpg"),		//01
+								IMG_Load("Assets/Textures/wolf002.jpg"),		//02
+								IMG_Load("Assets/Textures/mosaic001.jpg"),		//03
+								IMG_Load("Assets/Textures/brick001.jpg"),		//04
+								IMG_Load("Assets/Textures/concrete001.jpg"),	//05
+								IMG_Load("Assets/Textures/timber.jpg") };		//06
 
 	Solids->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
 	Actors->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
@@ -424,12 +482,6 @@ void software_renderer(bool exportFile, const std::string& fileName)
 	Game->updateShadowVolumes(solid);
 
 	Game->updateShadowVolumes(actor);
-
-
-	//Game->updateBoundingBoxes(solid, 0.5);
-	//Solids->activateBBox(0);
-	//Solids->activateBBox(1);
-	//Solids->activateBBox(2);
 
 	//Game->importMesh("export_test.dat");
 
@@ -446,8 +498,6 @@ void software_renderer(bool exportFile, const std::string& fileName)
 		Game->updateCameraPosition();
 
 		Controls->ceaseMotion();
-
-		//Game->updateShadowVolumes(actor);
 		
 		Game->renderEntities(solid, Screen->pixelBuffer, Screen->depthBuffer);
 
@@ -482,18 +532,6 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 void opengl_renderer()
 {
-	//glm::vec4* pixelBuffer = new glm::vec4[SCREEN_WIDTH * SCREEN_HEIGHT];	   
-	//for (auto i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)					   
-	//{																		   
-	//	pixelBuffer[i] = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);					   
-	//}																
-	//for (int i = 100000; i < 120000; i++)
-	//{
-	//	pixelBuffer[i] = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-	//}
-					   
-
-
 	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
 	OpenGLCamera Eye(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
 	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));

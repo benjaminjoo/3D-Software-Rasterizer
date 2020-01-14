@@ -250,6 +250,9 @@ void EventHandler::HandleUserEvents()
 		{
 			switch (event.key.keysym.sym)
 			{
+			case SDLK_h:
+				showHelp = showHelp ? false : true;
+				break;
 			case SDLK_z:
 				visualStyle = wireframe;
 				break;

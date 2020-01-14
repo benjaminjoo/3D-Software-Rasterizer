@@ -14,6 +14,8 @@ Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::sha
 
 	hRatio = Eye->getHRatio();
 	vRatio = Eye->getVRatio();
+
+	ControlsText = std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff);
 }
 
 
@@ -56,6 +58,12 @@ void Pong::addBall(std::shared_ptr<SolidBody> ball)
 void Pong::addEnemy(std::shared_ptr<Player> enemy)
 {
 	Enemies.push_back(enemy);
+}
+
+
+void Pong::addEmitter(std::shared_ptr<ParticleSystem> em)
+{
+	Emitter = em;
 }
 
 
@@ -342,8 +350,8 @@ void Pong::updateHeroPosition()
 	Hero->y += Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5);
 	Hero->z += Controls->riseP;
 
-	if (!Controls->isFiring)
-		Hero->idle();
+	//if (!Controls->isFiring)
+	//	Hero->idle();
 
 	updatePlayerModel(Hero);
 }
@@ -1002,6 +1010,9 @@ void Pong::renderAll()
 		}
 			
 	}
+
+	if (Emitter != nullptr)
+		Emitter->render(Eye, Screen);
 }
 
 
@@ -1085,11 +1096,20 @@ void Pong::updateAll()
 			}
 		}
 
+		if (Emitter != nullptr)
+		{
+			Emitter->update();
+			Emitter->setGravity(Controls->gravityOn);
+		}
 	}
 
 	Controls->ceaseMotion();
 
 	this->renderAll();
+
+	if (Controls->showHelp)
+		ControlsText->print(Screen);
+
 
 	this->displayStats(Controls->showCrosshair, Controls->showFPS, Controls->showPosition, Controls->showPolyN, Controls->showAmmo, Screen);
 
@@ -1133,8 +1153,12 @@ void Pong::calculateFrametime()
 
 void Pong::displayStats(bool crosshair, bool fps, bool position, bool polyN, bool amm, std::shared_ptr<Canvas> Screen)
 {
+	int screenWChar = Screen->getWidth() / 8;
+	int screenHChar = Screen->getHeight() / 8;
+
 	double azmToShow, altToShow, rolToShow;
-	if (crosshair) { Screen->drawCrosshair(2, 6,	0x007f7f7f); }
+	if (crosshair && !Controls->showHelp)
+		Screen->drawCrosshair(2, 6, 0x007f7f7f);
 	if (position)
 	{
 		Screen->displayString("MAX ILLUMINATION", 30, 12,			0x00ffffff);
@@ -1217,6 +1241,8 @@ void Pong::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 			break;
 		}
 	}	
+
+	Screen->displayString("PRESS H for HELP", 30, screenHChar - 2, 0x007f7fff);
 }
 
 

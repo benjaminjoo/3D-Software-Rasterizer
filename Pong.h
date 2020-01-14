@@ -6,7 +6,6 @@
 
 
 #include "Canvas.h"
-//#include "Speaker.h"
 #include "Camera.h"
 #include "EventHandler.h"
 #include "LightSource.h"
@@ -15,6 +14,8 @@
 #include "SolidSphere.h"
 #include "SolidCube.h"
 #include "Bullet.h"
+#include "Text.h"
+#include "ParticleSystem.h"
 
 
 class Pong
@@ -22,12 +23,13 @@ class Pong
 private:
 
 	std::shared_ptr<Canvas>						Screen			= nullptr;
-	//std::shared_ptr<Speaker>					SoundSystem		= nullptr;
 	std::shared_ptr<Camera>						Eye				= nullptr;
 	std::shared_ptr<EventHandler>				Controls		= nullptr;
+	std::shared_ptr<Text>						ControlsText	= nullptr;
 	std::shared_ptr<LightSource>				Sun				= nullptr;
 	std::shared_ptr<Player>						Hero			= nullptr;
 	std::shared_ptr<Player>						Enemy			= nullptr;
+	std::shared_ptr<ParticleSystem>				Emitter			= nullptr;
 
 	std::vector<txt>							textureData;
 
@@ -119,6 +121,7 @@ public:
 	void addEntity(std::shared_ptr<SolidBody>);
 	void addBall(std::shared_ptr<SolidBody>);
 	void addEnemy(std::shared_ptr<Player>);
+	void addEmitter(std::shared_ptr<ParticleSystem>);
 	void loadProjectile(unsigned int);
 	void buildMesh();
 	void destroyMesh();

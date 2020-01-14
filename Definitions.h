@@ -3,6 +3,7 @@
 #include <SDL/SDL.h>
 #include <vector>
 #include <string>
+#include "c64Fonts.h"
 
 
 #define GRAVITY				0.5
@@ -69,6 +70,13 @@ enum aiGoal { be_idle, follow_player, kill_player, follow_others, kill_others, f
 
 
 typedef unsigned char byte;
+
+
+union colour32
+{
+	unsigned argb = 0;
+	unsigned char c[4];
+};
 
 
 struct soundBite
@@ -203,6 +211,18 @@ struct vect3
 	double z = 0.0f;
 	double w = 0.0f;
 
+
+	double len()
+	{
+		return sqrt(x * x + y * y + z * z);
+	}
+
+	vect3 norm()
+	{
+		double s = 1.0f / this->len();
+		return { x * s, y * s, z * s, 1.0f };
+	}
+
 	vect3	operator + 	(const vect3& p)
 	{
 		return { x + p.x, y + p.y, z + p.z, 1.0f };
@@ -215,12 +235,18 @@ struct vect3
 
 	vect3	operator += (const vect3& p)
 	{
-		return { x += p.x, y += p.y, z += p.z, 1.0f };
+		x += p.x;
+		y += p.y;
+		z += p.z;
+		return *this;
 	}
 
 	vect3	operator -= (const vect3& p)
 	{
-		return { x -= p.x, y -= p.y, z -= p.z, 1.0f };
+		x -= p.x;
+		y -= p.y;
+		z -= p.z;
+		return *this;
 	}
 
 	vect3	operator ^ (const vect3& p)				//Cross Product
@@ -651,3 +677,5 @@ int* getFractionals(double number, int nDecimals);
 int* getIntegers(double number, int* n);
 
 void freePointerToPolyArray(triangle3dV** ptr, int nDimensions);
+
+bool* getSinglePETSCIICharacter(char char_no);

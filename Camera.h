@@ -51,6 +51,8 @@ public:
 	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
 	~Camera();
 
+	void renderPoint(point3, Uint32*);
+
 private:
 
 	double getFovH();
@@ -66,7 +68,7 @@ private:
 	triangle3dV world2viewT(const transform3d&, const triangle3dV&);
 	void world2view(const transform3d&, triangle3dV&);
 	line3d world2viewL(transform3d, line3d);
-	point3 world2viewP(transform3d, point3);
+	point3 world2viewP(point3);
 	vect3 world2view(const transform3d, const vect3);
 
 	void clipToFrustumL(line3d*);
@@ -86,7 +88,7 @@ private:
 
 	void projectPoly(int, vect3*, textCoord*, Uint32, Uint32*, double*, int, ShadowVolume*, double, double, projectionStyle, double, double, triangle3dV);
 	void projectLine(line3d, Uint32*, double*, double hRatio, double vRatio);
-	void projectPoint(point3, Uint32*, double hRatio, double vRatio);
+	void projectPoint(point3, Uint32*);
 
 	void fillTriangleSolidColour(const triangle3dV&, const triangle2dG&, Uint32*&, double*&, const bool&);
 	void fillTriangleCheckerboard(const triangle3dV&, const triangle2dG&, Uint32*&, double*&, const bool&);

@@ -4,6 +4,8 @@
 
 #include "Definitions.h"
 
+
+
 class Canvas
 {
 	int w			= 1000;
@@ -42,10 +44,11 @@ public:
 
 	int getHeight();
 
+	void putPixel(int x, int y, Uint32 colour);
 	void drawCrosshair(int, int, Uint32);
 	void drawMouseCursor(editingMode, screenCoord position, Uint32 colour);
 	void drawSnapTarget(screenCoord position, Uint32 colour);
-	bool* GetSingleDigit_8(char letter_No);
+	//bool* GetSingleDigit_8(char letter_No);
 	void displayFps(double value, int dec, int shiftH, int shiftV);
 	void displayValue(double value, int dec, int shiftH, int shiftV, Uint32 col);
 	void displayString(const char* text, int shiftH, int shiftV, Uint32 col);

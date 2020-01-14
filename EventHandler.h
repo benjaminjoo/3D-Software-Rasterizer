@@ -23,6 +23,7 @@ public:
 	bool showPosition				= true;
 	bool showPolyN					= true;
 	bool showAmmo					= true;
+	bool showHelp					= false;
 	bool gravityOn					= false;
 	bool isPaused					= false;
 	bool isFiring					= false;

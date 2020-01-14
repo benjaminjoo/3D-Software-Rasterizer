@@ -530,8 +530,8 @@ void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer)
 	transform3d eyePosition = Eye->getTransformation();
 	for (int i = 0; i < nPoints; i++)
 	{
-		point3 viewP = Eye->world2viewP(eyePosition, Points[i]);
-		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer, hRatio, vRatio); }
+		point3 viewP = Eye->world2viewP(Points[i]);
+		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer); }
 	}
 }
 
