@@ -115,6 +115,6 @@ void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas>
 			point3 p;
 			p.P = i->getPosition();
 			p.colour = getColour(0, r, g, b);
-			eye->renderPoint(p, screen->pixelBuffer);
+			eye->renderPoint(p, screen->pixelBuffer, screen->depthBuffer);
 		}
 }

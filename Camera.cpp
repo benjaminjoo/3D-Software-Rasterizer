@@ -542,14 +542,15 @@ void Camera::projectLine(line3d line, Uint32* pixelBuffer, double* depthBuffer, 
 }
 
 
-void Camera::projectPoint(point3 P, Uint32* pixelBuffer)
+void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
 {
 	double hRatio = this->getHRatio();
 	double vRatio = this->getVRatio();
 	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
-	if ((cp.x >= 0 && cp.x < w) && (cp.y >= 0 && cp.y < h))
+	if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
 	{
 		pixelBuffer[cp.y * w + cp.x] = P.colour;
+		depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
 	}
 }
 
@@ -2658,10 +2659,10 @@ void Camera::centreLook()
 }
 
 
-void Camera::renderPoint(point3 p, Uint32* pixelBuffer)
+void Camera::renderPoint(point3 p, Uint32* pixelBuffer, double* depthBuffer)
 {
 	point3 viewP = world2viewP(p);
-	projectPoint(viewP, pixelBuffer);
+	projectPoint(viewP, pixelBuffer, depthBuffer);
 }
 
 

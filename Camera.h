@@ -51,7 +51,7 @@ public:
 	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
 	~Camera();
 
-	void renderPoint(point3, Uint32*);
+	void renderPoint(point3, Uint32*, double*);
 
 private:
 
@@ -88,7 +88,7 @@ private:
 
 	void projectPoly(int, vect3*, textCoord*, Uint32, Uint32*, double*, int, ShadowVolume*, double, double, projectionStyle, double, double, triangle3dV);
 	void projectLine(line3d, Uint32*, double*, double hRatio, double vRatio);
-	void projectPoint(point3, Uint32*);
+	void projectPoint(point3, Uint32*, double*);
 
 	void fillTriangleSolidColour(const triangle3dV&, const triangle2dG&, Uint32*&, double*&, const bool&);
 	void fillTriangleCheckerboard(const triangle3dV&, const triangle2dG&, Uint32*&, double*&, const bool&);

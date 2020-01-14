@@ -111,7 +111,7 @@ void pong3d()
 
 //#define _PLANETS_
 #define _SHOOTER_
-//#define _PARTICLES_
+#define _PARTICLES_
 
 #ifdef _PLANETS_
 

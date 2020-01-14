@@ -525,13 +525,13 @@ void Renderer::updateEntities(model E)
 }
 
 
-void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer)
+void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer, double* depthBuffer)
 {
 	transform3d eyePosition = Eye->getTransformation();
 	for (int i = 0; i < nPoints; i++)
 	{
 		point3 viewP = Eye->world2viewP(Points[i]);
-		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer); }
+		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer, depthBuffer); }
 	}
 }
 
