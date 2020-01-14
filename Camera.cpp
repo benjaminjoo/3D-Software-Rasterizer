@@ -17,6 +17,11 @@ Camera::Camera():
 	std::cout << "Camera constructor called" << std::endl;
 
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);
+
+	hRatio = this->getHRatio();
+	vRatio = this->getVRatio();
+
+	this->clearVertexList();
 }
 
 
@@ -27,6 +32,11 @@ Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
 	std::cout << "Camera constructor called" << std::endl;
 
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
+
+	hRatio = this->getHRatio();
+	vRatio = this->getVRatio();
+
+	this->clearVertexList();
 }
 
 
@@ -38,6 +48,20 @@ Camera::Camera(double cx, double cy, double cz, double az, double al, double rl,
 	std::cout << "Camera constructor called" << std::endl;
 
 	Frustum.initFrustum(this->getFovH(), this->getFovV(), zNear, zFar);	//
+
+	hRatio = this->getHRatio();
+	vRatio = this->getVRatio();
+
+	this->clearVertexList();
+}
+
+
+void Camera::linkToCanvas(std::shared_ptr<Canvas> screen)
+{
+	pixelBuffer = screen->pixelBuffer;
+	depthBuffer = screen->depthBuffer;
+
+	Screen = screen;
 }
 
 
@@ -68,6 +92,16 @@ double Camera::getHRatio()
 double Camera::getVRatio()
 {
 	return 1 / (tan(atan(tan(fovH * 0.5) / (w / h) * 2)));
+}
+
+
+void Camera::clearVertexList()
+{
+	for (int v = 0; v < MAXCLIPVERTS; v++)
+	{
+		vertexList[v] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		uvList[v] = { 0.0f, 0.0f };
+	}
 }
 
 
@@ -124,16 +158,42 @@ triangle3dV Camera::world2viewT(const transform3d& T, const triangle3dV& tr)
 }
 
 
-void Camera::world2view(const transform3d& T, triangle3dV& tr)
+triangle3dV Camera::world2viewT(const triangle3dV& tr)
 {
-	tr.A	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.A))));
-	tr.B	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.B))));
-	tr.C	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.C))));
-	tr.An	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.An)));
-	tr.Bn	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Bn)));
-	tr.Cn	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Cn)));
+	transform3d T = this->getTransformation();
 
-	tr.N	= rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.N)));
+	triangle3dV t;
+
+	t.A = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.A))));
+	t.B = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.B))));
+	t.C = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.C))));
+	t.An = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.An))));
+	t.Bn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.Bn))));
+	t.Cn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.Cn))));
+
+	t.N = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.N))));
+	t.At = tr.At;
+	t.Bt = tr.Bt;
+	t.Ct = tr.Ct;
+	t.texture = tr.texture;
+	t.colour = tr.colour;
+
+	return t;
+}
+
+
+void Camera::world2view(triangle3dV& tr)
+{
+	transform3d T = this->getTransformation();
+
+	tr.A = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.A))));
+	tr.B = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.B))));
+	tr.C = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.C))));
+	tr.An = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.An)));
+	tr.Bn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Bn)));
+	tr.Cn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Cn)));
+
+	tr.N = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.N)));
 }
 
 
@@ -554,9 +614,7 @@ void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
 	}
 }
 
-
-void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 colour, Uint32* pixelBuffer, double* depthBuffer,
-	int nShadow, ShadowVolume* SH, double hRatio, double vRatio, projectionStyle style, double torchI, double maxI, triangle3dV originalPoly)
+void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double torchI, double maxI, triangle3dV originalPoly)
 {
 	triangle2dG screenT;
 	triangle3dV originalT;	//To be passed on to polygon filling routine
@@ -608,42 +666,45 @@ void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 col
 			{
 			case solid_colour:
 			{
-				this->fillTriangleSolidColour(originalT, screenT, pixelBuffer, depthBuffer, d);
+				this->fillTriangleSolidColour(originalT, screenT, d);
 			}
 			break;
 			case checkerboard:
 			{
-				this->fillTriangleCheckerboard(originalT, screenT, pixelBuffer, depthBuffer, d);
+				//this->fillTriangleCheckerboard(originalT, screenT);
+				Projection::fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
 			}
 			break;
 			case flat_shaded:
 			{
-				this->fillTriangleFlatShaded(screenT, pixelBuffer, depthBuffer);
+				//this->fillTriangleFlatShaded(screenT);
+				Projection::fillTriangleFlatShaded(screenT, Screen);
 			}
 			break;
 			case gouraud_shaded:
 			{
-				this->fillTriangleGouraudShaded(screenT, pixelBuffer, depthBuffer, d);
+				//this->fillTriangleGouraudShaded(screenT);
+				Projection::fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
 			}
 			break;
 			case depth_visualised:
 			{
-				this->fillTriangleDepthVisualised(originalT, screenT, pixelBuffer, depthBuffer, true);
+				this->fillTriangleDepthVisualised(originalT, screenT, true);
 			}
 			break;
 			case sunlight:
 			{
-				this->fillTriangleSunlight(originalT, screenT, pixelBuffer, depthBuffer, false);
+				this->fillTriangleSunlight(originalT, screenT, false);
 			}
 			break;
 			case torchlight:
 			{
-				this->fillTriangleTorchlight(originalT, screenT, pixelBuffer, depthBuffer, d, torchI, maxI);
+				this->fillTriangleTorchlight(originalT, screenT, d, torchI, maxI);
 			}
 			break;
 			case torchlight_solid:
 			{
-				this->fillTriangleTorchlightSolidColour(originalT, screenT, pixelBuffer, depthBuffer, d, torchI, maxI);
+				this->fillTriangleTorchlightSolidColour(originalT, screenT, d, torchI, maxI);
 			}
 			break;
 			case test:
@@ -654,7 +715,7 @@ void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 col
 			break;
 			default:
 			{
-				this->fillTriangleFlatShaded(screenT, pixelBuffer, depthBuffer);
+				this->fillTriangleFlatShaded(screenT);
 			}
 			break;
 			}
@@ -663,7 +724,7 @@ void Camera::projectPoly(int n, vect3* vertexList, textCoord* uvList, Uint32 col
 }
 
 
-inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
+inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, const bool& d)
 {
 	Uint32 pixelColour = t.h;
 	coord2 pt[3] = { t.a, t.b, t.c };
@@ -780,8 +841,7 @@ inline void Camera::fillTriangleSolidColour(const triangle3dV& T, const triangle
 }
 
 
-inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer,
-			const bool& d)
+inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -972,8 +1032,8 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 
 						sampleUV = this->getUVCoord(startVert, endVert, startUV, endUV, currentVert);
 
-						sampleXnew = ((int)(double(currentTexture.w) * sampleUV.u)) % currentTexture.w;
-						sampleYnew = ((int)(double(currentTexture.h) * sampleUV.v)) % currentTexture.h;
+						sampleXnew = ((int)(double(currentTexture->w) * sampleUV.u)) % currentTexture->w;
+						sampleYnew = ((int)(double(currentTexture->h) * sampleUV.v)) % currentTexture->h;
 
 						Uint32 blue		= getColour(0, 0, 0, (byte)(255 * illCurrent));
 						Uint32 white	= getColour(0, (byte)(255 * illCurrent), (byte)(255 * illCurrent), (byte)(255 * illCurrent));
@@ -1011,7 +1071,7 @@ inline void Camera::fillTriangleCheckerboard(const triangle3dV& T, const triangl
 }
 
 
-inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer)
+inline void Camera::fillTriangleFlatShaded(const triangle2dG& t)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1113,7 +1173,7 @@ inline void Camera::fillTriangleFlatShaded(const triangle2dG& t, Uint32*& pixelB
 }
 
 
-inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
+inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1241,7 +1301,7 @@ inline void Camera::fillTriangleGouraudShaded(const triangle2dG& t, Uint32*& pix
 }
 
 
-inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
+inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1344,269 +1404,7 @@ inline void Camera::fillTriangleDepthVisualised(const triangle3dV& T, const tria
 }
 
 
-inline void Camera::fillTriangleTest(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
-{
-	coord2 pt[3] = { t.a, t.b, t.c };
-
-	int yMin = GetYMin3(pt);
-	int yMax = GetYMax3(pt);
-
-	int dx, dy, xx, wd;
-	double dz, zz, sy;
-	double dIllum, illum;
-
-	int endIndex, hgw;
-
-	int lineEnd[2]			= { 0, 0 };
-	double zLimit[2]		= { 0.0f, 0.0f };
-	double illLimit[2]		= { 0.0f, 0.0f };
-
-	vect3 nullVect = { 0.0, 0.0, 0.0, 0.0 };
-	vect3 sides[4]			= { nullVect, nullVect, nullVect, nullVect };
-	vect3 sideL[2]			= { nullVect, nullVect };
-	vect3 sideR[2]			= { nullVect, nullVect };
-	
-	textCoord nullCoord = { 0.0, 0.0 };
-	textCoord uvSides[4]	= { nullCoord, nullCoord, nullCoord, nullCoord };
-	textCoord uvSideL[2]	= { nullCoord, nullCoord };
-	textCoord uvSideR[2]	= { nullCoord, nullCoord };
-
-	//vect3 sides[4];
-	//vect3 sideL[2];
-	//vect3 sideR[2];
-	//textCoord uvSides[4];
-	//textCoord uvSideL[2];
-	//textCoord uvSideR[2];
-
-	int startX, endX;
-	double startZ, endZ, deltaZ, zCurrent, invertCurrentZ, startIll, endIll, deltaIll, illCurrent;
-
-	coord2 startP, endP, currentP;
-	vect3 startVert, endVert, currentVert;
-
-	double invertStartPz, invertEndPz;
-
-	int halfW = std::round(w * 0.5);
-	int halfH = std::round(h * 0.5);
-
-	double hCorr = w * 0.475 * getHRatio();
-	double vCorr = w * 0.475 * getVRatio();
-
-	double invertHcorr = 1.0f / (w * 0.475 * getHRatio());
-	double invertVcorr = 1.0f / (w * 0.475 * getVRatio());
-
-	textCoord startUV, endUV, sampleUV;
-	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
-	Uint32 finalPixel;
-
-	for (int hg = yMin; hg < yMax; hg++)
-	{
-		endIndex = 0;
-		hgw = hg * w;
-		//Side A-B:
-		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
-		{
-			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
-			sy = 1.0f / ((double)hg - (double)t.a.y); xx = std::round(dx * sy); zz = t.a.z + dz * sy;
-			illum = t.illumA + dIllum * sy;
-			wd = t.a.x + std::round(xx);
-			if (endIndex < 2)
-			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
-				illLimit[endIndex] = illum * 100.0;
-
-				sides[endIndex * 2] = T.A;
-				sides[endIndex * 2 + 1] = T.B;
-				uvSides[endIndex * 2] = t.At;
-				uvSides[endIndex * 2 + 1] = t.Bt;
-
-				endIndex++;
-			}
-		}
-		//Side B-C:
-		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
-		{
-			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
-			sy = 1.0f / ((double)hg - (double)t.b.y); xx = std::round(dx * sy); zz = t.b.z + dz * sy;
-			illum = t.illumB + dIllum * sy;
-			wd = t.b.x + std::round(xx);
-			if (endIndex < 2)
-			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
-				illLimit[endIndex] = illum * 100.0;
-
-				sides[endIndex * 2] = T.B;
-				sides[endIndex * 2 + 1] = T.C;
-				uvSides[endIndex * 2] = t.Bt;
-				uvSides[endIndex * 2 + 1] = t.Ct;
-
-				endIndex++;
-			}
-		}
-		//Side C-A:
-		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
-		{
-			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
-			sy = 1.0f / ((double)hg - (double)t.c.y); xx = std::round(dx * sy); zz = t.c.z + dz * sy;
-			illum = t.illumC + dIllum * sy;
-			wd = t.c.x + std::round(xx);
-
-			if (endIndex < 2)
-			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
-				illLimit[endIndex] = illum * 100.0;
-
-				sides[endIndex * 2] = T.C;
-				sides[endIndex * 2 + 1] = T.A;
-				uvSides[endIndex * 2] = t.Ct;
-				uvSides[endIndex * 2 + 1] = t.At;
-
-				endIndex++;
-			}
-		}
-		if (endIndex == 2)
-		{
-			if (lineEnd[0] <= lineEnd[1])
-			{
-				startX = lineEnd[0];
-				endX = lineEnd[1];
-				startZ = zLimit[0];
-				endZ = zLimit[1];
-				startIll = illLimit[0];
-				endIll = illLimit[1];
-
-				sideL[0] = sides[0];
-				sideL[1] = sides[1];
-				sideR[0] = sides[2];
-				sideR[1] = sides[3];
-
-				uvSideL[0] = uvSides[0];
-				uvSideL[1] = uvSides[1];
-				uvSideR[0] = uvSides[2];
-				uvSideR[1] = uvSides[3];
-			}
-			else
-			{
-				startX = lineEnd[1];
-				endX = lineEnd[0];
-				startZ = zLimit[1];
-				endZ = zLimit[0];
-				startIll = illLimit[1];
-				endIll = illLimit[0];
-
-				sideL[0] = sides[2];
-				sideL[1] = sides[3];
-				sideR[0] = sides[0];
-				sideR[1] = sides[1];
-
-				uvSideL[0] = uvSides[2];
-				uvSideL[1] = uvSides[3];
-				uvSideR[0] = uvSides[0];
-				uvSideR[1] = uvSides[1];
-			}
-			double invertSpan = 1.0f / abs(endX - startX + 1);
-			deltaZ = (endZ - startZ) * invertSpan;
-			deltaIll = ((endIll - startIll) * invertSpan) * 0.01f;
-			zCurrent = startZ;
-			illCurrent = startIll * 0.01f;
-
-			startP.x = startX;	startP.y = hg;	startP.z = startZ;
-			endP.x = endX;		endP.y = hg;	endP.z = endZ;
-
-			invertStartPz = 1 / startP.z;
-			startVert.x = (startP.x - double(halfW)) * invertStartPz * invertHcorr;
-			startVert.y = (double(halfH) - startP.y) * invertStartPz * invertVcorr;
-			startVert.z = invertStartPz;
-
-			invertEndPz = 1 / endP.z;
-			endVert.x = (endP.x - double(halfW)) * invertEndPz * invertHcorr;
-			endVert.y = (double(halfH) - endP.y) * invertEndPz * invertVcorr;
-			endVert.z = invertEndPz;
-
-			startUV = getUVCoord(sideL[0], sideL[1], uvSideL[0], uvSideL[1], startVert);
-			endUV	= getUVCoord(sideR[0], sideR[1], uvSideR[0], uvSideR[1], endVert);
-
-			currentP.y = hg;
-
-			for (int i = startX; i < endX + 1; i++)
-			{
-				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
-				{
-					//invertCurrentZ = 1 / zCurrent;
-					//if (invertCurrentZ < depthBuffer[hgw + i])
-					//{
-					//	currentP.x = i;
-					//	currentP.z = zCurrent;
-					//
-					//	currentVert.x = (currentP.x - double(halfW)) * invertCurrentZ * invertHcorr;
-					//	currentVert.y = (double(halfH) - currentP.y) * invertCurrentZ * invertVcorr;
-					//	currentVert.z = invertCurrentZ;
-					//
-					//	sampleUV = this->getUVCoord(startVert, endVert, startUV, endUV, currentVert);
-					//
-					//	sampleXnew = ((int)(currentTexture.w * sampleUV.u)) % currentTexture.w;
-					//	sampleYnew = ((int)(currentTexture.h * sampleUV.v)) % currentTexture.h;
-					//
-					//	if (sampleXnew < 0) { sampleXnew = currentTexture.w + sampleXnew % currentTexture.w; }
-					//	if (sampleYnew < 0) { sampleYnew = currentTexture.h + sampleYnew % currentTexture.h; }
-					//
-					//	if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
-					//	{
-					//		finalPixel = currentTexture.pixels[sampleYnew * currentTexture.w + sampleXnew];
-					//	}
-					//
-					//	sampleXold = sampleXnew;
-					//	sampleYold = sampleYnew;
-					//
-					//	pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
-					//
-					//	depthBuffer[hgw + i] = invertCurrentZ;
-					//}
-					//zCurrent += deltaZ;
-					//illCurrent += deltaIll;
-					invertCurrentZ = 1 / zCurrent;
-					if (invertCurrentZ < depthBuffer[hgw + i])
-					{
-						currentP.x = i;
-						currentP.z = zCurrent;
-
-						currentVert.x = (currentP.x - double(halfW)) * invertCurrentZ / hCorr;
-						currentVert.y = (double(halfH) - currentP.y) * invertCurrentZ / vCorr;
-						currentVert.z = invertCurrentZ;
-
-						sampleUV = this->getUVCoord(startVert, endVert, startUV, endUV, currentVert);
-
-						sampleXnew = ((int)(currentTexture.w * sampleUV.u)) % currentTexture.w;
-						sampleYnew = ((int)(currentTexture.h * sampleUV.v)) % currentTexture.h;
-
-						if (sampleXnew < 0) { sampleXnew = currentTexture.w + sampleXnew % currentTexture.w; }
-						if (sampleYnew < 0) { sampleYnew = currentTexture.h + sampleYnew % currentTexture.h; }
-
-						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
-						{
-							finalPixel = currentTexture.pixels[sampleYnew * currentTexture.w + sampleXnew];
-						}
-
-						sampleXold = sampleXnew;
-						sampleYold = sampleYnew;
-
-						pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
-
-						depthBuffer[hgw + i] = invertCurrentZ;
-					}
-					zCurrent += deltaZ;
-					illCurrent += deltaIll;
-				}
-			}
-		}
-	}
-}
-
-
-inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d)
+inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, const bool& d)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -1650,10 +1448,8 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 	Uint32 finalPixel;
 
-	/**/
 	byte a = 0, r2fill = 0, g2fill = 0, b2fill = 0;
 	double illSurplus = 0.0;
-	/**/
 
 	for (int hg = yMin; hg < yMax; hg++)
 	{
@@ -1802,21 +1598,21 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 
 						sampleUV = this->getUVCoord(startVert, endVert, startUV, endUV, currentVert);
 
-						sampleXnew = ((int)(currentTexture.w * sampleUV.u)) % currentTexture.w;
-						sampleYnew = ((int)(currentTexture.h * sampleUV.v)) % currentTexture.h;
+						sampleXnew = ((int)(currentTexture->w * sampleUV.u)) % currentTexture->w;
+						sampleYnew = ((int)(currentTexture->h * sampleUV.v)) % currentTexture->h;
 
-						if (sampleXnew < 0) { sampleXnew = currentTexture.w + sampleXnew % currentTexture.w; }
-						if (sampleYnew < 0) { sampleYnew = currentTexture.h + sampleYnew % currentTexture.h; }
+						if (sampleXnew < 0) { sampleXnew = currentTexture->w + sampleXnew % currentTexture->w; }
+						if (sampleYnew < 0) { sampleYnew = currentTexture->h + sampleYnew % currentTexture->h; }
 
 						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
 						{
-							finalPixel = currentTexture.pixels[sampleYnew * currentTexture.w + sampleXnew];
+							finalPixel = currentTexture->pixels[sampleYnew * currentTexture->w + sampleXnew];
 						}
 
 						sampleXold = sampleXnew;
 						sampleYold = sampleYnew;
 
-						pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);						
+						pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
 
 						depthBuffer[hgw + i] = invertCurrentZ;
 					}
@@ -1829,7 +1625,7 @@ inline void Camera::fillTriangleSunlight(const triangle3dV& T, const triangle2dG
 }
 
 
-inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d,
+inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG& t, const bool& d,
 		const double& lightIntensity, const double& maxIllumination)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
@@ -2015,15 +1811,15 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 
 						sampleUV = this->getUVCoord(startVert, endVert, startUV, endUV, currentVert);
 
-						sampleXnew = ((int)(currentTexture.w * sampleUV.u)) % currentTexture.w;
-						sampleYnew = ((int)(currentTexture.h * sampleUV.v)) % currentTexture.h;
+						sampleXnew = ((int)(currentTexture->w * sampleUV.u)) % currentTexture->w;
+						sampleYnew = ((int)(currentTexture->h * sampleUV.v)) % currentTexture->h;
 
-						if (sampleYnew < 0) { sampleYnew = currentTexture.h + sampleYnew % currentTexture.h; }
-						if (sampleXnew < 0) { sampleXnew = currentTexture.w + sampleXnew % currentTexture.w; }
+						if (sampleYnew < 0) { sampleYnew = currentTexture->h + sampleYnew % currentTexture->h; }
+						if (sampleXnew < 0) { sampleXnew = currentTexture->w + sampleXnew % currentTexture->w; }
 
 						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
 						{
-							finalPixel = currentTexture.pixels[sampleYnew * currentTexture.w + sampleXnew];
+							finalPixel = currentTexture->pixels[sampleYnew * currentTexture->w + sampleXnew];
 						}
 
 						sampleXold = sampleXnew;
@@ -2040,7 +1836,7 @@ inline void Camera::fillTriangleTorchlight(const triangle3dV& T, const triangle2
 }
 
 
-inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, Uint32*& pixelBuffer, double*& depthBuffer, const bool& d,
+inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, const bool& d,
 	const double& lightIntensity, const double& maxIllumination)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
@@ -2197,7 +1993,7 @@ inline void Camera::fillTriangleTorchlightSolidColour(const triangle3dV& T, cons
 }
 
 
-inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t, double*& depthBuffer)
+inline void Camera::fillZBuffer(const triangle3dV& T, const triangle2dG& t)
 {
 	coord2 pt[3] = { t.a, t.b, t.c };
 	int yMin, yMax;
@@ -2663,6 +2459,48 @@ void Camera::renderPoint(point3 p, Uint32* pixelBuffer, double* depthBuffer)
 {
 	point3 viewP = world2viewP(p);
 	projectPoint(viewP, pixelBuffer, depthBuffer);
+}
+
+
+void Camera::addTexture(SDL_Surface* T)
+{
+	if (T == nullptr)
+	{
+		std::cout << "Image loading failed..." << std::endl;
+	}
+	else
+	{
+		txt tempTexture;
+		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
+		tempTexture.pixels = (Uint32*)tempImage->pixels;
+		tempTexture.ID = textureData.size();
+		tempTexture.w = T->w;
+		tempTexture.h = T->h;
+		textureData.push_back(tempTexture);
+	}
+}
+
+void Camera::addTexture(txt T)
+{
+	textureData.push_back(T);
+}
+
+
+void Camera::renderPolygon(triangle3dV& viewT, LightSource Sun, unsigned textureID, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	triangle3dV worldT = viewT;
+	
+	this->world2view(viewT);
+	
+	this->illuminatePoly(Sun, &viewT, worldT, visualStyle);
+	
+	int nVert = this->clipToFrustum(viewT, vertexList, uvList);
+
+	Uint32 colour = worldT.colour;
+
+	currentTexture = &textureData[textureID];
+
+	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
 }
 
 

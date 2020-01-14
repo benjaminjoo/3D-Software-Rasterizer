@@ -22,7 +22,7 @@ class BSP3Loader: public SolidBody
 	int		patchLod;
 
 public:
-	BSP3Loader(std::string);
+	BSP3Loader(std::string, double, double, double);
 	BSP3Loader(std::string, vect3);
 	~BSP3Loader();
 

@@ -5,7 +5,7 @@
 
 class SolidBody
 {
-protected:
+public:
 
 	vect3			scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	vect3			position		= { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -17,6 +17,8 @@ protected:
 	Uint32			colour			= 255;
 	int				texture			= 0;
 	double			txU				= 1.0f;
+
+protected:
 	
 	bool			castsShadows	= false;
 	bool			bBoxActive		= false;

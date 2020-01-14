@@ -8,10 +8,14 @@
 #include "BSP1Loader.h"
 
 
-BSP1Loader::BSP1Loader(std::string f):
+BSP1Loader::BSP1Loader(std::string f, double sx, double sy, double sz):
 	fileName(f)
 {
 	std::cout << "BSP1Loader constructor called" << std::endl;
+
+	scale.x = sx;
+	scale.y = sy;
+	scale.z = sz;
 
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);

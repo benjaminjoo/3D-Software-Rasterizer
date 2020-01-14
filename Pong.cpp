@@ -13,33 +13,12 @@ Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::sha
 	}
 
 	hRatio = Eye->getHRatio();
-	vRatio = Eye->getVRatio();
-
-	ControlsText = std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff);
+	vRatio = Eye->getVRatio();	
 }
 
 
 Pong::~Pong()
 {
-}
-
-
-void Pong::addTexture(SDL_Surface* T)
-{
-	if (T == nullptr)
-	{
-		printf("Image loading failed...\n");
-	}
-	else
-	{
-		txt tempTexture;
-		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
-		tempTexture.pixels = (Uint32*)tempImage->pixels;
-		tempTexture.ID = textureData.size();
-		tempTexture.w = T->w;
-		tempTexture.h = T->h;
-		textureData.push_back(tempTexture);
-	}
 }
 
 
@@ -58,6 +37,12 @@ void Pong::addBall(std::shared_ptr<SolidBody> ball)
 void Pong::addEnemy(std::shared_ptr<Player> enemy)
 {
 	Enemies.push_back(enemy);
+}
+
+
+void Pong::addTextScreen(std::string tname, std::shared_ptr<Text> tscreen)
+{
+	TextScreens.insert({ tname, tscreen });
 }
 
 
@@ -94,6 +79,9 @@ void Pong::buildMesh()
 		triangleMesh[i] = new triangle3dV[nCurrent];
 		polyCount[i] = nCurrent;
 		Entities[i]->getTriangleData_(triangleMesh[i]);
+		transformMesh(nCurrent, triangleMesh[i], Entities[i]->scale.x, Entities[i]->scale.y, Entities[i]->scale.z,
+													Entities[i]->position.x, Entities[i]->position.y, Entities[i]->position.z,
+													Entities[i]->rotation.x, Entities[i]->rotation.y, Entities[i]->rotation.z);
 	}
 
 	if (Hero != nullptr)
@@ -103,10 +91,15 @@ void Pong::buildMesh()
 		playerPolyCount = new unsigned int[nPlayerParts];
 		for (unsigned int i = 0; i < nPlayerParts; i++)
 		{
-			unsigned int nCurrent = Hero->Parts[i]->getTotalPoly();
+			std::shared_ptr<SolidBody> B = Hero->Parts[i];
+			unsigned int nCurrent = B->getTotalPoly();
 			playerMesh[i] = new triangle3dV[nCurrent];
 			playerPolyCount[i] = nCurrent;
-			Hero->Parts[i]->getTriangleData_(playerMesh[i]);
+			B->getTriangleData_(playerMesh[i]);
+
+			transformMesh(nCurrent, playerMesh[i], B->scale.x, B->scale.y, B->scale.z,
+					B->position.x, B->position.y, B->position.z,
+					B->rotation.x, B->rotation.y, B->rotation.z);
 		}
 	}
 
@@ -117,19 +110,24 @@ void Pong::buildMesh()
 		enemyPolyCount = new unsigned int[nEnemyParts];
 		for (unsigned int i = 0; i < nEnemyParts; i++)
 		{
-			unsigned int nCurrent = Enemy->Parts[i]->getTotalPoly();
+			std::shared_ptr<SolidBody> B = Enemy->Parts[i];
+			unsigned int nCurrent = B->getTotalPoly();
 			enemyMesh[i] = new triangle3dV[nCurrent];
 			enemyPolyCount[i] = nCurrent;
-			Enemy->Parts[i]->getTriangleData_(enemyMesh[i]);
-		}
+			B->getTriangleData_(enemyMesh[i]);
 
+			transformMesh(nCurrent, enemyMesh[i], B->scale.x, B->scale.y, B->scale.z,
+				B->position.x, B->position.y, B->position.z,
+				B->rotation.x, B->rotation.y, B->rotation.z);
+		}
+	
 		if (Enemy->skeleton != nullptr)
 		{
 			int nSkeletonMesh = Enemy->skeleton->getNMesh();
-
+	
 			skeletonMesh = new triangle3dV* [nSkeletonMesh];
 			skeletonPolyCount = new unsigned int[nSkeletonMesh];
-
+	
 			Enemy->skeleton->getPoly(skeletonPolyCount, skeletonMesh);
 		}
 	}
@@ -161,9 +159,15 @@ void Pong::buildMesh()
 	{
 		for (unsigned int j = 0; j < Enemies[i]->Parts.size(); j++)			//For each part in current enemy
 		{
-			int nCurrentPoly = Enemies[i]->Parts[j]->getTotalPoly();		//Number of polygons in current part
+			std::shared_ptr<SolidBody> B = Enemies[i]->Parts[j];
+			int nCurrentPoly = B->getTotalPoly();							//Number of polygons in current part
 			enemiesMesh[partIndex] = new triangle3dV[nCurrentPoly];			//Storage allocated for nCurrentPoly number of polygons
-			Enemies[i]->Parts[j]->getTriangleData_(enemiesMesh[partIndex]);	//enemiesMesh[partIndex][] filled up with polygon data
+			B->getTriangleData_(enemiesMesh[partIndex]);					//enemiesMesh[partIndex][] filled up with polygon data
+
+			transformMesh(nCurrentPoly, enemiesMesh[partIndex], B->scale.x, B->scale.y, B->scale.z,
+				B->position.x, B->position.y, B->position.z,
+				B->rotation.x, B->rotation.y, B->rotation.z);
+
 			partIndex++;													//Increment partIndex
 		}
 	}
@@ -262,28 +266,28 @@ void Pong::destroyMesh()
 		delete playerPolyCount;
 	}
 	
-	if (Enemy != nullptr)
-	{
-		size_t nEnemyParts = Enemy->Parts.size();
-		for (unsigned int i = 0; i < nEnemyParts; i++)
-		{
-			delete enemyMesh[i];
-		}
-		delete[] enemyMesh;
-		delete enemyPolyCount;
-
-		if (Enemy->skeleton != nullptr)
-		{
-			int nSkeletonMesh = Enemy->skeleton->getNMesh();
-
-			for (int i = 0; i < nSkeletonMesh; i++)
-			{
-				delete skeletonMesh[i];
-			}
-			delete[] skeletonMesh;
-			delete skeletonPolyCount;
-		}
-	}
+	//if (Enemy != nullptr)
+	//{
+	//	size_t nEnemyParts = Enemy->Parts.size();
+	//	for (unsigned int i = 0; i < nEnemyParts; i++)
+	//	{
+	//		delete enemyMesh[i];
+	//	}
+	//	delete[] enemyMesh;
+	//	delete enemyPolyCount;
+	//
+	//	if (Enemy->skeleton != nullptr)
+	//	{
+	//		int nSkeletonMesh = Enemy->skeleton->getNMesh();
+	//
+	//		for (int i = 0; i < nSkeletonMesh; i++)
+	//		{
+	//			delete skeletonMesh[i];
+	//		}
+	//		delete[] skeletonMesh;
+	//		delete skeletonPolyCount;
+	//	}
+	//}
 
 	delete enemiesPartCount;
 	size_t nEnemies = Enemies.size();
@@ -728,13 +732,13 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 	{
-		vect3 sc = Entities[i]->getScale();
-		vect3 mv = Entities[i]->getPosition();
-		vect3 rt = Entities[i]->getRotation();
+		//vect3 sc = Entities[i]->getScale();
+		//vect3 mv = Entities[i]->getPosition();
+		//vect3 rt = Entities[i]->getRotation();
 		for (unsigned int j = 0; j < polyCount[i]; j++)
 		{
 			triangle3dV tempWall = triangleMesh[i][j];
-			Eye->object2worldT(sc, mv, rt, tempWall);
+			//Eye->object2worldT(sc, mv, rt, tempWall);
 
 			if (objectApproachingWall(oldPos, displacement, tempWall))
 			{
@@ -867,7 +871,6 @@ void Pong::renderMesh(const transform3d& eyePosition, const vect3& sc, const vec
 	{
 		triangle3dV worldT = mesh[i];
 		Eye->object2worldT(sc, mv, rt, worldT);
-
 		
 		if (Eye->polyFacingCamera(worldT))
 		{
@@ -875,18 +878,30 @@ void Pong::renderMesh(const transform3d& eyePosition, const vect3& sc, const vec
 
 			triangle3dV viewT = worldT;
 
-			Eye->world2view(eyePosition, viewT);
+			int textureID = mesh[i].texture;
 
-			Eye->illuminatePoly(*Sun, &viewT, worldT, Controls->visualStyle);
+			Eye->renderPolygon(viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+		}
+		polyCounter++;
+	}
+}
 
-			int nVert = Eye->clipToFrustum(viewT, vertexList, uvList);
+
+void Pong::renderMesh(const transform3d& eyePosition, const int& nPoly, triangle3dV* mesh)
+{
+	for (int i = 0; i < nPoly; i++)
+	{
+		triangle3dV worldT = mesh[i];
+
+		if (Eye->polyFacingCamera(worldT))
+		{
+			Uint32 colour = mesh[i].colour;
+
+			triangle3dV viewT = worldT;
 
 			int textureID = mesh[i].texture;
 
-			Eye->currentTexture = textureData[textureID];
-
-			Eye->projectPoly(nVert, vertexList, uvList, colour, Screen->pixelBuffer, Screen->depthBuffer, 0, nullptr,
-				hRatio, vRatio, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination, viewT);
+			Eye->renderPolygon(viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 		}
 		polyCounter++;
 	}
@@ -901,15 +916,8 @@ void Pong::renderAll()
 
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
-	{
 		if (Entities[i]->isVisible())
-		{
-			vect3 sc = Entities[i]->getScale();
-			vect3 mv = Entities[i]->getPosition();
-			vect3 rt = Entities[i]->getRotation();
-			renderMesh(eyePosition, sc, mv, rt, polyCount[i], triangleMesh[i]);
-		}			
-	}
+			renderMesh(eyePosition, polyCount[i], triangleMesh[i]);		
 
 	if (Hero != nullptr)
 	{
@@ -1035,7 +1043,7 @@ void Pong::updateAll()
 
 	if (!Controls->isPaused)
 	{
-		this->updateEntities();
+		//this->updateEntities();
 		this->updateBalls();
 
 		if (Controls->playerControlled)
@@ -1108,7 +1116,7 @@ void Pong::updateAll()
 	this->renderAll();
 
 	if (Controls->showHelp)
-		ControlsText->print(Screen);
+		TextScreens["Controls Text"]->print(Screen);
 
 
 	this->displayStats(Controls->showCrosshair, Controls->showFPS, Controls->showPosition, Controls->showPolyN, Controls->showAmmo, Screen);

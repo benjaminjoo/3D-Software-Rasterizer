@@ -15,7 +15,6 @@
 #include "SolidCylinder.h"
 #include "SolidCone.h"
 #include "SolidSphere.h"
-#include "SolidRevolved.h"
 #include "Room.h"
 #include "SolidSTL.h"
 #include "SolidModel.h"
@@ -77,9 +76,11 @@ void editor()
 
 void pong3d()
 {
-	auto Screen		= std::make_shared<Canvas>("Pong 3D", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+	auto Screen		= std::make_shared<Canvas>("3D Shooter", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
 	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+
+	Eye->linkToCanvas(Screen);
 
 	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
 
@@ -99,24 +100,51 @@ void pong3d()
 	
 	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Observer);
 
-	//Load textures
-	Game->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/wolf002.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/mosaic001.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/brick001.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/concrete001.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/timber.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/metal.jpg"));
-
+//#define _STL_READER_
 //#define _PLANETS_
 #define _SHOOTER_
-#define _PARTICLES_
+//#define _PARTICLES_
+//#define _QUAKE_1_READER_
+//#define _QUAKE_3_READER_
+//#define	_BEZIER_PATCH_
+
+#ifdef _QUAKE_1_READER_
+
+	auto quake1Map = std::make_shared<BSP1Loader>("Assets/QuakeMaps/dm6.bsp", 0.01f, 0.01f, 0.01f);
+	quake1Map->readData();
+	Game->addEntity(quake1Map);
+
+	int nTxt = quake1Map->getTotalText();
+	txt* quakeTextures = new txt[nTxt];
+	for (int i = 0; i < nTxt; i++)
+		Eye->addTexture(quake1Map->getTextureData(i));
+
+#endif//_QUAKE_1_READER_
+
+	//Load textures
+	Eye->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/wolf002.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/mosaic001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/brick001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/concrete001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/timber.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/metal.jpg"));
+
+#ifdef _STL_READER_
+
+	auto navalGun = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/naval_gun.stl");
+	navalGun->readSTLfile();
+	//test_body.smoothSurfaces();
+	Game->addEntity(navalGun);
+
+#endif//_STL_READER_
 
 #ifdef _PLANETS_
 
-	Game->addTexture(IMG_Load("Assets/Textures/earth_large.jpg"));
-	Game->addTexture(IMG_Load("Assets/Textures/mars_large.jpg"));
+	//Load planet textures
+	Eye->addTexture(IMG_Load("Assets/Textures/earth_large.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/mars_large.jpg"));
 
 	auto Earth = std::make_shared<SolidSphere>(	1.0f, 1.0f, 1.0f,
 												0.0f, 0.5f, 0.0f,
@@ -139,6 +167,38 @@ void pong3d()
 	Game->addBall(Mars);
 
 #endif//_PLANETS_
+
+#ifdef _QUAKE_3_READER_
+
+	auto quake3Map = std::make_shared<BSP3Loader>("Assets/QuakeMaps/13ground.bsp", 0.01f, 0.01f, 0.01f);
+	quake3Map->readData();
+	Game->addEntity(quake3Map);
+
+#endif//_QUAKE_3_READER_
+
+#ifdef _BEZIER_PATCH_
+
+	auto patch = std::make_shared<BezierPatch>(32, 6, getColour(0, 127, 127, 255));
+
+	patch->setPosition({ -20.0f, -10.0f, 0.0f, 0.0f });
+
+	patch->setControlPoint(0, { 0.0f, -0.5f, 0.0f, 1.0f });
+	patch->setControlPoint(1, { 2.0f, 0.0f, 1.5f, 1.0f });
+	patch->setControlPoint(2, { 8.0f, 0.5f, 3.0f, 1.0f });
+
+	patch->setControlPoint(3, { 0.0f, 2.0f, 0.0f, 1.0f });
+	patch->setControlPoint(4, { 2.0f, 2.0f, 2.5f, 1.0f });
+	patch->setControlPoint(5, { 8.0f, 2.0f, 1.0f, 1.0f });
+
+	patch->setControlPoint(6, { 0.0f, 4.5f, 0.0f, 1.0f });
+	patch->setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
+	patch->setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
+
+	Game->addEntity(patch);
+
+	Game->loadProjectile(200);
+
+#endif//_BEZIER_PATCH_
 
 #ifdef _SHOOTER_
 
@@ -240,6 +300,9 @@ void pong3d()
 
 #endif//_PARTICLES_
 
+	//Add text screens
+	Game->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
+
 	//Build geometry
 	Game->buildMesh();
 
@@ -264,11 +327,7 @@ void pong3d()
 void software_renderer(bool exportFile, const std::string& fileName)
 {
 
-//#define _CUBE_
-//#define _BEZIER_PATCH_;
-#define _QUAKE_1_READER_
-//#define _QUAKE_3_READER_
-//#define _STL_READER_
+#define _BEZIER_PATCH_
 
 	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
 
@@ -283,45 +342,10 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 	auto Sun = std::make_shared<LightSource>(300.0, 45.0, 0.95);
 
-#ifdef _CUBE_
-
-	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
-	SolidCube cube_01;
-	cube_01.setTexture(2);
-	Solids->addSolid(&cube_01);
-
-#endif //_CUBE_
-
 
 #ifdef _BEZIER_PATCH_
 
 	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
-
-	Room room_01(-5.0, -5.0, -5.0, 10.0, 10.0, 10.0);
-	SolidBody* room_ptr_1 = &room_01;
-	room_01.setTexture(2, 3, 1, 1, 1, 1);
-	room_01.calculateMesh();
-	Solids->addSolid(room_ptr_1);
-
-
-	BezierPatch patch01(32, 3, getColour(0, 255, 127, 0));
-
-	patch01.setPosition({ 0.0f, 4.0f, 0.0f, 1.0f });
-
-	patch01.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
-	patch01.setControlPoint(1, { 2.0f, 0.0f, 2.0f, 1.0f });
-	patch01.setControlPoint(2, { 8.0f, 0.0f, 0.0f, 1.0f });
-
-	patch01.setControlPoint(3, { 0.0f, 0.0f, 2.0f, 1.0f });
-	patch01.setControlPoint(4, { 2.0f, 0.0f, 3.0f, 1.0f });
-	patch01.setControlPoint(5, { 8.0f, 0.0f, 2.0f, 1.0f });
-
-	patch01.setControlPoint(6, { 0.0f, 0.0f, 4.0f, 1.0f });
-	patch01.setControlPoint(7, { 2.0f, 0.0f, 4.0f, 1.0f });
-	patch01.setControlPoint(8, { 8.0f, 0.0f, 4.0f, 1.0f });
-
-	Solids->addSolid(&patch01);
-
 
 	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));
 
@@ -341,130 +365,7 @@ void software_renderer(bool exportFile, const std::string& fileName)
 
 	Solids->addSolid(&patch02);
 
-
-	BezierPatch patch03(32, 3, getColour(0, 127, 127, 255));;
-
-	patch03.setPosition({ 20.0f, 20.0f, 0.0f, 1.0f });
-
-	patch03.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
-	patch03.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
-	patch03.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
-
-	patch03.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
-	patch03.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
-	patch03.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
-
-	patch03.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
-	patch03.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
-	patch03.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
-
-	Solids->addSolid(&patch03);
-
-
-	BezierPatch patch04(32, 4, getColour(0, 127, 127, 255));;
-
-	patch04.setPosition({ 24.0f, 20.0f, 0.0f, 1.0f });
-
-	patch04.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
-	patch04.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
-	patch04.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
-
-	patch04.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
-	patch04.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
-	patch04.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
-
-	patch04.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
-	patch04.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
-	patch04.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
-
-	Solids->addSolid(&patch04);
-
-
-	BezierPatch patch05(32, 5, getColour(0, 127, 127, 255));;
-
-	patch05.setPosition({ 20.0f, 24.0f, 0.0f, 1.0f });
-
-	patch05.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
-	patch05.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
-	patch05.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
-
-	patch05.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
-	patch05.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
-	patch05.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
-
-	patch05.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
-	patch05.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
-	patch05.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
-
-	Solids->addSolid(&patch05);
-
-
-	BezierPatch patch06(32, 6, getColour(0, 127, 127, 255));;
-
-	patch06.setPosition({ 24.0f, 24.0f, 0.0f, 1.0f });
-
-	patch06.setControlPoint(0, { 0.0f, 0.0f, 0.0f, 1.0f });
-	patch06.setControlPoint(1, { 2.0f, 0.0f, 0.5f, 1.0f });
-	patch06.setControlPoint(2, { 4.0f, 0.0f, 0.0f, 1.0f });
-
-	patch06.setControlPoint(3, { 0.0f, 2.0f, 0.5f, 1.0f });
-	patch06.setControlPoint(4, { 2.0f, 2.0f, 2.0f, 1.0f });
-	patch06.setControlPoint(5, { 4.0f, 2.0f, 0.5f, 1.0f });
-
-	patch06.setControlPoint(6, { 0.0f, 4.0f, 0.0f, 1.0f });
-	patch06.setControlPoint(7, { 2.0f, 4.0f, 0.5f, 1.0f });
-	patch06.setControlPoint(8, { 4.0f, 4.0f, 0.0f, 1.0f });
-
-	Solids->addSolid(&patch06);
-
 #endif //_BEZIER_PATCH_
-
-
-#ifdef _QUAKE_1_READER_
-
-	BSP1Loader quakeMap("Assets/QuakeMaps/dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
-	quakeMap.readData();
-	SolidBody* map = &quakeMap;
-	Solids->addSolid(map);
-	int nTxt = quakeMap.getTotalText();
-	txt* quakeTextures = new txt[nTxt];
-	for (int i = 0; i < nTxt; i++)
-	{
-		quakeTextures[i] = quakeMap.getTextureData(i);
-	}
-	Solids->textureLoaderQ(nTxt, quakeTextures);
-
-#endif //_QUAKE_1_READER_
-
-
-#ifdef _QUAKE_3_READER_
-
-	BSP3Loader quakeMap("Assets/QuakeMaps/13ground.bsp", { 0.01, 0.01, 0.01, 1.0 });
-
-	quakeMap.readData();
-	SolidBody* map = &quakeMap;
-	Solids->addSolid(map);
-
-#endif //_QUAKE_3_READER_
-
-
-#ifdef _STL_READER_
-
-	SolidSTL test_body(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/naval_gun.stl");
-	test_body.readSTLfile();
-	test_body.smoothSurfaces();
-	Solids->addSolid(&test_body);
-
-#endif //_STL_READER_
-
-	SolidModel test_model(10.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 127, 127, 255), 0);
-	
-	if (exportFile)
-	{
-		test_model.readModelFile(fileName);
-		Solids->addSolid(&test_model);
-	}
-
 
 	SDL_Surface* textures[] = { IMG_Load("Assets/Textures/blue.jpg"),			//00
 								IMG_Load("Assets/Textures/wolf001.jpg"),		//01

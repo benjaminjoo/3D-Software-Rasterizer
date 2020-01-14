@@ -201,6 +201,7 @@
     <ClCompile Include="PelvisBone.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pong.cpp" />
+    <ClCompile Include="Projection.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
@@ -215,7 +216,6 @@
     <ClCompile Include="SolidFrustum.cpp" />
     <ClCompile Include="SolidModel.cpp" />
     <ClCompile Include="SolidPrism.cpp" />
-    <ClCompile Include="SolidRevolved.cpp" />
     <ClCompile Include="SolidSphere.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">6385</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
@@ -255,6 +255,7 @@
     <ClInclude Include="PelvisBone.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pong.h" />
+    <ClInclude Include="Projection.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />
@@ -266,7 +267,6 @@
     <ClInclude Include="SolidFrustum.h" />
     <ClInclude Include="SolidModel.h" />
     <ClInclude Include="SolidPrism.h" />
-    <ClInclude Include="SolidRevolved.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="SolidSTL.h" />
     <ClInclude Include="Speaker.h" />

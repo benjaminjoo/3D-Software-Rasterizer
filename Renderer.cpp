@@ -9,9 +9,6 @@ Renderer::Renderer(std::shared_ptr<Shapes> solids, std::shared_ptr<Shapes> actor
 {
 	std::cout << "Renderer constructor called" << std::endl;
 
-	hRatio = Eye->getHRatio();
-	vRatio = Eye->getVRatio();
-
 	solidN = Solids->getNEntities();
 	actorN = Actors->getNEntities();
 
@@ -219,86 +216,6 @@ bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
 	return collisionTakingPlace;
 }
 
-/*
-bool Renderer::checkCameraCollision(vect3* v, int* body, int* poly)
-{
-	bool collisionTakingPlace = false;
-
-	int bodyCount		= Solids->getNEntities();
-	int collidingBody	= 0;
-	int collidingPoly	= 0;
-
-	for (int i = 0; i < bodyCount; i++)												//FOR EACH SOLID BODIES
-	{
-		if (Solids->getBBState(i))													//CHECK IF CURRENT BODY HAS ACTIVE BOUNDING BOX
-		{
-			boundingBox tempBB = Solids->getBB(i);
-			if ((Eye->x >= tempBB.minExt.x) &&									//CHECK IF CAMERA IS INSIDE BOUNDING BOX
-				(Eye->y >= tempBB.minExt.y) &&
-				(Eye->z >= tempBB.minExt.z) &&
-				(Eye->x <= tempBB.maxExt.x) &&
-				(Eye->y <= tempBB.maxExt.y) &&
-				(Eye->z <= tempBB.maxExt.z))
-			{
-				int nPoly = Solids->getPolyCount(i);								//POLY COUNT OF CURRENT BODY
-				for (int p = 0; p < nPoly; p++)										//FOR EACH POLYGONS
-				{
-					triangle3dV polyChecked = solidMesh[i][p];					//TRIANGLE TO CHECK WITH
-					vect3 cameraCurr = { Eye->x, Eye->y, Eye->z, 1.0 };						//CAMERA POSITION IN THE CURRENT FRAME
-					vect3 cameraPlus1 = { Eye->x + v->x, Eye->y + v->y , Eye->z + v->z , 1.0 };//CAMERA POSITION IN THE NEXT FRAME
-					vect3 cameraPlus2 = { Eye->x + 2 * v->x, Eye->y + 2 * v->y, Eye->z + 2 * v->z, 1.0 };
-
-					double dCurr = distPoint2Plane(cameraCurr, polyChecked);
-					double dPlus1 = distPoint2Plane(cameraPlus1, polyChecked);
-					double dPlus2 = distPoint2Plane(cameraPlus2, polyChecked);
-
-					double sCurr	= dotProduct(subVectors(polyChecked.A, cameraCurr), polyChecked.N);
-					double sPlus1	= dotProduct(subVectors(polyChecked.A, cameraPlus1), polyChecked.N);
-					double sPlus2	= dotProduct(subVectors(polyChecked.A, cameraPlus2), polyChecked.N);
-
-					if (sign(sPlus1) != sign(sPlus2))
-					{
-						double t = (dotProduct(subVectors(polyChecked.A, cameraPlus1), polyChecked.N)) /
-							(dotProduct(subVectors(cameraPlus2, cameraPlus1), polyChecked.N));
-						vect3 intersection;
-
-						vect3 cameraVector = subVectors(cameraPlus2, cameraPlus1);
-
-						intersection.x = cameraPlus1.x + t * cameraVector.x;
-						intersection.y = cameraPlus1.y + t * cameraVector.y;
-						intersection.z = cameraPlus1.z + t * cameraVector.z;
-						intersection.w = 1.0;		//INTERSECTION POINT
-
-						double sA = dotProduct(subVectors(polyChecked.A, intersection),
-							subVectors(polyChecked.A, polyChecked.C));
-						double sB = dotProduct(subVectors(polyChecked.B, intersection),
-							subVectors(polyChecked.B, polyChecked.A));
-						double sC = dotProduct(subVectors(polyChecked.C, intersection),
-							subVectors(polyChecked.C, polyChecked.B));
-
-						if (sA >= 0.0f && sB >= 0.0f && sC >= 0.0f)
-						{
-							double dColl = collisionDist;
-							double sColl = (dCurr - dColl) / (dCurr - dPlus1);
-							v->x *= sColl; v->y *= sColl; v->z *= sColl;	//VELOCITY REDUCED SO CAMERA LANDS ON COLLISION ZONE BOUNDARY NEXT
-							collisionTakingPlace = true;
-							collidingBody = i;
-							collidingPoly = p;
-						}
-					}
-				}
-			}
-		}
-	}
-	if (collisionTakingPlace)
-	{
-		*body = collidingBody;
-		*poly = collidingPoly;
-	}
-	return collisionTakingPlace;
-}
-*/
-
 
 void Renderer::updateCameraPosition()
 {
@@ -333,7 +250,6 @@ void Renderer::updateCameraPosition(double turnH, double turnV, double tiltP, do
 		int polyNo = 0;
 		if (this->checkCameraCollision(velocity, &bodyNo, &polyNo))
 		{
-			//printf("Colliding with body: %d poly: %d at %.2f", bodyNo, polyNo, dist);
 			vect3 collisionNormal = solidMesh[bodyNo][polyNo].N;
 			double vMagnitude = dotProduct(collisionNormal, velocity);
 			if (vMagnitude < 0.0f)
@@ -369,11 +285,10 @@ void Renderer::updateShadowVolumes(model E)
 
 	transform3d T = Eye->getTransformation();
 	sunInView = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, sunVector)));
-	//sunInView = sunVector;
 
 	if (vShadows != nullptr)
 	{
-		delete[] vShadows;	//printf("-\n");
+		delete[] vShadows;
 		vShadows = nullptr;
 	}
 	   
@@ -409,11 +324,10 @@ void Renderer::updateShadowVolumes(model E)
 			for (int i = 0; i < polyCount[j]; i++)
 			{
 				triangle3dV tempPoly = Eye->world2viewT(T, shadowMesh[j][i]);
-				//triangle3dV tempPoly = shadowMesh[j][i];
 				if (Entities->assertShadowCasting(j) && this->polyFacingLightsource(sunInView, tempPoly))
 					nShadows++;
 			}
-	vShadows = new ShadowVolume[nShadows];	//printf("+\n");
+	vShadows = new ShadowVolume[nShadows];
 	int shCount = 0;
 	for (int j = 0; j < bodyCount; j++)
 	{
@@ -422,7 +336,6 @@ void Renderer::updateShadowVolumes(model E)
 			for (int i = 0; i < polyCount[j]; i++)
 			{
 				triangle3dV tempPoly = Eye->world2viewT(T, shadowMesh[j][i]);
-				//triangle3dV tempPoly = shadowMesh[j][i];
 				if (Entities->assertShadowCasting(j) && this->polyFacingLightsource(sunInView, tempPoly))
 				{
 					if (shCount < nShadows)
@@ -444,16 +357,12 @@ void Renderer::updateShadowVolumes(model E)
 						tempPlane.P = tempPoly.A;
 						tempPlane.N = tempPoly.N;
 						vShadows[shCount].setPlaneC(tempPlane);
-						//printf("Shadow volume no. %d calculated\n", shCount);
 						shCount++;
 					}
 				}
 			}
 		}
 	}
-
-	//printf("%d\t\t%.2f\t%.2f\t%.2f\n", nShadows, sunVector.x, sunVector.y, sunVector.z);
-
 }
 
 
@@ -559,8 +468,6 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 		std::shared_ptr<int[]> polyCount(new int[Entities->getNEntities()]);
 		Entities->getPolyCountEntities(polyCount);
 
-		transform3d eyePosition = Eye->getTransformation();
-
 		for (unsigned int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			int totalPoly = polyCount[i];
@@ -569,8 +476,8 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 				if (Eye->polyFacingCamera(triangleMesh[i][k]))		//Backface culling is performed here
 				{
 					Uint32 colour = triangleMesh[i][k].colour;
-
-					triangle3dV viewT = Eye->world2viewT(eyePosition, triangleMesh[i][k]);					
+	
+					triangle3dV viewT = Eye->world2viewT(triangleMesh[i][k]);
 
 					Eye->illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
 
@@ -578,10 +485,9 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 
 					int textureID = triangleMesh[i][k].texture;
 
-					Eye->currentTexture = Entities->getTextureData(textureID);
+					Eye->currentTexture = &Entities->getTextureData(textureID);
 
-					Eye->projectPoly(nVert, Entities->vertexList, Entities->uvList, colour, pixelBuffer, depthBuffer, nShadows, vShadows,
-						hRatio, vRatio, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination, viewT);
+					Eye->projectPoly(nVert, colour, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination, viewT);
 
 					this->incrementPolyCounter();
 				}

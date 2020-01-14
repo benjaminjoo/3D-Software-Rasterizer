@@ -6,10 +6,10 @@
 
 
 
-BSP3Loader::BSP3Loader(std::string f)
+BSP3Loader::BSP3Loader(std::string f, double sx, double sy, double sz)
 {
 	fileName	= f;
-	scale		= { 1.0, 1.0, 1.0, 1.0 };
+	scale		= { sx, sy, sz, 1.0f };
 	patchLod	= 12;
 }
 

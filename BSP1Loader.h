@@ -29,7 +29,7 @@ class BSP1Loader : public SolidBody
 	Uint32*						palette;
 
 public:
-	BSP1Loader(std::string);
+	BSP1Loader(std::string, double, double, double);
 	BSP1Loader(std::string, vect3);
 	~BSP1Loader();
 

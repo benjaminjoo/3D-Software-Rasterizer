@@ -2,6 +2,7 @@
 
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 
 
@@ -31,12 +32,12 @@ private:
 	std::shared_ptr<Player>						Enemy			= nullptr;
 	std::shared_ptr<ParticleSystem>				Emitter			= nullptr;
 
-	std::vector<txt>							textureData;
-
 	std::vector<std::shared_ptr<SolidBody>>		Entities;
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
 	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
+
+	std::unordered_map<std::string, std::shared_ptr<Text>>			TextScreens;
 
 	std::shared_ptr<SolidBody>					Bar;
 
@@ -102,6 +103,7 @@ private:
 	void explodeMesh(double, vect3, int, triangle3dV*);
 	void explodeDebris(double, vect3, int, triangle3dV*);
 	void renderMesh(const transform3d&, const vect3&, const vect3&, const vect3&, const int&, triangle3dV*);
+	void renderMesh(const transform3d&, const int&, triangle3dV*);
 	void renderAll();
 
 	void updateFrameCounter();
@@ -117,10 +119,10 @@ public:
 		std::shared_ptr<LightSource>, std::shared_ptr<Player>, std::shared_ptr<Player>);
 	~Pong();
 
-	void addTexture(SDL_Surface*);
 	void addEntity(std::shared_ptr<SolidBody>);
 	void addBall(std::shared_ptr<SolidBody>);
 	void addEnemy(std::shared_ptr<Player>);
+	void addTextScreen(std::string, std::shared_ptr<Text>);
 	void addEmitter(std::shared_ptr<ParticleSystem>);
 	void loadProjectile(unsigned int);
 	void buildMesh();

@@ -37,9 +37,6 @@ class Renderer
 	int				nShadows;
 	ShadowVolume*	vShadows;
 
-	double			hRatio;
-	double			vRatio;
-
 	clock_t			oldTime			= 0;
 	clock_t			newTime			= 0;
 	clock_t			frameTime		= 0;

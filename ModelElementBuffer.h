@@ -6,7 +6,6 @@
 #include "SolidCylinder.h"
 #include "SolidCone.h"
 #include "SolidSphere.h"
-#include "SolidRevolved.h"
 #include "Room.h"
 #include "SolidSTL.h"
 #include <iostream>

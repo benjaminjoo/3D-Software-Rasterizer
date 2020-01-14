@@ -280,9 +280,6 @@ void EventHandler::HandleUserEvents()
 			case SDLK_PERIOD:
 				visualStyle = torchlight_solid;
 				break;
-			case SDLK_SLASH:
-				visualStyle = test;
-				break;
 			case SDLK_g:
 				gravityOn = gravityOn ? false : true;
 				break;

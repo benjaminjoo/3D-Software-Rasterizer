@@ -79,7 +79,7 @@ void SolidSTL::getTriangleData_(triangle3dV* P)
 		P[i] = polyContainer[i];
 	}
 
-	transformMesh(polyContainer.size(), P, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
+	//transformMesh(polyContainer.size(), P, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
 }
 
 
