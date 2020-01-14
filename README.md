@@ -15,38 +15,38 @@ Features:
 
 Controls:
 
-*                Move Forward : W or UP ARROW              *
-*              Move Backwards : S or DOWN ARROW            *
-*                   Step Left : A                          *
-*                  Step Right : D                          *
-*                   Turn Left : LEFT ARROW                 *
-*                  Turn Right : RIGHT ARROW                *
-*         Roll Anti-Clockwise : 1                          *
-*              Roll Clockwise : 4                          *
-*                     Look Up : PAGE UP                    *
-*                   Look Down : PAGE DOWN                  *
-*                 Centre Look : HOME                       *
-*                     Move Up : Q                          *
-*                   Move Down : E                          *
-*                      Strafe : ALT                        *
-*                         Run : SHIFT                      *
-*              Run 2x as Fast : SHIFT + SPACE              *
-*              Wireframe View : Z                          *
-*               Solid Colours : X                          *
-*                Checkedboard : C                          *
-*                 Flat Shaded : V                          *
-*              Gouraud Shaded : B                          *
-*         Z-Buffer Visualised : N                          *
-*        Materials (Sunlight) : M                          *
-*      Materials (Torchlight) : COMMA                      *
-*  Solid Colours (Torchlight) : FULL STOP                  *
-*                  Show Stats : TAB                        *
-*          Torch Intensity Up : KEYPAD PLUS                *
-*        Torch Intensity Down : KEYPAD MINUS               *
-*           Toggle Mouse Look : KEYPAD 5                   *
-*              Toggle AI Goal : KEYPAD 0                   *
-* Toggle Player Controls / AI : END                        *
-*              Toggle Gravity : G                          *
-*                       Pause : BACKSPACE                  *
-*                        Help : H                          *
-*                        Quit : ESCAPE                     *
+                 Move Forward : W or UP ARROW              
+               Move Backwards : S or DOWN ARROW            
+                    Step Left : A                          
+                   Step Right : D                          
+                    Turn Left : LEFT ARROW                 
+                   Turn Right : RIGHT ARROW                
+          Roll Anti-Clockwise : 1                          
+               Roll Clockwise : 4                          
+                      Look Up : PAGE UP                    
+                    Look Down : PAGE DOWN                  
+                  Centre Look : HOME                       
+                      Move Up : Q                          
+                    Move Down : E                          
+                       Strafe : ALT                        
+                          Run : SHIFT                      
+               Run 2x as Fast : SHIFT + SPACE              
+               Wireframe View : Z                          
+                Solid Colours : X                          
+                 Checkedboard : C                          
+                  Flat Shaded : V                          
+               Gouraud Shaded : B                          
+          Z-Buffer Visualised : N                          
+         Materials (Sunlight) : M                          
+       Materials (Torchlight) : COMMA                      
+   Solid Colours (Torchlight) : FULL STOP                  
+                   Show Stats : TAB                        
+           Torch Intensity Up : KEYPAD PLUS                
+         Torch Intensity Down : KEYPAD MINUS               
+            Toggle Mouse Look : KEYPAD 5                   
+               Toggle AI Goal : KEYPAD 0                   
+  Toggle Player Controls / AI : END                        
+               Toggle Gravity : G                          
+                        Pause : BACKSPACE                  
+                         Help : H                          
+                         Quit : ESCAPE                     
