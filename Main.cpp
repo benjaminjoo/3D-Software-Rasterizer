@@ -100,6 +100,9 @@ void pong3d()
 	
 	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Observer);
 
+	//Fill up bullet pool
+	Game->loadProjectile(200);
+
 //#define _STL_READER_
 //#define _PLANETS_
 #define _SHOOTER_
@@ -151,20 +154,20 @@ void pong3d()
 												0.0f, 0.0f, 0.0f,
 												0xffffff00, 8, 6.0f, 24);
 
-	Earth->setMotion(true);
-	Earth->setAngularVelocity({ 0.0f, 0.0f, -0.001f, 1.0f });
+	//Earth->setMotion(true);
+	//Earth->setAngularVelocity({ 0.0f, 0.0f, -0.001f, 1.0f });
 
-	Game->addBall(Earth);
+	Game->addEntity(Earth);
 
 	auto Mars = std::make_shared<SolidSphere>(	1.0f, 1.0f, 1.0f,
 												15.0f, 12.5f, 5.0f,
 												0.0f, 0.0f, 0.0f,
 												0xffffff00, 9, 3.0f, 24);
 
-	Mars->setMotion(true);
-	Mars->setAngularVelocity({ 0.0f, 0.0f, -0.0005f, 1.0f });
+	//Mars->setMotion(true);
+	//Mars->setAngularVelocity({ 0.0f, 0.0f, -0.0005f, 1.0f });
 
-	Game->addBall(Mars);
+	Game->addEntity(Mars);
 
 #endif//_PLANETS_
 
@@ -195,8 +198,6 @@ void pong3d()
 	patch->setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
 
 	Game->addEntity(patch);
-
-	Game->loadProjectile(200);
 
 #endif//_BEZIER_PATCH_
 
@@ -237,9 +238,6 @@ void pong3d()
 	
 		Game->addBall(ball);
 	}
-
-	//Fill up bullet pool
-	Game->loadProjectile(200);
 
 	//Create enemies
 	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
@@ -324,113 +322,6 @@ void pong3d()
 
 
 
-void software_renderer(bool exportFile, const std::string& fileName)
-{
-
-#define _BEZIER_PATCH_
-
-	auto Screen = std::make_shared<Canvas>("Software Renderer", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9);
-
-	auto Solids = std::make_shared<Shapes>();
-
-	auto Actors = std::make_shared<Shapes>();
-
-	auto Eye	= std::make_shared<Camera>(0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, PI * 0.5, 0.01, 999.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-
-	auto Controls = std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
-	Controls->torchIntensity = 10.0;
-
-	auto Sun = std::make_shared<LightSource>(300.0, 45.0, 0.95);
-
-
-#ifdef _BEZIER_PATCH_
-
-	LightSource lights[] = { LightSource(300.0, 60.0, 1.00) };
-
-	BezierPatch patch02(32, 6, getColour(0, 127, 127, 255));
-
-	patch02.setPosition({ -20.0f, -10.0f, 0.0f, 0.0f });
-
-	patch02.setControlPoint(0, { 0.0f, -0.5f, 0.0f, 1.0f });
-	patch02.setControlPoint(1, { 2.0f, 0.0f, 1.5f, 1.0f });
-	patch02.setControlPoint(2, { 8.0f, 0.5f, 3.0f, 1.0f });
-
-	patch02.setControlPoint(3, { 0.0f, 2.0f, 0.0f, 1.0f });
-	patch02.setControlPoint(4, { 2.0f, 2.0f, 2.5f, 1.0f });
-	patch02.setControlPoint(5, { 8.0f, 2.0f, 1.0f, 1.0f });
-
-	patch02.setControlPoint(6, { 0.0f, 4.5f, 0.0f, 1.0f });
-	patch02.setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
-	patch02.setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
-
-	Solids->addSolid(&patch02);
-
-#endif //_BEZIER_PATCH_
-
-	SDL_Surface* textures[] = { IMG_Load("Assets/Textures/blue.jpg"),			//00
-								IMG_Load("Assets/Textures/wolf001.jpg"),		//01
-								IMG_Load("Assets/Textures/wolf002.jpg"),		//02
-								IMG_Load("Assets/Textures/mosaic001.jpg"),		//03
-								IMG_Load("Assets/Textures/brick001.jpg"),		//04
-								IMG_Load("Assets/Textures/concrete001.jpg"),	//05
-								IMG_Load("Assets/Textures/timber.jpg") };		//06
-
-	Solids->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
-	Actors->textureLoader(sizeof(textures) / sizeof(SDL_Surface*), textures);
-
-	auto Game = std::make_shared<Renderer>(Solids, Actors, Sun, Eye, Controls);
-
-	Game->updateShadowVolumes(solid);
-
-	Game->updateShadowVolumes(actor);
-
-	//Game->importMesh("export_test.dat");
-
-	while (!Controls->quit)
-	{
-		Game->calculateFrametime();
-
-		Controls->HandleUserEvents();
-
-		Screen->resetPixelBuffer();
-
-		Screen->resetDepthBuffer();
-
-		Game->updateCameraPosition();
-
-		Controls->ceaseMotion();
-		
-		Game->renderEntities(solid, Screen->pixelBuffer, Screen->depthBuffer);
-
-		if (!Controls->isPaused) { Game->updateEntities(actor); }
-
-		Game->renderEntities(actor, Screen->pixelBuffer, Screen->depthBuffer);
-
-		Game->displayStats(Controls->showCrosshair, Controls->showFPS, Controls->showPosition, Controls->showPolyN, Screen);
-
-		Game->resetPolyCounter();
-
-		Screen->update();
-
-		Game->updateFrameCounter();
-	}
-
-	char saveModel;
-	std::cout << "Do you want to save model? (Y/N)" << std::flush;
-	std::cin >> saveModel;
-	if(saveModel == 'y' || saveModel == 'Y')
-		Game->exportMesh("export_test.dat");
-
-	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++){ SDL_FreeSurface(textures[i]); }
-
-	Screen->cleanUp();
-	
-	IMG_Quit();
-	
-	SDL_Quit();
-}
-
-
 void opengl_renderer()
 {
 	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
@@ -490,35 +381,12 @@ void opengl_renderer()
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to use the Software Renderer <S> the OpenGL Renderer <O> or the Editor <E> or play Pong <P> ?" << std::endl;
+	std::cout << "Do you want to play the Game <P> or use the Editor <E>?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
-	std::string importFileName = "";
-	if (argc == 2)
-	{
-		importFileName += argv[1];
-	}
-
 	switch (userInput)
 	{
-	case 's':
-	case 'S':
-		{
-			if (argc == 2)
-			{
-				software_renderer(true, argv[1]);
-			}
-			else
-			{
-				software_renderer(false, "");
-			}			
-		}		
-		break;
-	case 'o':
-	case 'O':
-		opengl_renderer();
-		break;
 	case 'e':
 	case 'E':
 		editor();

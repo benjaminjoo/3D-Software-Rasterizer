@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Projection.h"
 #include "Shapes.h"
 #include "LightSource.h"
 #include "ShadowVolume.h"
@@ -58,10 +59,10 @@ public:
 	bool checkCameraCollision(vect3*, int*, int*);
 
 	bool polyFacingLightsource(vect3, triangle3dV);
-	void updateShadowVolumes(model);
+	//void updateShadowVolumes(model);
 	void updateBoundingBoxes(model, double);
 	void updateEntities(model);
-	void renderPoints(int, point3*, Uint32*, double*);
+	//void renderPoints(int, point3*, Uint32*, double*);
 	void renderEntities(model, Uint32*, double*);
 	void displayStats(bool, bool, bool, bool, std::shared_ptr<Canvas>);
 

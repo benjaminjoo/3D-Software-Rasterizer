@@ -161,9 +161,10 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 		{
 			vect3 origin	= this->getPosition();
 			vect3 rotation	= { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };			
-			vect3 velocity	= scaleVector(muzzleVelocity, rotation);
+			//vect3 velocity	= scaleVector(muzzleVelocity, rotation);
+			vect3 velocity = rotation * muzzleVelocity;
 
-			rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
+			Projection::rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
 
 			Projectiles[i]->setFired(true);
 			Projectiles[i]->setPosition(origin);

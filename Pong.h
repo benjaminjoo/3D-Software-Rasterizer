@@ -102,8 +102,8 @@ private:
 
 	void explodeMesh(double, vect3, int, triangle3dV*);
 	void explodeDebris(double, vect3, int, triangle3dV*);
-	void renderMesh(const transform3d&, const vect3&, const vect3&, const vect3&, const int&, triangle3dV*);
-	void renderMesh(const transform3d&, const int&, triangle3dV*);
+	void renderMesh(transform3d T, const vect3&, const vect3&, const vect3&, const int&, triangle3dV*);
+	void renderMesh(transform3d T, const int&, triangle3dV*);
 	void renderAll();
 
 	void updateFrameCounter();

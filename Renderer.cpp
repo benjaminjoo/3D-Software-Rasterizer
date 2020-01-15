@@ -273,7 +273,7 @@ bool Renderer::polyFacingLightsource(vect3 v, triangle3dV P)
 	return (dotProduct(P.N, v) < 0) ? true : false;
 }
 
-
+/*
 void Renderer::updateShadowVolumes(model E)
 {
 	int bodyCount = 0;
@@ -364,7 +364,7 @@ void Renderer::updateShadowVolumes(model E)
 		}
 	}
 }
-
+*/
 
 void Renderer::updateBoundingBoxes(model E, double padding)
 {
@@ -427,13 +427,13 @@ void Renderer::updateEntities(model E)
 		{
 			vect3 velocity = Entities->getVelocity(i);
 			vect3 angVelocity = Entities->getAngularVelocity(i);
-			transformMesh(polyCount[i], triangleMesh[i], 1.0, 1.0, 1.0, velocity.x, velocity.y, velocity.z,
+			Projection::transformMesh(polyCount[i], triangleMesh[i], 1.0, 1.0, 1.0, velocity.x, velocity.y, velocity.z,
 				angVelocity.x, angVelocity.y, angVelocity.z);
 		}
 	}
 }
 
-
+/*
 void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer, double* depthBuffer)
 {
 	transform3d eyePosition = Eye->getTransformation();
@@ -443,7 +443,7 @@ void Renderer::renderPoints(int nPoints, point3 * Points, Uint32 * pixelBuffer, 
 		if (Eye->insideFrustum(viewP)) { Eye->projectPoint(viewP, pixelBuffer, depthBuffer); }
 	}
 }
-
+*/
 
 void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer)
 {
@@ -468,6 +468,8 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 		std::shared_ptr<int[]> polyCount(new int[Entities->getNEntities()]);
 		Entities->getPolyCountEntities(polyCount);
 
+		transform3d T = Eye->getTransformation();
+
 		for (unsigned int i = 0; i < Entities->getNEntities(); i++)				//For every entity
 		{
 			int totalPoly = polyCount[i];
@@ -477,9 +479,12 @@ void Renderer::renderEntities(model E, Uint32 * pixelBuffer, double* depthBuffer
 				{
 					Uint32 colour = triangleMesh[i][k].colour;
 	
-					triangle3dV viewT = Eye->world2viewT(triangleMesh[i][k]);
+					//triangle3dV viewT = Eye->world2viewT(triangleMesh[i][k]);
+					triangle3dV viewT = triangleMesh[i][k];
+					
+					Projection::world2view(viewT, T, Eye->x, Eye->y, Eye->z);
 
-					Eye->illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
+					Projection::illuminatePoly(*Sun, &viewT, triangleMesh[i][k], Controls->visualStyle);
 
 					int nVert = Eye->clipToFrustum(viewT, Entities->vertexList, Entities->uvList);
 

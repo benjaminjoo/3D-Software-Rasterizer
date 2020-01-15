@@ -537,9 +537,6 @@ struct transform3d
 	double cosRol = 0.0f;
 };
 
-
-void clampValue(double* value, double lower, double upper);
-
 double distancePN(polyNode a, polyNode b);
 
 polyNode subNodes(polyNode a, polyNode b);
@@ -600,65 +597,11 @@ coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
 
 Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
 
-vect3 multiplyMxV(const mat4x4& m, const vect3& v);						//Multiplies 4x4 matrix and 1*4 column vector
-
-vect3 multiplyVxM(const mat4x4& m, const vect3& v);						//Multiplies 1*4 column vector and 4x4 matrix
-
-vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around X - pre-calculated sin & cos values
-
-vect3 rotYrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around Y - pre-calculated sin & cos values
-
-vect3 rotZrad(const double& sinA, const double& cosA, const vect3& v);	//Rotation around Z - pre-calculated sin & cos values
-
-vect3 rotX(double angle, vect3 v);										//Rotation around X
-
-vect3 rotY(double angle, vect3 v);										//Rotation around Y
-
-vect3 rotZ(double angle, vect3 v);										//Rotation around Z
-
-vect3 scale(double x, double y, double z, vect3 v);						//Scaling
-
-vect3 scaleVector(double s, vect3 v);
-
-vect3 translate(double x, double y, double z, vect3 v);					//Translation
-
-triangle3dV rotXT(double angle, triangle3dV T);							//Rotation around X
-
-triangle3dV rotYT(double angle, triangle3dV T);							//Rotation around Y
-
-triangle3dV rotZT(double angle, triangle3dV T);							//Rotation around Z
-
-triangle3dV scaleT(double x, double y, double z, triangle3dV T);		//Scaling
-
-triangle3dV translateT(double x, double y, double z, triangle3dV T);	//Translation
-
-triangle3dV* transformObject(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
-						double rX, double rY, double rZ);
-
-void movePoly(vect3 m, triangle3dV& poly);
-
-void transformMesh(int n, triangle3dV* object, vect3 m);
-
-void rotateMesh(int n, triangle3dV* object, double rx, double ry, double rz);
-
-void transformMesh(int n, triangle3dV* object, double mvX, double mvY, double mvZ);
-
-void transformMesh(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
-	double rX, double rY, double rZ);
-
-
-vect3 sun2view(double sinAzm, double cosAzm, double sinAlt, double cosAlt,
-				double sinRol, double cosRol, vect3 v);					//World-space to View space transformation of lightsources
-
 bool onScreen(coord2 test, int w, int h);
 
 int sign(const double& a);
 
 int roundInt(double a);
-
-//int GetYMin3(coord2* p);
-
-//int GetYMax3(coord2* p);
 
 template <class T> T getMinN(int n, T* list);
 

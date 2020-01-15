@@ -170,9 +170,9 @@ void Editor::updateUtilities()
 	Screen->displayValue(worldPosition.z, 4, 20, 2, BLUE);
 
 	//Draw axes
-	Cam->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED, Screen->pixelBuffer);
-	Cam->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN, Screen->pixelBuffer);
-	Cam->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE, Screen->pixelBuffer);
+	Screen->drawLine(world2screen({ -1000.0, 0.0, 0.0 }), world2screen({ 1000.0, 0.0, 0.0 }), 3, RED);
+	Screen->drawLine(world2screen({ 0.0, -1000.0, 0.0 }), world2screen({ 0.0, 1000.0, 0.0 }), 3, GREEN);
+	Screen->drawLine(world2screen({ 0.0, 0.0, -1000.0 }), world2screen({ 0.0, 0.0, 1000.0 }), 3, BLUE);
 }
 
 
@@ -188,7 +188,7 @@ void Editor::updateLines()
 
 			if (Model->isLine3Selected(i))
 			{
-				Cam->drawLine(tempStart, tempEnd, 1, RED, Screen->pixelBuffer);
+				Screen->drawLine(tempStart, tempEnd, 1, RED);
 				if (clicksInQueue > 0 && tempLine.id == currentEdit)
 				{
 					worldCoord move = mouseBeforeZoom - movementStart;
@@ -196,13 +196,13 @@ void Editor::updateLines()
 					screenCoord currentPosition = world2screen(movementStart + move);
 					if (startVertMoving)
 					{
-						Cam->drawLine(currentPosition, tempEnd, 1, ORANGE, Screen->pixelBuffer);
-						Cam->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY, Screen->pixelBuffer);
+						Screen->drawLine(currentPosition, tempEnd, 1, ORANGE);
+						Screen->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY);
 					}
 					if (endVertMoving)
 					{
-						Cam->drawLine(tempStart, currentPosition, 1, ORANGE, Screen->pixelBuffer);
-						Cam->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY, Screen->pixelBuffer);
+						Screen->drawLine(tempStart, currentPosition, 1, ORANGE);
+						Screen->drawLine(world2screen(movementStart), currentPosition, 4, DARK_GRAY);
 					}
 				}
 				else if (clicksInQueue == 0)
@@ -210,18 +210,18 @@ void Editor::updateLines()
 					if (abs(tempStart.x - mousePosition.x) <= 5 &&
 						abs(tempStart.y - mousePosition.y) <= 5)
 					{
-						Cam->drawSpot(tempStart,	RED, Screen->pixelBuffer);
+						Screen->drawSpot(tempStart, RED);
 					}
 					if (abs(tempEnd.x - mousePosition.x) <= 5 &&
 						abs(tempEnd.y - mousePosition.y) <= 5)
 					{
-						Cam->drawSpot(tempEnd,		RED, Screen->pixelBuffer);
+						Screen->drawSpot(tempEnd, RED);
 					}
 				}
 			}
 			else
 			{
-				Cam->drawLine(tempStart, tempEnd, 1, BLUE, Screen->pixelBuffer);
+				Screen->drawLine(tempStart, tempEnd, 1, BLUE);
 			}
 		}
 		if ((currentMode == Relocation || currentMode == CopyRelocation)	&& clicksInQueue == 1)
@@ -238,7 +238,7 @@ void Editor::updateLines()
 				screenCoord tempStart = world2screen(tempLine.vert[0]);
 				screenCoord tempEnd = world2screen(tempLine.vert[1]);
 
-				Cam->drawLine(tempStart, tempEnd, 1, ORANGE, Screen->pixelBuffer);
+				Screen->drawLine(tempStart, tempEnd, 1, ORANGE);
 			}
 		}
 		if ((currentMode == Rotation || currentMode == CopyRotation)	&& clicksInQueue == 2)		//Draw all visible lines currently being rotated
@@ -259,7 +259,7 @@ void Editor::updateLines()
 				tempLine.vert[1] = rotate2(tempLine.vert[1], currentView, rotationCentre, rotAngle);
 				screenCoord tempStart = world2screen(tempLine.vert[0]);
 				screenCoord tempEnd = world2screen(tempLine.vert[1]);
-				Cam->drawLine(tempStart, tempEnd, 1, ORANGE, Screen->pixelBuffer);
+				Screen->drawLine(tempStart, tempEnd, 1, ORANGE);
 			}
 		}
 	}
@@ -276,11 +276,11 @@ void Editor::updateVertices()
 			screenCoord temp = world2screen(tempVert.pos);
 			if (Model->isVertex3Selected(i))
 			{
-				Cam->drawSpot(temp, RED, Screen->pixelBuffer);
+				Screen->drawSpot(temp, RED);
 			}
 			else
 			{
-				Cam->drawSpot(temp, BLUE, Screen->pixelBuffer);
+				Screen->drawSpot(temp, BLUE);
 			}
 		}
 		if ((currentMode == Relocation || currentMode == CopyRelocation) && clicksInQueue == 1)
@@ -292,7 +292,7 @@ void Editor::updateVertices()
 				if (isOrthoOn) { this->alignToAxis(&tempMove); }
 				tempVert.pos -= tempMove;
 				screenCoord temp = world2screen(tempVert.pos);
-				Cam->drawSpot(temp, ORANGE, Screen->pixelBuffer);
+				Screen->drawSpot(temp, ORANGE);
 			}
 		}
 		if ((currentMode == Rotation || currentMode == CopyRotation) && clicksInQueue == 2)		//Draw all visible vertices currently being rotated
@@ -311,7 +311,7 @@ void Editor::updateVertices()
 				double rotAngle = calculateAngle(startVect, endVect);
 				tempVert.pos = rotate2(tempVert.pos, currentView, rotationCentre, rotAngle);
 				screenCoord temp = world2screen(tempVert.pos);
-				Cam->drawSpot(temp, ORANGE, Screen->pixelBuffer);
+				Screen->drawSpot(temp, ORANGE);
 			}
 		}
 	}
@@ -329,7 +329,7 @@ void Editor::hintResult()
 			if (isOrthoOn) { this->alignToAxis(&tempMove); }
 			worldCoord tempEnd;
 			tempEnd = movementStart + tempMove;
-			Cam->drawLine(world2screen(movementStart), world2screen(tempEnd), 4, DARK_GRAY, Screen->pixelBuffer);
+			Screen->drawLine(world2screen(movementStart), world2screen(tempEnd), 4, DARK_GRAY);
 		}
 	}
 
@@ -343,7 +343,7 @@ void Editor::hintResult()
 				this->alignToAxis(&temp);
 				mouseBeforeZoom = rotationCentre + temp;
 			}
-			Cam->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom),	2, DARK_GRAY, Screen->pixelBuffer);
+			Screen->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY);
 		}
 		else if (clicksInQueue == 2)
 		{
@@ -353,8 +353,8 @@ void Editor::hintResult()
 				this->alignToAxis(&temp);
 				mouseBeforeZoom = rotationCentre + temp;
 			}
-			Cam->drawLine(world2screen(rotationCentre), world2screen(rotationStart),	2, DARK_GRAY, Screen->pixelBuffer);
-			Cam->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom),	2, DARK_GRAY, Screen->pixelBuffer);
+			Screen->drawLine(world2screen(rotationCentre), world2screen(rotationStart), 2, DARK_GRAY);
+			Screen->drawLine(world2screen(rotationCentre), world2screen(mouseBeforeZoom), 2, DARK_GRAY);
 		}
 	}
 
@@ -367,7 +367,7 @@ void Editor::hintResult()
 			if (isOrthoOn) { this->alignToAxis(&tempMove); }
 			worldCoord tempEnd;
 			tempEnd = movementStart + tempMove;
-			Cam->drawLine(world2screen(movementStart), world2screen(tempEnd), 1, BLUE, Screen->pixelBuffer);
+			Screen->drawLine(world2screen(movementStart), world2screen(tempEnd), 1, BLUE);
 		}
 	}
 }

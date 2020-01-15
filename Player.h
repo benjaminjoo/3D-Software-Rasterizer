@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Definitions.h"
+#include "Projection.h"
 #include "SolidBody.h"
 #include "SolidSphere.h"
 #include "Bone.h"

@@ -4,7 +4,7 @@
 #include <SDLImage/SDL_image.h>
 
 #include "Fonts.h"
-//#include "c64Fonts.h"
+
 
 
 Canvas::Canvas(const std::string& windowTitle)
@@ -111,6 +111,338 @@ void Canvas::putPixel(int x, int y, Uint32 colour)
 	if (x >= 0 && x < w && y >= 0 && y < h)
 	{
 		pixelBuffer[y * w + x] = colour;
+	}
+}
+
+
+void Canvas::drawLine(const coord2& startP, const coord2& endP, const Uint32& colour)
+{
+	//No clipping takes place in this method, if either startP or endP
+	//are off screen, line is discarded entirely. It is assumed that all
+	//lines form sides of triangles already clipped to the view frustum
+
+	//Check if line endpoints differ, and if so, see how much they do
+	bool diffX = (endP.x - startP.x == 0) ? false : true;
+	bool diffY = (endP.y - startP.y == 0) ? false : true;
+	int deltaX = endP.x - startP.x;
+	int deltaY = endP.y - startP.y;
+
+	int x1, y1, x2, y2;
+
+	if (!diffX && !diffY)
+	{
+		//No extent - draw single pixel
+		int xCurrent = startP.x;
+		int yCurrent = startP.y;
+		if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+		{
+			pixelBuffer[yCurrent * w + xCurrent] = colour;
+		}
+	}
+	if (!diffX && diffY)
+	{
+		//No 'X' extent - draw vertical columns of pixels
+		if (startP.y < endP.y)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; yCurrent < y2; yCurrent++)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (!diffY && diffX)
+	{
+		//No 'Y' extent - draw horizontal row of pixels
+		if (startP.x < endP.x)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (diffX && diffY)
+	{
+		//Line extends both in the 'X' and 'Y' directions
+		if (abs(deltaX) == abs(deltaY))
+		{
+			//Line extends equally in both directions
+			int stepY = 0;
+			if (startP.x < endP.x)
+			{
+				x1 = startP.x;	y1 = startP.y;
+				x2 = endP.x;	y2 = endP.y;
+				stepY = (startP.y < endP.y) ? 1 : -1;
+			}
+			else
+			{
+				x1 = endP.x;	y1 = endP.y;
+				x2 = startP.x;	y2 = startP.y;
+				stepY = (startP.y < endP.y) ? -1 : 1;
+			}
+			for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++, yCurrent += stepY)
+			{
+				if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+				{
+					pixelBuffer[yCurrent * w + xCurrent] = colour;
+				}
+			}
+		}
+		else
+		{
+			//Generic line
+			if (abs(deltaX) >= abs(deltaY))
+			{
+				//Line is 'X'-major
+				int stepY = 0, xCount = 0, yCount = 0;
+				if (startP.x < endP.x)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepY = (startP.y < endP.y) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepY = (startP.y < endP.y) ? -1 : 1;
+				}
+				for (int xCurrent = x1; xCurrent < x2; xCurrent++, xCount++)
+				{
+					int yCurrent = y1 + yCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float yIdeal = ((float)deltaY / (float)deltaX) * xCount;
+					if (abs(yIdeal - yCount) > 0.5f) { yCount += stepY; }
+				}
+			}
+			else
+			{
+				//Line is 'Y'-major
+				int stepX = 0, xCount = 0, yCount = 0;
+				if (startP.y < endP.y)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepX = (startP.x < endP.x) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepX = (startP.x < endP.x) ? -1 : 1;
+				}
+				for (int yCurrent = y1; yCurrent < y2; yCurrent++, yCount++)
+				{
+					int xCurrent = x1 + xCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float xIdeal = ((float)deltaX / (float)deltaY) * yCount;
+					if (abs(xIdeal - xCount) > 0.5f) { xCount += stepX; }
+				}
+			}
+		}
+	}
+}
+
+
+void Canvas::drawLine(const screenCoord& startP, const screenCoord& endP, const int& step, const Uint32& colour)
+{
+	//No clipping takes place in this method, if either startP or endP
+	//are off screen, line is discarded entirely. It is assumed that all
+	//lines form sides of triangles already clipped to the view frustum
+
+	//Check if line endpoints differ, and if so, see how much they do
+	bool diffX = (endP.x - startP.x == 0) ? false : true;
+	bool diffY = (endP.y - startP.y == 0) ? false : true;
+	int deltaX = endP.x - startP.x;
+	int deltaY = endP.y - startP.y;
+
+	int x1, y1, x2, y2;
+
+	if (!diffX && !diffY)
+	{
+		//No extent - draw single pixel
+		int xCurrent = startP.x;
+		int yCurrent = startP.y;
+		if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+		{
+			pixelBuffer[yCurrent * w + xCurrent] = colour;
+		}
+	}
+	if (!diffX && diffY)
+	{
+		//No 'X' extent - draw vertical columns of pixels
+		if (startP.y < endP.y)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; yCurrent < y2; yCurrent += step)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (!diffY && diffX)
+	{
+		//No 'Y' extent - draw horizontal row of pixels
+		if (startP.x < endP.x)
+		{
+			x1 = startP.x;	y1 = startP.y;
+			x2 = endP.x;	y2 = endP.y;
+		}
+		else
+		{
+			x1 = endP.x;	y1 = endP.y;
+			x2 = startP.x;	y2 = startP.y;
+		}
+		for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent += step)
+		{
+			if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+			{
+				pixelBuffer[yCurrent * w + xCurrent] = colour;
+			}
+		}
+	}
+	if (diffX && diffY)
+	{
+		//Line extends both in the 'X' and 'Y' directions
+		if (abs(deltaX) == abs(deltaY))
+		{
+			//Line extends equally in both directions
+			int stepY = 0;
+			if (startP.x < endP.x)
+			{
+				x1 = startP.x;	y1 = startP.y;
+				x2 = endP.x;	y2 = endP.y;
+				stepY = (startP.y < endP.y) ? 1 : -1;
+			}
+			else
+			{
+				x1 = endP.x;	y1 = endP.y;
+				x2 = startP.x;	y2 = startP.y;
+				stepY = (startP.y < endP.y) ? -1 : 1;
+			}
+			for (int xCurrent = x1, yCurrent = y1; xCurrent < x2; xCurrent++, yCurrent += stepY)
+			{
+				if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+				{
+					pixelBuffer[yCurrent * w + xCurrent] = colour;
+				}
+			}
+		}
+		else
+		{
+			//Generic line
+			if (abs(deltaX) >= abs(deltaY))
+			{
+				//Line is 'X'-major
+				int stepY = 0, xCount = 0, yCount = 0;
+				if (startP.x < endP.x)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepY = (startP.y < endP.y) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepY = (startP.y < endP.y) ? -1 : 1;
+				}
+				for (int xCurrent = x1; xCurrent < x2; xCurrent++, xCount++)
+				{
+					int yCurrent = y1 + yCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float yIdeal = ((float)deltaY / (float)deltaX) * xCount;
+					if (abs(yIdeal - yCount) > 0.5f) { yCount += stepY; }
+				}
+			}
+			else
+			{
+				//Line is 'Y'-major
+				int stepX = 0, xCount = 0, yCount = 0;
+				if (startP.y < endP.y)
+				{
+					x1 = startP.x;	y1 = startP.y;
+					x2 = endP.x;	y2 = endP.y;
+					stepX = (startP.x < endP.x) ? 1 : -1;
+				}
+				else
+				{
+					x1 = endP.x;	y1 = endP.y;
+					x2 = startP.x;	y2 = startP.y;
+					stepX = (startP.x < endP.x) ? -1 : 1;
+				}
+				for (int yCurrent = y1; yCurrent < y2; yCurrent++, yCount++)
+				{
+					int xCurrent = x1 + xCount;
+					if ((xCurrent >= 0 && xCurrent < w) && (yCurrent >= 0 && yCurrent < h))
+					{
+						pixelBuffer[yCurrent * w + xCurrent] = colour;
+					}
+					float xIdeal = ((float)deltaX / (float)deltaY) * yCount;
+					if (abs(xIdeal - xCount) > 0.5f) { xCount += stepX; }
+				}
+			}
+		}
+	}
+}
+
+
+void Canvas::drawSpot(const screenCoord& P, const Uint32& colour)
+{
+	const bool spot[16] = { 0, 1, 1, 0,
+							1, 1, 1, 1,
+							1, 1, 1, 1,
+							0, 1, 1, 0 };
+
+	int xStart = P.x - 2;
+	int yStart = P.y - 2;
+	for (int j = yStart, q = 0; j < yStart + 4; j++, q++)
+	{
+		for (int i = xStart, p = 0; i < xStart + 4; i++, p++)
+		{
+			if ((i >= 0 && i < w) && (j >= 0 && j < h) && spot[q * 4 + p])
+			{
+				pixelBuffer[j * w + i] = colour;
+			}
+		}
 	}
 }
 

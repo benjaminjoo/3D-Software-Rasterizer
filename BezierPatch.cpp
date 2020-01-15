@@ -118,62 +118,62 @@ void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, vect3* V)
 
 void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, vect3 * V)
 {
-	vect3 midDist = subVectors(midP, halfwayPoint(frontP, backP));
-	vect3 midCtrl = addVectors(midP, midDist);
-	vect3 inTangent = subVectors(midCtrl, frontP);
-	vect3 outTangent = subVectors(backP, midCtrl);
+	vect3 midDist = midP - halfwayPoint(frontP, backP);
+	vect3 midCtrl = midP + midDist;
+	vect3 inTangent = midCtrl - frontP;
+	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = addVectors(frontP, scaleVector((1.0f / (double)lod) * i, inTangent));
-		vect3 stringEnd = addVectors(midCtrl, scaleVector((1.0f / (double)lod) * i, outTangent));
-		vect3 stringVect = subVectors(stringEnd, stringStart);
-		V[i] = addVectors(stringStart, scaleVector((1.0f / (double)lod) * i, stringVect));
+		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		vect3 stringVect = stringEnd - stringStart;
+		V[i] = stringStart + stringVect * ((1.0f / (double)lod) * i);
 	}
 }
 
 
 void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, std::shared_ptr<vect3[]> V)
 {
-	vect3 midDist = subVectors(midP, halfwayPoint(frontP, backP));
-	vect3 midCtrl = addVectors(midP, midDist);
-	vect3 inTangent = subVectors(midCtrl, frontP);
-	vect3 outTangent = subVectors(backP, midCtrl);
+	vect3 midDist = midP - halfwayPoint(frontP, backP);
+	vect3 midCtrl = midP + midDist;
+	vect3 inTangent = midCtrl - frontP;
+	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = addVectors(frontP, scaleVector((1.0f / (double)lod) * i, inTangent));
-		vect3 stringEnd = addVectors(midCtrl, scaleVector((1.0f / (double)lod) * i, outTangent));
-		vect3 stringVect = subVectors(stringEnd, stringStart);
-		V[i] = addVectors(stringStart, scaleVector((1.0f / (double)lod) * i, stringVect));
+		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		vect3 stringVect = stringEnd - stringStart;
+		V[i] = stringStart + stringVect * ((1.0f / (double)lod) * i);
 	}
 }
 
 
 void BezierPatch::getTangent(vect3 frontP, vect3 midP, vect3 backP, vect3 * T)
 {
-	vect3 midDist = subVectors(midP, halfwayPoint(frontP, backP));
-	vect3 midCtrl = addVectors(midP, midDist);
-	vect3 inTangent = subVectors(midCtrl, frontP);
-	vect3 outTangent = subVectors(backP, midCtrl);
+	vect3 midDist = midP - halfwayPoint(frontP, backP);
+	vect3 midCtrl = midP + midDist;
+	vect3 inTangent = midCtrl - frontP;
+	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = addVectors(frontP, scaleVector((1.0f / (double)lod) * i, inTangent));
-		vect3 stringEnd = addVectors(midCtrl, scaleVector((1.0f / (double)lod) * i, outTangent));
-		T[i] = unitVector(subVectors(stringEnd, stringStart));
+		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		T[i] = unitVector(stringEnd - stringStart);
 	}
 }
 
 
 vect3 BezierPatch::getTangent(vect3 frontP, vect3 midP, vect3 backP, int i)
 {
-	vect3 midDist = subVectors(midP, halfwayPoint(frontP, backP));
-	vect3 midCtrl = addVectors(midP, midDist);
-	vect3 inTangent = subVectors(midCtrl, frontP);
-	vect3 outTangent = subVectors(backP, midCtrl);
+	vect3 midDist = midP - halfwayPoint(frontP, backP);
+	vect3 midCtrl = midP + midDist;
+	vect3 inTangent = midCtrl - frontP;
+	vect3 outTangent = backP - midCtrl;
 
-	vect3 stringStart = addVectors(frontP, scaleVector((1.0f / (double)lod) * i, inTangent));
-	vect3 stringEnd = addVectors(midCtrl, scaleVector((1.0f / (double)lod) * i, outTangent));
+	vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
+	vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
 
-	return unitVector(subVectors(stringEnd, stringStart));
+	return unitVector(stringEnd - stringStart);
 }
 
 
@@ -263,7 +263,7 @@ void BezierPatch::getVertexData_(std::shared_ptr<vect3[]> s, std::shared_ptr<vec
 		{
 			vect3 tangentH = getTangent(leftV[j], middleV[j], rightV[j], i);
 			vect3 tangentV = getTangent(lowerH[i], middleH[i], upperH[i], j);
-			t[j * (lod + 1) + i] = unitVector(crossProduct(tangentH, tangentV));
+			t[j * (lod + 1) + i] = unitVector(tangentH ^ tangentV);
 		}
 	}
 }
@@ -294,7 +294,7 @@ void BezierPatch::getTriangleData_(triangle3dV * t)
 				t[tCount].Bn = tang[(j + 1) * (lod + 1) + i + 1];
 				t[tCount].Cn = tang[j * (lod + 1) + i + 1];
 
-				vect3 temp = crossProduct(subVectors(t[tCount].B, t[tCount].C), subVectors(t[tCount].A, t[tCount].C));
+				vect3 temp = (t[tCount].B - t[tCount].C) ^ (t[tCount].A - t[tCount].C);
 				t[tCount].N = unitVector(temp);
 
 				t[tCount].At.u = (1.0f / double(lod)) * double(i);				t[tCount].At.v = (1.0f / double(lod)) * double(j);
@@ -317,7 +317,7 @@ void BezierPatch::getTriangleData_(triangle3dV * t)
 				t[tCount].Bn = tang[(j + 1) * (lod + 1) + i];
 				t[tCount].Cn = tang[(j + 1) * (lod + 1) + i + 1];
 
-				vect3 temp = crossProduct(subVectors(t[tCount].A, t[tCount].B), subVectors(t[tCount].C, t[tCount].B));
+				vect3 temp = (t[tCount].A - t[tCount].B) ^ (t[tCount].C - t[tCount].B);
 				t[tCount].N = unitVector(temp);
 
 				t[tCount].At.u = (1.0f / double(lod)) * double(i);			t[tCount].At.v = (1.0f / double(lod)) * double(j);

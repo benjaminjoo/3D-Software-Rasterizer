@@ -33,22 +33,21 @@ public:
 	~Canvas();
 
 	void update();
-
 	void cleanUp();
 
 	void resetPixelBuffer();
-
 	void resetDepthBuffer();
 
 	int getWidth();
-
 	int getHeight();
 
 	void putPixel(int x, int y, Uint32 colour);
+	void drawLine(const coord2&, const coord2&, const Uint32&);
+	void drawLine(const screenCoord&, const screenCoord&, const int&, const Uint32&);
+	void drawSpot(const screenCoord&, const Uint32&);
 	void drawCrosshair(int, int, Uint32);
 	void drawMouseCursor(editingMode, screenCoord position, Uint32 colour);
 	void drawSnapTarget(screenCoord position, Uint32 colour);
-	//bool* GetSingleDigit_8(char letter_No);
 	void displayFps(double value, int dec, int shiftH, int shiftV);
 	void displayValue(double value, int dec, int shiftH, int shiftV, Uint32 col);
 	void displayString(const char* text, int shiftH, int shiftV, Uint32 col);

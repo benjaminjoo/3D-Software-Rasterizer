@@ -79,7 +79,7 @@ void Pong::buildMesh()
 		triangleMesh[i] = new triangle3dV[nCurrent];
 		polyCount[i] = nCurrent;
 		Entities[i]->getTriangleData_(triangleMesh[i]);
-		transformMesh(nCurrent, triangleMesh[i], Entities[i]->scale.x, Entities[i]->scale.y, Entities[i]->scale.z,
+		Projection::transformMesh(nCurrent, triangleMesh[i], Entities[i]->scale.x, Entities[i]->scale.y, Entities[i]->scale.z,
 													Entities[i]->position.x, Entities[i]->position.y, Entities[i]->position.z,
 													Entities[i]->rotation.x, Entities[i]->rotation.y, Entities[i]->rotation.z);
 	}
@@ -97,9 +97,9 @@ void Pong::buildMesh()
 			playerPolyCount[i] = nCurrent;
 			B->getTriangleData_(playerMesh[i]);
 
-			transformMesh(nCurrent, playerMesh[i], B->scale.x, B->scale.y, B->scale.z,
-					B->position.x, B->position.y, B->position.z,
-					B->rotation.x, B->rotation.y, B->rotation.z);
+			Projection::transformMesh(nCurrent, playerMesh[i], B->scale.x, B->scale.y, B->scale.z,
+														B->position.x, B->position.y, B->position.z,
+														B->rotation.x, B->rotation.y, B->rotation.z);
 		}
 	}
 
@@ -116,9 +116,9 @@ void Pong::buildMesh()
 			enemyPolyCount[i] = nCurrent;
 			B->getTriangleData_(enemyMesh[i]);
 
-			transformMesh(nCurrent, enemyMesh[i], B->scale.x, B->scale.y, B->scale.z,
-				B->position.x, B->position.y, B->position.z,
-				B->rotation.x, B->rotation.y, B->rotation.z);
+			Projection::transformMesh(nCurrent, enemyMesh[i], B->scale.x, B->scale.y, B->scale.z,
+													B->position.x, B->position.y, B->position.z,
+													B->rotation.x, B->rotation.y, B->rotation.z);
 		}
 	
 		if (Enemy->skeleton != nullptr)
@@ -164,9 +164,9 @@ void Pong::buildMesh()
 			enemiesMesh[partIndex] = new triangle3dV[nCurrentPoly];			//Storage allocated for nCurrentPoly number of polygons
 			B->getTriangleData_(enemiesMesh[partIndex]);					//enemiesMesh[partIndex][] filled up with polygon data
 
-			transformMesh(nCurrentPoly, enemiesMesh[partIndex], B->scale.x, B->scale.y, B->scale.z,
-				B->position.x, B->position.y, B->position.z,
-				B->rotation.x, B->rotation.y, B->rotation.z);
+			Projection::transformMesh(nCurrentPoly, enemiesMesh[partIndex], B->scale.x, B->scale.y, B->scale.z,
+																		B->position.x, B->position.y, B->position.z,
+																		B->rotation.x, B->rotation.y, B->rotation.z);
 
 			partIndex++;													//Increment partIndex
 		}
@@ -265,29 +265,6 @@ void Pong::destroyMesh()
 		delete[] playerMesh;
 		delete playerPolyCount;
 	}
-	
-	//if (Enemy != nullptr)
-	//{
-	//	size_t nEnemyParts = Enemy->Parts.size();
-	//	for (unsigned int i = 0; i < nEnemyParts; i++)
-	//	{
-	//		delete enemyMesh[i];
-	//	}
-	//	delete[] enemyMesh;
-	//	delete enemyPolyCount;
-	//
-	//	if (Enemy->skeleton != nullptr)
-	//	{
-	//		int nSkeletonMesh = Enemy->skeleton->getNMesh();
-	//
-	//		for (int i = 0; i < nSkeletonMesh; i++)
-	//		{
-	//			delete skeletonMesh[i];
-	//		}
-	//		delete[] skeletonMesh;
-	//		delete skeletonPolyCount;
-	//	}
-	//}
 
 	delete enemiesPartCount;
 	size_t nEnemies = Enemies.size();
@@ -732,13 +709,9 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 	{
-		//vect3 sc = Entities[i]->getScale();
-		//vect3 mv = Entities[i]->getPosition();
-		//vect3 rt = Entities[i]->getRotation();
 		for (unsigned int j = 0; j < polyCount[i]; j++)
 		{
 			triangle3dV tempWall = triangleMesh[i][j];
-			//Eye->object2worldT(sc, mv, rt, tempWall);
 
 			if (objectApproachingWall(oldPos, displacement, tempWall))
 			{
@@ -860,17 +833,17 @@ void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* 
 		if (Controls->gravityOn)
 			displacement = addVectors(displacement, gravity);
 
-		movePoly(displacement, mesh[i]);
+		Projection::movePoly(displacement, mesh[i]);
 	}
 }
 
 
-void Pong::renderMesh(const transform3d& eyePosition, const vect3& sc, const vect3& mv, const vect3& rt, const int& nPoly, triangle3dV* mesh)
+void Pong::renderMesh(transform3d T, const vect3& sc, const vect3& mv, const vect3& rt, const int& nPoly, triangle3dV* mesh)
 {
 	for (int i = 0; i < nPoly; i++)
 	{
 		triangle3dV worldT = mesh[i];
-		Eye->object2worldT(sc, mv, rt, worldT);
+		Projection::object2worldT(sc, mv, rt, worldT);
 		
 		if (Eye->polyFacingCamera(worldT))
 		{
@@ -880,14 +853,14 @@ void Pong::renderMesh(const transform3d& eyePosition, const vect3& sc, const vec
 
 			int textureID = mesh[i].texture;
 
-			Eye->renderPolygon(viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+			Eye->renderPolygon(T, viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 		}
 		polyCounter++;
 	}
 }
 
 
-void Pong::renderMesh(const transform3d& eyePosition, const int& nPoly, triangle3dV* mesh)
+void Pong::renderMesh(transform3d T, const int& nPoly, triangle3dV* mesh)
 {
 	for (int i = 0; i < nPoly; i++)
 	{
@@ -901,7 +874,7 @@ void Pong::renderMesh(const transform3d& eyePosition, const int& nPoly, triangle
 
 			int textureID = mesh[i].texture;
 
-			Eye->renderPolygon(viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+			Eye->renderPolygon(T, viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 		}
 		polyCounter++;
 	}
@@ -912,12 +885,12 @@ void Pong::renderAll()
 {
 	polyCounter = 0;
 
-	transform3d eyePosition = Eye->getTransformation();
+	transform3d T = Eye->getTransformation();
 
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 		if (Entities[i]->isVisible())
-			renderMesh(eyePosition, polyCount[i], triangleMesh[i]);		
+			renderMesh(T, polyCount[i], triangleMesh[i]);		
 
 	if (Hero != nullptr)
 	{
@@ -929,7 +902,7 @@ void Pong::renderAll()
 				vect3 sc = Hero->Parts[i]->getScale();
 				vect3 mv = Hero->Parts[i]->getPosition();
 				vect3 rt = Hero->Parts[i]->getRotation();
-				renderMesh(eyePosition, sc, mv, rt, playerPolyCount[i], playerMesh[i]);
+				renderMesh(T, sc, mv, rt, playerPolyCount[i], playerMesh[i]);
 			}			
 		}
 	}
@@ -951,7 +924,7 @@ void Pong::renderAll()
 					unsigned int partIndex = enemiesMeshIndices[i][j];
 					unsigned int nPoly = enemiesPolyCount[i][j];
 
-					renderMesh(eyePosition, sc, mv, rt, enemiesPolyCount[i][j], enemiesMesh[partIndex]);
+					renderMesh(T, sc, mv, rt, enemiesPolyCount[i][j], enemiesMesh[partIndex]);
 				}
 			}
 		}
@@ -967,7 +940,7 @@ void Pong::renderAll()
 				vect3 sc = Enemy->Parts[i]->getScale();
 				vect3 mv = Enemy->Parts[i]->getPosition();
 				vect3 rt = Enemy->Parts[i]->getRotation();
-				renderMesh(eyePosition, sc, mv, rt, enemyPolyCount[i], enemyMesh[i]);
+				renderMesh(T, sc, mv, rt, enemyPolyCount[i], enemyMesh[i]);
 			}			
 		}
 
@@ -983,7 +956,7 @@ void Pong::renderAll()
 
 			for (int i = 0; i < nSkeletonMesh; i++)
 			{
-				renderMesh(eyePosition, sc[i], mv[i], rt[i], skeletonPolyCount[i], skeletonMesh[i]);
+				renderMesh(T, sc[i], mv[i], rt[i], skeletonPolyCount[i], skeletonMesh[i]);
 			}
 
 			delete[] sc;
@@ -1000,7 +973,7 @@ void Pong::renderAll()
 			vect3 sc = Projectiles[i]->getScale();
 			vect3 mv = Projectiles[i]->getPosition();
 			vect3 rt = Projectiles[i]->getRotation();
-			renderMesh(eyePosition, sc, mv, rt, projectilePolyCount[i], projectileMesh[i]);
+			renderMesh(T, sc, mv, rt, projectilePolyCount[i], projectileMesh[i]);
 		}			
 	}
 
@@ -1012,9 +985,9 @@ void Pong::renderAll()
 			vect3 sc = Balls[i]->getScale();
 			vect3 mv = Balls[i]->getPosition();
 			vect3 rt = Balls[i]->getRotation();
-			renderMesh(eyePosition, sc, mv, rt, ballPolyCount[i], ballMesh[i]);
+			renderMesh(T, sc, mv, rt, ballPolyCount[i], ballMesh[i]);
 			if(Balls[i]->isDestroyed())
-				renderMesh(eyePosition, sc, mv, rt, explosionPolyCount[i], explosionMesh[i]);
+				renderMesh(T, sc, mv, rt, explosionPolyCount[i], explosionMesh[i]);
 		}
 			
 	}
@@ -1043,13 +1016,10 @@ void Pong::updateAll()
 
 	if (!Controls->isPaused)
 	{
-		//this->updateEntities();
 		this->updateBalls();
 
 		if (Controls->playerControlled)
 		{
-			
-			//this->updateEnemyPositionAI(Controls->purposeOfAI);
 			this->updateEnemiesPositionsAI(Controls->purposeOfAI);
 		}
 
