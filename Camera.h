@@ -45,7 +45,8 @@ private:
 	Uint32*					pixelBuffer = nullptr;
 	double*					depthBuffer = nullptr;
 
-	std::shared_ptr<Canvas> Screen = nullptr;
+	std::shared_ptr<Canvas> Screen			= nullptr;
+	std::shared_ptr<Projection> Renderer	= nullptr;
 
 	vect3					vertexList[MAXCLIPVERTS];
 	textCoord				uvList[MAXCLIPVERTS];
@@ -62,17 +63,26 @@ private:
 
 public:
 
-	Camera();
-	Camera(double, double, double, int, int, int);
-	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
+	Camera(std::shared_ptr<Projection> R);
+	Camera(std::shared_ptr<Projection> R, double, double, double, int, int, int);
+	Camera(std::shared_ptr<Projection> R, double, double, double, double, double, double, double, double, double, double, double, int, int, int);
 	~Camera();
+
+	mat4x4 getTranslation();
+	mat4x4 getRotation();
+	mat4x4 getRotation(axis t, double a);
+	void world2view(triangle3dV& T, mat4x4& rot, mat4x4& mov);
 
 	void linkToCanvas(std::shared_ptr<Canvas> screen);
 	void addTexture(SDL_Surface*);
 	void addTexture(txt);
 	void renderPoint(point3, Uint32*, double*);
-	void renderPolygon(transform3d T, triangle3dV& viewT, LightSource Sun, unsigned textureID,
-			const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
+		const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+		vect3 sc, vect3 mv, vect3 rt, LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
 
 private:
 
@@ -83,8 +93,6 @@ private:
 	double getVRatio();
 
 	void clearVertexList();
-
-	transform3d getTransformation();
 
 	bool polyFacingCamera(const triangle3dV&);
 	void clipToFrustumL(line3d*);

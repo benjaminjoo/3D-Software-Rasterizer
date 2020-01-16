@@ -202,7 +202,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pong.cpp" />
     <ClCompile Include="Projection.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
     <ClCompile Include="Shapes.cpp" />
@@ -256,7 +255,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pong.h" />
     <ClInclude Include="Projection.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />
     <ClInclude Include="Shapes.h" />

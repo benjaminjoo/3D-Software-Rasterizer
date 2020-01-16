@@ -2,9 +2,9 @@
 
 
 
-Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<EventHandler> controls,
+Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<Projection> renderer, std::shared_ptr<EventHandler> controls,
 			std::shared_ptr<LightSource> sun, std::shared_ptr<Player> hero, std::shared_ptr<Player> enemy):
-	Screen(screen), Eye(eye), Controls(controls), Sun(sun), Hero(hero), Enemy(enemy)
+	Screen(screen), Eye(eye), Renderer(renderer), Controls(controls), Sun(sun), Hero(hero), Enemy(enemy)
 {
 	for (int v = 0; v < MAXCLIPVERTS; v++)
 	{
@@ -79,7 +79,7 @@ void Pong::buildMesh()
 		triangleMesh[i] = new triangle3dV[nCurrent];
 		polyCount[i] = nCurrent;
 		Entities[i]->getTriangleData_(triangleMesh[i]);
-		Projection::transformMesh(nCurrent, triangleMesh[i], Entities[i]->scale.x, Entities[i]->scale.y, Entities[i]->scale.z,
+		Renderer->transformMesh(nCurrent, triangleMesh[i], Entities[i]->scale.x, Entities[i]->scale.y, Entities[i]->scale.z,
 													Entities[i]->position.x, Entities[i]->position.y, Entities[i]->position.z,
 													Entities[i]->rotation.x, Entities[i]->rotation.y, Entities[i]->rotation.z);
 	}
@@ -97,7 +97,7 @@ void Pong::buildMesh()
 			playerPolyCount[i] = nCurrent;
 			B->getTriangleData_(playerMesh[i]);
 
-			Projection::transformMesh(nCurrent, playerMesh[i], B->scale.x, B->scale.y, B->scale.z,
+			Renderer->transformMesh(nCurrent, playerMesh[i], B->scale.x, B->scale.y, B->scale.z,
 														B->position.x, B->position.y, B->position.z,
 														B->rotation.x, B->rotation.y, B->rotation.z);
 		}
@@ -116,7 +116,7 @@ void Pong::buildMesh()
 			enemyPolyCount[i] = nCurrent;
 			B->getTriangleData_(enemyMesh[i]);
 
-			Projection::transformMesh(nCurrent, enemyMesh[i], B->scale.x, B->scale.y, B->scale.z,
+			Renderer->transformMesh(nCurrent, enemyMesh[i], B->scale.x, B->scale.y, B->scale.z,
 													B->position.x, B->position.y, B->position.z,
 													B->rotation.x, B->rotation.y, B->rotation.z);
 		}
@@ -164,7 +164,7 @@ void Pong::buildMesh()
 			enemiesMesh[partIndex] = new triangle3dV[nCurrentPoly];			//Storage allocated for nCurrentPoly number of polygons
 			B->getTriangleData_(enemiesMesh[partIndex]);					//enemiesMesh[partIndex][] filled up with polygon data
 
-			Projection::transformMesh(nCurrentPoly, enemiesMesh[partIndex], B->scale.x, B->scale.y, B->scale.z,
+			Renderer->transformMesh(nCurrentPoly, enemiesMesh[partIndex], B->scale.x, B->scale.y, B->scale.z,
 																		B->position.x, B->position.y, B->position.z,
 																		B->rotation.x, B->rotation.y, B->rotation.z);
 
@@ -833,50 +833,7 @@ void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* 
 		if (Controls->gravityOn)
 			displacement = addVectors(displacement, gravity);
 
-		Projection::movePoly(displacement, mesh[i]);
-	}
-}
-
-
-void Pong::renderMesh(transform3d T, const vect3& sc, const vect3& mv, const vect3& rt, const int& nPoly, triangle3dV* mesh)
-{
-	for (int i = 0; i < nPoly; i++)
-	{
-		triangle3dV worldT = mesh[i];
-		Projection::object2worldT(sc, mv, rt, worldT);
-		
-		if (Eye->polyFacingCamera(worldT))
-		{
-			Uint32 colour = mesh[i].colour;
-
-			triangle3dV viewT = worldT;
-
-			int textureID = mesh[i].texture;
-
-			Eye->renderPolygon(T, viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
-		}
-		polyCounter++;
-	}
-}
-
-
-void Pong::renderMesh(transform3d T, const int& nPoly, triangle3dV* mesh)
-{
-	for (int i = 0; i < nPoly; i++)
-	{
-		triangle3dV worldT = mesh[i];
-
-		if (Eye->polyFacingCamera(worldT))
-		{
-			Uint32 colour = mesh[i].colour;
-
-			triangle3dV viewT = worldT;
-
-			int textureID = mesh[i].texture;
-
-			Eye->renderPolygon(T, viewT, *Sun, textureID, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
-		}
-		polyCounter++;
+		Renderer->movePoly(displacement, mesh[i]);
 	}
 }
 
@@ -885,12 +842,14 @@ void Pong::renderAll()
 {
 	polyCounter = 0;
 
-	transform3d T = Eye->getTransformation();
+	mat4x4 RotationM = Eye->getRotation();
+	mat4x4 TranslationM = Eye->getTranslation();
 
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
 		if (Entities[i]->isVisible())
-			renderMesh(T, polyCount[i], triangleMesh[i]);		
+			Eye->renderMesh(polyCount[i], triangleMesh[i], RotationM, TranslationM,
+				*Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Hero != nullptr)
 	{
@@ -902,7 +861,9 @@ void Pong::renderAll()
 				vect3 sc = Hero->Parts[i]->getScale();
 				vect3 mv = Hero->Parts[i]->getPosition();
 				vect3 rt = Hero->Parts[i]->getRotation();
-				renderMesh(T, sc, mv, rt, playerPolyCount[i], playerMesh[i]);
+
+				Eye->renderMesh(playerPolyCount[i], playerMesh[i], RotationM, TranslationM,
+					sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 			}			
 		}
 	}
@@ -924,7 +885,8 @@ void Pong::renderAll()
 					unsigned int partIndex = enemiesMeshIndices[i][j];
 					unsigned int nPoly = enemiesPolyCount[i][j];
 
-					renderMesh(T, sc, mv, rt, enemiesPolyCount[i][j], enemiesMesh[partIndex]);
+					Eye->renderMesh(enemiesPolyCount[i][j], enemiesMesh[partIndex], RotationM, TranslationM,
+						sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 				}
 			}
 		}
@@ -940,29 +902,29 @@ void Pong::renderAll()
 				vect3 sc = Enemy->Parts[i]->getScale();
 				vect3 mv = Enemy->Parts[i]->getPosition();
 				vect3 rt = Enemy->Parts[i]->getRotation();
-				renderMesh(T, sc, mv, rt, enemyPolyCount[i], enemyMesh[i]);
+
+				Eye->renderMesh(enemyPolyCount[i], enemyMesh[i], RotationM, TranslationM,
+					sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 			}			
 		}
 
-		if (Enemy->skeleton != nullptr)
-		{
-			int nSkeletonMesh = Enemy->skeleton->getNMesh();
-
-			vect3* sc = new vect3[nSkeletonMesh];
-			vect3* mv = new vect3[nSkeletonMesh];
-			vect3* rt = new vect3[nSkeletonMesh];
-
-			Enemy->skeleton->getBonePosition(sc, mv, rt);
-
-			for (int i = 0; i < nSkeletonMesh; i++)
-			{
-				renderMesh(T, sc[i], mv[i], rt[i], skeletonPolyCount[i], skeletonMesh[i]);
-			}
-
-			delete[] sc;
-			delete[] mv;
-			delete[] rt;
-		}
+		//if (Enemy->skeleton != nullptr)
+		//{
+		//	int nSkeletonMesh = Enemy->skeleton->getNMesh();
+		//
+		//	vect3* sc = new vect3[nSkeletonMesh];
+		//	vect3* mv = new vect3[nSkeletonMesh];
+		//	vect3* rt = new vect3[nSkeletonMesh];
+		//
+		//	Enemy->skeleton->getBonePosition(sc, mv, rt);
+		//
+		//	for (int i = 0; i < nSkeletonMesh; i++)
+		//		Eye->renderMesh(skeletonPolyCount[i], skeletonMesh[i], T, sc[i], mv[i], rt[i], *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+		//
+		//	delete[] sc;
+		//	delete[] mv;
+		//	delete[] rt;
+		//}
 	}
 
 	size_t nProjectiles = Projectiles.size();
@@ -973,7 +935,10 @@ void Pong::renderAll()
 			vect3 sc = Projectiles[i]->getScale();
 			vect3 mv = Projectiles[i]->getPosition();
 			vect3 rt = Projectiles[i]->getRotation();
-			renderMesh(T, sc, mv, rt, projectilePolyCount[i], projectileMesh[i]);
+
+			Eye->renderMesh(projectilePolyCount[i], projectileMesh[i], RotationM, TranslationM,
+				sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+
 		}			
 	}
 
@@ -985,9 +950,13 @@ void Pong::renderAll()
 			vect3 sc = Balls[i]->getScale();
 			vect3 mv = Balls[i]->getPosition();
 			vect3 rt = Balls[i]->getRotation();
-			renderMesh(T, sc, mv, rt, ballPolyCount[i], ballMesh[i]);
+
+			Eye->renderMesh(ballPolyCount[i], ballMesh[i], RotationM, TranslationM,
+				sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+
 			if(Balls[i]->isDestroyed())
-				renderMesh(T, sc, mv, rt, explosionPolyCount[i], explosionMesh[i]);
+				Eye->renderMesh(explosionPolyCount[i], explosionMesh[i], RotationM, TranslationM,
+					sc, mv, rt, *Sun, Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 		}
 			
 	}

@@ -4,11 +4,13 @@
 
 Projection::Projection()
 {
+	std::cout << "Projection toolbox created..." << std::endl;
 }
 
 
 Projection::~Projection()
 {
+	std::cout << "Projection toolbox destroyed..." << std::endl;
 }
 
 
@@ -239,6 +241,34 @@ vect3 Projection::multiplyMxV(const mat4x4& m, const vect3& v)
 }
 
 
+mat4x4 Projection::multiplyMxM(const mat4x4& p, const mat4x4& q)
+{
+	mat4x4 t;
+
+	t._00 = p._00 * q._00 + p._01 * q._10 + p._02 * q._20 + p._03 * q._30;
+	t._01 = p._00 * q._01 + p._01 * q._11 + p._02 * q._21 + p._03 * q._31;
+	t._02 = p._00 * q._02 + p._01 * q._12 + p._02 * q._22 + p._03 * q._32;
+	t._03 = p._00 * q._03 + p._01 * q._13 + p._02 * q._23 + p._03 * q._33;
+
+	t._10 = p._10 * q._00 + p._11 * q._10 + p._12 * q._20 + p._13 * q._30;
+	t._11 = p._10 * q._01 + p._11 * q._11 + p._12 * q._21 + p._13 * q._31;
+	t._12 = p._10 * q._02 + p._11 * q._12 + p._12 * q._22 + p._13 * q._32;
+	t._13 = p._10 * q._03 + p._11 * q._13 + p._12 * q._23 + p._13 * q._33;
+
+	t._20 = p._20 * q._00 + p._21 * q._10 + p._22 * q._20 + p._23 * q._30;
+	t._21 = p._20 * q._01 + p._21 * q._11 + p._22 * q._21 + p._23 * q._31;
+	t._22 = p._20 * q._02 + p._21 * q._12 + p._22 * q._22 + p._23 * q._32;
+	t._23 = p._20 * q._03 + p._21 * q._13 + p._22 * q._23 + p._23 * q._33;
+
+	t._30 = p._30 * q._00 + p._31 * q._10 + p._32 * q._20 + p._33 * q._30;
+	t._31 = p._30 * q._01 + p._31 * q._11 + p._32 * q._21 + p._33 * q._31;
+	t._32 = p._30 * q._02 + p._31 * q._12 + p._32 * q._22 + p._33 * q._32;
+	t._33 = p._30 * q._03 + p._31 * q._13 + p._32 * q._23 + p._33 * q._33;
+
+	return t;
+}
+
+
 void Projection::movePoly(vect3 m, triangle3dV& poly)
 {
 	poly.A = addVectors(poly.A, m);
@@ -302,6 +332,18 @@ void Projection::world2view(triangle3dV& tr, transform3d T, double x, double y, 
 }
 
 
+void Projection::world2view(triangle3dV& tr, mat4x4& rot, mat4x4& mov)
+{
+	tr.A = rot * mov * tr.A;
+	tr.B = rot * mov * tr.B;
+	tr.C = rot * mov * tr.C;
+	tr.An = rot * tr.An;
+	tr.Bn = rot * tr.Bn;
+	tr.Cn = rot * tr.Cn;
+	tr.N = rot * tr.N;
+}
+
+
 vect3 Projection::world2view(transform3d T, vect3 tr, double x, double y, double z)
 {
 	vect3 v;
@@ -312,11 +354,12 @@ vect3 Projection::world2view(transform3d T, vect3 tr, double x, double y, double
 }
 
 
-point3 Projection::world2viewP(transform3d T, point3 p, double x, double y, double z)
+point3 Projection::world2viewP(point3 p, mat4x4& rot, mat4x4& mov)
 {
 	point3 tempPoint;
 
-	tempPoint.P = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, p.P))));
+	//tempPoint.P = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, p.P))));
+	tempPoint.P = rot * mov * p.P;
 	tempPoint.P.w = 1.0;
 	tempPoint.colour = p.colour;
 

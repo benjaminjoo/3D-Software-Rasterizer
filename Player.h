@@ -55,6 +55,7 @@ private:
 
 	std::vector<std::shared_ptr<SolidBody>>		Parts;
 
+	std::shared_ptr<Projection> Renderer		= nullptr;
 	std::shared_ptr<PelvisBone>	skeleton		= nullptr;
 
 	double						currentPhase	= 0.0f;
@@ -65,8 +66,8 @@ private:
 
 public:
 
-	Player();
-	Player(double, double, double, double, double, double, double, int, int, std::shared_ptr<PelvisBone>);
+	Player(std::shared_ptr<Projection>);
+	Player(std::shared_ptr<Projection>, double, double, double, double, double, double, double, int, int, std::shared_ptr<PelvisBone>);
 	~Player();
 
 	bool isDestroyed();

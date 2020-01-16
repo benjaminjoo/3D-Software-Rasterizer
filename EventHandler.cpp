@@ -187,11 +187,11 @@ void EventHandler::HandleUserEvents()
 	}
 	if (state[SDL_SCANCODE_PAGEUP])
 	{
-		turnV -= turnP;
+		turnV += turnP;
 	}
 	if (state[SDL_SCANCODE_PAGEDOWN])
 	{
-		turnV += turnP;
+		turnV -= turnP;
 	}
 	if (state[SDL_SCANCODE_1])
 	{

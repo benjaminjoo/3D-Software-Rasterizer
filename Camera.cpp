@@ -10,8 +10,8 @@
 
 #define PI					3.141592654
 
-Camera::Camera():
-	x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+Camera::Camera(std::shared_ptr<Projection> R):
+	Renderer(R), x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(320), h(200)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -22,11 +22,13 @@ Camera::Camera():
 	vRatio = this->getVRatio();
 
 	this->clearVertexList();
+
+	Renderer = std::make_shared<Projection>();
 }
 
 
-Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
-	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, int width, int height, int s):
+	Renderer(R), x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -37,12 +39,14 @@ Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
 	vRatio = this->getVRatio();
 
 	this->clearVertexList();
+
+	Renderer = std::make_shared<Projection>();
 }
 
 
-Camera::Camera(double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
+Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
 	double fov, double nr, double fr, int width, int height, int s):
-	x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
+	Renderer(R), x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
 	fovH(fov), zNear(nr), zFar(fr), w(width), h(height)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -53,6 +57,8 @@ Camera::Camera(double cx, double cy, double cz, double az, double al, double rl,
 	vRatio = this->getVRatio();
 
 	this->clearVertexList();
+
+	Renderer = std::make_shared<Projection>();
 }
 
 
@@ -105,18 +111,80 @@ void Camera::clearVertexList()
 }
 
 
-transform3d Camera::getTransformation()
+mat4x4 Camera::getTranslation()
 {
-	transform3d T;
+	mat4x4 result;
 
-	T.sinAzm = sin(azm + PI * 0.5);
-	T.cosAzm = cos(azm + PI * 0.5);
-	T.sinAlt = sin(alt + PI * 0.5);
-	T.cosAlt = cos(alt + PI * 0.5);
-	T.sinRol = sin(rol);
-	T.cosRol = cos(rol);
+	result = {  1.0f,          0.0f,         0.0f,		-x,
+				0.0f,          1.0f,         0.0f,		-y,
+				0.0f,          0.0f,         1.0f,		-z,
+				0.0f,          0.0f,         0.0f,       1.0f };
 
-	return T;
+	return result;
+}
+
+
+mat4x4 Camera::getRotation(axis t, double a)
+{
+	mat4x4 result = {	1.0f, 0.0f, 0.0f, 0.0f,
+						0.0f, 1.0f, 0.0f, 0.0f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f };
+
+	double sinA = sin(a);
+	double cosA = cos(a);
+
+	switch (t)
+	{
+		case axis::x:
+		{
+			result = {  1.0f,       0.0f,       0.0f,       0.0f,
+						0.0f,       cosA,       sinA,       0.0f,
+						0.0f,      -sinA,       cosA,       0.0f,
+						0.0f,       0.0f,       0.0f,       1.0f };
+		}
+		break;
+		case axis::y:
+		{
+			result = {	cosA,       0.0f,      -sinA,       0.0f,
+						0.0f,       1.0f,       0.0f,       0.0f,
+						sinA,       0.0f,       cosA,       0.0f,
+						0.0f,       0.0f,       0.0f,       1.0f };
+		}
+		break;
+		case axis::z:
+		{
+			result = {	cosA,       sinA,       0.0f,       0.0f,
+					   -sinA,       cosA,       0.0f,       0.0f,
+						0.0f,       0.0f,       1.0f,       0.0f,
+						0.0f,       0.0f,       0.0f,       1.0f };
+		}
+		break;
+	}
+
+	return result;
+}
+
+
+mat4x4 Camera::getRotation()
+{
+	mat4x4 result = getRotation(axis::z, rol) *
+					getRotation(axis::x, -(alt + PI * 0.5f)) *
+					getRotation(axis::z, -(azm + PI * 0.5f));
+
+	return result;
+}
+
+
+void Camera::world2view(triangle3dV& T, mat4x4& rot, mat4x4& mov)
+{
+	T.A = rot * mov * T.A;
+	T.B = rot * mov * T.B;
+	T.C = rot * mov * T.C;
+	T.An = rot * T.An;
+	T.Bn = rot * T.Bn;
+	T.Cn = rot * T.Cn;
+	T.N = rot * T.N;
 }
 
 
@@ -480,42 +548,42 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			{
 			case solid_colour:
 			{
-				Projection::fillTriangleSolidColour(originalT, screenT, Screen, hRatio, vRatio);
+				Renderer->fillTriangleSolidColour(originalT, screenT, Screen, hRatio, vRatio);
 			}
 			break;
 			case checkerboard:
 			{
-				Projection::fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
+				Renderer->fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
 			}
 			break;
 			case flat_shaded:
 			{
-				Projection::fillTriangleFlatShaded(screenT, Screen);
+				Renderer->fillTriangleFlatShaded(screenT, Screen);
 			}
 			break;
 			case gouraud_shaded:
 			{
-				Projection::fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
+				Renderer->fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
 			}
 			break;
 			case depth_visualised:
 			{
-				Projection::fillTriangleDepthVisualised(originalT, screenT, Screen, zNear, hRatio, vRatio);
+				Renderer->fillTriangleDepthVisualised(originalT, screenT, Screen, zNear, hRatio, vRatio);
 			}
 			break;
 			case sunlight:
 			{
-				Projection::fillTriangleSunlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture);
+				Renderer->fillTriangleSunlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture);
 			}
 			break;
 			case torchlight:
 			{
-				Projection::fillTriangleTorchlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture, torchI, maxI);
+				Renderer->fillTriangleTorchlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture, torchI, maxI);
 			}
 			break;
 			case torchlight_solid:
 			{
-				Projection::fillTriangleTorchlightSolidColour(originalT, screenT, Screen, hRatio, vRatio, torchI, maxI);
+				Renderer->fillTriangleTorchlightSolidColour(originalT, screenT, Screen, hRatio, vRatio, torchI, maxI);
 			}
 			break;
 			case test:
@@ -525,7 +593,7 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			break;
 			default:
 			{
-				Projection::fillTriangleFlatShaded(screenT, Screen);
+				Renderer->fillTriangleFlatShaded(screenT, Screen);
 			}
 			break;
 			}
@@ -560,8 +628,10 @@ void Camera::centreLook()
 
 void Camera::renderPoint(point3 p, Uint32* pixelBuffer, double* depthBuffer)
 {
-	point3 viewP = Projection::world2viewP(getTransformation(), p, x, y, z);
-	projectPoint(viewP, pixelBuffer, depthBuffer);
+	mat4x4 Rotation = getRotation();
+	mat4x4 Translation = getTranslation();
+	Renderer->world2viewP(p, Rotation, Translation);
+	projectPoint(p, pixelBuffer, depthBuffer);
 }
 
 
@@ -589,22 +659,50 @@ void Camera::addTexture(txt T)
 }
 
 
-void Camera::renderPolygon(transform3d T, triangle3dV& viewT, LightSource Sun, unsigned textureID,
-				const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+void Camera::renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
+	const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
 {
 	triangle3dV worldT = viewT;
 
-	Projection::world2view(viewT, T, x, y, z);
+	this->world2view(viewT, rot, mov);
 
-	Projection::illuminatePoly(Sun, &viewT, worldT, visualStyle);
+	Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle);
 	
 	int nVert = this->clipToFrustum(viewT, vertexList, uvList);
 
 	Uint32 colour = worldT.colour;
 
-	currentTexture = &textureData[textureID];
+	currentTexture = &textureData[viewT.texture];
 
 	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
+}
+
+
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	for (int i = 0; i < nPoly; i++)
+	{
+		triangle3dV worldT = mesh[i];
+
+		if (polyFacingCamera(worldT))
+			renderPolygon(rot, mov, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
+	}
+}
+
+
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+	vect3 sc, vect3 mv, vect3 rt, LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	for (int i = 0; i < nPoly; i++)
+	{
+		triangle3dV worldT = mesh[i];
+
+		Renderer->object2worldT(sc, mv, rt, worldT);
+
+		if (polyFacingCamera(worldT))
+			renderPolygon(rot, mov, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
+	}
 }
 
 

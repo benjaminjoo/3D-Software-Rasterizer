@@ -19,10 +19,12 @@ Canvas::Canvas(const std::string& windowTitle)
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-	pixelBuffer = new Uint32[w * h];
-	depthBuffer = new double[w * h];
+	size = w * h;
 
-	for (int i = 0; i < w * h; i++)
+	pixelBuffer = new Uint32[size];
+	depthBuffer = new double[size];
+
+	for (int i = 0; i < size; i++)
 	{
 		pixelBuffer[i] = 0;
 		depthBuffer[i] = zFar;
@@ -43,10 +45,12 @@ Canvas::Canvas(const std::string& windowTitle, int width, int height, double z):
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-	pixelBuffer = new Uint32[w * h];
-	depthBuffer = new double[w * h];
+	size = w * h;
 
-	for (int i = 0; i < w * h; i++)
+	pixelBuffer = new Uint32[size];
+	depthBuffer = new double[size];
+
+	for (int i = 0; i < size; i++)
 	{
 		pixelBuffer[i] = 0;
 		depthBuffer[i] = zFar;
@@ -89,7 +93,7 @@ void Canvas::resetPixelBuffer()
 
 void Canvas::resetDepthBuffer()
 {
-	for (double* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
+	for (double* i = depthBuffer, *end = &depthBuffer[size]; i != end; i++)
 		* i = zFar;
 }
 

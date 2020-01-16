@@ -1,14 +1,15 @@
 #include "Player.h"
 
 
-Player::Player()
+Player::Player(std::shared_ptr<Projection> renderer) : Renderer(renderer)
 {
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 0.5f, 24);
 }
 
 
-Player::Player(double px, double py, double pz, double rx, double ry, double rz, double rad, int hlt, int amm, std::shared_ptr<PelvisBone> sk):
-	x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm), skeleton(sk)
+Player::Player(std::shared_ptr<Projection> renderer, double px, double py, double pz, double rx, double ry, double rz,
+	double rad, int hlt, int amm, std::shared_ptr<PelvisBone> sk) :
+	Renderer(renderer), x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm), skeleton(sk)
 {
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, px, py, pz, rx, ry, rz, 0xffffff00, 1, 0.5f, 24);
 }
@@ -164,7 +165,7 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 			//vect3 velocity	= scaleVector(muzzleVelocity, rotation);
 			vect3 velocity = rotation * muzzleVelocity;
 
-			Projection::rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
+			Renderer->rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
 
 			Projectiles[i]->setFired(true);
 			Projectiles[i]->setPosition(origin);

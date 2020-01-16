@@ -25,6 +25,7 @@ private:
 
 	std::shared_ptr<Canvas>						Screen			= nullptr;
 	std::shared_ptr<Camera>						Eye				= nullptr;
+	std::shared_ptr<Projection>					Renderer		= nullptr;
 	std::shared_ptr<EventHandler>				Controls		= nullptr;
 	std::shared_ptr<Text>						ControlsText	= nullptr;
 	std::shared_ptr<LightSource>				Sun				= nullptr;
@@ -102,8 +103,6 @@ private:
 
 	void explodeMesh(double, vect3, int, triangle3dV*);
 	void explodeDebris(double, vect3, int, triangle3dV*);
-	void renderMesh(transform3d T, const vect3&, const vect3&, const vect3&, const int&, triangle3dV*);
-	void renderMesh(transform3d T, const int&, triangle3dV*);
 	void renderAll();
 
 	void updateFrameCounter();
@@ -115,7 +114,7 @@ private:
 
 public:
 
-	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<EventHandler>,
+	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<Projection>, std::shared_ptr<EventHandler>,
 		std::shared_ptr<LightSource>, std::shared_ptr<Player>, std::shared_ptr<Player>);
 	~Pong();
 

@@ -10,6 +10,7 @@ class Canvas
 {
 	int w			= 1000;
 	int h			= 500;
+	int size		= 1000 * 500;
 
 	int fontSize	= 8;
 	int cursorSize	= 16;

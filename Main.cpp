@@ -24,7 +24,6 @@
 #include "MessagePump.h"
 #include "Editor.h"
 #include "ModelElementBuffer.h"
-#include "Renderer.h"
 #include "BSP3Loader.h"
 #include "BSP1Loader.h"
 #include "BezierPatch.h"
@@ -45,7 +44,9 @@ void editor()
 {
 	auto Screen		= std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9f);
 
-	auto Viewer		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.01f, 999.0f, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	auto Renderer	= std::make_shared<Projection>();
+
+	auto Viewer		= std::make_shared<Camera>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.01f, 999.0f, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
 	auto Drawing	= std::make_shared<ModelElementBuffer>("test.wtf");
 
@@ -78,7 +79,9 @@ void pong3d()
 {
 	auto Screen		= std::make_shared<Canvas>("3D Shooter", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
-	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Renderer	= std::make_shared<Projection>();
+
+	auto Eye		= std::make_shared<Camera>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	Eye->linkToCanvas(Screen);
 
@@ -86,19 +89,19 @@ void pong3d()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(-15.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
+	auto Hero		= std::make_shared<Player>(Renderer, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
 
 	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
 
-	Hero->addPart(weapon);
+	//Hero->addPart(weapon);
 
-	auto Observer	= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Observer	= std::make_shared<Player>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
 	auto cone		= std::make_shared<SolidCone>(0.0f, 0.0f, 0.0f, 0x000000ff);
 
 	Observer->addPart(cone);
 	
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Controls, Sun, Hero, Observer);
+	auto Game		= std::make_shared<Pong>(Screen, Eye, Renderer, Controls, Sun, Hero, Observer);
 
 	//Fill up bullet pool
 	Game->loadProjectile(200);
@@ -240,7 +243,7 @@ void pong3d()
 	}
 
 	//Create enemies
-	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy1		= std::make_shared<Player>(Renderer, 20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
 	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4);
@@ -254,7 +257,7 @@ void pong3d()
 
 	Game->addEnemy(Enemy1);
 
-	auto Enemy2		= std::make_shared<Player>(40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy2		= std::make_shared<Player>(Renderer, 40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
 	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 7, 1.5f, 8);
 	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
@@ -268,7 +271,7 @@ void pong3d()
 
 	Game->addEnemy(Enemy2);
 
-	auto Enemy3 = std::make_shared<Player>(-40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy3 = std::make_shared<Player>(Renderer, -40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
 	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 8);
 	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
