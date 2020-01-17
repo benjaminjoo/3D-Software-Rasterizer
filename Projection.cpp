@@ -47,21 +47,6 @@ void Projection::clampValue(double* value, double lower, double upper)
 }
 
 
-transform3d Projection::getTransformation(double azm, double alt, double rol)
-{
-	transform3d T;
-
-	T.sinAzm = sin(azm + PI * 0.5);
-	T.cosAzm = cos(azm + PI * 0.5);
-	T.sinAlt = sin(alt + PI * 0.5);
-	T.cosAlt = cos(alt + PI * 0.5);
-	T.sinRol = sin(rol);
-	T.cosRol = cos(rol);
-
-	return T;
-}
-
-
 vect3 Projection::rotXrad(const double& sinA, const double& cosA, const vect3& v)
 {
 	vect3 t;
@@ -310,25 +295,83 @@ void Projection::transformMesh(int n, triangle3dV* object, double scX, double sc
 }
 
 
+mat4x4 Projection::getTranslation(vect3 mv)
+{
+	mat4x4 result;
+
+	result = {  1.0f,          0.0f,         0.0f,		 mv.x,
+				0.0f,          1.0f,         0.0f,		 mv.y,
+				0.0f,          0.0f,         1.0f,		 mv.z,
+				0.0f,          0.0f,         0.0f,       1.0f };
+
+	return result;
+}
+
+
+mat4x4 Projection::getRotation(axis t, double a)
+{
+	mat4x4 result = {   1.0f, 0.0f, 0.0f, 0.0f,
+						0.0f, 1.0f, 0.0f, 0.0f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f };
+
+	double sinA = sin(a);
+	double cosA = cos(a);
+
+	switch (t)
+	{
+	case axis::x:
+	{
+		result = {  1.0f,       0.0f,       0.0f,       0.0f,
+					0.0f,       cosA,       sinA,       0.0f,
+					0.0f,      -sinA,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::y:
+	{
+		result = {  cosA,       0.0f,      -sinA,       0.0f,
+					0.0f,       1.0f,       0.0f,       0.0f,
+					sinA,       0.0f,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::z:
+	{
+		result = {  cosA,       sinA,       0.0f,       0.0f,
+				   -sinA,       cosA,       0.0f,       0.0f,
+					0.0f,       0.0f,       1.0f,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	}
+
+	return result;
+}
+
+
 void Projection::object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T)
 {
+
+	//mat4x4 rotX = getRotation(axis::x, rt.x);
+	//mat4x4 rotY = getRotation(axis::y, rt.y);
+	//mat4x4 rotZ = getRotation(axis::z, rt.z);
+	//mat4x4 mXYZ = getTranslation(mv);
+	//
+	//T.A = mXYZ * rotX * rotY * rotZ * mXYZ * T.A;
+	//T.B = mXYZ * rotX * rotY * rotZ * mXYZ * T.B;
+	//T.C = mXYZ * rotX * rotY * rotZ * mXYZ * T.C;
+	//
+	//T.An = rotX * rotY * rotZ * T.An;
+	//T.Bn = rotX * rotY * rotZ * T.Bn;
+	//T.Cn = rotX * rotY * rotZ * T.Cn;
+	//
+	//T.N = rotX * rotY * rotZ * T.N;
+
 	T = Projection::rotXT(rt.x, T);
 	T = Projection::rotYT(rt.y, T);
 	T = Projection::rotZT(rt.z, T);
 	T = translateT(mv.x, mv.y, mv.z, T);
-}
-
-
-void Projection::world2view(triangle3dV& tr, transform3d T, double x, double y, double z)
-{
-	tr.A = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.A))));
-	tr.B = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.B))));
-	tr.C = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr.C))));
-	tr.An = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.An)));
-	tr.Bn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Bn)));
-	tr.Cn = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.Cn)));
-
-	tr.N = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, tr.N)));
 }
 
 
@@ -344,16 +387,6 @@ void Projection::world2view(triangle3dV& tr, mat4x4& rot, mat4x4& mov)
 }
 
 
-vect3 Projection::world2view(transform3d T, vect3 tr, double x, double y, double z)
-{
-	vect3 v;
-
-	v = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, tr))));
-
-	return v;
-}
-
-
 point3 Projection::world2viewP(point3 p, mat4x4& rot, mat4x4& mov)
 {
 	point3 tempPoint;
@@ -364,16 +397,6 @@ point3 Projection::world2viewP(point3 p, mat4x4& rot, mat4x4& mov)
 	tempPoint.colour = p.colour;
 
 	return tempPoint;
-}
-
-
-vect3 Projection::sun2view(transform3d T, vect3 v)
-{
-	vect3 t;
-
-	t = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, v)));
-
-	return t;
 }
 
 

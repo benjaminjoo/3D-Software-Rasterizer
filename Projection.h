@@ -19,8 +19,6 @@ public:
 
 	void clampValue(double* value, double lower, double upper);
 
-	transform3d getTransformation(double azm, double alt, double rol);
-
 	vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v);
 
 	vect3 rotYrad(const double& sinA, const double& cosA, const vect3& v);
@@ -54,17 +52,15 @@ public:
 	void transformMesh(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
 		double rX, double rY, double rZ);
 
-	void object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T);
+	mat4x4 getTranslation(vect3 mv);
 
-	void world2view(triangle3dV& tr, transform3d T, double x, double y, double z);
+	mat4x4 getRotation(axis t, double a);
+
+	void object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T);
 
 	void world2view(triangle3dV& tr, mat4x4& rot, mat4x4& mov);
 
-	vect3 world2view(transform3d T, vect3 tr, double x, double y, double z);
-
 	point3 world2viewP(point3 p, mat4x4& rot, mat4x4& mov);
-
-	vect3 sun2view(transform3d T, vect3 v);
 
 	vect3 screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
 

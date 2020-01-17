@@ -1,8 +1,9 @@
 #include "Particle.h"
 
 
-Particle::Particle(const unsigned& life) : age(0), lifetime(life)
+Particle::Particle(const double& m, const unsigned& life) : mass(m), age(0), lifetime(life)
 {
+	updateKineticEnergy();
 }
 
 
@@ -39,6 +40,7 @@ void Particle::activate(const vect3& pos, const vect3& vel, const vect3& acc)
 	position = pos;
 	velocity = vel;
 	acceleration = acc;
+	updateKineticEnergy();
 }
 
 
@@ -57,12 +59,25 @@ void Particle::update()
 void Particle::updateVelocity()
 {
 	velocity += acceleration;
+	updateKineticEnergy();
+}
+
+
+void Particle::updateKineticEnergy()
+{
+	kEnergy = 0.5f * mass * velocity.len2();
 }
 
 
 vect3 Particle::getPosition()
 {
 	return position;
+}
+
+
+double Particle::getKineticEnergy()
+{
+	return kEnergy;
 }
 
 

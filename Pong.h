@@ -62,9 +62,6 @@ private:
 	unsigned int**								enemiesPolyCount	= nullptr;
 	unsigned int**								enemiesMeshIndices  = nullptr;
 
-	triangle3dV**								skeletonMesh		= nullptr;
-	unsigned int*								skeletonPolyCount	= nullptr;
-
 	triangle3dV**								ballMesh			= nullptr;
 	unsigned int*								ballPolyCount		= nullptr;
 

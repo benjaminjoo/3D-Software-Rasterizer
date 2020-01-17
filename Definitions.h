@@ -219,6 +219,11 @@ struct vect3
 		return sqrt(x * x + y * y + z * z);
 	}
 
+	double len2()
+	{
+		return x * x + y * y + z * z;
+	}
+
 	vect3 norm()
 	{
 		double s = 1.0f / this->len();
@@ -263,6 +268,69 @@ struct vect3
 	vect3	operator *	(const double& s)			//Scale
 	{
 		return { x * s, y * s, z * s, 1.0f };
+	}
+};
+
+
+struct mat4x4
+{
+	double _00 = 0.0f;
+	double _01 = 0.0f;
+	double _02 = 0.0f;
+	double _03 = 0.0f;
+
+	double _10 = 0.0f;
+	double _11 = 0.0f;
+	double _12 = 0.0f;
+	double _13 = 0.0f;
+
+	double _20 = 0.0f;
+	double _21 = 0.0f;
+	double _22 = 0.0f;
+	double _23 = 0.0f;
+
+	double _30 = 0.0f;
+	double _31 = 0.0f;
+	double _32 = 0.0f;
+	double _33 = 0.0f;
+
+	vect3 operator * (const vect3& v)
+	{
+		vect3 t;
+
+		t.x = v.x * _00 + v.y * _01 + v.z * _02 + v.w * _03;
+		t.y = v.x * _10 + v.y * _11 + v.z * _12 + v.w * _13;
+		t.z = v.x * _20 + v.y * _21 + v.z * _22 + v.w * _23;
+		t.w = v.x * _30 + v.y * _31 + v.z * _32 + v.w * _33;
+
+		return t;
+	}
+
+	mat4x4 operator * (const mat4x4& m)
+	{
+		mat4x4 t;
+
+		t._00 = _00 * m._00 + _01 * m._10 + _02 * m._20 + _03 * m._30;
+		t._01 = _00 * m._01 + _01 * m._11 + _02 * m._21 + _03 * m._31;
+		t._02 = _00 * m._02 + _01 * m._12 + _02 * m._22 + _03 * m._32;
+		t._03 = _00 * m._03 + _01 * m._13 + _02 * m._23 + _03 * m._33;
+
+		t._10 = _10 * m._00 + _11 * m._10 + _12 * m._20 + _13 * m._30;
+		t._11 = _10 * m._01 + _11 * m._11 + _12 * m._21 + _13 * m._31;
+		t._12 = _10 * m._02 + _11 * m._12 + _12 * m._22 + _13 * m._32;
+		t._13 = _10 * m._03 + _11 * m._13 + _12 * m._23 + _13 * m._33;
+
+		t._20 = _20 * m._00 + _21 * m._10 + _22 * m._20 + _23 * m._30;
+		t._21 = _20 * m._01 + _21 * m._11 + _22 * m._21 + _23 * m._31;
+		t._22 = _20 * m._02 + _21 * m._12 + _22 * m._22 + _23 * m._32;
+		t._23 = _20 * m._03 + _21 * m._13 + _22 * m._23 + _23 * m._33;
+
+		t._30 = _30 * m._00 + _31 * m._10 + _32 * m._20 + _33 * m._30;
+		t._31 = _30 * m._01 + _31 * m._11 + _32 * m._21 + _33 * m._31;
+		t._32 = _30 * m._02 + _31 * m._12 + _32 * m._22 + _33 * m._32;
+		t._33 = _30 * m._03 + _31 * m._13 + _32 * m._23 + _33 * m._33;
+
+		return t;
 	}
 };
 
@@ -500,70 +568,7 @@ struct triangle2dG	//2D Triangle for Gouraud shading
 	textCoord Ct;
 };
 
-
-struct mat4x4
-{
-	double _00 = 0.0f;
-	double _01 = 0.0f;
-	double _02 = 0.0f;
-	double _03 = 0.0f;
-
-	double _10 = 0.0f;
-	double _11 = 0.0f;
-	double _12 = 0.0f;
-	double _13 = 0.0f;
-
-	double _20 = 0.0f;
-	double _21 = 0.0f;
-	double _22 = 0.0f;
-	double _23 = 0.0f;
-
-	double _30 = 0.0f;
-	double _31 = 0.0f;
-	double _32 = 0.0f;
-	double _33 = 0.0f;
-
-	vect3 operator * (const vect3& v)
-	{
-		vect3 t;
-
-		t.x = v.x * _00 + v.y * _01 + v.z * _02 + v.w * _03;
-		t.y = v.x * _10 + v.y * _11 + v.z * _12 + v.w * _13;
-		t.z = v.x * _20 + v.y * _21 + v.z * _22 + v.w * _23;
-		t.w = v.x * _30 + v.y * _31 + v.z * _32 + v.w * _33;
-
-		return t;
-	}
-
-	mat4x4 operator * (const mat4x4& m)
-	{
-		mat4x4 t;
-
-		t._00 = _00 * m._00 + _01 * m._10 + _02 * m._20 + _03 * m._30;
-		t._01 = _00 * m._01 + _01 * m._11 + _02 * m._21 + _03 * m._31;
-		t._02 = _00 * m._02 + _01 * m._12 + _02 * m._22 + _03 * m._32;
-		t._03 = _00 * m._03 + _01 * m._13 + _02 * m._23 + _03 * m._33;
-
-		t._10 = _10 * m._00 + _11 * m._10 + _12 * m._20 + _13 * m._30;
-		t._11 = _10 * m._01 + _11 * m._11 + _12 * m._21 + _13 * m._31;
-		t._12 = _10 * m._02 + _11 * m._12 + _12 * m._22 + _13 * m._32;
-		t._13 = _10 * m._03 + _11 * m._13 + _12 * m._23 + _13 * m._33;
-
-		t._20 = _20 * m._00 + _21 * m._10 + _22 * m._20 + _23 * m._30;
-		t._21 = _20 * m._01 + _21 * m._11 + _22 * m._21 + _23 * m._31;
-		t._22 = _20 * m._02 + _21 * m._12 + _22 * m._22 + _23 * m._32;
-		t._23 = _20 * m._03 + _21 * m._13 + _22 * m._23 + _23 * m._33;
-
-		t._30 = _30 * m._00 + _31 * m._10 + _32 * m._20 + _33 * m._30;
-		t._31 = _30 * m._01 + _31 * m._11 + _32 * m._21 + _33 * m._31;
-		t._32 = _30 * m._02 + _31 * m._12 + _32 * m._22 + _33 * m._32;
-		t._33 = _30 * m._03 + _31 * m._13 + _32 * m._23 + _33 * m._33;
-
-		return t;
-	}
-};
-
-
+/*
 struct transform3d
 {
 	double x = 0.0f;
@@ -577,7 +582,7 @@ struct transform3d
 	double sinRol = 0.0f;
 	double cosRol = 0.0f;
 };
-
+*/
 double distancePN(polyNode a, polyNode b);
 
 polyNode subNodes(polyNode a, polyNode b);

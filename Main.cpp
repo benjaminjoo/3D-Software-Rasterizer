@@ -93,7 +93,7 @@ void pong3d()
 
 	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
 
-	//Hero->addPart(weapon);
+	Hero->addPart(weapon);
 
 	auto Observer	= std::make_shared<Player>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
 
@@ -289,15 +289,22 @@ void pong3d()
 
 #ifdef _PARTICLES_
 
-	//Add particle emitter
-	auto smokeMachine = std::make_shared<ParticleSystem>(0.25f, 2000, 5, 0x007f7fff);
-	smokeMachine->setOrigin({ -10.0f, -10.0f, 0.0f, 1.0f });
-	smokeMachine->setDirection({ 0.0f, 1.0f, 1.0f, 1.0f });
-	smokeMachine->setDispersion(0.01f);
-	smokeMachine->activate();
-	smokeMachine->setGravity(false);
+	//Add room
+	auto box2 = std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
+	box2->setTexture(3, 3, 3, 3, 3, 3);
+	box2->setTextureScale(10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f);
+	box2->calculateMesh();
+	Game->addEntity(box2);
 
-	Game->addEmitter(smokeMachine);
+	//Add particle emitter
+	auto waterFountain = std::make_shared<ParticleSystem>(0.2f, 1.0f, 3000, 3, 0x007f7fff);
+	waterFountain->setOrigin({ 1.0f, 1.0f, 1.0f, 1.0f });
+	waterFountain->setDirection({ 3.0f, 4.0f, 5.0f, 1.0f });
+	waterFountain->setDispersion(0.01f);
+	waterFountain->activate();
+	waterFountain->setGravity(true);
+
+	Game->addEmitter(waterFountain);
 
 #endif//_PARTICLES_
 

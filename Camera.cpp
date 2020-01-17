@@ -62,6 +62,12 @@ Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, d
 }
 
 
+Camera::~Camera()
+{
+	std::cout << "Camera destructor called" << std::endl;
+}
+
+
 void Camera::linkToCanvas(std::shared_ptr<Canvas> screen)
 {
 	pixelBuffer = screen->pixelBuffer;
@@ -71,9 +77,22 @@ void Camera::linkToCanvas(std::shared_ptr<Canvas> screen)
 }
 
 
-Camera::~Camera()
+void Camera::addTexture(SDL_Surface* T)
 {
-	std::cout << "Camera destructor called" << std::endl;
+	if (T == nullptr)
+	{
+		std::cout << "Image loading failed..." << std::endl;
+	}
+	else
+	{
+		txt tempTexture;
+		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
+		tempTexture.pixels = (Uint32*)tempImage->pixels;
+		tempTexture.ID = textureData.size();
+		tempTexture.w = T->w;
+		tempTexture.h = T->h;
+		textureData.push_back(tempTexture);
+	}
 }
 
 
@@ -101,93 +120,6 @@ double Camera::getVRatio()
 }
 
 
-void Camera::clearVertexList()
-{
-	for (int v = 0; v < MAXCLIPVERTS; v++)
-	{
-		vertexList[v] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		uvList[v] = { 0.0f, 0.0f };
-	}
-}
-
-
-mat4x4 Camera::getTranslation()
-{
-	mat4x4 result;
-
-	result = {  1.0f,          0.0f,         0.0f,		-x,
-				0.0f,          1.0f,         0.0f,		-y,
-				0.0f,          0.0f,         1.0f,		-z,
-				0.0f,          0.0f,         0.0f,       1.0f };
-
-	return result;
-}
-
-
-mat4x4 Camera::getRotation(axis t, double a)
-{
-	mat4x4 result = {	1.0f, 0.0f, 0.0f, 0.0f,
-						0.0f, 1.0f, 0.0f, 0.0f,
-						0.0f, 0.0f, 1.0f, 0.0f,
-						0.0f, 0.0f, 0.0f, 1.0f };
-
-	double sinA = sin(a);
-	double cosA = cos(a);
-
-	switch (t)
-	{
-		case axis::x:
-		{
-			result = {  1.0f,       0.0f,       0.0f,       0.0f,
-						0.0f,       cosA,       sinA,       0.0f,
-						0.0f,      -sinA,       cosA,       0.0f,
-						0.0f,       0.0f,       0.0f,       1.0f };
-		}
-		break;
-		case axis::y:
-		{
-			result = {	cosA,       0.0f,      -sinA,       0.0f,
-						0.0f,       1.0f,       0.0f,       0.0f,
-						sinA,       0.0f,       cosA,       0.0f,
-						0.0f,       0.0f,       0.0f,       1.0f };
-		}
-		break;
-		case axis::z:
-		{
-			result = {	cosA,       sinA,       0.0f,       0.0f,
-					   -sinA,       cosA,       0.0f,       0.0f,
-						0.0f,       0.0f,       1.0f,       0.0f,
-						0.0f,       0.0f,       0.0f,       1.0f };
-		}
-		break;
-	}
-
-	return result;
-}
-
-
-mat4x4 Camera::getRotation()
-{
-	mat4x4 result = getRotation(axis::z, rol) *
-					getRotation(axis::x, -(alt + PI * 0.5f)) *
-					getRotation(axis::z, -(azm + PI * 0.5f));
-
-	return result;
-}
-
-
-void Camera::world2view(triangle3dV& T, mat4x4& rot, mat4x4& mov)
-{
-	T.A = rot * mov * T.A;
-	T.B = rot * mov * T.B;
-	T.C = rot * mov * T.C;
-	T.An = rot * T.An;
-	T.Bn = rot * T.Bn;
-	T.Cn = rot * T.Cn;
-	T.N = rot * T.N;
-}
-
-
 bool Camera::polyFacingCamera(const triangle3dV& P)
 {
 	vect3 eyeVector = subVectors(P.A, { x, y, z, 1.0 });
@@ -195,97 +127,13 @@ bool Camera::polyFacingCamera(const triangle3dV& P)
 }
 
 
-void Camera::clipToFrustumL(line3d* line)
+void Camera::clearVertexList()
 {
-	plane currentPlane;
-
-	currentPlane = Frustum.getNearPlane();
-	this->clipLine(currentPlane, line);
-	currentPlane = Frustum.getTopPlane();
-	this->clipLine(currentPlane, line);
-	currentPlane = Frustum.getBottomPlane();
-	this->clipLine(currentPlane, line);
-	currentPlane = Frustum.getLeftPlane();
-	this->clipLine(currentPlane, line);
-	currentPlane = Frustum.getRightPlane();
-	this->clipLine(currentPlane, line);
-	currentPlane = Frustum.getFarPlane();
-	this->clipLine(currentPlane, line);
-}
-
-
-void Camera::clipLine(plane p, line3d* line)
-{
-	double t;
-
-	//vect3 a		= line->A - p.P;
-	vect3 a			= subVectors(line->A, p.P);
-	//double sA	= a * p.N;
-	double sA		= dotProduct(a, p.N);
-	//vect3 b		= line->B - p.P;
-	vect3 b			= subVectors(line->B, p.P);
-	//double sB	= b * p.N;
-	double sB		= dotProduct(b, p.N);
-
-	if (sign(sA) != sign(sB))
+	for (int v = 0; v < MAXCLIPVERTS; v++)
 	{
-		//vect3 d = line->B - line->A;
-		vect3 d = subVectors(line->B, line->A);
-		//double dist = d * p.N;
-		double dist = dotProduct(d, p.N);
-
-		if (sA > 0)
-		{
-			if (dist)
-			{
-				t = (dist - sB) / dist;
-
-				line->B.x = line->A.x + t * (line->B.x - line->A.x);
-				line->B.y = line->A.y + t * (line->B.y - line->A.y);
-				line->B.z = line->A.z + t * (line->B.z - line->A.z);
-
-				//line->B = line->A + ((line->B - line->A) * t);
-			}
-		}
-		if (sB > 0)
-		{
-			if (dist)
-			{
-				t = (-dist - sA) / dist;
-
-				line->A.x = line->B.x - t * (line->A.x - line->B.x);
-				line->A.y = line->B.y - t * (line->A.y - line->B.y);
-				line->A.z = line->B.z - t * (line->A.z - line->B.z);
-
-				//line->A = line->B - ((line->A - line->B) * t);
-			}
-		}
+		vertexList[v] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		uvList[v] = { 0.0f, 0.0f };
 	}
-}
-
-
-bool Camera::insideFrustum(point3 point)
-{
-	if (this->assertPointVis(Frustum.getNearPlane(),	point) &&
-		this->assertPointVis(Frustum.getTopPlane(),		point) &&
-		this->assertPointVis(Frustum.getBottomPlane(),	point) &&
-		this->assertPointVis(Frustum.getLeftPlane(),	point) &&
-		this->assertPointVis(Frustum.getRightPlane(),	point) &&
-		this->assertPointVis(Frustum.getFarPlane(),		point))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-
-bool Camera::assertPointVis(plane plane, point3 Point)
-{
-	return dotProduct(subVectors(Point.P, plane.P), plane.N) >= 0 ? true : false;
-	//return ((Point.P - plane.P) * plane.N) >= 0.0f ? true : false;
 }
 
 
@@ -455,6 +303,215 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 }
 
 
+void Camera::updatePosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
+{
+	azm = -turnH;
+	alt = -turnV;
+	rol = tiltP;
+
+	x -= moveP * cos(azm) - strafeP * cos(azm + PI * 0.5f);
+	y += moveP * sin(azm) - strafeP * sin(azm + PI * 0.5f);
+	z += riseP;
+}
+
+
+void Camera::centreLook()
+{
+	alt = 0.0f;
+}
+
+
+mat4x4 Camera::getTranslation(vect3 mv)
+{
+	mat4x4 result;
+
+	result = {  1.0f,          0.0f,         0.0f,		 mv.x,
+				0.0f,          1.0f,         0.0f,		 mv.y,
+				0.0f,          0.0f,         1.0f,		 mv.z,
+				0.0f,          0.0f,         0.0f,       1.0f };
+
+	return result;
+}
+
+
+mat4x4 Camera::getTranslation()
+{
+	mat4x4 result;
+
+	result = {  1.0f,          0.0f,         0.0f,		-x,
+				0.0f,          1.0f,         0.0f,		-y,
+				0.0f,          0.0f,         1.0f,		-z,
+				0.0f,          0.0f,         0.0f,       1.0f };
+
+	return result;
+}
+
+
+mat4x4 Camera::getRotation(axis t, double a)
+{
+	mat4x4 result = {   1.0f, 0.0f, 0.0f, 0.0f,
+						0.0f, 1.0f, 0.0f, 0.0f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f };
+
+	double sinA = sin(a);
+	double cosA = cos(a);
+
+	switch (t)
+	{
+	case axis::x:
+	{
+		result = {  1.0f,       0.0f,       0.0f,       0.0f,
+					0.0f,       cosA,       sinA,       0.0f,
+					0.0f,      -sinA,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::y:
+	{
+		result = {  cosA,       0.0f,      -sinA,       0.0f,
+					0.0f,       1.0f,       0.0f,       0.0f,
+					sinA,       0.0f,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::z:
+	{
+		result = {  cosA,       sinA,       0.0f,       0.0f,
+				   -sinA,       cosA,       0.0f,       0.0f,
+					0.0f,       0.0f,       1.0f,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	}
+
+	return result;
+}
+
+
+mat4x4 Camera::getRotation()
+{
+	mat4x4 result = getRotation(axis::z, rol) *
+					getRotation(axis::x, -(alt + PI * 0.5f)) *
+					getRotation(axis::z, -(azm + PI * 0.5f));
+
+	return result;
+}
+
+
+void Camera::object2world(mat4x4& MR, mat4x4& R, triangle3dV& T)
+{
+	T.A		= MR	* T.A;
+	T.B		= MR	* T.B;
+	T.C		= MR	* T.C;
+	T.An	= R	* T.An;
+	T.Bn	= R	* T.Bn;
+	T.Cn	= R	* T.Cn;
+	T.N		= R	* T.N;
+}
+
+
+void Camera::world2view(mat4x4 & RM, mat4x4 & R, triangle3dV& T)
+{
+	T.A		= RM * T.A;
+	T.B		= RM * T.B;
+	T.C		= RM * T.C;
+	T.An	= R * T.An;
+	T.Bn	= R * T.Bn;
+	T.Cn	= R * T.Cn;
+	T.N		= R * T.N;
+}
+
+
+void Camera::world2viewPointM(point3 & P, mat4x4 & RM)
+{
+	P.P = RM * P.P;
+}
+
+
+void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, double* depthBuffer)
+{
+	this->world2viewPointM(p, RM);
+	projectPoint(p, pixelBuffer, depthBuffer);
+}
+
+
+void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
+{
+	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
+	if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
+	{
+		pixelBuffer[cp.y * w + cp.x] = P.colour;
+		depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
+	}
+}
+
+
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	mat4x4 RM	= rot * mov;
+	mat4x4 M	= mov;
+
+	for (int i = 0; i < nPoly; i++)
+	{
+		triangle3dV worldT = mesh[i];
+
+		if (polyFacingCamera(worldT))
+			renderPolygon(RM, M, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
+	}
+}
+
+
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+	vect3 mv, vect3 rt, LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	mat4x4 rotX	= getRotation(axis::x, rt.x);
+
+	mat4x4 rotY	= getRotation(axis::y, -rt.y);
+
+	mat4x4 rotZ	= getRotation(axis::z, -rt.z);
+
+	mat4x4 R	= rotZ * rotY * rotX;
+
+	mat4x4 MOV	= getTranslation(mv);
+
+	mat4x4 MR	= MOV * R;
+
+	mat4x4 RM	= rot * mov;
+	mat4x4 M	= mov;
+
+	for (int i = 0; i < nPoly; i++)
+	{
+		triangle3dV worldT = mesh[i];
+
+		this->object2world(MR, R, worldT);
+
+		if (polyFacingCamera(worldT))
+			renderPolygon(RM, M, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
+	}
+}
+
+
+void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSource Sun,
+	const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+{
+	triangle3dV worldT = viewT;
+
+	this->world2view(RM, R, viewT);
+
+	Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle);
+
+	int nVert = this->clipToFrustum(viewT, vertexList, uvList);
+
+	Uint32 colour = worldT.colour;
+
+	currentTexture = &textureData[viewT.texture];
+
+	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
+}
+
+
 inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const double& vR)
 {
 	coord2 pixel;
@@ -468,33 +525,6 @@ inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const d
 	return pixel;
 }
 
-
-void Camera::projectLine(line3d line, Uint32* pixelBuffer, double* depthBuffer, double hRatio, double vRatio)
-{
-	coord2 startP	= this->view2screen(line.A, hRatio, vRatio);
-	coord2 endP		= this->view2screen(line.B, hRatio, vRatio);
-
-	if ((startP.x	>= 0	&& startP.x		< w	)	&&
-		(startP.y	>= 0	&& startP.y		< h	)	&&
-		(endP.x		>= 0	&& endP.x		< w	)	&&
-		(endP.y		>= 0	&& endP.y		< h	))
-	{
-		Screen->drawLine(startP, endP, line.colour);
-	}
-}
-
-
-void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
-{
-	double hRatio = this->getHRatio();
-	double vRatio = this->getVRatio();
-	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
-	if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
-	{
-		pixelBuffer[cp.y * w + cp.x] = P.colour;
-		depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
-	}
-}
 
 void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double torchI, double maxI, triangle3dV originalPoly)
 {
@@ -542,7 +572,6 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			screenT.Ct = uvList[2 + i];
 
 			screenT.h = colour;
-			bool d = false;
 
 			switch (style)
 			{
@@ -588,7 +617,7 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			break;
 			case test:
 			{
-				
+
 			}
 			break;
 			default:
@@ -598,110 +627,6 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			break;
 			}
 		}
-	}
-}
-
-
-vect3 Camera::getPosition()
-{
-	return { x, y, z, 1.0f };
-}
-
-
-void Camera::updatePosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
-{
-	azm = -turnH;
-	alt = -turnV;
-	rol = tiltP;
-
-	x -= moveP * cos(azm) - strafeP * cos(azm + PI * 0.5);
-	y += moveP * sin(azm) - strafeP * sin(azm + PI * 0.5);
-	z += riseP;
-}
-
-
-void Camera::centreLook()
-{
-	alt = 0.0;
-}
-
-
-void Camera::renderPoint(point3 p, Uint32* pixelBuffer, double* depthBuffer)
-{
-	mat4x4 Rotation = getRotation();
-	mat4x4 Translation = getTranslation();
-	Renderer->world2viewP(p, Rotation, Translation);
-	projectPoint(p, pixelBuffer, depthBuffer);
-}
-
-
-void Camera::addTexture(SDL_Surface* T)
-{
-	if (T == nullptr)
-	{
-		std::cout << "Image loading failed..." << std::endl;
-	}
-	else
-	{
-		txt tempTexture;
-		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
-		tempTexture.pixels = (Uint32*)tempImage->pixels;
-		tempTexture.ID = textureData.size();
-		tempTexture.w = T->w;
-		tempTexture.h = T->h;
-		textureData.push_back(tempTexture);
-	}
-}
-
-void Camera::addTexture(txt T)
-{
-	textureData.push_back(T);
-}
-
-
-void Camera::renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
-	const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
-{
-	triangle3dV worldT = viewT;
-
-	this->world2view(viewT, rot, mov);
-
-	Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle);
-	
-	int nVert = this->clipToFrustum(viewT, vertexList, uvList);
-
-	Uint32 colour = worldT.colour;
-
-	currentTexture = &textureData[viewT.texture];
-
-	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
-}
-
-
-void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
-{
-	for (int i = 0; i < nPoly; i++)
-	{
-		triangle3dV worldT = mesh[i];
-
-		if (polyFacingCamera(worldT))
-			renderPolygon(rot, mov, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
-	}
-}
-
-
-void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-	vect3 sc, vect3 mv, vect3 rt, LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
-{
-	for (int i = 0; i < nPoly; i++)
-	{
-		triangle3dV worldT = mesh[i];
-
-		Renderer->object2worldT(sc, mv, rt, worldT);
-
-		if (polyFacingCamera(worldT))
-			renderPolygon(rot, mov, worldT, Sun, visualStyle, torchIntensity, maxIllumination);
 	}
 }
 
