@@ -195,7 +195,7 @@ void SolidSTL::readSTLfile()
 
 void SolidSTL::smoothSurfaces()
 {
-	for (auto p = polyContainer.begin(); p != polyContainer.end(); ++p)
+	for (auto& p : polyContainer)
 	{
 		vect3 accA, accB, accC;
 
@@ -205,11 +205,11 @@ void SolidSTL::smoothSurfaces()
 
 		//Vertex A
 
-		for (auto a = polyContainer.begin(); a != polyContainer.end(); ++a)
+		for (auto& a : polyContainer)
 		{
-			if ((match(p->A, a->A) || match(p->A, a->B) || match(p->A, a->C)) && dotProduct(p->N, a->N) > 0.5f)
+			if ((match(p.A, a.A) || match(p.A, a.B) || match(p.A, a.C)) && dotProduct(p.N, a.N) > 0.5f)
 			{
-				accA = addVectors(accA, a->N);
+				accA = addVectors(accA, a.N);
 				neighbourCountA++;
 				if (neighbourCountA >= 5)
 					break;
@@ -218,11 +218,11 @@ void SolidSTL::smoothSurfaces()
 
 		//Vertex B
 
-		for (auto b = polyContainer.begin(); b != polyContainer.end(); ++b)
+		for (auto& b : polyContainer)
 		{
-			if ((match(p->B, b->A) || match(p->B, b->B) || match(p->B, b->C)) && dotProduct(p->N, b->N) > 0.5f)
+			if ((match(p.B, b.A) || match(p.B, b.B) || match(p.B, b.C)) && dotProduct(p.N, b.N) > 0.5f)
 			{
-				accB = addVectors(accB, b->N);
+				accB = addVectors(accB, b.N);
 				neighbourCountB++;
 				if (neighbourCountB >= 5)
 					break;
@@ -231,19 +231,19 @@ void SolidSTL::smoothSurfaces()
 
 		//Vertex C
 
-		for (auto c = polyContainer.begin(); c != polyContainer.end(); ++c)
+		for (auto& c : polyContainer)
 		{
-			if ((match(p->C, c->A) || match(p->C, c->B) || match(p->C, c->C)) && dotProduct(p->N, c->N) > 0.5f)
+			if ((match(p.C, c.A) || match(p.C, c.B) || match(p.C, c.C)) && dotProduct(p.N, c.N) > 0.5f)
 			{
-				accC = addVectors(accC, c->N);
+				accC = addVectors(accC, c.N);
 				neighbourCountC++;
 				if (neighbourCountC >= 5)
 					break;
 			}
 		}
 
-		p->An = unitVector(accA);
-		p->Bn = unitVector(accB);
-		p->Cn = unitVector(accC);
+		p.An = unitVector(accA);
+		p.Bn = unitVector(accB);
+		p.Cn = unitVector(accC);
 	}
 }

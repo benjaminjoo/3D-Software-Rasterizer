@@ -25,6 +25,7 @@ void Particle::reset()
 	position = { 0.0f, 0.0f, 0.0f, 1.0f };
 	velocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 	acceleration = { 0.0f, 0.0f, 0.0f, 1.0f };
+	kEnergy = 0.0f;
 }
 
 
@@ -52,6 +53,8 @@ void Particle::update()
 		age++;
 		if (age >= lifetime)
 			reset();
+		if (kEnergy <= 0.0f)
+			reset();
 	}
 }
 
@@ -59,6 +62,13 @@ void Particle::update()
 void Particle::updateVelocity()
 {
 	velocity += acceleration;
+	updateKineticEnergy();
+}
+
+
+void Particle::updateVelocity(vect3& v)
+{
+	velocity += v;
 	updateKineticEnergy();
 }
 
@@ -72,6 +82,12 @@ void Particle::updateKineticEnergy()
 vect3 Particle::getPosition()
 {
 	return position;
+}
+
+
+vect3 Particle::getVelocity()
+{
+	return velocity;
 }
 
 

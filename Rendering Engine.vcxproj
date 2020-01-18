@@ -174,8 +174,6 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6385</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6385</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="Bone.cpp" />
-    <ClCompile Include="LongBone.cpp" />
     <ClCompile Include="BSP1Loader.cpp" />
     <ClCompile Include="BSP3Loader.cpp" />
     <ClCompile Include="Bullet.cpp" />
@@ -198,9 +196,8 @@
     <ClCompile Include="OpenGLShader.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
-    <ClCompile Include="PelvisBone.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Pong.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Projection.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="ShadowVolume.cpp" />
@@ -223,12 +220,11 @@
     <ClCompile Include="Speaker.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="ViewVolume.cpp" />
+    <ClCompile Include="DynamicMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BezierPatch.h" />
-    <ClInclude Include="Bone.h" />
     <ClInclude Include="c64Fonts.h" />
-    <ClInclude Include="LongBone.h" />
     <ClInclude Include="BSP1Loader.h" />
     <ClInclude Include="BSP3Loader.h" />
     <ClInclude Include="Bullet.h" />
@@ -251,9 +247,8 @@
     <ClInclude Include="OpenGLTransform.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
-    <ClInclude Include="PelvisBone.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Pong.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Projection.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ShadowVolume.h" />
@@ -271,6 +266,7 @@
     <ClInclude Include="Text.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewVolume.h" />
+    <ClInclude Include="DynamicMesh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

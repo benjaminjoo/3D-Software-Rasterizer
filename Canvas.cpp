@@ -61,6 +61,7 @@ Canvas::Canvas(const std::string& windowTitle, int width, int height, double z):
 Canvas::~Canvas()
 {
 	std::cout << "Canvas destructor called" << std::endl;
+	cleanUp();
 }
 
 

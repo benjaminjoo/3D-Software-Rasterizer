@@ -8,8 +8,8 @@ Player::Player(std::shared_ptr<Projection> renderer) : Renderer(renderer)
 
 
 Player::Player(std::shared_ptr<Projection> renderer, double px, double py, double pz, double rx, double ry, double rz,
-	double rad, int hlt, int amm, std::shared_ptr<PelvisBone> sk) :
-	Renderer(renderer), x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm), skeleton(sk)
+	double rad, int hlt, int amm) :
+	Renderer(renderer), x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm) 
 {
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, px, py, pz, rx, ry, rz, 0xffffff00, 1, 0.5f, 24);
 }
@@ -110,40 +110,6 @@ unsigned int Player::getHealth()
 void Player::addPart(std::shared_ptr<SolidBody> p)
 {
 	Parts.push_back(p);
-}
-
-
-void Player::incrementWalkPhase()
-{
-	currentPhase += walkingSpeed;
-	if (currentPhase >= 1.0f)
-		currentPhase = 0.0f;
-}
-
-
-void Player::updateSkeleton()
-{
-	incrementWalkPhase();
-	std::cout << currentPhase * 100.0f << "%" << std::endl;
-	if (currentPhase < 0.5f)
-		this->updateLeftLimb();
-	else
-		this->updateRightLimb();
-
-}
-
-
-void Player::updateLeftLimb()
-{
-	if(skeleton != nullptr)
-		skeleton->initiateUpdateLeft();
-}
-
-
-void Player::updateRightLimb()
-{
-	if(skeleton != nullptr)
-		skeleton->initiateUpdateRight();
 }
 
 

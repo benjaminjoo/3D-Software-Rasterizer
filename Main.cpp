@@ -33,11 +33,10 @@
 #include "OpenGLAdapter.h"
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
-#include "Pong.h"
+#include "Game.h"
 #include "Player.h"
-#include "PelvisBone.h"
-#include "LongBone.h"
 #include "ParticleSystem.h"
+#include "DynamicMesh.h"
 
 
 void editor()
@@ -59,7 +58,6 @@ void editor()
 	while (!Controls->quit)
 	{
 		Screen->resetPixelBuffer();
-		Screen->resetDepthBuffer();
 
 		Builder->updateScreen();
 		Controls->HandleUserEvents();
@@ -67,7 +65,49 @@ void editor()
 		Screen->update();
 	}
 
-	Screen->cleanUp();
+	IMG_Quit();
+
+	SDL_Quit();
+}
+
+
+void water()
+{
+	auto Eye		= std::make_shared<Camera>(nullptr, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+
+	Eye->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/wolf002.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/mosaic001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/brick001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/concrete001.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/timber.jpg"));
+	Eye->addTexture(IMG_Load("Assets/Textures/metal.jpg"));
+
+	auto Screen		= std::make_shared<Canvas>("Waves", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+
+	Eye->linkToCanvas(Screen);
+
+	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+
+	auto Sun		= std::make_shared<LightSource>(300.0f, 75.0f, 0.95f);
+
+	auto Viewer		= std::make_shared<Player>(nullptr, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+
+	auto testWorld	= std::make_shared<Game>(Screen, Eye, nullptr, Controls, Sun, Viewer, nullptr);
+
+	testWorld->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
+
+	auto Sea		= std::make_shared<DynamicMesh>(36, 36, 8.0f, 0.25f, 5.0f, 2.5f, 0x00007fbf, false);
+
+	testWorld->addDynamicSurface(Sea);
+
+	testWorld->buildMesh();
+
+	while (!Controls->quit)
+		testWorld->updateAll();
+
+	testWorld->destroyMesh();
 
 	IMG_Quit();
 
@@ -75,7 +115,7 @@ void editor()
 }
 
 
-void pong3d()
+void fps_game()
 {
 	auto Screen		= std::make_shared<Canvas>("3D Shooter", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
@@ -89,22 +129,22 @@ void pong3d()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(Renderer, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);	
+	auto Hero		= std::make_shared<Player>(Renderer, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
 
 	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
 
 	Hero->addPart(weapon);
 
-	auto Observer	= std::make_shared<Player>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Observer	= std::make_shared<Player>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto cone		= std::make_shared<SolidCone>(0.0f, 0.0f, 0.0f, 0x000000ff);
 
 	Observer->addPart(cone);
 	
-	auto Game		= std::make_shared<Pong>(Screen, Eye, Renderer, Controls, Sun, Hero, Observer);
+	auto fpsGame		= std::make_shared<Game>(Screen, Eye, Renderer, Controls, Sun, Hero, Observer);
 
 	//Fill up bullet pool
-	Game->loadProjectile(200);
+	fpsGame->loadProjectile(200);
 
 //#define _STL_READER_
 //#define _PLANETS_
@@ -118,7 +158,7 @@ void pong3d()
 
 	auto quake1Map = std::make_shared<BSP1Loader>("Assets/QuakeMaps/dm6.bsp", 0.01f, 0.01f, 0.01f);
 	quake1Map->readData();
-	Game->addEntity(quake1Map);
+	fpsGame->addEntity(quake1Map);
 
 	int nTxt = quake1Map->getTotalText();
 	txt* quakeTextures = new txt[nTxt];
@@ -139,10 +179,10 @@ void pong3d()
 
 #ifdef _STL_READER_
 
-	auto navalGun = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/naval_gun.stl");
-	navalGun->readSTLfile();
-	//test_body.smoothSurfaces();
-	Game->addEntity(navalGun);
+	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/utah_teapot.stl");
+	teapot->readSTLfile();
+	teapot->smoothSurfaces();
+	fpsGame->addEntity(teapot);
 
 #endif//_STL_READER_
 
@@ -160,7 +200,7 @@ void pong3d()
 	//Earth->setMotion(true);
 	//Earth->setAngularVelocity({ 0.0f, 0.0f, -0.001f, 1.0f });
 
-	Game->addEntity(Earth);
+	fpsGame->addEntity(Earth);
 
 	auto Mars = std::make_shared<SolidSphere>(	1.0f, 1.0f, 1.0f,
 												15.0f, 12.5f, 5.0f,
@@ -170,7 +210,7 @@ void pong3d()
 	//Mars->setMotion(true);
 	//Mars->setAngularVelocity({ 0.0f, 0.0f, -0.0005f, 1.0f });
 
-	Game->addEntity(Mars);
+	fpsGame->addEntity(Mars);
 
 #endif//_PLANETS_
 
@@ -178,7 +218,7 @@ void pong3d()
 
 	auto quake3Map = std::make_shared<BSP3Loader>("Assets/QuakeMaps/13ground.bsp", 0.01f, 0.01f, 0.01f);
 	quake3Map->readData();
-	Game->addEntity(quake3Map);
+	fpsGame->addEntity(quake3Map);
 
 #endif//_QUAKE_3_READER_
 
@@ -200,7 +240,7 @@ void pong3d()
 	patch->setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
 	patch->setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
 
-	Game->addEntity(patch);
+	fpsGame->addEntity(patch);
 
 #endif//_BEZIER_PATCH_
 
@@ -213,9 +253,9 @@ void pong3d()
 	auto box		= std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
 	box->calculateMesh();	
 
-	Game->addEntity(box);
-	Game->addEntity(pedestal);
-	Game->addEntity(wall);
+	fpsGame->addEntity(box);
+	fpsGame->addEntity(pedestal);
+	fpsGame->addEntity(wall);
 
 	//Add some spheres floating around
 	srand(unsigned int(time(NULL)));
@@ -239,11 +279,11 @@ void pong3d()
 		ball->setBehaviour(bounce);
 		ball->setBreakability(true);
 	
-		Game->addBall(ball);
+		fpsGame->addBall(ball);
 	}
 
 	//Create enemies
-	auto Enemy1		= std::make_shared<Player>(Renderer, 20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy1		= std::make_shared<Player>(Renderer, 20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
 	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4);
@@ -255,9 +295,9 @@ void pong3d()
 	Enemy1->addPart(e_031);
 	Enemy1->addPart(e_041);
 
-	Game->addEnemy(Enemy1);
+	fpsGame->addEnemy(Enemy1);
 
-	auto Enemy2		= std::make_shared<Player>(Renderer, 40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy2		= std::make_shared<Player>(Renderer, 40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 7, 1.5f, 8);
 	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
@@ -269,9 +309,9 @@ void pong3d()
 	Enemy2->addPart(e_032);
 	Enemy2->addPart(e_042);
 
-	Game->addEnemy(Enemy2);
+	fpsGame->addEnemy(Enemy2);
 
-	auto Enemy3 = std::make_shared<Player>(Renderer, -40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100, nullptr);
+	auto Enemy3 = std::make_shared<Player>(Renderer, -40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 8);
 	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
@@ -283,7 +323,7 @@ void pong3d()
 	Enemy3->addPart(e_033);
 	Enemy3->addPart(e_043);
 
-	Game->addEnemy(Enemy3);
+	fpsGame->addEnemy(Enemy3);
 
 #endif//_SHOOTER_
 
@@ -294,7 +334,7 @@ void pong3d()
 	box2->setTexture(3, 3, 3, 3, 3, 3);
 	box2->setTextureScale(10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f);
 	box2->calculateMesh();
-	Game->addEntity(box2);
+	fpsGame->addEntity(box2);
 
 	//Add particle emitter
 	auto waterFountain = std::make_shared<ParticleSystem>(0.2f, 1.0f, 3000, 3, 0x007f7fff);
@@ -304,32 +344,32 @@ void pong3d()
 	waterFountain->activate();
 	waterFountain->setGravity(true);
 
-	Game->addEmitter(waterFountain);
+
+	//Game->buildMesh();
+	fpsGame->addEmitter(waterFountain);
+	//Game->initEmitterWithTerrain(0, 0);
 
 #endif//_PARTICLES_
 
 	//Add text screens
-	Game->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
+	fpsGame->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
 
 	//Build geometry
-	Game->buildMesh();
+	fpsGame->buildMesh();
 
 	//Main loop
 	while (!Controls->quit)
 	{
-		Game->updateAll();
+		fpsGame->updateAll();
 	}
 
 	//Destroy geometry
-	Game->destroyMesh();
-
-	Screen->cleanUp();
+	fpsGame->destroyMesh();
 
 	IMG_Quit();
 
 	SDL_Quit();
 }
-
 
 
 void opengl_renderer()
@@ -391,7 +431,7 @@ void opengl_renderer()
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to play the Game <P> or use the Editor <E>?" << std::endl;
+	std::cout << "Do you want to play the Game <P>, see some waves <W> or use the Editor <E>?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
@@ -401,9 +441,13 @@ int main(int argc, char** argv)
 	case 'E':
 		editor();
 		break;
+	case 'w':
+	case 'W':
+		water();
+		break;
 	case 'p':
 	case 'P':
-		pong3d();
+		fps_game();
 		break;
 	default:
 

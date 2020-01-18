@@ -9,14 +9,12 @@
 #include "Projection.h"
 #include "SolidBody.h"
 #include "SolidSphere.h"
-#include "Bone.h"
-#include "PelvisBone.h"
-#include "LongBone.h"
+
 
 class Player
 {
 
-	friend class Pong;
+	friend class Game;
 
 private:
 
@@ -42,10 +40,12 @@ private:
 
 	unsigned int				lastShot		= 0;
 	bool						isFiring		= false;
+	bool						destroyed		= false;
+	bool						underAttack		= false;
 
 	unsigned int				lastHit			= 0;
 	vect3						hitFrom			= { 0.0f, 0.0f, 0.0f, 1.0f };
-	bool						underAttack		= false;
+
 
 	unsigned int				idlePhase		= 1;
 	double						amplitude		= 0.5f;
@@ -56,18 +56,11 @@ private:
 	std::vector<std::shared_ptr<SolidBody>>		Parts;
 
 	std::shared_ptr<Projection> Renderer		= nullptr;
-	std::shared_ptr<PelvisBone>	skeleton		= nullptr;
-
-	double						currentPhase	= 0.0f;
-	double						walkingSpeed	= 0.03125;
-
-	bool						destroyed = false;
-
 
 public:
 
 	Player(std::shared_ptr<Projection>);
-	Player(std::shared_ptr<Projection>, double, double, double, double, double, double, double, int, int, std::shared_ptr<PelvisBone>);
+	Player(std::shared_ptr<Projection>, double, double, double, double, double, double, double, int, int);
 	~Player();
 
 	bool isDestroyed();
@@ -84,15 +77,10 @@ public:
 
 	void addPart(std::shared_ptr<SolidBody>);
 
-	void updateSkeleton();
-
 private:
 	
 	void setAmmo(unsigned int);
 	void shoot(std::vector<std::shared_ptr<SolidBody>>, unsigned int*, triangle3dV**);
-	void incrementWalkPhase();	
-	void updateLeftLimb();
-	void updateRightLimb();
 
 	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);
 	unsigned int pickTarget(const std::vector<std::shared_ptr<Player>>&, const unsigned int&);

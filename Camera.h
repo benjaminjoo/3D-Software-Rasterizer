@@ -15,7 +15,7 @@ class Camera
 {
 	friend class Renderer;
 	friend class Editor;
-	friend class Pong;
+	friend class Game;
 
 private:
 
@@ -71,7 +71,15 @@ public:
 
 	void addTexture(SDL_Surface*);
 
+	void addTexture(txt);
+
 	void renderPoint(point3, mat4x4&, Uint32*, double*);
+
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
+		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
 
 private:
 
@@ -94,6 +102,10 @@ private:
 	void clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
 		int* nResult, vect3* temp, textCoord* temp_uv);
 
+	bool pointInsideFrustum(vect3& V);
+
+	bool pointBehindPlane(const plane& p, vect3& V);
+
 	void updatePosition(double, double, double, double, double, double);
 
 	void centreLook();
@@ -113,12 +125,6 @@ private:
 	void world2viewPointM(point3& P, mat4x4& RM);
 
 	void projectPoint(point3, Uint32*, double*);
-
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
-
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
-		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
 
 	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
 		const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);

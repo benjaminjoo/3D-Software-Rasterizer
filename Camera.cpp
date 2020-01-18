@@ -96,6 +96,12 @@ void Camera::addTexture(SDL_Surface* T)
 }
 
 
+void Camera::addTexture(txt t)
+{
+	textureData.push_back(t);
+}
+
+
 double Camera::getFovH()
 {
 	return fovH;
@@ -303,6 +309,49 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 }
 
 
+bool Camera::pointInsideFrustum(vect3& V)
+{
+	plane currentPlane;
+
+	currentPlane = Frustum.getNearPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	currentPlane = Frustum.getTopPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	currentPlane = Frustum.getBottomPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	currentPlane = Frustum.getLeftPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	currentPlane = Frustum.getRightPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	currentPlane = Frustum.getFarPlane();
+	if (pointBehindPlane(currentPlane, V))
+		return false;
+
+	return true;
+}
+
+
+bool Camera::pointBehindPlane(const plane& p, vect3& V)
+{
+	vect3 a = V - p.P;
+	double sa = a * p.N;
+	if (sa <= 0.0f)
+		return true;
+	else
+		return false;
+}
+
+
 void Camera::updatePosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
 {
 	azm = -turnH;
@@ -432,7 +481,8 @@ void Camera::world2viewPointM(point3 & P, mat4x4 & RM)
 void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, double* depthBuffer)
 {
 	this->world2viewPointM(p, RM);
-	projectPoint(p, pixelBuffer, depthBuffer);
+	if (pointInsideFrustum(p.P))
+		projectPoint(p, pixelBuffer, depthBuffer);
 }
 
 

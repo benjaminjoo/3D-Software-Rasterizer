@@ -17,28 +17,30 @@
 #include "Bullet.h"
 #include "Text.h"
 #include "ParticleSystem.h"
+#include "DynamicMesh.h"
 
 
-class Pong
+class Game
 {
 private:
 
-	std::shared_ptr<Canvas>						Screen			= nullptr;
-	std::shared_ptr<Camera>						Eye				= nullptr;
-	std::shared_ptr<Projection>					Renderer		= nullptr;
-	std::shared_ptr<EventHandler>				Controls		= nullptr;
-	std::shared_ptr<Text>						ControlsText	= nullptr;
-	std::shared_ptr<LightSource>				Sun				= nullptr;
-	std::shared_ptr<Player>						Hero			= nullptr;
-	std::shared_ptr<Player>						Enemy			= nullptr;
-	std::shared_ptr<ParticleSystem>				Emitter			= nullptr;
+	std::shared_ptr<Canvas>						Screen				= nullptr;
+	std::shared_ptr<Camera>						Eye					= nullptr;
+	std::shared_ptr<Projection>					Renderer			= nullptr;
+	std::shared_ptr<EventHandler>				Controls			= nullptr;
+	std::shared_ptr<Text>						ControlsText		= nullptr;
+	std::shared_ptr<LightSource>				Sun					= nullptr;
+	std::shared_ptr<Player>						Hero				= nullptr;
+	std::shared_ptr<Player>						Enemy				= nullptr;
 
 	std::vector<std::shared_ptr<SolidBody>>		Entities;
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
 	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
+	std::vector<std::shared_ptr<DynamicMesh>>	DynamicSurfaces;
 
 	std::unordered_map<std::string, std::shared_ptr<Text>>			TextScreens;
+	std::vector<std::shared_ptr<ParticleSystem>>					Emitters;
 
 	std::shared_ptr<SolidBody>					Bar;
 
@@ -73,14 +75,14 @@ private:
 
 	unsigned int								ammo				= 0;
 
-	clock_t			lastShot		= 0;
-	clock_t			oldTime			= 0;
-	clock_t			newTime			= 0;
-	clock_t			frameTime		= 0;
-	int				frameCounter	= 0;
-	int				polyCounter		= 0;
+	clock_t										lastShot			= 0;
+	clock_t										oldTime				= 0;
+	clock_t										newTime				= 0;
+	clock_t										frameTime			= 0;
+	int											frameCounter		= 0;
+	int											polyCounter			= 0;
 
-	vect3			gravity			= { 0.0f, 0.0f, -0.01f, 0.0f };
+	vect3										gravity				= { 0.0f, 0.0f, -0.01f, 0.0f };
 
 	void updateCameraPosition(const std::shared_ptr<Player>&);
 	void updateHeroPosition();
@@ -96,7 +98,7 @@ private:
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 
 	bool updateMovingObject(std::shared_ptr<SolidBody>, int, triangle3dV*);
-	bool objectApproachingWall(vect3, vect3, triangle3dV);
+	bool objectApproachingWall(vect3&, vect3&, triangle3dV&);
 
 	void explodeMesh(double, vect3, int, triangle3dV*);
 	void explodeDebris(double, vect3, int, triangle3dV*);
@@ -111,15 +113,17 @@ private:
 
 public:
 
-	Pong(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<Projection>, std::shared_ptr<EventHandler>,
+	Game(std::shared_ptr<Canvas>, std::shared_ptr<Camera>, std::shared_ptr<Projection>, std::shared_ptr<EventHandler>,
 		std::shared_ptr<LightSource>, std::shared_ptr<Player>, std::shared_ptr<Player>);
-	~Pong();
+	~Game();
 
 	void addEntity(std::shared_ptr<SolidBody>);
 	void addBall(std::shared_ptr<SolidBody>);
 	void addEnemy(std::shared_ptr<Player>);
 	void addTextScreen(std::string, std::shared_ptr<Text>);
 	void addEmitter(std::shared_ptr<ParticleSystem>);
+	void initEmitterWithTerrain(unsigned p, unsigned q);
+	void addDynamicSurface(std::shared_ptr<DynamicMesh>);
 	void loadProjectile(unsigned int);
 	void buildMesh();
 	void destroyMesh();

@@ -22,23 +22,26 @@ enum class colourBy
 class ParticleSystem
 {
 private:
-	vect3 origin			= { 0.0f, 0.0f, 0.0f, 1.0f };
-	vect3 direction			= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3 origin						= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3 direction						= { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	double particleMass		= 1.0f;
+	double particleMass					= 1.0f;
 
-	double speed			= 0.0f;
-	double dispersion		= 0.0f;
-	unsigned num			= 0;
-	unsigned density		= 0;
+	double speed						= 0.0f;
+	double dispersion					= 0.0f;
+	unsigned num						= 0;
+	unsigned density					= 0;
 
-	bool active				= false;
-	bool gravity			= false;
+	bool active							= false;
+	bool gravity						= false;
 
 	colour32 colour;
-	colourBy colourMethod	= colourBy::uniform;
+	colourBy colourMethod				= colourBy::uniform;
 
 	std::vector<Particle> particles;
+
+	triangle3dV* terrainMesh			= nullptr;
+	unsigned terrainPolyCount			= 0;
 
 	vect3 getRandomVelocity(double sp);
 
@@ -48,6 +51,7 @@ public:
 	~ParticleSystem();
 
 	void loadParticles();
+	void importTerrain(unsigned nPoly, triangle3dV* mesh);
 	void setOrigin(const vect3& pos);
 	void setDirection(const vect3& dir);
 	void setDispersion(const double& disp);
@@ -55,6 +59,9 @@ public:
 	void activate();
 	void deactivate();
 	void update();
+	void handleCollisions();
+	bool particleApproachingWall(vect3& p, vect3& v, triangle3dV& T);
+
 	void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
 };
 

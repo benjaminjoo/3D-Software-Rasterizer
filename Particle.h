@@ -29,9 +29,11 @@ public:
 	void activate(const vect3& pos, const vect3& vel, const vect3& acc);
 	void update();
 	void updateVelocity();
+	void updateVelocity(vect3& v);
 	void updateKineticEnergy();
 
 	vect3 getPosition();
+	vect3 getVelocity();
 	double getKineticEnergy();
 	double getAge();
 };

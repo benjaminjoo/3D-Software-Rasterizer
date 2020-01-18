@@ -1,8 +1,8 @@
-#include "Pong.h"
+#include "Game.h"
 
 
 
-Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<Projection> renderer, std::shared_ptr<EventHandler> controls,
+Game::Game(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::shared_ptr<Projection> renderer, std::shared_ptr<EventHandler> controls,
 			std::shared_ptr<LightSource> sun, std::shared_ptr<Player> hero, std::shared_ptr<Player> enemy):
 	Screen(screen), Eye(eye), Renderer(renderer), Controls(controls), Sun(sun), Hero(hero), Enemy(enemy)
 {
@@ -17,42 +17,55 @@ Pong::Pong(std::shared_ptr<Canvas> screen, std::shared_ptr<Camera> eye, std::sha
 }
 
 
-Pong::~Pong()
+Game::~Game()
 {
 }
 
 
-void Pong::addEntity(std::shared_ptr<SolidBody> entity)
+void Game::addEntity(std::shared_ptr<SolidBody> entity)
 {
 	Entities.push_back(entity);
 }
 
 
-void Pong::addBall(std::shared_ptr<SolidBody> ball)
+void Game::addBall(std::shared_ptr<SolidBody> ball)
 {
 	Balls.push_back(ball);
 }
 
 
-void Pong::addEnemy(std::shared_ptr<Player> enemy)
+void Game::addEnemy(std::shared_ptr<Player> enemy)
 {
 	Enemies.push_back(enemy);
 }
 
 
-void Pong::addTextScreen(std::string tname, std::shared_ptr<Text> tscreen)
+void Game::addTextScreen(std::string tname, std::shared_ptr<Text> tscreen)
 {
 	TextScreens.insert({ tname, tscreen });
 }
 
 
-void Pong::addEmitter(std::shared_ptr<ParticleSystem> em)
+void Game::addEmitter(std::shared_ptr<ParticleSystem> em)
 {
-	Emitter = em;
+	Emitters.push_back(em);
 }
 
 
-void Pong::loadProjectile(unsigned int n)
+void Game::initEmitterWithTerrain(unsigned p, unsigned q)
+{
+	if ((Emitters.size() > p) && (Entities.size() > q) && triangleMesh != nullptr)
+		Emitters[p]->importTerrain(polyCount[q], triangleMesh[q]);
+}
+
+
+void Game::addDynamicSurface(std::shared_ptr<DynamicMesh> s)
+{
+	DynamicSurfaces.push_back(s);
+}
+
+
+void Game::loadProjectile(unsigned int n)
 {
 	for (unsigned int i = 0; i < n; i++)
 	{
@@ -68,7 +81,7 @@ void Pong::loadProjectile(unsigned int n)
 }
 
 
-void Pong::buildMesh()
+void Game::buildMesh()
 {
 	size_t nEntities = Entities.size();
 	triangleMesh = new triangle3dV* [nEntities];
@@ -235,7 +248,7 @@ void Pong::buildMesh()
 }
 
 
-void Pong::destroyMesh()
+void Game::destroyMesh()
 {
 	size_t nEntities = Entities.size();
 	for (unsigned int i = 0; i < nEntities; i++)
@@ -299,7 +312,7 @@ void Pong::destroyMesh()
 }
 
 
-void Pong::updateCameraPosition(const std::shared_ptr<Player>& player)
+void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 {
 	Eye->azm	= player->azm;
 	Eye->alt	= player->alt;
@@ -311,7 +324,7 @@ void Pong::updateCameraPosition(const std::shared_ptr<Player>& player)
 }
 
 
-void Pong::updateHeroPosition()
+void Game::updateHeroPosition()
 {
 	Hero->azm = -Controls->turnH;
 	Hero->alt = -Controls->turnV;
@@ -328,7 +341,7 @@ void Pong::updateHeroPosition()
 }
 
 
-void Pong::updateEnemyPosition()
+void Game::updateEnemyPosition()
 {
 	Enemy->azm = -Controls->turnH;
 	Enemy->alt = -Controls->turnV;
@@ -342,7 +355,7 @@ void Pong::updateEnemyPosition()
 }
 
 
-void Pong::updateEnemyPositionAI(aiGoal goal)
+void Game::updateEnemyPositionAI(aiGoal goal)
 {
 	switch (goal)
 	{
@@ -415,7 +428,7 @@ void Pong::updateEnemyPositionAI(aiGoal goal)
 }
 
 
-void Pong::updateEnemiesPositionsAI(aiGoal goal)
+void Game::updateEnemiesPositionsAI(aiGoal goal)
 {
 	for (unsigned int i = 0; i < Enemies.size(); i++)
 	{
@@ -541,7 +554,7 @@ void Pong::updateEnemiesPositionsAI(aiGoal goal)
 }
 
 
-void Pong::updatePlayerModel(std::shared_ptr<Player> character)
+void Game::updatePlayerModel(std::shared_ptr<Player> character)
 {
 	for (unsigned int i = 0; i < character->Parts.size(); i++)
 	{
@@ -551,7 +564,7 @@ void Pong::updatePlayerModel(std::shared_ptr<Player> character)
 }
 
 
-void Pong::updateEntities()
+void Game::updateEntities()
 {
 	for (unsigned int i = 0; i < Entities.size(); i++)
 	{
@@ -568,7 +581,7 @@ void Pong::updateEntities()
 }
 
 
-void Pong::updateBalls()
+void Game::updateBalls()
 {
 	for (unsigned int i = 0; i < Balls.size(); i++)
 	{
@@ -590,7 +603,7 @@ void Pong::updateBalls()
 }
 
 
-void Pong::updateProjectiles()
+void Game::updateProjectiles()
 {
 	for (unsigned int i = 0; i < Projectiles.size(); i++)
 	{	
@@ -626,7 +639,7 @@ void Pong::updateProjectiles()
 }
 
 
-bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::shared_ptr<Player> actor)
+bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::shared_ptr<Player> actor)
 {
 	vect3 displacement = bullet->getVelocity();
 	vect3 oldPos = bullet->getPosition();
@@ -654,7 +667,7 @@ bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::shared_ptr<Pla
 }
 
 
-bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::shared_ptr<SolidBody>> targets)
+bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::shared_ptr<SolidBody>> targets)
 {
 	vect3 displacement = bullet->getVelocity();
 	vect3 oldPos = bullet->getPosition();
@@ -685,7 +698,7 @@ bool Pong::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 }
 
 
-bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, triangle3dV* objectMesh)
+bool Game::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, triangle3dV* objectMesh)
 {
 	if (Controls->gravityOn && object->isGravitating())
 		object->updateVelocity(gravity);
@@ -769,7 +782,7 @@ bool Pong::updateMovingObject(std::shared_ptr<SolidBody> object, int nPoly, tria
 }
 
 
-bool Pong::objectApproachingWall(vect3 p, vect3 v, triangle3dV T)
+bool Game::objectApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 {
 	double v2n = v * T.N;							//Magnitude of velocity projected to plane normal
 	double dist = distPoint2Plane(p, T);			//Distance from point to plane
@@ -792,7 +805,7 @@ bool Pong::objectApproachingWall(vect3 p, vect3 v, triangle3dV T)
 }
 
 
-void Pong::explodeMesh(double velocity, vect3 centre, int nPoly, triangle3dV* mesh)
+void Game::explodeMesh(double velocity, vect3 centre, int nPoly, triangle3dV* mesh)
 {
 	for (int i = 0; i < nPoly; i++)
 	{
@@ -807,7 +820,7 @@ void Pong::explodeMesh(double velocity, vect3 centre, int nPoly, triangle3dV* me
 }
 
 
-void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* mesh)
+void Game::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* mesh)
 {
 	for (int i = 0; i < nPoly; i++)
 	{
@@ -828,7 +841,7 @@ void Pong::explodeDebris(double velocity, vect3 centre, int nPoly, triangle3dV* 
 }
 
 
-void Pong::renderAll()
+void Game::renderAll()
 {
 	polyCounter = 0;
 
@@ -933,16 +946,26 @@ void Pong::renderAll()
 			
 	}
 
-	if (Emitter != nullptr)
+	if (Emitters.size())
 	{
 		mat4x4 RM = RotationM * TranslationM;
-		Emitter->render(Eye, Screen, RM);
+		for (auto& e : Emitters)
+			e->render(Eye, Screen, RM);
+	}		
+
+	if (DynamicSurfaces.size())
+	{
+		mat4x4 RM = RotationM * TranslationM;
+		for (auto& s : DynamicSurfaces)
+		{
+			s->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+				Controls->torchIntensity, Controls->maxIllumination);
+		}
 	}
-		
 }
 
 
-void Pong::updateAll()
+void Game::updateAll()
 {
 	this->calculateFrametime();
 
@@ -995,16 +1018,16 @@ void Pong::updateAll()
 			}
 		}
 
-		for (unsigned int i = 0; i < Enemies.size(); i++)
+		for (auto en : Enemies)
 		{
-			if (Enemies[i]->lastShot < 5)
-				Enemies[i]->lastShot++;
+			if (en->lastShot < 5)
+				en->lastShot++;
 			if (Controls->playerControlled)
 
 			{
-				if (Enemies[i]->isFiring && Enemies[i]->lastShot >= 5)
+				if (en->isFiring && en->lastShot >= 5)
 				{
-					Enemies[i]->shoot(Projectiles, projectilePolyCount, projectileMesh);
+					en->shoot(Projectiles, projectilePolyCount, projectileMesh);
 					ammo--;
 				}
 			}
@@ -1019,11 +1042,14 @@ void Pong::updateAll()
 			}
 		}
 
-		if (Emitter != nullptr)
+		for (auto& e : Emitters)
 		{
-			Emitter->update();
-			Emitter->setGravity(Controls->gravityOn);
+			e->update();
+			e->setGravity(Controls->gravityOn);
 		}
+
+		for (auto& s : DynamicSurfaces)
+			s->update();
 	}
 
 	Controls->ceaseMotion();
@@ -1044,25 +1070,25 @@ void Pong::updateAll()
 }
 
 
-void Pong::updateFrameCounter()
+void Game::updateFrameCounter()
 {
 	frameCounter++;
 }
 
 
-void Pong::resetPolyCounter()
+void Game::resetPolyCounter()
 {
 	polyCounter = 0;
 }
 
 
-void Pong::incrementPolyCounter()
+void Game::incrementPolyCounter()
 {
 	polyCounter++;
 }
 
 
-void Pong::calculateFrametime()
+void Game::calculateFrametime()
 {
 	if (frameCounter == 30)
 	{
@@ -1074,7 +1100,7 @@ void Pong::calculateFrametime()
 }
 
 
-void Pong::displayStats(bool crosshair, bool fps, bool position, bool polyN, bool amm, std::shared_ptr<Canvas> Screen)
+void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, bool amm, std::shared_ptr<Canvas> Screen)
 {
 	int screenWChar = Screen->getWidth() / 8;
 	int screenHChar = Screen->getHeight() / 8;
