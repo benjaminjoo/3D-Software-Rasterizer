@@ -4,6 +4,9 @@
 
 SolidFrustum::SolidFrustum()
 {
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -12,6 +15,10 @@ SolidFrustum::SolidFrustum(double px, double py, double pz, double znear, double
 {
 	position = { px, py, pz, 1.0 };
 	colour = c;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -32,7 +39,7 @@ int SolidFrustum::getTotalPoly()
 }
 
 
-void SolidFrustum::getTriangleData_(triangle3dV* t)
+void SolidFrustum::getTriangleData(triangle3dV* t)
 {
 	vect3* p = new vect3[8];
 
@@ -152,10 +159,4 @@ void SolidFrustum::getTriangleData_(triangle3dV* t)
 	t[11].colour = colour;
 
 	delete[] p;
-}
-
-
-void SolidFrustum::constructShadowVolume(vect3)
-{
-
 }

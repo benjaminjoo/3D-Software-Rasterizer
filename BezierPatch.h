@@ -18,20 +18,20 @@ public:
 	BezierPatch(unsigned int, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3, vect3);
 	~BezierPatch();
 
-	void	setControlPoint(unsigned int, vect3);
-	void	turnInsideOut();
+	void setControlPoint(unsigned int, vect3);
+	void turnInsideOut();
 
-	int		getTotalVert();
-	int		getTotalPoly();
+	int	getTotalVert();
+	int	getTotalPoly();
 
-	void	getSpineCoord(vect3, vect3, vect3, vect3*);
-	void	getSpineCoord(vect3, vect3, vect3, std::shared_ptr<vect3[]>);
-	void	getTangent(vect3, vect3, vect3, vect3*);
-	vect3	getTangent(vect3, vect3, vect3, int);
+	void getSpineCoord(vect3, vect3, vect3, vect3*);
+	void getSpineCoord(vect3, vect3, vect3, std::shared_ptr<vect3[]>);
+	void getTangent(vect3, vect3, vect3, vect3*);
+	vect3 getTangent(vect3, vect3, vect3, int);
 
-	void	getVertexData(point3*);
-	void	getVertexData_(std::shared_ptr<vect3[]>, std::shared_ptr<vect3[]>);
-	void	getTriangleData_(triangle3dV*);
-	void	constructShadowVolume(vect3);
+	void getVertexData(point3*);
+	void getVertexData_(std::shared_ptr<vect3[]>, std::shared_ptr<vect3[]>);
+	void getTriangleData(triangle3dV*);
+	void calculateMesh();
 };
 

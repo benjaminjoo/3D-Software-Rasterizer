@@ -14,13 +14,13 @@ SolidSTL::SolidSTL(std::string fn):
 
 SolidSTL::SolidSTL(double px, double py, double pz, Uint32 c, int t, std::string fn)
 {
-	scale			= { 1.0, 1.0, 1.0, 1.0 };
-	position		= { px, py, pz, 1.0 };
-	rotation		= { 0.0, 0.0, 0.0, 1.0 };
+	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
+	position		= { px, py, pz, 1.0f };
+	rotation		= { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	colour			= c;
 	texture			= t;
-	txU				= 1.0;
+	txU				= 1.0f;
 
 	castsShadows	= true;
 
@@ -33,9 +33,9 @@ SolidSTL::SolidSTL(double px, double py, double pz, Uint32 c, int t, std::string
 
 SolidSTL::SolidSTL(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz, Uint32 c, int t, std::string fn)
 {
-	scale			= { sx, sy, sz, 1.0 };
-	position		= { px, py, pz, 1.0 };
-	rotation		= { rx, ry, rz, 1.0 };
+	scale			= { sx, sy, sz, 1.0f };
+	position		= { px, py, pz, 1.0f };
+	rotation		= { rx, ry, rz, 1.0f };
 
 	colour			= c;
 	texture			= t;
@@ -72,20 +72,12 @@ int	SolidSTL::getTotalPoly()
 }
 
 
-void SolidSTL::getTriangleData_(triangle3dV* P)
+void SolidSTL::getTriangleData(triangle3dV* P)
 {
 	for (unsigned int i = 0; i < polyContainer.size(); i++)
 	{
 		P[i] = polyContainer[i];
 	}
-
-	//transformMesh(polyContainer.size(), P, scale.x, scale.y, scale.z, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-}
-
-
-void SolidSTL::constructShadowVolume(vect3)
-{
-
 }
 
 
@@ -94,14 +86,14 @@ void SolidSTL::readSTLfile()
 	if (modelFile)
 	{
 		char headerInfo[80] = "";
-		char nPoly[4] = "";
+		char nPolygon[4] = "";
 		unsigned long nPolyLong = 0;
 
 		modelFile.read(headerInfo, 80);
 		std::cout << headerInfo << std::endl;
 
-		modelFile.read(nPoly, 4);
-		nPolyLong = *((unsigned long*)nPoly);
+		modelFile.read(nPolygon, 4);
+		nPolyLong = *((unsigned long*)nPolygon);
 		std::cout << "Number of polygons: " << nPolyLong << std::endl;
 
 		char normal[12] = "";
@@ -185,6 +177,9 @@ void SolidSTL::readSTLfile()
 		}
 		polyContainer.shrink_to_fit();
 
+		nPoly = getTotalPoly();
+		mesh = new triangle3dV[nPoly];
+		getTriangleData(mesh);
 	}
 	else
 	{
@@ -246,4 +241,6 @@ void SolidSTL::smoothSurfaces()
 		p.Bn = unitVector(accB);
 		p.Cn = unitVector(accC);
 	}
+
+	getTriangleData(mesh);
 }

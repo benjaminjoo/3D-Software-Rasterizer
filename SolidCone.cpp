@@ -17,6 +17,10 @@ SolidCone::SolidCone()
 	radius			= 1.0;
 	height			= 1.0;
 	resol			= 24;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -35,6 +39,10 @@ SolidCone::SolidCone(double px, double py, double pz, Uint32 c)
 	radius			= 1.0;
 	height			= 1.0;
 	resol			= 24;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -54,6 +62,10 @@ SolidCone::SolidCone(double sx, double sy, double sz, double px, double py, doub
 	radius			= r;
 	height			= h;
 	resol			= res;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 SolidCone::~SolidCone()
@@ -73,7 +85,7 @@ int	SolidCone::getTotalPoly()
 }
 
 
-void SolidCone::getVertexData_(vect3* s)
+void SolidCone::getVertexData(vect3* s)
 {
 	double angleH, stepH;
 	stepH = 360.0 / (double(resol) * 2);
@@ -106,13 +118,13 @@ void SolidCone::getVertexData_(vect3* s)
 }
 
 
-void SolidCone::getTriangleData_(triangle3dV* t)
+void SolidCone::getTriangleData(triangle3dV* t)
 {
 	int totalVert, totalPoly;
 	totalVert = 2 * resol + 1;
 	totalPoly = 4 * resol - 2;
 	vect3* s = new vect3[totalVert];
-	this->getVertexData_(s);
+	this->getVertexData(s);
 	vect3 vectR = { 0.0, 0.0, -(radius * radius) / height, 1.0 };
 
 	int tCount = 0;
@@ -193,10 +205,4 @@ void SolidCone::getTriangleData_(triangle3dV* t)
 	}
 
 	delete[] s;
-}
-
-
-void SolidCone::constructShadowVolume(vect3)
-{
-
 }

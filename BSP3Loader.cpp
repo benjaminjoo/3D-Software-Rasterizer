@@ -259,7 +259,9 @@ void BSP3Loader::readData()
 		idFaces.shrink_to_fit();
 	}
 
-
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 
 	modelFile.close();
 }
@@ -302,7 +304,7 @@ void BSP3Loader::getVertexData(point3* v)
 }
 
 
-void BSP3Loader::getTriangleData_(triangle3dV* T)
+void BSP3Loader::getTriangleData(triangle3dV* T)
 {
 	int nFace		= idFaces.size();
 	int nPoly		= 0;
@@ -407,7 +409,7 @@ void BSP3Loader::getTriangleData_(triangle3dV* T)
 
 					triangle3dV* tempMesh = new triangle3dV[nPoly];
 
-					tempPatch.getTriangleData_(tempMesh);
+					tempPatch.getTriangleData(tempMesh);
 
 					for (int currentPoly = 0; currentPoly < nPoly; currentPoly++)
 					{
@@ -427,10 +429,4 @@ void BSP3Loader::getTriangleData_(triangle3dV* T)
 	{
 		T[i] = polyContainer[i];
 	}
-}
-
-
-void BSP3Loader::constructShadowVolume(vect3)
-{
-
 }

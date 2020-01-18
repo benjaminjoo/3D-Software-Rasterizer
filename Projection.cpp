@@ -4,13 +4,13 @@
 
 Projection::Projection()
 {
-	std::cout << "Projection toolbox created..." << std::endl;
+	std::cout << "+";
 }
 
 
 Projection::~Projection()
 {
-	std::cout << "Projection toolbox destroyed..." << std::endl;
+	std::cout << "-";
 }
 
 

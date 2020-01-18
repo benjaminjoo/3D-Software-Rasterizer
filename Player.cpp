@@ -1,16 +1,18 @@
 #include "Player.h"
 
 
-Player::Player(std::shared_ptr<Projection> renderer) : Renderer(renderer)
+Player::Player()
 {
+	Renderer = std::make_shared<Projection>();
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 0.5f, 24);
 }
 
 
-Player::Player(std::shared_ptr<Projection> renderer, double px, double py, double pz, double rx, double ry, double rz,
+Player::Player(double px, double py, double pz, double rx, double ry, double rz,
 	double rad, int hlt, int amm) :
-	Renderer(renderer), x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm) 
+	x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm) 
 {
+	Renderer = std::make_shared<Projection>();
 	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, px, py, pz, rx, ry, rz, 0xffffff00, 1, 0.5f, 24);
 }
 
@@ -109,6 +111,7 @@ unsigned int Player::getHealth()
 
 void Player::addPart(std::shared_ptr<SolidBody> p)
 {
+	p->updateMesh();
 	Parts.push_back(p);
 }
 
@@ -119,7 +122,7 @@ void Player::setAmmo(unsigned int a)
 }
 
 
-void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned int* polyCount, triangle3dV** mesh)
+void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles)
 {
 	double muzzleVelocity = 5.0f;
 	for (unsigned int i = 0; i < Projectiles.size(); i++)
@@ -128,10 +131,9 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles, unsigned
 		{
 			vect3 origin	= this->getPosition();
 			vect3 rotation	= { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };			
-			//vect3 velocity	= scaleVector(muzzleVelocity, rotation);
-			vect3 velocity = rotation * muzzleVelocity;
+			vect3 velocity	= rotation * muzzleVelocity;
 
-			Renderer->rotateMesh(polyCount[i], mesh[i], -alt, rol, -(azm + PI * 0.5f));
+			Projectiles[i]->setRotation({ alt, rol, -(azm + PI * 0.5f), 1.0f });
 
 			Projectiles[i]->setFired(true);
 			Projectiles[i]->setPosition(origin);

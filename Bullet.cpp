@@ -4,6 +4,9 @@
 
 Bullet::Bullet()
 {
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -12,6 +15,10 @@ Bullet::Bullet(double px, double py, double pz, double d, double l, double v, Ui
 {
 	position	= { px, py, pz, 1.0 };
 	colour		= c;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -32,7 +39,7 @@ int	Bullet::getTotalPoly()
 }
 
 
-void Bullet::getTriangleData_(triangle3dV* t)
+void Bullet::getTriangleData(triangle3dV* t)
 {
 	vect3* p = new vect3[4];
 
@@ -80,13 +87,9 @@ void Bullet::getTriangleData_(triangle3dV* t)
 }
 
 
-void Bullet::constructShadowVolume(vect3)
-{
-
-}
-
-
 double Bullet::getMuzzleVelocity()
 {
 	return muzzleVelocity;
 }
+
+

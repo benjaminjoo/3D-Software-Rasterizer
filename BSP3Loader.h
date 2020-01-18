@@ -26,11 +26,10 @@ public:
 	BSP3Loader(std::string, vect3);
 	~BSP3Loader();
 
-	void			readData();
-	int				getTotalVert();
-	int				getTotalPoly();
-	void			getVertexData(point3*);
-	void			getTriangleData_(triangle3dV*);
-	void			constructShadowVolume(vect3);
+	void readData();
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getVertexData(point3*);
+	void getTriangleData(triangle3dV*);
 };
 

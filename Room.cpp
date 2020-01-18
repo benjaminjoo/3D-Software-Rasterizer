@@ -1004,10 +1004,14 @@ void Room::calculateMesh()
 
 	delete[] p;
 	delete[] pPoly, pHole;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
-void Room::getTriangleData_(triangle3dV* t)
+void Room::getTriangleData(triangle3dV* t)
 {
 	int tCount = this->getTotalPoly();
 
@@ -1078,10 +1082,4 @@ void Room::getTriangleData_(triangle3dV* t)
 			t[tC].C.x += position.x;	t[tC].C.y += position.y;	t[tC].C.z += position.z;
 		}
 	}
-}
-
-
-void Room::constructShadowVolume(vect3)
-{
-
 }

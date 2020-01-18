@@ -31,9 +31,9 @@ private:
 
 	bool						gravitating		= false;
 
-	double						range			= 50.0f;	//25.0f;
-	double						closeQuarters	= 50.0f;	//10.0f;
-	double						safeDistance	= 50.0f;	//25.0f;
+	double						range			= 25.0f;	//50.0f;
+	double						closeQuarters	= 10.0f;	//50.0f;
+	double						safeDistance	= 25.0f;	//50.0f;
 
 	unsigned int				health			= 100;
 	unsigned int				ammo			= 100;
@@ -59,8 +59,8 @@ private:
 
 public:
 
-	Player(std::shared_ptr<Projection>);
-	Player(std::shared_ptr<Projection>, double, double, double, double, double, double, double, int, int);
+	Player();
+	Player(double, double, double, double, double, double, double, int, int);
 	~Player();
 
 	bool isDestroyed();
@@ -80,7 +80,7 @@ public:
 private:
 	
 	void setAmmo(unsigned int);
-	void shoot(std::vector<std::shared_ptr<SolidBody>>, unsigned int*, triangle3dV**);
+	void shoot(std::vector<std::shared_ptr<SolidBody>>);
 
 	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);
 	unsigned int pickTarget(const std::vector<std::shared_ptr<Player>>&, const unsigned int&);

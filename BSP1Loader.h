@@ -33,16 +33,15 @@ public:
 	BSP1Loader(std::string, vect3);
 	~BSP1Loader();
 
-	void	readData();
-	int		getTotalText();
-	int		getTotalVert();
-	int		getTotalEdge();
-	int		getTotalPoly();
-	void	getVertexData(point3*);
-	void	calculateTriangles();
-	void	getTriangleData_(triangle3dV*);
-	txt		getTextureData(unsigned int);
-	void	constructShadowVolume(vect3);
+	void readData();
+	int	getTotalText();
+	int	getTotalVert();
+	int	getTotalEdge();
+	int	getTotalPoly();
+	void getVertexData(point3*);
+	void calculateTriangles();
+	void getTriangleData(triangle3dV*);
+	txt	getTextureData(unsigned int);
 	line3d	getLine(unsigned int);
 };
 

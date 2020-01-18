@@ -4,7 +4,6 @@
 #include "LightSource.h"
 #include "ViewVolume.h"
 #include "Canvas.h"
-#include "ShadowVolume.h"
 #include "Projection.h"
 
 #include <time.h>
@@ -13,7 +12,7 @@
 
 class Camera
 {
-	friend class Renderer;
+	friend class SolidBody;
 	friend class Editor;
 	friend class Game;
 
@@ -62,9 +61,9 @@ private:
 
 public:
 
-	Camera(std::shared_ptr<Projection> R);
-	Camera(std::shared_ptr<Projection> R, double, double, double, int, int, int);
-	Camera(std::shared_ptr<Projection> R, double, double, double, double, double, double, double, double, double, double, double, int, int, int);
+	Camera();
+	Camera(double, double, double, int, int, int);
+	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
 	~Camera();
 
 	void linkToCanvas(std::shared_ptr<Canvas> screen);

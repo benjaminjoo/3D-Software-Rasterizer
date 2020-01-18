@@ -6,9 +6,9 @@
 class SolidPrism: public SolidBody
 {
 
-	double			edgeX;
-	double			edgeY;
-	double			edgeZ;
+	double			edgeX	= 0.0f;
+	double			edgeY	= 0.0f;
+	double			edgeZ	= 0.0f;
 
 public:
 
@@ -17,9 +17,8 @@ public:
 	SolidPrism(double, double, double, double, double, double, double, double, double, Uint32, int, double, double, double);
 	~SolidPrism();
 
-	int				getTotalVert();
-	int				getTotalPoly();
-	void			getTriangleData_(triangle3dV*);
-	void			constructShadowVolume(vect3);
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getTriangleData(triangle3dV*);
 };
 

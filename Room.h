@@ -90,8 +90,6 @@ public:
 	bool checkForHole(Side, polygon4uv*, vect3*);
 	void traversePolygonTree(Side, polygon4uv*, vect3, Uint32, int);
 	void calculateMesh();
-	void getTriangleData_(triangle3dV*);	
-
-	void constructShadowVolume(vect3);
+	void getTriangleData(triangle3dV*);	
 };
 

@@ -15,9 +15,8 @@ public:
 	SolidCube(double, double, double, double, double, double, double, double, double, Uint32, int, double);
 	~SolidCube();
 
-	int				getTotalVert();
-	int				getTotalPoly();
-	void			getTriangleData_(triangle3dV*);
-	void			constructShadowVolume(vect3);
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getTriangleData(triangle3dV*);
 };
 

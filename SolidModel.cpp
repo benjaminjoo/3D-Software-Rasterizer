@@ -52,18 +52,12 @@ int	SolidModel::getTotalPoly()
 }
 
 
-void SolidModel::getTriangleData_(triangle3dV* P)
+void SolidModel::getTriangleData(triangle3dV* P)
 {
 	for (unsigned int i = 0; i < polyContainer.size(); i++)
 	{
 		P[i] = polyContainer[i];
 	}
-}
-
-
-void SolidModel::constructShadowVolume(vect3)
-{
-
 }
 
 
@@ -96,6 +90,10 @@ void SolidModel::readModelFile(const std::string& fileName)
 			}
 		}
 		polyContainer.shrink_to_fit();
+
+		nPoly = getTotalPoly();
+		mesh = new triangle3dV[nPoly];
+		getTriangleData(mesh);
 	}
 	else
 	{

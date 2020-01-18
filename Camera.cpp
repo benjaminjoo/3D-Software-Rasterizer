@@ -5,13 +5,12 @@
 #include "LightSource.h"
 #include "ViewVolume.h"
 #include "Canvas.h"
-#include "ShadowVolume.h"
 
 
 #define PI					3.141592654
 
-Camera::Camera(std::shared_ptr<Projection> R):
-	Renderer(R), x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+Camera::Camera():
+	x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(320), h(200)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -27,8 +26,8 @@ Camera::Camera(std::shared_ptr<Projection> R):
 }
 
 
-Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, int width, int height, int s):
-	Renderer(R), x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
+Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
+	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -44,9 +43,9 @@ Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, i
 }
 
 
-Camera::Camera(std::shared_ptr<Projection> R, double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
+Camera::Camera(double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
 	double fov, double nr, double fr, int width, int height, int s):
-	Renderer(R), x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
+	x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
 	fovH(fov), zNear(nr), zFar(fr), w(width), h(height)
 {
 	std::cout << "Camera constructor called" << std::endl;
@@ -513,8 +512,8 @@ void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4
 }
 
 
-void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-	vect3 mv, vect3 rt, LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
+	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
 {
 	mat4x4 rotX	= getRotation(axis::x, rt.x);
 

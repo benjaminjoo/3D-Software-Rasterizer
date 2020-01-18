@@ -127,12 +127,6 @@ int Shapes::getPolyCount(int n)
 }
 
 
-bool Shapes::assertShadowCasting(int n)
-{
-	return bodyContainer[n]->assertShadowCasting();
-}
-
-
 int* Shapes::getPolyCountEntities()
 {
 	int n = bodyContainer.size();
@@ -170,7 +164,7 @@ void Shapes::getPolyData_(int n, triangle3dV** meshTriangles)
 {
 	for (int i = 0; i < n; i++)
 	{
-		bodyContainer[i]->getTriangleData_(meshTriangles[i]);
+		bodyContainer[i]->getTriangleData(meshTriangles[i]);
 	}
 }
 

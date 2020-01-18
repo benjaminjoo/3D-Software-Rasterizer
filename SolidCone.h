@@ -17,11 +17,9 @@ public:
 	SolidCone(double, double, double, double, double, double, double, double, double, Uint32, int, double, double, int);
 	~SolidCone();
 
-	int				getTotalVert();
-	int				getTotalPoly();
-	void			getVertexData_(vect3*);
-	void			getTriangleData_(triangle3dV*);
-
-	void			constructShadowVolume(vect3);
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getVertexData(vect3*);
+	void getTriangleData(triangle3dV*);
 };
 

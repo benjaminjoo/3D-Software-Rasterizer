@@ -16,11 +16,10 @@ public:
 	SolidSphere(double, double, double, double, double, double, double, double, double, Uint32, int, double, int);
 	~SolidSphere();
 
-	void			setRadius(double);
-	double			getRadius();
-	int				getTotalVert();
-	int				getTotalPoly();
-	void			getVertexData_(vect3*);
-	void			getTriangleData_(triangle3dV*);
-	void			constructShadowVolume(vect3);
+	void setRadius(double);
+	double getRadius();
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getVertexData(vect3*);
+	void getTriangleData(triangle3dV*);
 };

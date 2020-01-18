@@ -43,9 +43,7 @@ void editor()
 {
 	auto Screen		= std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9f);
 
-	auto Renderer	= std::make_shared<Projection>();
-
-	auto Viewer		= std::make_shared<Camera>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.01f, 999.0f, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
+	auto Viewer		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.01f, 999.0f, EDITOR_WIDTH, EDITOR_HEIGHT, 0);
 
 	auto Drawing	= std::make_shared<ModelElementBuffer>("test.wtf");
 
@@ -73,7 +71,7 @@ void editor()
 
 void water()
 {
-	auto Eye		= std::make_shared<Camera>(nullptr, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	Eye->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
 	Eye->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
@@ -92,9 +90,9 @@ void water()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 75.0f, 0.95f);
 
-	auto Viewer		= std::make_shared<Player>(nullptr, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Viewer		= std::make_shared<Player>(15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
-	auto testWorld	= std::make_shared<Game>(Screen, Eye, nullptr, Controls, Sun, Viewer, nullptr);
+	auto testWorld	= std::make_shared<Game>(Screen, Eye, Controls, Sun, Viewer, nullptr);
 
 	testWorld->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
 
@@ -102,12 +100,12 @@ void water()
 
 	testWorld->addDynamicSurface(Sea);
 
-	testWorld->buildMesh();
+	//testWorld->buildMesh();
 
 	while (!Controls->quit)
 		testWorld->updateAll();
 
-	testWorld->destroyMesh();
+	//testWorld->destroyMesh();
 
 	IMG_Quit();
 
@@ -119,9 +117,7 @@ void fps_game()
 {
 	auto Screen		= std::make_shared<Canvas>("3D Shooter", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
 
-	auto Renderer	= std::make_shared<Projection>();
-
-	auto Eye		= std::make_shared<Camera>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Eye		= std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	Eye->linkToCanvas(Screen);
 
@@ -129,26 +125,26 @@ void fps_game()
 
 	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
 
-	auto Hero		= std::make_shared<Player>(Renderer, 15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
+	auto Hero		= std::make_shared<Player>(15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
 
-	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 4);
+	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32);
 
 	Hero->addPart(weapon);
 
-	auto Observer	= std::make_shared<Player>(Renderer, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Observer	= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto cone		= std::make_shared<SolidCone>(0.0f, 0.0f, 0.0f, 0x000000ff);
 
 	Observer->addPart(cone);
 	
-	auto fpsGame		= std::make_shared<Game>(Screen, Eye, Renderer, Controls, Sun, Hero, Observer);
+	auto fpsGame		= std::make_shared<Game>(Screen, Eye, Controls, Sun, Hero, Observer);
 
 	//Fill up bullet pool
 	fpsGame->loadProjectile(200);
 
-//#define _STL_READER_
+#define _STL_READER_
 //#define _PLANETS_
-#define _SHOOTER_
+//#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
@@ -179,7 +175,7 @@ void fps_game()
 
 #ifdef _STL_READER_
 
-	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, getColour(0, 255, 255, 255), 3, "Assets/Stl/utah_teapot.stl");
+	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
 	teapot->readSTLfile();
 	teapot->smoothSurfaces();
 	fpsGame->addEntity(teapot);
@@ -240,6 +236,8 @@ void fps_game()
 	patch->setControlPoint(7, { 2.0f, 4.0f, 2.0f, 1.0f });
 	patch->setControlPoint(8, { 8.0f, 3.5f, 0.0f, 1.0f });
 
+	patch->calculateMesh();
+
 	fpsGame->addEntity(patch);
 
 #endif//_BEZIER_PATCH_
@@ -283,7 +281,7 @@ void fps_game()
 	}
 
 	//Create enemies
-	auto Enemy1		= std::make_shared<Player>(Renderer, 20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
 	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4);
@@ -297,7 +295,7 @@ void fps_game()
 
 	fpsGame->addEnemy(Enemy1);
 
-	auto Enemy2		= std::make_shared<Player>(Renderer, 40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Enemy2		= std::make_shared<Player>(40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 7, 1.5f, 8);
 	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
@@ -311,7 +309,7 @@ void fps_game()
 
 	fpsGame->addEnemy(Enemy2);
 
-	auto Enemy3 = std::make_shared<Player>(Renderer, -40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Enemy3 = std::make_shared<Player>(-40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 8);
 	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
@@ -347,24 +345,17 @@ void fps_game()
 
 	//Game->buildMesh();
 	fpsGame->addEmitter(waterFountain);
-	//Game->initEmitterWithTerrain(0, 0);
 
 #endif//_PARTICLES_
 
 	//Add text screens
 	fpsGame->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
 
-	//Build geometry
-	fpsGame->buildMesh();
-
 	//Main loop
 	while (!Controls->quit)
 	{
 		fpsGame->updateAll();
 	}
-
-	//Destroy geometry
-	fpsGame->destroyMesh();
 
 	IMG_Quit();
 

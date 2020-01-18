@@ -12,12 +12,6 @@ SolidBody::~SolidBody()
 }
 
 
-bool SolidBody::assertShadowCasting()
-{
-	return castsShadows;
-}
-
-
 void SolidBody::setScale(vect3 sc)
 {
 	scale.x = sc.x;
@@ -333,4 +327,23 @@ void SolidBody::incrementBounceCount()
 int SolidBody::getBounceCount()
 {
 	return nBounces;
+}
+
+
+void SolidBody::updateMesh()
+{
+	Projector->transformMesh(nPoly, mesh, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
+}
+
+
+void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
+				LightSource sun, const projectionStyle& style, double torch, double ill)
+{
+	if (mesh != nullptr)
+		if (trans)
+			eye->renderMesh(getTotalPoly(), mesh, rot, mov, position, rotation, sun, style, torch, ill);
+		else
+			eye->renderMesh(getTotalPoly(), mesh, rot, mov, sun, style, torch, ill);
 }

@@ -4,46 +4,54 @@
 
 SolidCylinder::SolidCylinder()
 {
-	scale			= { 1.0, 1.0, 1.0, 1.0 };
-	position		= { 0.0, 0.0, 0.0, 1.0 };
-	rotation		= { 0.0, 0.0, 0.0, 1.0 };
+	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
+	position		= { 0.0f, 0.0f, 0.0f, 1.0f };
+	rotation		= { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	colour			= 255;
 	texture			= 0;
-	txU				= 1.0;
+	txU				= 1.0f;
 
 	castsShadows	= false;
 
-	radius			= 1.0;
-	height			= 1.0;
+	radius			= 1.0f;
+	height			= 1.0f;
 	resol			= 24;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
 SolidCylinder::SolidCylinder(double px, double py, double pz, Uint32 c)
 {
-	scale			= { 1.0, 1.0, 1.0, 1.0 };
-	position		= { px, py, pz, 1.0 };
-	rotation		= { 0.0, 0.0, 0.0, 1.0 };
+	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
+	position		= { px, py, pz, 1.0f };
+	rotation		= { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	colour			= c;
 	texture			= 0;
-	txU				= 1.0;
+	txU				= 1.0f;
 
 	castsShadows	= false;
 
-	radius			= 1.0;
-	height			= 2.0;
+	radius			= 1.0f;
+	height			= 2.0f;
 	resol			= 24;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
 SolidCylinder::SolidCylinder(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz,
 								Uint32 c, int t, double r, double h, int res)
 {
-	scale			= { sx, sy, sz, 1.0 };
-	position		= { px, py, pz, 1.0 };
-	rotation		= { rx, ry, rz, 1.0 };
+	scale			= { sx, sy, sz, 1.0f };
+	position		= { px, py, pz, 1.0f };
+	rotation		= { rx, ry, rz, 1.0f };
 
 	colour			= c;
 	texture			= t;
@@ -54,6 +62,10 @@ SolidCylinder::SolidCylinder(double sx, double sy, double sz, double px, double 
 	radius			= r;
 	height			= h;
 	resol			= res;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -74,10 +86,10 @@ int	SolidCylinder::getTotalPoly()
 }
 
 
-void SolidCylinder::getVertexData_(vect3* s)
+void SolidCylinder::getVertexData(vect3* s)
 {
 	double angleH, stepH;
-	stepH = 360.0 / (double(resol) * 2);
+	stepH = 360.0f / (double(resol) * 2);
 	int cnt = 0;
 	int total;
 	total = 4 * resol;
@@ -85,13 +97,13 @@ void SolidCylinder::getVertexData_(vect3* s)
 	{
 		for (int i = 0; i < 2 * resol; i++)
 		{
-			angleH = (i * stepH) * PI / 180.0;
+			angleH = (i * stepH) * PI / 180.0f;
 			if (cnt < total)
 			{
 				s[cnt].x = radius * cos(angleH);
 				s[cnt].y = radius * sin(angleH);
-				s[cnt].z = 0.0;
-				s[cnt].w = 1.0;
+				s[cnt].z = 0.0f;
+				s[cnt].w = 1.0f;
 				cnt++;
 			}
 		}
@@ -103,7 +115,7 @@ void SolidCylinder::getVertexData_(vect3* s)
 				s[cnt].x = radius * cos(angleH);
 				s[cnt].y = radius * sin(angleH);
 				s[cnt].z = height;
-				s[cnt].w = 1.0;
+				s[cnt].w = 1.0f;
 				cnt++;
 			}
 		}
@@ -111,15 +123,15 @@ void SolidCylinder::getVertexData_(vect3* s)
 }
 
 
-void SolidCylinder::getTriangleData_(triangle3dV* t)
+void SolidCylinder::getTriangleData(triangle3dV* t)
 {
 	int totalVert, totalPoly;
 	totalVert = 4 * resol;
 	totalPoly = 4 * resol + 2 * (2 * resol - 2);
 	vect3 * s = new vect3[totalVert];
-	vect3 centreB = { 0.0, 0.0, 0.0, 1.0 };
-	vect3 centreT = { 0.0, 0.0, height, 1.0 };
-	this->getVertexData_(s);
+	vect3 centreB = { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3 centreT = { 0.0f, 0.0f, height, 1.0f };
+	this->getVertexData(s);
 
 	int tCount = 0;
 
@@ -136,7 +148,7 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 			t[tCount].A = s[0];		t[tCount].B = s[i + 2];	t[tCount].C = s[i + 1];
 			//vect3 temp = crossProduct(subVectors(t[tCount].B, t[tCount].A), subVectors(t[tCount].C, t[tCount].B));
 			//t[tCount].N = unitVector(temp);
-			t[tCount].An = t[tCount].Bn = t[tCount].Cn = t[tCount].N = { 0.0, 0.0, -1.0, 0.0 };
+			t[tCount].An = t[tCount].Bn = t[tCount].Cn = t[tCount].N = { 0.0f, 0.0f, -1.0f, 0.0f };
 
 			t[tCount].texture = 0;
 			t[tCount].colour = colour;
@@ -163,9 +175,9 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.0);		t[tCount].At.v = 0.0;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0);		t[tCount].Bt.v = 0.0;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0);		t[tCount].Ct.v = height / txU;
+				t[tCount].At.u = uvStepHor * (double(i) + 0.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = 0.0f;
+				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -184,9 +196,9 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.0);		t[tCount].At.v = 0.0;
-				t[tCount].Bt.u = perimeter / txU;					t[tCount].Bt.v = 0.0;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0);		t[tCount].Ct.v = height / txU;
+				t[tCount].At.u = uvStepHor * (double(i) + 0.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = perimeter / txU;						t[tCount].Bt.v = 0.0f;
+				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -211,9 +223,9 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 1.0);		t[tCount].At.v = 0.0;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0);		t[tCount].Bt.v = height / txU;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0);		t[tCount].Ct.v = height / txU;
+				t[tCount].At.u = uvStepHor * (double(i) + 1.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = height / txU;
+				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -234,7 +246,7 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = perimeter / txU;					t[tCount].At.v = 0.0;
+				t[tCount].At.u = perimeter / txU;					t[tCount].At.v = 0.0f;
 				t[tCount].Bt.u = perimeter / txU;					t[tCount].Bt.v = height / txU;
 				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0);		t[tCount].Ct.v = height / txU;
 
@@ -254,7 +266,7 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 			t[tCount].C = s[2 * resol + i + 2];
 			//vect3 temp = crossProduct(subVectors(t[tCount].B, t[tCount].A), subVectors(t[tCount].C, t[tCount].B));
 			//t[tCount].N = unitVector(temp);
-			t[tCount].An = t[tCount].Bn = t[tCount].Cn = t[tCount].N = { 0.0, 0.0, 1.0, 0.0 };
+			t[tCount].An = t[tCount].Bn = t[tCount].Cn = t[tCount].N = { 0.0f, 0.0f, 1.0f, 0.0f };
 
 			t[tCount].texture = 0;
 			t[tCount].colour = colour;
@@ -264,10 +276,4 @@ void SolidCylinder::getTriangleData_(triangle3dV* t)
 	}
 
 	delete[] s;
-}
-
-
-void SolidCylinder::constructShadowVolume(vect3)
-{
-
 }

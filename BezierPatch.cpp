@@ -269,7 +269,7 @@ void BezierPatch::getVertexData_(std::shared_ptr<vect3[]> s, std::shared_ptr<vec
 }
 
 
-void BezierPatch::getTriangleData_(triangle3dV * t)
+void BezierPatch::getTriangleData(triangle3dV * t)
 {
 	int totalVert, totalPoly;
 	totalVert = this->getTotalVert();
@@ -334,9 +334,10 @@ void BezierPatch::getTriangleData_(triangle3dV * t)
 }
 
 
-void BezierPatch::constructShadowVolume(vect3)
+void BezierPatch::calculateMesh()
 {
-
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
-
 

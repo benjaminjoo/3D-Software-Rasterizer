@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Definitions.h"
+#include "Camera.h"
+#include "Projection.h"
+
+#include <memory>
 
 
 class SolidBody
@@ -17,6 +21,11 @@ public:
 	Uint32			colour			= 255;
 	int				texture			= 0;
 	double			txU				= 1.0f;
+
+	int				nPoly			= 0;
+	triangle3dV*	mesh			= nullptr;
+
+	std::shared_ptr<Projection> Projector = std::make_shared<Projection>();
 
 protected:
 	
@@ -44,12 +53,9 @@ public:
 	SolidBody();
 	~SolidBody();
 
-	virtual int				getTotalVert()					= 0;
-	virtual int				getTotalPoly()					= 0;
-	virtual void			getTriangleData_(triangle3dV*)	= 0;
-	virtual void			constructShadowVolume(vect3)	= 0;
-
-	bool assertShadowCasting();
+	virtual int	getTotalVert()														= 0;
+	virtual int	getTotalPoly()														= 0;
+	virtual void getTriangleData(triangle3dV*)										= 0;
 
 	void setScale(vect3);
 	void setPosition(vect3);
@@ -120,5 +126,9 @@ public:
 
 	void incrementBounceCount();
 	int getBounceCount();
+
+	void updateMesh();
+	void render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
+		LightSource sun, const projectionStyle& style, double torch, double ill);
 };
 

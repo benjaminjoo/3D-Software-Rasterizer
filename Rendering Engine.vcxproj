@@ -200,7 +200,6 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Projection.cpp" />
     <ClCompile Include="Room.cpp" />
-    <ClCompile Include="ShadowVolume.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="SolidBody.cpp" />
     <ClCompile Include="SolidCone.cpp">
@@ -217,7 +216,6 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">6385</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="SolidSTL.cpp" />
-    <ClCompile Include="Speaker.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="ViewVolume.cpp" />
     <ClCompile Include="DynamicMesh.cpp" />
@@ -251,7 +249,6 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Projection.h" />
     <ClInclude Include="Room.h" />
-    <ClInclude Include="ShadowVolume.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="SolidBody.h" />
     <ClInclude Include="SolidCone.h" />
@@ -262,7 +259,6 @@
     <ClInclude Include="SolidPrism.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="SolidSTL.h" />
-    <ClInclude Include="Speaker.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewVolume.h" />

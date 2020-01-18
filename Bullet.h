@@ -17,10 +17,9 @@ public:
 	Bullet(double, double, double, double, double, double, Uint32);
 	~Bullet();
 
-	int		getTotalVert();
-	int		getTotalPoly();
-	void	getTriangleData_(triangle3dV*);
-	void	constructShadowVolume(vect3);
-	double	getMuzzleVelocity();
+	int	getTotalVert();
+	int	getTotalPoly();
+	void getTriangleData(triangle3dV*);
+	double getMuzzleVelocity();
 };
 

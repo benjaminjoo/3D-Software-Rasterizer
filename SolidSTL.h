@@ -20,13 +20,12 @@ public:
 	SolidSTL(double, double, double, double, double, double, double, double, double, Uint32, int, std::string);
 	~SolidSTL();
 
-	virtual int				getTotalVert();
-	virtual int				getTotalPoly();
-	virtual void			getTriangleData_(triangle3dV*);
-	virtual void			constructShadowVolume(vect3);
+	virtual int	getTotalVert();
+	virtual int	getTotalPoly();
+	virtual void getTriangleData(triangle3dV*);
 
-	void			readSTLfile();
-	void			smoothSurfaces();
+	void readSTLfile();
+	void smoothSurfaces();
 
 	bool match(const vect3& a, const vect3& b)
 	{

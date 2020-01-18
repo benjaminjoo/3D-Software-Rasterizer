@@ -83,9 +83,9 @@ void BSP1Loader::readData()
 			float vert_z = *((float*)temp_4);
 
 			point3 tempPoint;
-			tempPoint.P.x = (double)vert_x * scale.x;
-			tempPoint.P.y = (double)vert_y * scale.y;
-			tempPoint.P.z = (double)vert_z * scale.z;
+			tempPoint.P.x = (double)vert_x;// * scale.x;
+			tempPoint.P.y = (double)vert_y;// * scale.y;
+			tempPoint.P.z = (double)vert_z;// * scale.z;
 			tempPoint.P.w = 1.0;
 			tempPoint.colour = getColour(0, 127, 127, 255);
 
@@ -296,6 +296,10 @@ void BSP1Loader::readData()
 	modelFile.close();
 
 	this->calculateTriangles();
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
 }
 
 
@@ -422,18 +426,13 @@ void BSP1Loader::calculateTriangles()
 }
 
 
-void BSP1Loader::getTriangleData_(triangle3dV* T)
+void BSP1Loader::getTriangleData(triangle3dV* T)
 {
-	for (int i = 0; i < this->getTotalPoly(); i++)
+	nPoly = getTotalPoly();
+	for (int i = 0; i < this->nPoly; i++)
 	{
 		T[i] = polyContainer[i];
 	}
-}
-
-
-void BSP1Loader::constructShadowVolume(vect3)
-{
-
 }
 
 
@@ -466,3 +465,4 @@ line3d BSP1Loader::getLine(unsigned int n)
 		return { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0), 255 };
 	}
 }
+

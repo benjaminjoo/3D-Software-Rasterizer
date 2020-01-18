@@ -21,12 +21,11 @@ public:
 	SolidModel(double, double, double, double, double, double, double, double, double, Uint32, int);
 	~SolidModel();
 
-	virtual int				getTotalVert();
-	virtual int				getTotalPoly();
-	virtual void			getTriangleData_(triangle3dV*);
-	virtual void			constructShadowVolume(vect3);
+	virtual int	getTotalVert();
+	virtual int	getTotalPoly();
+	virtual void getTriangleData(triangle3dV*);
 
-	void			readModelFile(const std::string& fileName);
+	void readModelFile(const std::string& fileName);
 
 	void logPolyContainerSize();
 };
