@@ -27,6 +27,12 @@ void Game::addEntity(std::shared_ptr<SolidBody> entity)
 	int n = entity->getTotalPoly();
 	triangle3dV* temp = new triangle3dV[n];
 	entity->getTriangleData(temp);
+	vect3 sc = entity->getScale();
+	vect3 mv = entity->getPosition();
+	vect3 rt = entity->getRotation();
+	Renderer->transformMesh(n, temp, sc.x, sc.y, sc.z,
+		mv.x, mv.y, mv.z,
+		rt.x, rt.y, rt.z);
 	for (int i = 0; i < n; i++)
 		collisionPlanes.push_back(temp[i]);
 	delete[] temp;
@@ -88,6 +94,8 @@ void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 	Eye->x		= player->x;
 	Eye->y		= player->y;
 	Eye->z		= player->z;
+
+	Eye->updateViewDirection();
 }
 
 
@@ -556,6 +564,8 @@ void Game::updateAll()
 
 	if (!Controls->isPaused)
 	{
+		Sun->update();
+
 		this->updateBalls();
 
 		if (Controls->playerControlled)

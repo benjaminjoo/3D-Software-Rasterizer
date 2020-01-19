@@ -34,6 +34,26 @@ int Projection::GetYMin3(coord2 * p)
 }
 
 
+double Projection::getMax(int n, double* v)
+{
+	double max = v[0];
+	for (int i = 0; i < n; i++)
+		if (v[i] > max)
+			max = v[i];
+	return max;
+}
+
+
+double Projection::getMin(int n, double* v)
+{
+	double min = v[0];
+	for (int i = 0; i < n; i++)
+		if (v[i] > min)
+			min = v[i];
+	return min;
+}
+
+
 void Projection::clampValue(double* value, double lower, double upper)
 {
 	if (*value < lower)
@@ -352,22 +372,6 @@ mat4x4 Projection::getRotation(axis t, double a)
 
 void Projection::object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T)
 {
-
-	//mat4x4 rotX = getRotation(axis::x, rt.x);
-	//mat4x4 rotY = getRotation(axis::y, rt.y);
-	//mat4x4 rotZ = getRotation(axis::z, rt.z);
-	//mat4x4 mXYZ = getTranslation(mv);
-	//
-	//T.A = mXYZ * rotX * rotY * rotZ * mXYZ * T.A;
-	//T.B = mXYZ * rotX * rotY * rotZ * mXYZ * T.B;
-	//T.C = mXYZ * rotX * rotY * rotZ * mXYZ * T.C;
-	//
-	//T.An = rotX * rotY * rotZ * T.An;
-	//T.Bn = rotX * rotY * rotZ * T.Bn;
-	//T.Cn = rotX * rotY * rotZ * T.Cn;
-	//
-	//T.N = rotX * rotY * rotZ * T.N;
-
 	T = Projection::rotXT(rt.x, T);
 	T = Projection::rotYT(rt.y, T);
 	T = Projection::rotZT(rt.z, T);
@@ -391,7 +395,6 @@ point3 Projection::world2viewP(point3 p, mat4x4& rot, mat4x4& mov)
 {
 	point3 tempPoint;
 
-	//tempPoint.P = rotZrad(T.sinRol, T.cosRol, rotXrad(T.sinAlt, T.cosAlt, rotZrad(T.sinAzm, T.cosAzm, translate(-x, -y, -z, p.P))));
 	tempPoint.P = rot * mov * p.P;
 	tempPoint.P.w = 1.0;
 	tempPoint.colour = p.colour;
@@ -417,36 +420,35 @@ vect3 Projection::screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, doub
 }
 
 
-void Projection::illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV& P, const projectionStyle& style)
+void Projection::illuminatePoly(LightSource Light, vect3& View, triangle3dV* viewT, const triangle3dV& worldT, const projectionStyle& style, const double& min)
 {
 	double illumAll, illumA, illumB, illumC;
-	illumAll = illumA = illumB = illumC = 0.0;
+	illumAll = illumA = illumB = illumC = 0.0f;
 	vect3 n;
 
-	if (style == gouraud_shaded ||
-		style == sunlight)
+	if (style == sunlight || style == gouraud_shaded || style == blinn_phong)
 	{
-		n = P.An;
-		illumA = L.getIllumination(n);
-		clampValue(&illumA, MIN_ILLUMINATION, MAX_ILLUMINATION);
-		T->A.w = illumA;
+		n = worldT.An;
+		illumA = Light.getIllumination(n);
+		clampValue(&illumA, min, 1.0f);
+		viewT->A.w = illumA;
 
-		n = P.Bn;
-		illumB = L.getIllumination(n);
-		clampValue(&illumB, MIN_ILLUMINATION, MAX_ILLUMINATION);
-		T->B.w = illumB;
+		n = worldT.Bn;
+		illumB = Light.getIllumination(n);
+		clampValue(&illumB, min, 1.0f);
+		viewT->B.w = illumB;
 
-		n = P.Cn;
-		illumC = L.getIllumination(n);
-		clampValue(&illumC, MIN_ILLUMINATION, MAX_ILLUMINATION);
-		T->C.w = illumC;
+		n = worldT.Cn;
+		illumC = Light.getIllumination(n);
+		clampValue(&illumC, min, 1.0f);
+		viewT->C.w = illumC;
 	}
 	else
 	{
-		n = P.N;
-		illumAll = L.getIllumination(n);
-		clampValue(&illumAll, MIN_ILLUMINATION, MAX_ILLUMINATION);
-		T->A.w = T->B.w = T->C.w = illumAll;
+		n = worldT.N;
+		illumAll = Light.getIllumination(n);
+		clampValue(&illumAll, min, 1.0f);
+		viewT->A.w = viewT->B.w = viewT->C.w = illumAll;
 	}
 }
 
@@ -840,7 +842,14 @@ void Projection::fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr
 				{
 					if (1 / zCurrent < screen->depthBuffer[hg * w + i])
 					{
-						screen->pixelBuffer[hg * w + i] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
+						if (illCurrent > 1.0f)
+						{
+							screen->pixelBuffer[hg * w + i] = 0x00ffffff;
+						}
+						else
+						{
+							screen->pixelBuffer[hg * w + i] = getColour(0, (byte)(r * illCurrent), (byte)(g * illCurrent), (byte)(b * illCurrent));
+						}						
 						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
 					}
 					zCurrent += deltaZ;
@@ -1770,6 +1779,175 @@ void Projection::fillTriangleTorchlightSolidColour(const triangle3dV& T, const t
 						screen->depthBuffer[hg * w + i] = invertCurrentZ;
 					}
 					zCurrent += deltaZ;
+				}
+			}
+		}
+	}
+}
+
+
+void Projection::fillTriangleBlinnPhong(const triangle2dG& t, double* spL, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio)
+{
+	int w = screen->getWidth();
+	int h = screen->getHeight();
+
+	coord2 pt[3] = { t.a, t.b, t.c };
+	int yMin, yMax;
+
+	yMin = GetYMin3(pt);
+	yMax = GetYMax3(pt);
+
+	int wd = 0;
+	int dx, dy;
+	double dIllum, illum;
+	double dSpec, spec;
+	double xx, yy, zz, dz;
+	int lineEnd[2] = { 0, 0 };
+	double zLimit[2] = { 0.0f, 0.0f };
+	double illLimit[2] = { 0.0f, 0.0f };
+	double specLimit[2] = { 0.0f, 0.0f };
+	int endIndex;
+	int startX, endX;
+	double startZ, endZ, zCurrent, startIll, endIll, illCurrent, startSpec, endSpec, specCurrent;
+
+	double deltaZ, deltaIll, deltaSpec;
+
+	byte r, g, b;
+	r = ((byte)(t.h >> 16 & 0xFF));
+	g = ((byte)(t.h >> 8 & 0xFF));
+	b = ((byte)(t.h & 0xFF));
+
+	double corr = 0.0;
+
+	coord2 currentP, startP, endP;
+	vect3 startV, endV;
+
+	for (int hg = yMin; hg < yMax; hg++)
+	{
+		endIndex = 0;
+		//Side A-B:
+		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
+		{
+			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA; dSpec = spL[1] - spL[0];
+			yy = (double)hg - (double)t.a.y; xx = dx * (yy / dy);
+			zz = t.a.z + dz * (yy / (double)dy);
+			illum = t.illumA + dIllum * (yy / (double)dy);
+			spec = spL[0] + dSpec * (yy / (double)dy);
+			wd = t.a.x + std::round(xx);
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				illLimit[endIndex] = illum;
+				specLimit[endIndex] = spec;
+				endIndex++;
+			}
+		}
+		//Side B-C:
+		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
+		{
+			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB; dSpec = spL[2] - spL[1];
+			yy = (double)hg - (double)t.b.y; xx = dx * (yy / dy);
+			zz = t.b.z + dz * (yy / (double)dy);
+			illum = t.illumB + dIllum * (yy / (double)dy);
+			spec = spL[1] + dSpec * (yy / (double)dy);
+			wd = t.b.x + std::round(xx);
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				illLimit[endIndex] = illum;
+				specLimit[endIndex] = spec;
+				endIndex++;
+			}
+		}
+		//Side C-A:
+		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
+		{
+			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC; dSpec = spL[0] - spL[2];
+			yy = (double)hg - (double)t.c.y; xx = dx * (yy / dy);
+			zz = t.c.z + dz * (yy / (double)dy);
+			illum = t.illumC + dIllum * (yy / (double)dy);
+			spec = spL[2] + dSpec * (yy / (double)dy);
+			wd = t.c.x + std::round(xx);
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				illLimit[endIndex] = illum;
+				specLimit[endIndex] = spec;
+				endIndex++;
+			}
+		}
+		if (endIndex == 2)
+		{
+			if (lineEnd[0] <= lineEnd[1])
+			{
+				startX = lineEnd[0];
+				endX = lineEnd[1];
+				startZ = zLimit[0];
+				endZ = zLimit[1];
+				startIll = illLimit[0];
+				endIll = illLimit[1];
+				startSpec = specLimit[0];
+				endSpec = specLimit[1];
+			}
+			else
+			{
+				startX = lineEnd[1];
+				endX = lineEnd[0];
+				startZ = zLimit[1];
+				endZ = zLimit[0];
+				startIll = illLimit[1];
+				endIll = illLimit[0];
+				startSpec = specLimit[1];
+				endSpec = specLimit[0];
+			}
+			int span = abs(endX - startX + 1);
+			deltaZ = (endZ - startZ) / (double)span;
+			deltaIll = ((endIll - startIll) / (double)span);
+			deltaSpec = ((endSpec - startSpec) / (double)span);
+			zCurrent = startZ;
+			illCurrent = startIll;
+			specCurrent = startSpec;
+
+			startP.x = startX;	startP.y = hg;	startP.z = startZ;
+			endP.x = endX;		endP.y = hg;	endP.z = endZ;
+			startV = screen2view(startP, screen, h_ratio, v_ratio);
+			endV = screen2view(endP, screen, h_ratio, v_ratio);
+
+			for (int i = startX; i < endX + 1; i++)
+			{
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
+				{
+					if (1 / zCurrent < screen->depthBuffer[hg * w + i])
+					{
+						double rgb[3];
+
+						rgb[0] = (static_cast<double>(r) * illCurrent) + (255.0f * specCurrent);
+						rgb[1] = (static_cast<double>(g) * illCurrent) + (255.0f * specCurrent);
+						rgb[2] = (static_cast<double>(b) * illCurrent) + (255.0f * specCurrent);
+						
+						double rgbMax = getMax(3, rgb);
+						if (rgbMax > 255.0f)
+						{
+							double scale = 1.0f / getMax(3, rgb);
+
+							rgb[0] = (rgb[0] * scale) * 255.0f;
+							rgb[1] = (rgb[1] * scale) * 255.0f;
+							rgb[2] = (rgb[2] * scale) * 255.0f;
+						}
+
+						Uint32 finalPixel = getColour(0,	static_cast<unsigned char>(rgb[0]),
+															static_cast<unsigned char>(rgb[1]),
+															static_cast<unsigned char>(rgb[2]));
+
+						screen->pixelBuffer[hg * w + i] = finalPixel;
+						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
+					}
+					zCurrent += deltaZ;
+					illCurrent += deltaIll;
+					specCurrent += deltaSpec;
 				}
 			}
 		}

@@ -125,10 +125,16 @@ double Camera::getVRatio()
 }
 
 
-bool Camera::polyFacingCamera(const triangle3dV& P)
+void Camera::updateViewDirection()
 {
-	vect3 eyeVector = subVectors(P.A, { x, y, z, 1.0 });
-	return dotProduct(P.N, eyeVector) < 0.0f ? true : false;
+	viewDirection = { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };
+}
+
+
+bool Camera::polyFacingCamera(const triangle3dV& worldT)
+{
+	vect3 eyeVector = subVectors(worldT.A, { x, y, z, 1.0 });
+	return dotProduct(worldT.N, eyeVector) < 0.0f ? true : false;
 }
 
 
@@ -136,57 +142,68 @@ void Camera::clearVertexList()
 {
 	for (int v = 0; v < MAXCLIPVERTS; v++)
 	{
-		vertexList[v] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		uvList[v] = { 0.0f, 0.0f };
+		vertexList[v]	= { 0.0f, 0.0f, 0.0f, 0.0f };
+		uvList[v]		= { 0.0f, 0.0f };
+		specularList[v] = { 0 };
 	}
 }
 
 
-int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList)
+int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList, double* specList)
 {
 	memset(vertList, 0, MAXCLIPVERTS * sizeof(double));
 
-	vertList[0] = viewT.A;	uvList[0] = viewT.At;
-	vertList[1] = viewT.B;	uvList[1] = viewT.Bt;
-	vertList[2] = viewT.C;	uvList[2] = viewT.Ct;
+	vertList[0] = viewT.A;	uvList[0] = viewT.At;	specList[0] = illSpec[0];
+	vertList[1] = viewT.B;	uvList[1] = viewT.Bt;	specList[1] = illSpec[1];
+	vertList[2] = viewT.C;	uvList[2] = viewT.Ct;	specList[2] = illSpec[2];
 
 	int nVert = 3;
 	plane currentPlane;
 
 	currentPlane = Frustum.getNearPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getTopPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getBottomPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getLeftPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getRightPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getFarPlane();
-	this->clipPoly(&nVert, vertList, uvList, currentPlane);
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 
 	return nVert;
 }
 
 
-inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, plane clippingPlane)
+inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, double* specList, plane clippingPlane)
 {
 	int nResult = 0;
 	vect3 vTemp[MAXCLIPVERTS];
 	textCoord uvTemp[MAXCLIPVERTS];
+	double specTemp[MAXCLIPVERTS];
 
 	for (int i = 0; i < *nVert; i++)
 	{
 		if (i < (*nVert) - 1)
-		{ this->clipEdge(clippingPlane,		vertList[i],	vertList[i + 1], uvList[i],		uvList[i + 1],		&nResult, vTemp, uvTemp); }
+		{ this->clipEdge(clippingPlane,
+			vertList[i], vertList[i + 1],
+			uvList[i], uvList[i + 1],
+			specList[i], specList[i + 1],
+			&nResult, vTemp, uvTemp, specTemp); }
 		else
-		{ this->clipEdge(clippingPlane,		vertList[i],		vertList[0], uvList[i],			uvList[0],		&nResult, vTemp, uvTemp); }
+		{ this->clipEdge(clippingPlane,
+			vertList[i], vertList[0],
+			uvList[i], uvList[0],
+			specList[i], specList[0],
+			&nResult, vTemp, uvTemp, specTemp); }
 	}
 	for (int j = 0; j < nResult; j++)
 	{
 		vertList[j] = vTemp[j];
 		uvList[j] = uvTemp[j];
+		specList[j] = specTemp[j];
 	}
 
 	*nVert = nResult;
@@ -194,7 +211,7 @@ inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, p
 
 
 inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
-	int* nResult, vect3 * vTemp, textCoord * uvTemp)
+	const double& startSpec, const double& endSpec, int* nResult, vect3 * vTemp, textCoord * uvTemp, double* specTemp)
 {
 	double t;
 	//vect3 a = subVectors(startV, p.P);
@@ -234,6 +251,8 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 				uvTemp[*nResult].u = startUV.u + t * (endUV.u - startUV.u);
 				uvTemp[*nResult].v = startUV.v + t * (endUV.v - startUV.v);
 
+				specTemp[*nResult] = startSpec + t * (endSpec - startSpec);
+
 				(*nResult)++;
 			}
 		}
@@ -253,6 +272,8 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 				uvTemp[*nResult].u = endUV.u - t * (startUV.u - endUV.u);
 				uvTemp[*nResult].v = endUV.v - t * (startUV.v - endUV.v);
 
+				specTemp[*nResult] = endSpec - t * (startSpec - endSpec);
+
 				(*nResult)++;
 			}
 			else
@@ -267,6 +288,8 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 
 				uvTemp[*nResult].u = endUV.u;
 				uvTemp[*nResult].v = endUV.v;
+
+				specTemp[*nResult] = endSpec;
 				
 				(*nResult)++;
 			}
@@ -283,6 +306,8 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 
 			uvTemp[*nResult].u = endUV.u;
 			uvTemp[*nResult].v = endUV.v;
+
+			specTemp[*nResult] = endSpec;
 
 			(*nResult)++;
 		}
@@ -301,6 +326,8 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 
 			uvTemp[*nResult].u = endUV.u;
 			uvTemp[*nResult].v = endUV.v;
+
+			specTemp[*nResult] = endSpec;
 
 			(*nResult)++;
 		}
@@ -348,18 +375,6 @@ bool Camera::pointBehindPlane(const plane& p, vect3& V)
 		return true;
 	else
 		return false;
-}
-
-
-void Camera::updatePosition(double turnH, double turnV, double tiltP, double moveP, double strafeP, double riseP)
-{
-	azm = -turnH;
-	alt = -turnV;
-	rol = tiltP;
-
-	x -= moveP * cos(azm) - strafeP * cos(azm + PI * 0.5f);
-	y += moveP * sin(azm) - strafeP * sin(azm + PI * 0.5f);
-	z += riseP;
 }
 
 
@@ -549,15 +564,30 @@ void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSourc
 
 	this->world2view(RM, R, viewT);
 
-	Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle);
+	if (visualStyle == blinn_phong)
+	{
+		Renderer->illuminatePoly(Sun, viewDirection, &viewT, worldT, visualStyle, 0.0f);
+		getSpec(illSpec, Sun, worldT, 16.0f);
+	}
+	else
+		Renderer->illuminatePoly(Sun, viewDirection, &viewT, worldT, visualStyle, 0.1f);
+		
 
-	int nVert = this->clipToFrustum(viewT, vertexList, uvList);
+	int nVert = this->clipToFrustum(viewT, vertexList, uvList, specularList);
 
 	Uint32 colour = worldT.colour;
 
 	currentTexture = &textureData[viewT.texture];
 
 	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
+}
+
+
+void Camera::getSpec(double* illSp, LightSource Light, const triangle3dV& worldT, double shine)
+{
+	illSp[0] = Light.getBlinnSpecular(worldT.An, viewDirection, shine);
+	illSp[1] = Light.getBlinnSpecular(worldT.Bn, viewDirection, shine);
+	illSp[2] = Light.getBlinnSpecular(worldT.Cn, viewDirection, shine);
 }
 
 
@@ -577,9 +607,6 @@ inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const d
 
 void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double torchI, double maxI, triangle3dV originalPoly)
 {
-	triangle2dG screenT;
-	triangle3dV originalT;	//To be passed on to polygon filling routine
-
 	if (style == wireframe)
 	{
 		coord2 startP, endP;
@@ -600,6 +627,9 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 	}
 	else
 	{
+		triangle2dG screenT;
+		triangle3dV originalT;	//To be passed on to polygon filling routine
+
 		for (int i = 0; i < n - 2; i++)
 		{
 			screenT.a = this->view2screen(vertexList[0], hRatio, vRatio);
@@ -642,6 +672,15 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			case gouraud_shaded:
 			{
 				Renderer->fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
+			}
+			break;
+			case blinn_phong:
+			{
+				double specular[3];
+				specular[0] = specularList[0];
+				specular[1] = specularList[1 + i];
+				specular[2] = specularList[2 + i];
+				Renderer->fillTriangleBlinnPhong(screenT, specular, Screen, hRatio, vRatio);
 			}
 			break;
 			case depth_visualised:

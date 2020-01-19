@@ -26,6 +26,8 @@ private:
 	double					alt;
 	double					rol;
 
+	vect3					viewDirection = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	double					step;
 	double					turn;
 
@@ -40,14 +42,17 @@ private:
 	double					hRatio;
 	double					vRatio;
 
-	Uint32*					pixelBuffer = nullptr;
-	double*					depthBuffer = nullptr;
+	Uint32*					pixelBuffer		= nullptr;
+	double*					depthBuffer		= nullptr;
 
 	std::shared_ptr<Canvas> Screen			= nullptr;
 	std::shared_ptr<Projection> Renderer	= nullptr;
 
 	vect3					vertexList[MAXCLIPVERTS];
 	textCoord				uvList[MAXCLIPVERTS];
+	double					specularList[MAXCLIPVERTS];
+
+	double					illSpec[3]		= { 0.0f };
 
 	txt*					currentTexture = nullptr;
 	std::vector<txt>		textureData;
@@ -90,22 +95,22 @@ private:
 
 	double getVRatio();
 
+	void updateViewDirection();
+
 	bool polyFacingCamera(const triangle3dV&);
 
 	void clearVertexList();
 
-	int clipToFrustum(const triangle3dV&, vect3*, textCoord*);
+	int clipToFrustum(const triangle3dV&, vect3*, textCoord*, double*);
 
-	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, plane clippingPlane);
+	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, double* specList, plane clippingPlane);
 
 	void clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
-		int* nResult, vect3* temp, textCoord* temp_uv);
+		const double& startSpec, const double& endSpec, int* nResult, vect3* temp, textCoord* temp_uv, double* temp_spec);
 
 	bool pointInsideFrustum(vect3& V);
 
 	bool pointBehindPlane(const plane& p, vect3& V);
-
-	void updatePosition(double, double, double, double, double, double);
 
 	void centreLook();
 
@@ -128,10 +133,11 @@ private:
 	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
 		const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
 
+	void getSpec(double* illSpec, LightSource Light, const triangle3dV& worldT, double shine);
+
 	coord2 view2screen(const vect3& vertex, const double& hR, const double& vR);
 
 	void projectPoly(int, Uint32, projectionStyle, double, double, triangle3dV);
 
 	void outputImage(Canvas);
-
 };

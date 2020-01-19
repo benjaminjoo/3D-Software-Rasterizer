@@ -123,9 +123,9 @@ void fps_game()
 
 	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
 
-	auto Sun		= std::make_shared<LightSource>(300.0f, 45.0f, 0.95f);
+	auto Sun		= std::make_shared<LightSource>(300.0f, 22.5f, 1.0f);
 
-	auto Hero		= std::make_shared<Player>(15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
+	auto Hero		= std::make_shared<Player>(15.0f, 20.0f, 2.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
 
 	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32);
 
@@ -175,10 +175,13 @@ void fps_game()
 
 #ifdef _STL_READER_
 
-	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
+	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
 	teapot->readSTLfile();
 	teapot->smoothSurfaces();
 	fpsGame->addEntity(teapot);
+
+	auto board = std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, -15.0f, -15.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0x0000007f, 6, 30.0f, 30.0f, 1.0f);
+	fpsGame->addEntity(board);
 
 #endif//_STL_READER_
 

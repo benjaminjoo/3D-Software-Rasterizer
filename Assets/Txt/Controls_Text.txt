@@ -19,10 +19,11 @@
 *                Checkedboard : C                          *
 *                 Flat Shaded : V                          *
 *              Gouraud Shaded : B                          *
-*         Z-Buffer Visualised : N                          *
-*        Materials (Sunlight) : M                          *
-*      Materials (Torchlight) : COMMA                      *
-*  Solid Colours (Torchlight) : FULL STOP                  *
+*                 Blinn-Phong : N                          *
+*         Z-Buffer Visualised : M                          *
+*        Materials (Sunlight) : COMMA                      *
+*      Materials (Torchlight) : FULL STOP                  *
+*  Solid Colours (Torchlight) : SLASH			   *
 *                  Show Stats : TAB                        *
 *          Torch Intensity Up : KEYPAD PLUS                *
 *        Torch Intensity Down : KEYPAD MINUS               *

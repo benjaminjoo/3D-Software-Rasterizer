@@ -298,7 +298,7 @@ vect3 dirVector(double azm, double alt)
 	temp.x = cos(alt * PI / 180.0) * cos(azm * PI / 180.0);
 	temp.y = cos(alt * PI / 180.0) * sin(azm * PI / 180.0);
 	temp.z = sin(alt * PI / 180.0);
-	temp.w = 1.0;	//0.0
+	temp.w = 1.0;
 
 	return temp;
 }

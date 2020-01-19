@@ -134,7 +134,6 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles)
 			vect3 velocity	= rotation * muzzleVelocity;
 
 			Projectiles[i]->setRotation({ alt, rol, -(azm + PI * 0.5f), 1.0f });
-
 			Projectiles[i]->setFired(true);
 			Projectiles[i]->setPosition(origin);
 			Projectiles[i]->setVelocity(velocity);			

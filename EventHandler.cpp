@@ -269,15 +269,18 @@ void EventHandler::HandleUserEvents()
 				visualStyle = gouraud_shaded;
 				break;
 			case SDLK_n:
-				visualStyle = depth_visualised;
+				visualStyle = blinn_phong;
 				break;
 			case SDLK_m:
-				visualStyle = sunlight;
+				visualStyle = depth_visualised;
 				break;
 			case SDLK_COMMA:
-				visualStyle = torchlight;
+				visualStyle = sunlight;
 				break;
 			case SDLK_PERIOD:
+				visualStyle = torchlight;
+				break;
+			case SDLK_SLASH:
 				visualStyle = torchlight_solid;
 				break;
 			case SDLK_g:

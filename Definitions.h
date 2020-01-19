@@ -43,32 +43,103 @@
 enum class axis { x, y, z };
 
 
-enum Side { Bottom, Top, Back, Front, Left, Right };
+enum Side
+{
+	Bottom,
+	Top,
+	Back,
+	Front,
+	Left,
+	Right
+};
 
 
-enum editingMode { Selection, Placement, LineDrawing, Relocation, Rotation, CopyRelocation, CopyRotation };
+enum editingMode
+{
+	Selection,
+	Placement,
+	LineDrawing,
+	Relocation,
+	Rotation,
+	CopyRelocation,
+	CopyRotation
+};
 
 
-enum tool { none, arrow, cross, line, move, rotate, copy_move, copy_rotate, view_top, view_front, view_side, obj_snap, grid_snap};
+enum tool
+{
+	none,
+	arrow,
+	cross,
+	line,
+	move,
+	rotate,
+	copy_move,
+	copy_rotate,
+	view_top,
+	view_front,
+	view_side,
+	obj_snap,
+	grid_snap
+};
 
 
-enum toolStatus { active, inactive };
+enum toolStatus
+{
+	active,
+	inactive
+};
 
 
-enum handedness { left, right };
+enum handedness
+{
+	left,
+	right
+};
 
 
-enum projectionStyle { wireframe, solid_colour, checkerboard, flat_shaded, gouraud_shaded, depth_visualised, sunlight,
-						torchlight, torchlight_solid, test };
+enum projectionStyle
+{
+	wireframe,
+	solid_colour,
+	checkerboard,
+	flat_shaded,
+	gouraud_shaded,
+	blinn_phong,
+	depth_visualised,
+	sunlight,
+	torchlight,
+	torchlight_solid,
+	test
+};
 
 
-enum model { solid, actor };
+enum model
+{
+	solid,
+	actor
+};
 
 
-enum hit_response { penetrate, stick, bounce, slide };
+enum hit_response
+{
+	penetrate,
+	stick,
+	bounce,
+	slide
+};
 
 
-enum aiGoal { be_idle, follow_player, kill_player, follow_others, kill_others, follow_each_other, kill_each_other };
+enum aiGoal
+{
+	be_idle,
+	follow_player,
+	kill_player,
+	follow_others,
+	kill_others,
+	follow_each_other,
+	kill_each_other
+};
 
 
 typedef unsigned char byte;
@@ -228,6 +299,12 @@ struct vect3
 	{
 		double s = 1.0f / this->len();
 		return { x * s, y * s, z * s, 1.0f };
+	}
+
+	vect3	operator |	(const vect3& p)
+	{
+		vect3 sum = { x + p.x, y + p.y, z + p.z, 1.0f };
+		return sum.norm();
 	}
 
 	vect3	operator + 	(const vect3& p)

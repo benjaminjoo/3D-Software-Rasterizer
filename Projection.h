@@ -17,6 +17,10 @@ public:
 
 	int GetYMin3(coord2* p);
 
+	double getMax(int n, double* v);
+
+	double getMin(int n, double* v);
+
 	void clampValue(double* value, double lower, double upper);
 
 	vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v);
@@ -64,7 +68,7 @@ public:
 
 	vect3 screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
 
-	void illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV& P, const projectionStyle& style);
+	void illuminatePoly(LightSource L, vect3& V, triangle3dV* T, const triangle3dV& P, const projectionStyle& style, const double& min);
 
 	Uint32 modifyColour(const Uint32& inputColour, const double& illumination);
 
@@ -87,5 +91,7 @@ public:
 
 	void fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio,
 				const double& lightIntensity, const double& maxIllumination);
+
+	void fillTriangleBlinnPhong(const triangle2dG& t, double* spec, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
 };
 
