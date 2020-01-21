@@ -52,10 +52,10 @@ public:
 	worldCoord			rotationCentre	= { 0.0f, 0.0f, 0.0f };
 	worldCoord			rotationStart	= { 0.0f, 0.0f, 0.0f };
 	worldCoord			rotationEnd		= { 0.0f, 0.0f, 0.0f };
-	double				rotationAngle	= 0.0f;
+	float				rotationAngle	= 0.0f;
 
-	double				scale			= 1.0f;
-	double				tolerance;
+	float				scale			= 1.0f;
+	float				tolerance;
 
 	screenCoord			planPosition	= { 600, 300 };
 	screenCoord			frontPosition	= { 600, 300 };
@@ -73,7 +73,7 @@ public:
 	worldCoord			worldPosition	= { 0.0f, 0.0f, 0.0f };
 
 
-	Editor(double toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer);
+	Editor(float toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer);
 	~Editor();
 
 	worldCoord screen2world(screenCoord);
@@ -114,7 +114,7 @@ public:
 	bool snapToVert(worldCoord*);
 	void alignToAxis(worldCoord*);
 	void flattenVector(worldCoord*);
-	double calculateAngle(worldCoord rotStart, worldCoord rotEnd);
+	float calculateAngle(worldCoord rotStart, worldCoord rotEnd);
 
 	void selectAll();
 	void deselectAll();

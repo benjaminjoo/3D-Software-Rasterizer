@@ -1,7 +1,7 @@
 #include "Definitions.h"
 
 
-double distancePN(polyNode a, polyNode b)
+float distancePN(polyNode a, polyNode b)
 {
 	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
@@ -41,7 +41,7 @@ polyNode unitNode(polyNode a)
 {
 	polyNode t;
 
-	double length = sqrt(a.x * a.x + a.y * a.y);
+	float length = sqrt(a.x * a.x + a.y * a.y);
 	t.x = a.x / length;
 	t.y = a.y / length;
 	t.s = a.s;
@@ -50,7 +50,7 @@ polyNode unitNode(polyNode a)
 }
 
 
-double dotNodes(polyNode a, polyNode b)
+float dotNodes(polyNode a, polyNode b)
 {
 	return a.x * b.x + a.y * b.y;
 }
@@ -73,7 +73,7 @@ bool checkPolygonForSplitting(int n, vect2* V, polyNode p, polyNode q)
 	bool needsSplitting = false;
 	polyNode normal = getNormal(p, q);
 	polyNode currentStart, currentEnd;
-	double sStart, sEnd;
+	float sStart, sEnd;
 	polyNode P, Q;
 	for (int i = 0; i < n - 1; i++)
 	{
@@ -101,7 +101,7 @@ bool checkPolygonForSplitting(polygon4uv V, polyNode p, polyNode q)
 	bool needsSplitting = false;
 	polyNode normal = getNormal(p, q);
 	polyNode currentStart, currentEnd;
-	double sStart, sEnd;
+	float sStart, sEnd;
 	polyNode P, Q;
 	for (int i = 0; i < 3; i++)
 	{
@@ -134,17 +134,17 @@ bool iSect2dLine(vect2 a, vect2 b, polyNode p, polyNode q, vect2* r)
 
 	polyNode normal = getNormal(p, q);
 
-	double sA = dotNodes(ap, normal);
-	double sB = dotNodes(bp, normal);
+	float sA = dotNodes(ap, normal);
+	float sB = dotNodes(bp, normal);
 
-	double t;
+	float t;
 
 	if (sign(sA) != sign(sB))
 	{
 		polyNode d = subNodes(b_, a_);
-		double dist = dotNodes(d, normal);
+		float dist = dotNodes(d, normal);
 
-		if (sA < 0.0)
+		if (sA < 0.0f)
 		{
 			if (dist)
 			{
@@ -156,7 +156,7 @@ bool iSect2dLine(vect2 a, vect2 b, polyNode p, polyNode q, vect2* r)
 				r->v = a.v + t * (b.v - a.v);
 			}
 		}
-		if (sB < 0.0)
+		if (sB < 0.0f)
 		{
 			if (dist)
 			{
@@ -190,7 +190,7 @@ vect3 invertVector(vect3 a)
 	temp.x = -a.x;
 	temp.y = -a.y;
 	temp.z = -a.z;
-	temp.x = 1.0;
+	temp.x = 1.0f;
 
 	return temp;
 }
@@ -203,7 +203,7 @@ vect3 addVectors(const vect3& a, const vect3& b)
 	temp.x = a.x + b.x;
 	temp.y = a.y + b.y;
 	temp.z = a.z + b.z;
-	temp.w = 1.0;
+	temp.w = 1.0f;
 
 	return temp;
 }
@@ -231,7 +231,7 @@ vect3 subVectors(const vect3& a, const vect3& b)
 	temp.x = a.x - b.x;
 	temp.y = a.y - b.y;
 	temp.z = a.z - b.z;
-	temp.w = 1.0;
+	temp.w = 1.0f;
 
 	return temp;
 }
@@ -241,22 +241,22 @@ vect3 halfwayPoint(vect3 a, vect3 b)
 {
 	vect3 temp;
 
-	temp.x = (a.x + b.x) * 0.5;
-	temp.y = (a.y + b.y) * 0.5;
-	temp.z = (a.z + b.z) * 0.5;
-	temp.w = 1.0;
+	temp.x = (a.x + b.x) * 0.5f;
+	temp.y = (a.y + b.y) * 0.5f;
+	temp.z = (a.z + b.z) * 0.5f;
+	temp.w = 1.0f;
 
 	return temp;
 }
 
 
-double distanceSquared(vect3 a, vect3 b)
+float distanceSquared(vect3 a, vect3 b)
 {
 	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
 }
 
 
-double lengthSquared(vect3 v)
+float lengthSquared(vect3 v)
 {
 	return v.x * v.x + v.y * v.y + v.z * v.z;
 }
@@ -266,12 +266,12 @@ vect3 unitVector(vect3 v)
 {
 	vect3 temp;
 
-	double length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
 	temp.x = v.x / length;
 	temp.y = v.y / length;
 	temp.z = v.z / length;
-	temp.w = 1.0;
+	temp.w = 1.0f;
 
 	return temp;
 }
@@ -281,7 +281,7 @@ worldCoord unitVector2(worldCoord v)
 {
 	worldCoord temp;
 
-	double length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
 	temp.x = v.x / length;
 	temp.y = v.y / length;
@@ -291,47 +291,47 @@ worldCoord unitVector2(worldCoord v)
 }
 
 
-vect3 dirVector(double azm, double alt)
+vect3 dirVector(float azm, float alt)
 {
 	vect3 temp;
 
-	temp.x = cos(alt * PI / 180.0) * cos(azm * PI / 180.0);
-	temp.y = cos(alt * PI / 180.0) * sin(azm * PI / 180.0);
-	temp.z = sin(alt * PI / 180.0);
-	temp.w = 1.0;
+	temp.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
+	temp.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
+	temp.z = (float)sin(alt * PI / 180.0f);
+	temp.w = 1.0f;
 
 	return temp;
 }
 
 
-double dotProduct(const vect3& a, const vect3& b)
+float dotProduct(const vect3& a, const vect3& b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
 
 
-worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, double angle)
+worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, float angle)
 {
 	worldCoord temp		= target - origin;
 	worldCoord result	= { 0.0f, 0.0f, 0.0f };
 
 	if (currentView == Top)
 	{
-		result.x = temp.x * cos(angle) - temp.y * sin(angle);
-		result.y = temp.y * cos(angle) + temp.x * sin(angle);
+		result.x = temp.x * (float)cos(angle) - temp.y * (float)sin(angle);
+		result.y = temp.y * (float)cos(angle) + temp.x * (float)sin(angle);
 		result.z = target.z;
 	}
 	else if (currentView == Front)
 	{
-		result.x = temp.x * cos(angle) - temp.z * sin(angle);
+		result.x = temp.x * (float)cos(angle) - temp.z * (float)sin(angle);
 		result.y = target.y;
-		result.z = temp.z * cos(angle) + temp.x * sin(angle);
+		result.z = temp.z * (float)cos(angle) + temp.x * (float)sin(angle);
 	}
 	else if (currentView == Right)
 	{
 		result.x = target.x;
-		result.y = temp.y * cos(angle) - temp.z * sin(angle);
-		result.z = temp.z * cos(angle) + temp.y * sin(angle);
+		result.y = temp.y * (float)cos(angle) - temp.z * (float)sin(angle);
+		result.z = temp.z * (float)cos(angle) + temp.y * (float)sin(angle);
 	}
 
 	result.x += origin.x;
@@ -342,20 +342,20 @@ worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, doubl
 }
 
 
-double dotProductSquared(const vect3& a, const vect3& b)
+float dotProductSquared(const vect3& a, const vect3& b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z) * (a.x * b.x + a.y * b.y + a.z * b.z);
 }
 
 
-double distPoint2Plane(vect3 P, triangle3dV T)
+float distPoint2Plane(vect3 P, triangle3dV T)
 {
 	//return abs((T.A - P) * T.N);
 	return -dotProduct(subVectors(T.A, P), T.N);
 }
 
 
-double distPoint2Line(worldCoord P, Side view, line3 L)
+float distPoint2Line(worldCoord P, Side view, line3 L)
 {
 	worldCoord normal = rotate2(unitVector2(L.vert[1] - L.vert[0]), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
 	switch (view)
@@ -374,7 +374,7 @@ double distPoint2Line(worldCoord P, Side view, line3 L)
 }
 
 
-double distPoint2LineSquared(vect3 p, vect3 a, vect3 b)
+float distPoint2LineSquared(vect3 p, vect3 a, vect3 b)
 {
 	return lengthSquared(crossProduct(subVectors(p, a), subVectors(p, b))) / lengthSquared(subVectors(b, a));
 }
@@ -407,8 +407,8 @@ bool pointIsAroundLine(worldCoord P, Side view, line3 L)
 		}
 		break;
 	}
-	double sA = (B - A) * (A - P);
-	double sB = (B - A) * (B - P);
+	float sA = (B - A) * (A - P);
+	float sB = (B - A) * (B - P);
 
 	return (sign(sA) != sign(sB)) ? true : false;
 }
@@ -422,7 +422,7 @@ vect3 crossProduct(vect3 a, vect3 b)
 	t.y = a.z * b.x - a.x * b.z;
 	t.z = a.x * b.y - a.y * b.x;
 
-	t.w = 1.0;
+	t.w = 1.0f;
 
 	return t;
 }
@@ -435,18 +435,18 @@ vect3 midPoint(vect3 a, vect3 b)
 	temp.x = (a.x + b.x) / 2;
 	temp.y = (a.y + b.y) / 2;
 	temp.z = (a.z + b.z) / 2;
-	temp.w = 1.0;
+	temp.w = 1.0f;
 
 	return temp;
 }
 
 
-coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR)
+coord2 view2screen(vect3 vertex, int width, int height, float hR, float vR)
 {
 	coord2 pixel;
 
-	pixel.x = (int)(width * 0.5 + (vertex.x / vertex.z) * width * 0.5 * hR * 0.95);
-	pixel.y = (int)(height * 0.5 - (vertex.y / vertex.z) * width * 0.5 * vR * 0.95);
+	pixel.x = (int)(width * 0.5f + (vertex.x / vertex.z) * width * 0.5f * hR * 0.95f);
+	pixel.y = (int)(height * 0.5f - (vertex.y / vertex.z) * width * 0.5f * vR * 0.95f);
 	pixel.z = vertex.z;
 
 	return pixel;
@@ -466,13 +466,13 @@ T getMinN(int n, T* list)
 
 
 
-vect3 getXYZmin(int n, triangle3dV* T, double padding)
+vect3 getXYZmin(int n, triangle3dV* T, float padding)
 {
 	vect3 xyzMin;
 	xyzMin.x = T[0].A.x;
 	xyzMin.y = T[0].A.y;
 	xyzMin.z = T[0].A.z;
-	xyzMin.w = 1.0;
+	xyzMin.w = 1.0f;
 	for (int i = 0; i < n; i++)
 	{
 		if (T[i].A.x < xyzMin.x) { xyzMin.x = T[i].A.x; }	
@@ -492,13 +492,13 @@ vect3 getXYZmin(int n, triangle3dV* T, double padding)
 }
 
 
-vect3 getXYZmax(int n, triangle3dV* T, double padding)
+vect3 getXYZmax(int n, triangle3dV* T, float padding)
 {
 	vect3 xyzMax;
 	xyzMax.x = T[0].A.x;
 	xyzMax.y = T[0].A.y;
 	xyzMax.z = T[0].A.z;
-	xyzMax.w = 1.0;
+	xyzMax.w = 1.0f;
 	for (int i = 0; i < n; i++)
 	{
 		if (T[i].A.x > xyzMax.x) { xyzMax.x = T[i].A.x; }
@@ -561,7 +561,7 @@ void drawCrosshair(Uint32* pixels, int w, int h, int hole, int size, Uint32 colo
 }
 
 
-int sign(const double& a)
+int sign(const float& a)
 {
 	int t;
 	if (a > 0) { t = 1; }
@@ -572,9 +572,9 @@ int sign(const double& a)
 }
 
 
-int roundInt(double a)
+int roundInt(float a)
 {
-	double t = a - (int)a;
+	float t = a - (int)a;
 	if (a >= 0.5)
 	{
 		return (int)a + 1;
@@ -586,9 +586,9 @@ int roundInt(double a)
 }
 
 
-double pow10(int n)
+float pow10(int n)
 {
-	double result = 1.0;
+	float result = 1.0;
 
 	if (n > 0)
 	{
@@ -622,7 +622,7 @@ int pow2(int n)
 }
 
 
-int* getFractionals(double number, int nDecimals)
+int* getFractionals(float number, int nDecimals)
 {
 	int dec;
 	if (number > 0)
@@ -647,7 +647,7 @@ int* getFractionals(double number, int nDecimals)
 }
 
 
-int* getIntegers(double number, int* n)
+int* getIntegers(float number, int* n)
 {
 	int rawInt = (int)(number);
 	int nDigits = 0;

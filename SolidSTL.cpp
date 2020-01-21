@@ -8,11 +8,15 @@ SolidSTL::SolidSTL(std::string fn):
 	fileName(fn)
 {
 	modelFile = std::ifstream(fileName.c_str(), std::ifstream::in | std::ifstream::binary);
-	if (modelFile) { std::cout << "Model file succesfully opened..." << std::endl; }
+	if (modelFile)
+	{
+		std::cout << "Model file succesfully opened..." << std::endl;
+		readSTLfile();
+	}
 }
 
 
-SolidSTL::SolidSTL(double px, double py, double pz, Uint32 c, int t, std::string fn)
+SolidSTL::SolidSTL(float px, float py, float pz, Uint32 c, int t, std::string fn)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -27,11 +31,15 @@ SolidSTL::SolidSTL(double px, double py, double pz, Uint32 c, int t, std::string
 	fileName		= fn;
 
 	modelFile = std::ifstream(fileName.c_str(), std::ifstream::in | std::ifstream::binary);
-	if (modelFile) { std::cout << "Model file succesfully opened..." << std::endl; }
+	if (modelFile)
+	{
+		std::cout << "Model file succesfully opened..." << std::endl;
+		readSTLfile();
+	}
 }
 
 
-SolidSTL::SolidSTL(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz, Uint32 c, int t, std::string fn)
+SolidSTL::SolidSTL(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz, Uint32 c, int t, std::string fn)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -46,7 +54,11 @@ SolidSTL::SolidSTL(double sx, double sy, double sz, double px, double py, double
 	fileName		= fn;
 
 	modelFile = std::ifstream(fileName.c_str(), std::ifstream::in | std::ifstream::binary);
-	if (modelFile) { std::cout << "Model file succesfully opened..." << std::endl; }
+	if (modelFile)
+	{
+		std::cout << "Model file succesfully opened..." << std::endl;
+		readSTLfile();
+	}
 }
 
 
@@ -74,10 +86,16 @@ int	SolidSTL::getTotalPoly()
 
 void SolidSTL::getTriangleData(triangle3dV* P)
 {
+	smoothSurfaces();
+
 	for (unsigned int i = 0; i < polyContainer.size(); i++)
 	{
 		P[i] = polyContainer[i];
 	}
+
+	Projector->transformMesh(nPoly, P, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }
 
 
@@ -122,7 +140,7 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.N = tempPoly.An = tempPoly.Bn = tempPoly.Cn = { (double)xf, (double)yf, (double)zf, 0.0f };
+			tempPoly.N = tempPoly.An = tempPoly.Bn = tempPoly.Cn = { (float)xf, (float)yf, (float)zf, 0.0f };
 
 
 
@@ -136,7 +154,8 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.A = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
+			//tempPoly.A = { (float)xf * scale.x, (float)yf * scale.y, (float)zf * scale.z, 1.0f };
+			tempPoly.A = { (float)xf, (float)yf, (float)zf, 1.0f };
 
 
 
@@ -150,7 +169,8 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.B = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
+			//tempPoly.B = { (float)xf * scale.x, (float)yf * scale.y, (float)zf * scale.z, 1.0f };
+			tempPoly.B = { (float)xf, (float)yf, (float)zf, 1.0f };
 
 
 
@@ -164,7 +184,8 @@ void SolidSTL::readSTLfile()
 			yf = *((float*)yy);
 			zf = *((float*)zz);
 
-			tempPoly.C = { (double)xf * scale.x, (double)yf * scale.y, (double)zf * scale.z, 1.0f };
+			//tempPoly.C = { (float)xf * scale.x, (float)yf * scale.y, (float)zf * scale.z, 1.0f };
+			tempPoly.C = { (float)xf, (float)yf, (float)zf, 1.0f };
 
 
 
@@ -176,6 +197,9 @@ void SolidSTL::readSTLfile()
 			polyContainer.push_back(tempPoly);
 		}
 		polyContainer.shrink_to_fit();
+
+		if (centered)
+			centreXY();
 
 		nPoly = getTotalPoly();
 		mesh = new triangle3dV[nPoly];
@@ -241,6 +265,80 @@ void SolidSTL::smoothSurfaces()
 		p.Bn = unitVector(accB);
 		p.Cn = unitVector(accC);
 	}
+}
 
-	getTriangleData(mesh);
+
+void SolidSTL::centreXY()
+{	
+	if (polyContainer.size())
+	{
+		float xMin = polyContainer[0].A.x;
+		float xMax = polyContainer[0].A.x;
+		float yMin = polyContainer[0].A.y;
+		float yMax = polyContainer[0].A.y;
+		float zMin = polyContainer[0].A.z;
+		float zMax = polyContainer[0].A.z;
+
+		for (auto& p : polyContainer)
+		{
+			if (p.A.x < xMin)
+				xMin = p.A.x;
+			if (p.A.x > xMax)
+				xMax = p.A.x;
+
+			if (p.A.y < yMin)
+				yMin = p.A.y;
+			if (p.A.y > yMax)
+				yMax = p.A.y;
+		}
+
+		float deltaX = (xMin + xMax) * 0.5f;
+		float deltaY = (yMin + yMax) * 0.5f;
+
+		float tempX, tempY;
+
+		for (auto& p : polyContainer)
+		{
+			p.A.x -= deltaX;		
+			p.A.y -= deltaY;		
+			tempX = p.A.x * cos(rotZ) - p.A.y * sin(rotZ);
+			tempY = p.A.y * cos(rotZ) + p.A.x * sin(rotZ);
+			p.A.x = tempX;
+			p.A.y = tempY;
+
+			p.B.x -= deltaX;
+			p.B.y -= deltaY;
+			tempX = p.B.x * cos(rotZ) - p.B.y * sin(rotZ);
+			tempY = p.B.y * cos(rotZ) + p.B.x * sin(rotZ);
+			p.B.x = tempX;
+			p.B.y = tempY;
+
+			p.C.x -= deltaX;
+			p.C.y -= deltaY;
+			tempX = p.C.x * cos(rotZ) - p.C.y * sin(rotZ);
+			tempY = p.C.y * cos(rotZ) + p.C.x * sin(rotZ);
+			p.C.x = tempX;
+			p.C.y = tempY;		
+
+			tempX = p.An.x * cos(rotZ) - p.An.y * sin(rotZ);
+			tempY = p.An.y * cos(rotZ) + p.An.x * sin(rotZ);
+			p.An.x = tempX;
+			p.An.y = tempY;
+
+			tempX = p.Bn.x * cos(rotZ) - p.Bn.y * sin(rotZ);
+			tempY = p.Bn.y * cos(rotZ) + p.Bn.x * sin(rotZ);
+			p.Bn.x = tempX;
+			p.Bn.y = tempY;
+
+			tempX = p.Cn.x * cos(rotZ) - p.Cn.y * sin(rotZ);
+			tempY = p.Cn.y * cos(rotZ) + p.Cn.x * sin(rotZ);
+			p.Cn.x = tempX;
+			p.Cn.y = tempY;
+
+			tempX = p.N.x * cos(rotZ) - p.N.y * sin(rotZ);
+			tempY = p.N.y * cos(rotZ) + p.N.x * sin(rotZ);
+			p.N.x = tempX;
+			p.N.y = tempY;
+		}
+	}
 }

@@ -6,15 +6,16 @@
 class SolidCylinder: public SolidBody
 {
 
-	double			radius;
-	double			height;
+	float			radius;
+	float			height;
 	int				resol;
 
 public:
 
 	SolidCylinder();
-	SolidCylinder(double, double, double, Uint32);
-	SolidCylinder(double, double, double, double, double, double, double, double, double, Uint32, int, double, double, int);
+	SolidCylinder(float, float, float, Uint32);
+	SolidCylinder(float, float, float, float, float, float, float, float, float, Uint32, int, float, float, int);
+	SolidCylinder(float, float, float, float, float, float, float, float, float, Uint32, int, float, float, int, bool);
 	~SolidCylinder();
 
 	int	getTotalVert();

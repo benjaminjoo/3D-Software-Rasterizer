@@ -1,7 +1,7 @@
 #include "Editor.h"
 
 
-Editor::Editor(double toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer):
+Editor::Editor(float toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer):
 	tolerance(toler), Cam(camera), Screen(screen), Model(buffer)
 {
 	std::cout << "Editor constructor called" << std::endl;
@@ -20,21 +20,21 @@ worldCoord Editor::screen2world(screenCoord Sc)
 
 	if (currentView == Top)
 	{
-		temp.x = ((double)(Sc.x) / scale) + viewportCentre.x;
-		temp.y = ((double)(Sc.y) / scale) + viewportCentre.y;
+		temp.x = ((float)(Sc.x) / scale) + viewportCentre.x;
+		temp.y = ((float)(Sc.y) / scale) + viewportCentre.y;
 		temp.z = 0.0f;
 	}
 	else if (currentView == Front)
 	{
-		temp.x = ((double)(Sc.x) / scale) + viewportCentre.x;
+		temp.x = ((float)(Sc.x) / scale) + viewportCentre.x;
 		temp.y = 0.0f;
-		temp.z = ((double)(Sc.y) / scale) + viewportCentre.y;
+		temp.z = ((float)(Sc.y) / scale) + viewportCentre.y;
 	}
 	else if (currentView == Right)
 	{
 		temp.x = 0.0f;
-		temp.y = ((double)(Sc.x) / scale) + viewportCentre.x;
-		temp.z = ((double)(Sc.y) / scale) + viewportCentre.y;
+		temp.y = ((float)(Sc.x) / scale) + viewportCentre.x;
+		temp.z = ((float)(Sc.y) / scale) + viewportCentre.y;
 	}
 
 	if (isGridSnapOn)
@@ -76,21 +76,21 @@ void Editor::updateWorldPosition()
 {
 	if (currentView == Top)
 	{
-		worldPosition.x = viewportCentre.x + (double)planPosition.x / scale;
-		worldPosition.y = -(viewportCentre.y + (double)planPosition.y / scale);
+		worldPosition.x = viewportCentre.x + (float)planPosition.x / scale;
+		worldPosition.y = -(viewportCentre.y + (float)planPosition.y / scale);
 		worldPosition.z = 0.0f;
 	}
 	else if (currentView == Front)
 	{
-		worldPosition.x = viewportCentre.x + (double)frontPosition.x / scale;
+		worldPosition.x = viewportCentre.x + (float)frontPosition.x / scale;
 		worldPosition.y = 0.0f;
-		worldPosition.z = -(viewportCentre.y + (double)frontPosition.y / scale);
+		worldPosition.z = -(viewportCentre.y + (float)frontPosition.y / scale);
 	}
 	else if (currentView == Right)
 	{
 		worldPosition.x = 0.0f;
-		worldPosition.y = viewportCentre.x + (double)rightPosition.x / scale;
-		worldPosition.z = -(viewportCentre.y + (double)rightPosition.y / scale);
+		worldPosition.y = viewportCentre.x + (float)rightPosition.x / scale;
+		worldPosition.z = -(viewportCentre.y + (float)rightPosition.y / scale);
 	}
 }
 
@@ -99,8 +99,8 @@ void Editor::compensatePan()
 {
 	SDL_GetMouseState(&dragStart.x, &dragStart.y);
 
-	viewportCentre.x += ((double)mousePosition.x - (double)dragStart.x) / scale;
-	viewportCentre.y += ((double)mousePosition.y - (double)dragStart.y) / scale;
+	viewportCentre.x += ((float)mousePosition.x - (float)dragStart.x) / scale;
+	viewportCentre.y += ((float)mousePosition.y - (float)dragStart.y) / scale;
 
 	mousePosition = dragStart;
 }
@@ -254,7 +254,7 @@ void Editor::updateLines()
 					mouseBeforeZoom = rotationCentre + temp;
 				}
 				worldCoord endVect = unitVector2(mouseBeforeZoom - rotationCentre);
-				double rotAngle = calculateAngle(startVect, endVect);
+				float rotAngle = calculateAngle(startVect, endVect);
 				tempLine.vert[0] = rotate2(tempLine.vert[0], currentView, rotationCentre, rotAngle);
 				tempLine.vert[1] = rotate2(tempLine.vert[1], currentView, rotationCentre, rotAngle);
 				screenCoord tempStart = world2screen(tempLine.vert[0]);
@@ -308,7 +308,7 @@ void Editor::updateVertices()
 					mouseBeforeZoom = rotationCentre + temp;
 				}
 				worldCoord endVect = unitVector2(mouseBeforeZoom - rotationCentre);
-				double rotAngle = calculateAngle(startVect, endVect);
+				float rotAngle = calculateAngle(startVect, endVect);
 				tempVert.pos = rotate2(tempVert.pos, currentView, rotationCentre, rotAngle);
 				screenCoord temp = world2screen(tempVert.pos);
 				Screen->drawSpot(temp, ORANGE);
@@ -465,7 +465,7 @@ void Editor::leftMouseClick(screenCoord X)
 					{
 						line3		tempLine	= Model->getLine3(i);
 						worldCoord	currentP	= P;
-						double		dist		= distPoint2Line(currentP, currentView, tempLine);
+						float		dist		= distPoint2Line(currentP, currentView, tempLine);
 						if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 5)
 						{
 							Model->selectLine3byIndex(i);
@@ -836,7 +836,7 @@ bool Editor::snapToVert(worldCoord* P)
 void Editor::alignToAxis(worldCoord* V)
 {
 	char greatest = ' ';
-	double maxExtent;
+	float maxExtent;
 
 	switch (currentView)
 	{
@@ -885,9 +885,9 @@ void Editor::flattenVector(worldCoord* V)
 }
 
 
-double Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
+float Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
 {
-	double rotAngle = 0.0f;
+	float rotAngle = 0.0f;
 	worldCoord cp = rotStart ^ rotEnd;
 	switch (currentView)
 	{

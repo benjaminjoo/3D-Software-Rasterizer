@@ -8,37 +8,37 @@ LightSource::LightSource()
 	azm = 0.0f;
 	alt = 0.0f;
 
-	direction.x = cos(alt * PI / 180.0f) * cos(azm * PI / 180.0f);
-	direction.y = cos(alt * PI / 180.0f) * sin(azm * PI / 180.0f);
-	direction.z = sin(alt * PI / 180.0f);
+	direction.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
+	direction.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
+	direction.z = (float)sin(alt * PI / 180.0f);
 	direction.w = 1.0f;
 
 	intensity = 0.0f;
 }
 
 
-LightSource::LightSource(double az, double al)
+LightSource::LightSource(float az, float al)
 {
 	azm = az;
 	alt = al;
 
-	direction.x = cos(alt * PI / 180.0f) * cos(azm * PI / 180.0f);
-	direction.y = cos(alt * PI / 180.0f) * sin(azm * PI / 180.0f);
-	direction.z = sin(alt * PI / 180.0f);
+	direction.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
+	direction.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
+	direction.z = (float)sin(alt * PI / 180.0f);
 	direction.w = 0.0f;
 
 	intensity = 1.0f;
 }
 
 
-LightSource::LightSource(double az, double al, double i)
+LightSource::LightSource(float az, float al, float i)
 {
 	azm = az;
 	alt = al;
 
-	direction.x = cos(alt * PI / 180.0f) * cos(azm * PI / 180.0f);
-	direction.y = cos(alt * PI / 180.0f) * sin(azm * PI / 180.0f);
-	direction.z = sin(alt * PI / 180.0f);
+	direction.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
+	direction.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
+	direction.z = (float)sin(alt * PI / 180.0f);
 	direction.w = 0.0f;
 
 	intensity = i;
@@ -50,7 +50,7 @@ LightSource::~LightSource()
 }
 
 
-void LightSource::setPosition(double az, double al)
+void LightSource::setPosition(float az, float al)
 {
 	azm = az;
 	alt = al;
@@ -62,24 +62,24 @@ void LightSource::update()
 	azm += deltaAzm;
 	alt += deltaAlt;
 
-	direction.x = cos(alt * PI / 180.0f) * cos(azm * PI / 180.0f);
-	direction.y = cos(alt * PI / 180.0f) * sin(azm * PI / 180.0f);
-	direction.z = sin(alt * PI / 180.0f);
+	direction.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
+	direction.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
+	direction.z = (float)sin(alt * PI / 180.0f);
 	direction.w = 0.0f;
 }
 
 
-double LightSource::getIllumination(vect3& N)
+float LightSource::getIllumination(vect3& N)
 {
 	vect3 L = direction;
 	return (N * L) * intensity;
 }
 
 
-double LightSource::getBlinnSpecular(vect3 Normal, vect3 View, double shine)
+float LightSource::getBlinnSpecular(vect3 Normal, vect3 View, float shine)
 {
 	vect3 Light = direction;
-	double cosAngIncidence = Normal * Light;
+	float cosAngIncidence = Normal * Light;
 
 	if (cosAngIncidence < 0.0f)
 		cosAngIncidence = 0.0f;
@@ -87,7 +87,7 @@ double LightSource::getBlinnSpecular(vect3 Normal, vect3 View, double shine)
 		cosAngIncidence = 1.0f;
 
 	vect3 Half = (Light + View).norm();
-	double blinnTerm = Normal * Half;
+	float blinnTerm = Normal * Half;
 
 	if (blinnTerm < 0.0f)
 		blinnTerm = 0.0f;
@@ -95,7 +95,7 @@ double LightSource::getBlinnSpecular(vect3 Normal, vect3 View, double shine)
 		blinnTerm = 1.0f;
 
 	blinnTerm = cosAngIncidence != 0.0f ? blinnTerm : 0.0f;
-	blinnTerm = pow(blinnTerm, shine);
+	blinnTerm = (float)pow(blinnTerm, shine);
 
 	return blinnTerm;
 }

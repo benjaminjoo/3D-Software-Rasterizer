@@ -18,22 +18,22 @@ class Player
 
 private:
 
-	double						x				= 0.0f;
-	double						y				= 0.0f;
-	double						z				= 0.0f;
+	float						x				= 0.0f;
+	float						y				= 0.0f;
+	float						z				= 0.0f;
 
-	double						azm				= 0.0f;
-	double						alt				= 0.0f;
-	double						rol				= 0.0f;
+	float						azm				= 0.0f;
+	float						alt				= 0.0f;
+	float						rol				= 0.0f;
 
-	double						runningSpeed	= 0.1f;
-	double						turningSpeed	= 0.1f;
+	float						runningSpeed	= 0.1f;
+	float						turningSpeed	= 0.1f;
 
 	bool						gravitating		= false;
 
-	double						range			= 25.0f;	//50.0f;
-	double						closeQuarters	= 10.0f;	//50.0f;
-	double						safeDistance	= 25.0f;	//50.0f;
+	float						range			= 25.0f;	//50.0f;
+	float						closeQuarters	= 10.0f;	//50.0f;
+	float						safeDistance	= 25.0f;	//50.0f;
 
 	unsigned int				health			= 100;
 	unsigned int				ammo			= 100;
@@ -48,10 +48,10 @@ private:
 
 
 	unsigned int				idlePhase		= 1;
-	double						amplitude		= 0.5f;
+	float						amplitude		= 0.5f;
 
 	std::shared_ptr<SolidBody>	boundingVolume	= nullptr;
-	double						bbRadius		= 0.25f;
+	float						bbRadius		= 0.25f;
 
 	std::vector<std::shared_ptr<SolidBody>>		Parts;
 
@@ -60,7 +60,7 @@ private:
 public:
 
 	Player();
-	Player(double, double, double, double, double, double, double, int, int);
+	Player(float, float, float, float, float, float, float, int, int);
 	~Player();
 
 	bool isDestroyed();
@@ -69,9 +69,9 @@ public:
 	void setUnderAttack(bool);
 	void gotHitFrom(vect3);
 	void moveOutOfHarmsWay();
-	double getBBRadius();
+	float getBBRadius();
 	vect3 getPosition();
-	double getRange();
+	float getRange();
 	void takeDamage(unsigned int);
 	unsigned int getHealth();
 

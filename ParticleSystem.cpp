@@ -1,7 +1,7 @@
 #include "ParticleSystem.h"
 
 
-ParticleSystem::ParticleSystem(const double& sp, const double& mass, const unsigned& n, const unsigned& dens, const Uint32& c) :
+ParticleSystem::ParticleSystem(const float& sp, const float& mass, const unsigned& n, const unsigned& dens, const Uint32& c) :
 	speed(sp), num(n), density(dens)
 {
 	colour.argb = c;
@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem(const double& sp, const double& mass, const unsig
 }
 
 
-ParticleSystem::ParticleSystem(const vect3& pos, const vect3& dir, const double& sp, const unsigned& n, const unsigned& dens) :
+ParticleSystem::ParticleSystem(const vect3& pos, const vect3& dir, const float& sp, const unsigned& n, const unsigned& dens) :
 	origin(pos), direction(dir), speed(sp), num(n), density(dens)
 {
 	colour.argb = 0xffffffff;
@@ -26,10 +26,10 @@ ParticleSystem::~ParticleSystem()
 }
 
 
-vect3 ParticleSystem::getRandomVelocity(double sp)
+vect3 ParticleSystem::getRandomVelocity(float sp)
 {
-	double azm = (double)(rand() % 360 / 180.0f * PI);
-	double alt = (double)(rand() % 360 / 180.0f * PI);
+	float azm = (float)(rand() % 360 / 180.0f * PI);
+	float alt = (float)(rand() % 360 / 180.0f * PI);
 	
 	return { sp * cos(alt) * cos(azm), sp * cos(alt) * sin(azm), sp * sin(alt), 1.0f };
 }
@@ -63,7 +63,7 @@ void ParticleSystem::setDirection(const vect3& dir)
 }
 
 
-void ParticleSystem::setDispersion(const double& disp)
+void ParticleSystem::setDispersion(const float& disp)
 {
 	dispersion = disp;
 }
@@ -147,16 +147,16 @@ void ParticleSystem::handleCollisions()
 
 bool ParticleSystem::particleApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 {
-	double v2n = v * T.N;								//Magnitude of velocity projected to plane normal
-	double dist = distPoint2Plane(p, T);				//Distance from point to plane
+	float v2n = v * T.N;								//Magnitude of velocity projected to plane normal
+	float dist = distPoint2Plane(p, T);				//Distance from point to plane
 	if (dist >= 0.0f && v2n < 0.0f)
 	{
-		double t = dist / -v2n;
+		float t = dist / -v2n;
 		vect3 intersection{ p.x + v.x * t, p.y + v.y * t, p.z + v.z * t, 1.0f };
 
-		double sA = ((T.A - T.C) ^ T.N) * (T.A - intersection);
-		double sB = ((T.B - T.A) ^ T.N) * (T.B - intersection);
-		double sC = ((T.C - T.B) ^ T.N) * (T.C - intersection);
+		float sA = ((T.A - T.C) ^ T.N) * (T.A - intersection);
+		float sB = ((T.B - T.A) ^ T.N) * (T.B - intersection);
+		float sC = ((T.C - T.B) ^ T.N) * (T.C - intersection);
 
 		if ((sA <= 0.0f && sB <= 0.0f && sC <= 0.0f) ||
 			(sA >= 0.0f && sB >= 0.0f && sC >= 0.0f))	//If point of intersection lies inside triangle T
@@ -173,22 +173,22 @@ void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas>
 	for (auto& i : particles)
 		if (i.isActive())
 		{
-			double age = i.getAge();
-			double energy = i.getKineticEnergy();
+			float age = i.getAge();
+			float energy = i.getKineticEnergy();
 
 			unsigned char r, g, b;
 
 			if (colourMethod == colourBy::age)
 			{
-				r = static_cast<unsigned char>(static_cast<double>(colour.c[2]) * (1.0f - age));
-				g = static_cast<unsigned char>(static_cast<double>(colour.c[1]) * (1.0f - age));
-				b = static_cast<unsigned char>(static_cast<double>(colour.c[0]) * (1.0f - age));
+				r = static_cast<unsigned char>(static_cast<float>(colour.c[2]) * (1.0f - age));
+				g = static_cast<unsigned char>(static_cast<float>(colour.c[1]) * (1.0f - age));
+				b = static_cast<unsigned char>(static_cast<float>(colour.c[0]) * (1.0f - age));
 			}
 			else if (colourMethod == colourBy::energy)
 			{
-				r = static_cast<unsigned char>(static_cast<double>(colour.c[2]) * energy * 100.0f);
-				g = static_cast<unsigned char>(static_cast<double>(colour.c[1]) * energy * 100.0f);
-				b = static_cast<unsigned char>(static_cast<double>(colour.c[0]) * energy * 100.0f);
+				r = static_cast<unsigned char>(static_cast<float>(colour.c[2]) * energy * 100.0f);
+				g = static_cast<unsigned char>(static_cast<float>(colour.c[1]) * energy * 100.0f);
+				b = static_cast<unsigned char>(static_cast<float>(colour.c[0]) * energy * 100.0f);
 			}
 			else
 			{

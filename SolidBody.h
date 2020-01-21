@@ -20,7 +20,7 @@ public:
 
 	Uint32			colour			= 255;
 	int				texture			= 0;
-	double			txU				= 1.0f;
+	float			txU				= 1.0f;
 
 	int				nPoly			= 0;
 	triangle3dV*	mesh			= nullptr;
@@ -29,6 +29,7 @@ public:
 
 protected:
 	
+	bool			isDynamic		= false;
 	bool			castsShadows	= false;
 	bool			bBoxActive		= false;
 	bool			gravitating		= false;
@@ -39,8 +40,8 @@ protected:
 	bool			destroyed		= false;
 	bool			vanished		= false;
 
-	boundingBox		BB				= { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0) };
-	double			bbRadius		= 0.25f;
+	boundingBox		BB				= { (0.0f, 0.0f, 0.0f, 1.0f), (0.0f, 0.0f, 0.0f, 1.0f) };
+	float			bbRadius		= 0.25f;
 
 	hit_response	behaviour		= penetrate;
 	unsigned int	ticksSinceHit	= 0;
@@ -69,7 +70,7 @@ public:
 	void setAngularVelocity(vect3);
 
 	void updateVelocity(vect3);
-	void updateVelocity(double);
+	void updateVelocity(float);
 	void updateAngularVelocity(vect3);
 	bool stoppedMoving();
 
@@ -77,9 +78,8 @@ public:
 	vect3 getAngularVelocity();
 
 	void updatePosition();	
-	void updateRotation();
-
 	void updatePosition(vect3);
+	void updateRotation();
 
 	void setTexture(int);
 
@@ -88,8 +88,8 @@ public:
 	void updatebBBox(vect3, vect3);
 	boundingBox getBB();
 
-	double getBBRadius();
-	void setBBRadius(double);
+	float getBBRadius();
+	void setBBRadius(float);
 
 	bool isGravitating();
 	void setGravity(bool);
@@ -129,6 +129,6 @@ public:
 
 	void updateMesh();
 	void render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
-		LightSource sun, const projectionStyle& style, double torch, double ill);
+		LightSource sun, const projectionStyle& style, float torch, float ill);
 };
 

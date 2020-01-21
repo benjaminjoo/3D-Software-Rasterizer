@@ -10,7 +10,7 @@ Bullet::Bullet()
 }
 
 
-Bullet::Bullet(double px, double py, double pz, double d, double l, double v, Uint32 c):
+Bullet::Bullet(float px, float py, float pz, float d, float l, float v, Uint32 c):
 	dia(d), len(l), muzzleVelocity(v)
 {
 	position	= { px, py, pz, 1.0 };
@@ -84,10 +84,16 @@ void Bullet::getTriangleData(triangle3dV* t)
 	t[3].colour = colour;
 
 	delete[] p;
+
+	nPoly = getTotalPoly();
+
+	Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }
 
 
-double Bullet::getMuzzleVelocity()
+float Bullet::getMuzzleVelocity()
 {
 	return muzzleVelocity;
 }

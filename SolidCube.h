@@ -6,13 +6,13 @@
 class SolidCube: public SolidBody
 {
 
-	double			edge;
+	float			edge;
 
 public:
 
 	SolidCube();
-	SolidCube(double, double, double, Uint32);
-	SolidCube(double, double, double, double, double, double, double, double, double, Uint32, int, double);
+	SolidCube(float, float, float, Uint32);
+	SolidCube(float, float, float, float, float, float, float, float, float, Uint32, int, float);
 	~SolidCube();
 
 	int	getTotalVert();

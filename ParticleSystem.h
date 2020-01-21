@@ -25,10 +25,10 @@ private:
 	vect3 origin						= { 0.0f, 0.0f, 0.0f, 1.0f };
 	vect3 direction						= { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	double particleMass					= 1.0f;
+	float particleMass					= 1.0f;
 
-	double speed						= 0.0f;
-	double dispersion					= 0.0f;
+	float speed						= 0.0f;
+	float dispersion					= 0.0f;
 	unsigned num						= 0;
 	unsigned density					= 0;
 
@@ -43,18 +43,18 @@ private:
 	triangle3dV* terrainMesh			= nullptr;
 	unsigned terrainPolyCount			= 0;
 
-	vect3 getRandomVelocity(double sp);
+	vect3 getRandomVelocity(float sp);
 
 public:
-	ParticleSystem(const double& sp, const double& mass, const unsigned& n, const unsigned& dens, const Uint32& c);
-	ParticleSystem(const vect3& p, const vect3& dir, const double& sp, const unsigned& n, const unsigned& dens);
+	ParticleSystem(const float& sp, const float& mass, const unsigned& n, const unsigned& dens, const Uint32& c);
+	ParticleSystem(const vect3& p, const vect3& dir, const float& sp, const unsigned& n, const unsigned& dens);
 	~ParticleSystem();
 
 	void loadParticles();
 	void importTerrain(unsigned nPoly, triangle3dV* mesh);
 	void setOrigin(const vect3& pos);
 	void setDirection(const vect3& dir);
-	void setDispersion(const double& disp);
+	void setDispersion(const float& disp);
 	void setGravity(bool g);
 	void activate();
 	void deactivate();

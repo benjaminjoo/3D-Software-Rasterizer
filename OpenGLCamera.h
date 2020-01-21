@@ -18,8 +18,8 @@ public:
 	{
 		view		= glm::perspective(fov, aspect, zNear, zFar);
 		position	= pos;
-		forward		= glm::vec3(0.0f, 0.0f, 1.0f);
-		up			= glm::vec3(0.0f, 1.0f, 0.0f);
+		forward		= glm::vec3(0.0f, 1.0f, 0.0f);
+		up			= glm::vec3(0.0f, 0.0f, -1.0f);
 	}
 
 
@@ -31,7 +31,6 @@ public:
 
 	~OpenGLCamera()
 	{
-
 	}
 };
 

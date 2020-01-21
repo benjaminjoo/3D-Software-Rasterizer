@@ -8,7 +8,7 @@
 #include "BSP1Loader.h"
 
 
-BSP1Loader::BSP1Loader(std::string f, double sx, double sy, double sz):
+BSP1Loader::BSP1Loader(std::string f, float sx, float sy, float sz):
 	fileName(f)
 {
 	std::cout << "BSP1Loader constructor called" << std::endl;
@@ -20,6 +20,8 @@ BSP1Loader::BSP1Loader(std::string f, double sx, double sy, double sz):
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
 	palette = (Uint32*)tempImage->pixels;
+
+	readData();
 }
 
 
@@ -31,6 +33,8 @@ BSP1Loader::BSP1Loader(std::string f, vect3 s):
 	SDL_Surface* tempPalette = IMG_Load("Palette/quake1palette.jpg");
 	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(tempPalette, SDL_PIXELFORMAT_ARGB8888, 0);
 	palette = (Uint32*)tempImage->pixels;
+
+	readData();
 }
 
 
@@ -83,9 +87,9 @@ void BSP1Loader::readData()
 			float vert_z = *((float*)temp_4);
 
 			point3 tempPoint;
-			tempPoint.P.x = (double)vert_x;// * scale.x;
-			tempPoint.P.y = (double)vert_y;// * scale.y;
-			tempPoint.P.z = (double)vert_z;// * scale.z;
+			tempPoint.P.x = (float)vert_x;// * scale.x;
+			tempPoint.P.y = (float)vert_y;// * scale.y;
+			tempPoint.P.z = (float)vert_z;// * scale.z;
 			tempPoint.P.w = 1.0;
 			tempPoint.colour = getColour(0, 127, 127, 255);
 
@@ -366,9 +370,9 @@ void BSP1Loader::calculateTriangles()
 		S.x = surfaceContainer[textureId].S.x;		T.x = surfaceContainer[textureId].T.x;
 		S.y = surfaceContainer[textureId].S.y;		T.y = surfaceContainer[textureId].T.y;
 		S.z = surfaceContainer[textureId].S.z;		T.z = surfaceContainer[textureId].T.z;
-		double distS, distT;
-		distS = (double)surfaceContainer[textureId].distS;
-		distT = (double)surfaceContainer[textureId].distT;
+		float distS, distT;
+		distS = (float)surfaceContainer[textureId].distS;
+		distT = (float)surfaceContainer[textureId].distT;
 
 		unsigned long txt_id = surfaceContainer[textureId].texture_id;
 
@@ -403,17 +407,17 @@ void BSP1Loader::calculateTriangles()
 			temp.An = temp.Bn = temp.Cn = temp.N;
 
 			//temp.At.u = ((temp.A * S) + distS) * 1.6;
-			temp.At.u = (dotProduct(temp.A, S) + distS) * 1.6f;
+			temp.At.u = (dotProduct(temp.A, S) + distS) * scale.x;
 			//temp.At.v = ((temp.A * T) + distT) * 1.6;
-			temp.At.v = (dotProduct(temp.A, T) + distT) * 1.6f;
+			temp.At.v = (dotProduct(temp.A, T) + distT) * scale.y;
 			//temp.Bt.u = ((temp.B * S) + distS) * 1.6;
-			temp.Bt.u = (dotProduct(temp.B, S) + distS) * 1.6f;
+			temp.Bt.u = (dotProduct(temp.B, S) + distS) * scale.x;
 			//temp.Bt.v = ((temp.B * T) + distT) * 1.6;
-			temp.Bt.v = (dotProduct(temp.B, T) + distT) * 1.6f;
+			temp.Bt.v = (dotProduct(temp.B, T) + distT) * scale.y;
 			//temp.Ct.u = ((temp.C * S) + distS) * 1.6;
-			temp.Ct.u = (dotProduct(temp.C, S) + distS) * 1.6f;
+			temp.Ct.u = (dotProduct(temp.C, S) + distS) * scale.x;
 			//temp.Ct.v = ((temp.C * T) + distT) * 1.6;
-			temp.Ct.v = (dotProduct(temp.C, T) + distT) * 1.6f;
+			temp.Ct.v = (dotProduct(temp.C, T) + distT) * scale.y;
 
 			temp.colour = getColour(0, 255, 255, 255);
 
@@ -433,6 +437,9 @@ void BSP1Loader::getTriangleData(triangle3dV* T)
 	{
 		T[i] = polyContainer[i];
 	}
+	Projector->transformMesh(nPoly, T, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }
 
 

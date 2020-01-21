@@ -10,7 +10,7 @@ SolidFrustum::SolidFrustum()
 }
 
 
-SolidFrustum::SolidFrustum(double px, double py, double pz, double znear, double zfar, double fov, double asp, Uint32 c):
+SolidFrustum::SolidFrustum(float px, float py, float pz, float znear, float zfar, float fov, float asp, Uint32 c):
 	zNear(znear), zFar(zfar), fovH(fov), aspRatio(asp)
 {
 	position = { px, py, pz, 1.0 };
@@ -43,10 +43,10 @@ void SolidFrustum::getTriangleData(triangle3dV* t)
 {
 	vect3* p = new vect3[8];
 
-	double wNear	= zNear	* tan(fovH * 0.5f);
-	double wFar		= zFar	* tan(fovH * 0.5f);
-	double hNear	= wNear * aspRatio;
-	double hFar		= wFar	* aspRatio;
+	float wNear	= zNear	* tan(fovH * 0.5f);
+	float wFar		= zFar	* tan(fovH * 0.5f);
+	float hNear	= wNear * aspRatio;
+	float hFar		= wFar	* aspRatio;
 
 	p[0].x = wNear;			p[0].y = hNear;			p[0].z = zNear;			p[0].w = 1.0f;
 	p[1].x = wNear;			p[1].y = -hNear;		p[1].z = zNear;			p[1].w = 1.0f;
@@ -159,4 +159,10 @@ void SolidFrustum::getTriangleData(triangle3dV* t)
 	t[11].colour = colour;
 
 	delete[] p;
+
+	nPoly = getTotalPoly();
+
+	Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }

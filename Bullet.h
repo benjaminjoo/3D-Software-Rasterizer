@@ -7,19 +7,19 @@ class Bullet: public SolidBody
 {
 private:
 
-	double	dia				= 0.01f;
-	double	len				= 1.0f;
-	double	muzzleVelocity	= 5.0f;
+	float	dia				= 0.01f;
+	float	len				= 1.0f;
+	float	muzzleVelocity	= 5.0f;
 
 public:
 
 	Bullet();
-	Bullet(double, double, double, double, double, double, Uint32);
+	Bullet(float, float, float, float, float, float, Uint32);
 	~Bullet();
 
 	int	getTotalVert();
 	int	getTotalPoly();
 	void getTriangleData(triangle3dV*);
-	double getMuzzleVelocity();
+	float getMuzzleVelocity();
 };
 

@@ -19,19 +19,24 @@ ViewVolume::~ViewVolume()
 }
 
 
-void ViewVolume::initFrustum(double fovH, double fovV, double zNear, double zFar)
+void ViewVolume::initFrustum(float fovH, float fovV, float zNear, float zFar)
 {
+	float cosFovH2 = static_cast<float>(cos(fovH / 2));
+	float cosFovV2 = static_cast<float>(cos(fovV / 2));
+	float sinFovH2 = static_cast<float>(sin(fovH / 2));
+	float sinFovV2 = static_cast<float>(sin(fovV / 2));
+
 	nearPlane.N		= { 0.0,            0.0,            1.0,            0.0 };
 	nearPlane.P		= { 0.0,            0.0,          zNear,            1.0 };
 	farPlane.N		= { 0.0,            0.0,           -1.0,            0.0 };
 	farPlane.P		= { 0.0,            0.0,           zFar,            1.0 };
-	leftPlane.N		= { cos(fovH / 2),  0.0,  sin(fovH / 2), 	        0.0 };
+	leftPlane.N		= { cosFovH2,		0.0,		sinFovH2, 	        0.0 };
 	leftPlane.P		= { 0.0,            0.0,            0.0001,         1.0 };
-	rightPlane.N	= { -cos(fovH / 2), 0.0,  sin(fovH / 2),            0.0 };
+	rightPlane.N	= { -cosFovH2,		0.0,		sinFovH2,            0.0 };
 	rightPlane.P	= { 0.0,            0.0,            0.0001,         1.0 };
-	topPlane.N		= { 0.0, cos(fovV / 2),  sin(fovV / 2),             0.0 };
+	topPlane.N		= { 0.0,		cosFovV2,		sinFovV2,             0.0 };
 	topPlane.P		= { 0.0,            0.0,            0.0001,         1.0 };
-	bottomPlane.N	= { 0.0,  -cos(fovV / 2),  sin(fovV / 2),           0.0 };
+	bottomPlane.N	= { 0.0,		-cosFovV2,		sinFovV2,           0.0 };
 	bottomPlane.P	= { 0.0,            0.0,            0.0001,         1.0 };
 }
 

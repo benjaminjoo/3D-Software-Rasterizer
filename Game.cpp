@@ -22,17 +22,11 @@ Game::~Game()
 
 void Game::addEntity(std::shared_ptr<SolidBody> entity)
 {
-	entity->updateMesh();
 	Entities.push_back(entity);
 	int n = entity->getTotalPoly();
+	std::cout << "Adding " << n << " polygons to collision mesh..." << std::endl;
 	triangle3dV* temp = new triangle3dV[n];
 	entity->getTriangleData(temp);
-	vect3 sc = entity->getScale();
-	vect3 mv = entity->getPosition();
-	vect3 rt = entity->getRotation();
-	Renderer->transformMesh(n, temp, sc.x, sc.y, sc.z,
-		mv.x, mv.y, mv.z,
-		rt.x, rt.y, rt.z);
 	for (int i = 0; i < n; i++)
 		collisionPlanes.push_back(temp[i]);
 	delete[] temp;
@@ -66,6 +60,12 @@ void Game::addEmitter(std::shared_ptr<ParticleSystem> em)
 void Game::addDynamicSurface(std::shared_ptr<DynamicMesh> s)
 {
 	DynamicSurfaces.push_back(s);
+}
+
+
+void Game::addStaticSurface(std::shared_ptr<Terrain> t)
+{
+	StaticSurfaces.push_back(t);
 }
 
 
@@ -105,8 +105,8 @@ void Game::updateHeroPosition()
 	Hero->alt = -Controls->turnV;
 	Hero->rol = Controls->tiltP;
 
-	Hero->x -= Controls->moveP * cos(Hero->azm) - Controls->strafeP * cos(Hero->azm + PI * 0.5);
-	Hero->y += Controls->moveP * sin(Hero->azm) - Controls->strafeP * sin(Hero->azm + PI * 0.5);
+	Hero->x -= Controls->moveP * (float)cos(Hero->azm) - Controls->strafeP * (float)cos(Hero->azm + PI * 0.5);
+	Hero->y += Controls->moveP * (float)sin(Hero->azm) - Controls->strafeP * (float)sin(Hero->azm + PI * 0.5);
 	Hero->z += Controls->riseP;
 
 	//if (!Controls->isFiring)
@@ -122,8 +122,8 @@ void Game::updateEnemyPosition()
 	Enemy->alt = -Controls->turnV;
 	Enemy->rol = Controls->tiltP;
 
-	Enemy->x -= Controls->moveP * cos(Enemy->azm) - Controls->strafeP * cos(Enemy->azm + PI * 0.5);
-	Enemy->y += Controls->moveP * sin(Enemy->azm) - Controls->strafeP * sin(Enemy->azm + PI * 0.5);
+	Enemy->x -= Controls->moveP * (float)cos(Enemy->azm) - Controls->strafeP * (float)cos(Enemy->azm + PI * 0.5);
+	Enemy->y += Controls->moveP * (float)sin(Enemy->azm) - Controls->strafeP * (float)sin(Enemy->azm + PI * 0.5);
 	Enemy->z += Controls->riseP;
 
 	updatePlayerModel(Enemy);
@@ -257,22 +257,22 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 
 void Game::updatePlayerModel(std::shared_ptr<Player> character)
 {
-	for (auto& P : character->Parts)
+	for (auto& Part : character->Parts)
 	{
-		P->setPosition({ character->x, character->y, character->z, 1.0f });
-		P->setRotation({ -character->rol, character->alt, -character->azm, 1.0f });
+		Part->setPosition({ character->x, character->y, character->z, 1.0f });
+		Part->setRotation({ -character->rol, character->alt, -character->azm, 1.0f });
 	}
 }
 
 
 void Game::updateEntities()
 {
-	for (auto& E : Entities)
+	for (auto& Entity : Entities)
 	{
-		if (E->isInMotion() && E->isVisible())
+		if (Entity->isInMotion() && Entity->isVisible())
 		{
-			E->updatePosition();
-			E->updateRotation();
+			Entity->updatePosition();
+			Entity->updateRotation();
 		}
 	}
 }
@@ -280,17 +280,16 @@ void Game::updateEntities()
 
 void Game::updateBalls()
 {
-	for (unsigned int i = 0; i < Balls.size(); i++)
+	for (auto& Ball : Balls)
 	{
-		if (Balls[i]->isInMotion())
-			updateMovingObject(Balls[i]);
-		if (Balls[i]->isDestroyed() && !Balls[i]->isVanished())
-		{
-			
-			Balls[i]->incrementTicksSinceHit();
-			double ticks = double(Balls[i]->getTicksSinceHit());
+		if (Ball->isInMotion())
+			updateMovingObject(Ball);
+		if (Ball->isDestroyed() && !Ball->isVanished())
+		{			
+			Ball->incrementTicksSinceHit();
+			float ticks = float(Ball->getTicksSinceHit());
 			if (ticks >= 60.0f)
-				Balls[i]->vanish();
+				Ball->vanish();
 		}
 	}
 }
@@ -338,11 +337,11 @@ bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::shared_ptr<Pla
 
 	if (actor != nullptr && !actor->isDestroyed())
 	{
-		double targetRadius = actor->getBBRadius();
+		float targetRadius = actor->getBBRadius();
 		vect3 targetPosition = actor->getPosition();
 		vect3 currentV = newPos - oldPos;
-		double sOld = (oldPos - targetPosition) * currentV;
-		double sNew = (newPos - targetPosition) * currentV;
+		float sOld = (oldPos - targetPosition) * currentV;
+		float sNew = (newPos - targetPosition) * currentV;
 		if (distPoint2LineSquared(targetPosition, oldPos, newPos) <= targetRadius * targetRadius &&
 			sign(sOld) != sign(sNew))
 		{
@@ -368,11 +367,11 @@ bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 	{
 		if (!targets[i]->isDestroyed())
 		{
-			double targetRadius = targets[i]->getBBRadius();
+			float targetRadius = targets[i]->getBBRadius();
 			vect3 targetPosition = targets[i]->getPosition();
 			vect3 currentV = newPos - oldPos;
-			double sOld = (oldPos - targetPosition) * currentV;
-			double sNew = (newPos - targetPosition) * currentV;
+			float sOld = (oldPos - targetPosition) * currentV;
+			float sNew = (newPos - targetPosition) * currentV;
 			if (distPoint2LineSquared(targetPosition, oldPos, newPos) <= targetRadius * targetRadius &&
 				sign(sOld) != sign(sNew))
 			{
@@ -398,20 +397,20 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 	vect3 oldPos = object->getPosition();
 	vect3 newPos = oldPos + displacement;
 
-	double radius = object->getBBRadius();
+	float radius = object->getBBRadius();
 
 	for (auto& tempWall : collisionPlanes)
 	{
 		if (objectApproachingWall(oldPos, displacement, tempWall))
 		{
-			double oldDistWall = distPoint2Plane(oldPos, tempWall);
-			double newDistWall = distPoint2Plane(newPos, tempWall);
+			float oldDistWall = distPoint2Plane(oldPos, tempWall);
+			float newDistWall = distPoint2Plane(newPos, tempWall);
 
 			if (newDistWall <= radius)
 			{
-				double x = oldDistWall - radius;
-				double v2n = -(displacement * tempWall.N);
-				double safePercentage = x / v2n;
+				float x = oldDistWall - radius;
+				float v2n = -(displacement * tempWall.N);
+				float safePercentage = x / v2n;
 
 				vect3 toIntersection = displacement * safePercentage;
 				object->updatePosition(toIntersection);
@@ -469,16 +468,16 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 
 bool Game::objectApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 {
-	double v2n = v * T.N;							//Magnitude of velocity projected to plane normal
-	double dist = distPoint2Plane(p, T);			//Distance from point to plane
+	float v2n = v * T.N;							//Magnitude of velocity projected to plane normal
+	float dist = distPoint2Plane(p, T);			//Distance from point to plane
 	if (dist >= 0.0f && v2n < 0.0f)
 	{
-		double t = dist / -v2n;
+		float t = dist / -v2n;
 		vect3 intersection{ p.x + v.x * t, p.y + v.y * t, p.z + v.z * t, 1.0f };
 
-		double sA = ((T.A - T.C) ^ T.N) * (T.A - intersection);
-		double sB = ((T.B - T.A) ^ T.N) * (T.B - intersection);
-		double sC = ((T.C - T.B) ^ T.N) * (T.C - intersection);
+		float sA = ((T.A - T.C) ^ T.N) * (T.A - intersection);
+		float sB = ((T.B - T.A) ^ T.N) * (T.B - intersection);
+		float sC = ((T.C - T.B) ^ T.N) * (T.C - intersection);
 
 		if ((sA <= 0.0f && sB <= 0.0f && sC <= 0.0f) ||
 			(sA >= 0.0f && sB >= 0.0f && sC >= 0.0f))	//If point of intersection lies inside triangle T
@@ -496,6 +495,7 @@ void Game::renderAll()
 
 	mat4x4 RotationM = Eye->getRotation();
 	mat4x4 TranslationM = Eye->getTranslation();
+	mat4x4 RM = RotationM * TranslationM;
 
 	for (auto& E : Entities)
 		if (E->isVisible())
@@ -533,7 +533,6 @@ void Game::renderAll()
 
 	if (Emitters.size())
 	{
-		mat4x4 RM = RotationM * TranslationM;
 		for (auto& e : Emitters)
 			e->render(Eye, Screen, RM);
 	}		
@@ -542,6 +541,15 @@ void Game::renderAll()
 		for (auto& s : DynamicSurfaces)
 			s->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
 				Controls->torchIntensity, Controls->maxIllumination);
+
+	if (StaticSurfaces.size())
+		for (auto& t : StaticSurfaces)
+		{
+			t->renderGrid(Eye, Screen, RM);
+			//t->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+			//	Controls->torchIntensity, Controls->maxIllumination);
+		}
+
 }
 
 
@@ -561,6 +569,8 @@ void Game::updateAll()
 		this->updateEnemyPosition();
 
 	this->updateCameraPosition(Hero);
+
+	//Hero->Parts[Hero->Parts.size() - 1]->position.x += Controls->mx;
 
 	if (!Controls->isPaused)
 	{
@@ -687,7 +697,7 @@ void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 	int screenWChar = Screen->getWidth() / 8;
 	int screenHChar = Screen->getHeight() / 8;
 
-	double azmToShow, altToShow, rolToShow;
+	float azmToShow, altToShow, rolToShow;
 	if (crosshair && !Controls->showHelp)
 		Screen->drawCrosshair(2, 6, 0x007f7f7f);
 	if (position)
@@ -698,21 +708,21 @@ void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 		Screen->displayValue(Controls->torchIntensity, 2, 2, 11,	0x00ffffff);
 
 		Screen->displayString("POSITION X", 30, 9,		0x00ff7f7f);
-		Screen->displayValue((double)Eye->x, 1, 2, 9,	0x00ff7f7f);
+		Screen->displayValue((float)Eye->x, 1, 2, 9,	0x00ff7f7f);
 		Screen->displayString("POSITION Y", 30, 8,		0x007fff7f);
-		Screen->displayValue((double)Eye->y, 1, 2, 8,	0x007fff7f);
+		Screen->displayValue((float)Eye->y, 1, 2, 8,	0x007fff7f);
 		Screen->displayString("POSITION Z", 30, 7,		0x007f7fff);
-		Screen->displayValue((double)Eye->z, 1, 2, 7,	0x007f7fff);
+		Screen->displayValue((float)Eye->z, 1, 2, 7,	0x007f7fff);
 
-		azmToShow = Eye->azm * 180.0 / PI;
-		if (azmToShow > 360.0) { azmToShow -= 360.0; }
-		if (azmToShow < -360.0) { azmToShow += 360.0; }
-		altToShow = Eye->alt * 180.0 / PI - 180.0;
-		if (altToShow > 360.0) { altToShow -= 360.0; }
-		if (altToShow < -360.0) { altToShow += 360.0; }
-		rolToShow = Eye->rol * 180.0 / PI;
-		if (rolToShow > 360.0) { rolToShow -= 360.0; }
-		if (rolToShow < -360.0) { rolToShow += 360.0; }
+		azmToShow = Eye->azm * 180.0f / PI;
+		if (azmToShow > 360.0f) { azmToShow -= 360.0f; }
+		if (azmToShow < -360.0f) { azmToShow += 360.0f; }
+		altToShow = Eye->alt * 180.0f / PI - 180.0f;
+		if (altToShow > 360.0f) { altToShow -= 360.0f; }
+		if (altToShow < -360.0f) { altToShow += 360.0f; }
+		rolToShow = Eye->rol * 180.0f / PI;
+		if (rolToShow > 360.0f) { rolToShow -= 360.0f; }
+		if (rolToShow < -360.0f) { rolToShow += 360.0f; }
 
 		Screen->displayString("ROTATION X", 30, 5,	0x00ff3f3f);
 		Screen->displayValue(azmToShow, 1, 2, 5,	0x00ff3f3f);
@@ -723,7 +733,7 @@ void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 	}
 	if (fps)
 	{
-		Screen->displayFps((double)(30000.0 / frameTime), 1, 2, 0);
+		Screen->displayFps((float)(30000.0f / frameTime), 1, 2, 0);
 	}
 	if (polyN)
 	{

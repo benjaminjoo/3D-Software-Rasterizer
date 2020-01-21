@@ -9,7 +9,7 @@ SolidSphere::SolidSphere()
 }
 
 
-SolidSphere::SolidSphere(double px, double py, double pz, Uint32 c)
+SolidSphere::SolidSphere(float px, float py, float pz, Uint32 c)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -28,8 +28,8 @@ SolidSphere::SolidSphere(double px, double py, double pz, Uint32 c)
 }
 
 
-SolidSphere::SolidSphere(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz,
-							Uint32 c, int t, double r, int res)
+SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
+							Uint32 c, int t, float r, int res)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -48,18 +48,40 @@ SolidSphere::SolidSphere(double sx, double sy, double sz, double px, double py, 
 }
 
 
+SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
+	Uint32 c, int t, float r, int res, bool dynamic)
+{
+	scale = { sx, sy, sz, 1.0f };
+	position = { px, py, pz, 1.0f };
+	rotation = { rx, ry, rz, 1.0f };
+
+	colour = c;
+	texture = t;
+	castsShadows = false;
+
+	radius = r;
+	resol = res;
+
+	isDynamic = dynamic;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
+}
+
+
 SolidSphere::~SolidSphere()
 {
 }
 
 
-void SolidSphere::setRadius(double r)
+void SolidSphere::setRadius(float r)
 {
 	radius = r;
 }
 
 
-double SolidSphere::getRadius()
+float SolidSphere::getRadius()
 {
 	return radius;
 }
@@ -79,9 +101,9 @@ int	SolidSphere::getTotalPoly()
 
 void SolidSphere::getVertexData(vect3* s)
 {
-	double angleV, angleH, stepV, stepH;
+	float angleV, angleH, stepV, stepH;
 	stepV = 180.0f / resol;
-	stepH = 360.0f / (double(resol) * 2);
+	stepH = 360.0f / (float(resol) * 2);
 	int cnt = 0;
 	int total;
 	total = 2 * resol * (resol - 1) + 2;
@@ -137,9 +159,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 
 	int tCount = 0;
 
-	double uvStepHor, uvStepVer;
-	uvStepHor = 1.0f / (2 * double(resol));
-	uvStepVer = 1.0f / double(resol);
+	float uvStepHor, uvStepVer;
+	uvStepHor = 1.0f / (2 * float(resol));
+	uvStepVer = 1.0f / float(resol);
 
 	//Adding triangles forming caps, South Pole first
 
@@ -159,9 +181,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.5f);		t[tCount].At.v = 0.0f;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = uvStepVer;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = uvStepVer;
+				t[tCount].At.u = uvStepHor * (float(i) + 0.5f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);		t[tCount].Bt.v = uvStepVer;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.0f);		t[tCount].Ct.v = uvStepVer;
 
 				tCount++;
 			}
@@ -213,9 +235,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 					t[tCount].texture = texture;
 					t[tCount].colour = colour;
 
-					t[tCount].At.u = uvStepHor * (double(i));			t[tCount].At.v = uvStepVer * (double(j) + 1);
-					t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);	t[tCount].Bt.v = uvStepVer * (double(j) + 1);
-					t[tCount].Ct.u = uvStepHor * (double(i));			t[tCount].Ct.v = uvStepVer * (double(j) + 2);
+					t[tCount].At.u = uvStepHor * (float(i));			t[tCount].At.v = uvStepVer * (float(j) + 1);
+					t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);	t[tCount].Bt.v = uvStepVer * (float(j) + 1);
+					t[tCount].Ct.u = uvStepHor * (float(i));			t[tCount].Ct.v = uvStepVer * (float(j) + 2);
 
 					tCount++;
 				}
@@ -235,9 +257,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 					t[tCount].texture = texture;
 					t[tCount].colour = colour;
 
-					t[tCount].At.u = uvStepHor * (double(i) + 1.0f);	t[tCount].At.v = uvStepVer * (double(j) + 1);
-					t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);	t[tCount].Bt.v = uvStepVer * (double(j) + 2);
-					t[tCount].Ct.u = uvStepHor * (double(i));			t[tCount].Ct.v = uvStepVer * (double(j) + 2);
+					t[tCount].At.u = uvStepHor * (float(i) + 1.0f);	t[tCount].At.v = uvStepVer * (float(j) + 1);
+					t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);	t[tCount].Bt.v = uvStepVer * (float(j) + 2);
+					t[tCount].Ct.u = uvStepHor * (float(i));			t[tCount].Ct.v = uvStepVer * (float(j) + 2);
 
 					tCount++;
 				}
@@ -258,9 +280,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 					t[tCount].texture = texture;
 					t[tCount].colour = colour;
 
-					t[tCount].At.u = 1.0f - uvStepHor;					t[tCount].At.v = uvStepVer * (double(j) + 1);
-					t[tCount].Bt.u = 1.0f;								t[tCount].Bt.v = uvStepVer * (double(j) + 1);
-					t[tCount].Ct.u = 1.0f - uvStepHor;					t[tCount].Ct.v = uvStepVer * (double(j) + 2);
+					t[tCount].At.u = 1.0f - uvStepHor;					t[tCount].At.v = uvStepVer * (float(j) + 1);
+					t[tCount].Bt.u = 1.0f;								t[tCount].Bt.v = uvStepVer * (float(j) + 1);
+					t[tCount].Ct.u = 1.0f - uvStepHor;					t[tCount].Ct.v = uvStepVer * (float(j) + 2);
 
 					tCount++;
 				}
@@ -279,9 +301,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 					t[tCount].texture = texture;
 					t[tCount].colour = colour;
 
-					t[tCount].At.u = 1.0f;								t[tCount].At.v = uvStepVer * (double(j) + 1);
-					t[tCount].Bt.u = 1.0f;								t[tCount].Bt.v = uvStepVer * (double(j) + 2);
-					t[tCount].Ct.u = 1.0f - uvStepHor;					t[tCount].Ct.v = uvStepVer * (double(j) + 2);
+					t[tCount].At.u = 1.0f;								t[tCount].At.v = uvStepVer * (float(j) + 1);
+					t[tCount].Bt.u = 1.0f;								t[tCount].Bt.v = uvStepVer * (float(j) + 2);
+					t[tCount].Ct.u = 1.0f - uvStepHor;					t[tCount].Ct.v = uvStepVer * (float(j) + 2);
 
 					tCount++;
 				}
@@ -309,9 +331,9 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.0f);		t[tCount].At.v = 1.0f - uvStepVer;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = 1.0f - uvStepVer;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.5f);		t[tCount].Ct.v = 1.0f;
+				t[tCount].At.u = uvStepHor * (float(i) + 0.0f);		t[tCount].At.v = 1.0f - uvStepVer;
+				t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);		t[tCount].Bt.v = 1.0f - uvStepVer;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.5f);		t[tCount].Ct.v = 1.0f;
 
 				tCount++;
 			}
@@ -342,5 +364,14 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 	}
 
 	delete[] s;
+
+	nPoly = getTotalPoly();
+
+	if (!isDynamic)
+	{
+		Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+			position.x, position.y, position.z,
+			rotation.x, rotation.y, rotation.z);
+	}
 }
 

@@ -22,29 +22,29 @@ private:
 	int polyCount			= 0;
 	int polyCountS			= 0;
 
-	double unit				= 1.0f;
+	float unit				= 1.0f;
 
 	bool sidesOn			= false;
-	double depth			= -50.0f;
+	float depth				= -50.0f;
 
-	double tick				= 0.0f;
-	double phase			= 0.0f;
-	double frequency		= 1.0f;
-	double speed			= 1.0f;
+	float tick					= 0.0f;
+	float phase				= 0.0f;
+	float frequency			= 1.0f;
+	float speed				= 1.0f;
 
-	double amplitude		= 10.0f;
+	float amplitude			= 10.0f;
 
 	Uint32 colour			= 0xffffffff;
 
 	void updateMesh();
 
 public:
-	DynamicMesh(int x, int y, double f, double s, double u, double a, Uint32, bool side);
+	DynamicMesh(int x, int y, float f, float s, float u, float a, Uint32, bool side);
 	~DynamicMesh();
 
 	void update();
 	void renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
 	void renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource Sun,
-		const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 };
 

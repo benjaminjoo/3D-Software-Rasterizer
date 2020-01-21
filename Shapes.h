@@ -17,7 +17,7 @@ class Shapes
 
 	txt* textures;
 	vect3* spotLightPositions;
-	double* spotLightIntensities;
+	float* spotLightIntensities;
 
 public:
 
@@ -36,6 +36,7 @@ public:
 	void addSolid(SolidBody*);
 	void addTextureName(char*);
 	void addTextureData(txt);
+	void addTextureData(SDL_Surface*);
 
 	void setPosition(unsigned int, vect3);
 	vect3 getPosition(unsigned int);

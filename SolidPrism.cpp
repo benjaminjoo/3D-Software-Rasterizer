@@ -24,7 +24,7 @@ SolidPrism::SolidPrism()
 }
 
 
-SolidPrism::SolidPrism(double px, double py, double pz, Uint32 c, double ex, double ey, double ez)
+SolidPrism::SolidPrism(float px, float py, float pz, Uint32 c, float ex, float ey, float ez)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -46,8 +46,8 @@ SolidPrism::SolidPrism(double px, double py, double pz, Uint32 c, double ex, dou
 }
 
 
-SolidPrism::SolidPrism(double sx, double sy, double sz, double px, double py, double pz,
-						double rx, double ry, double rz, Uint32 c, int t, double ex, double ey, double ez)
+SolidPrism::SolidPrism(float sx, float sy, float sz, float px, float py, float pz,
+						float rx, float ry, float rz, Uint32 c, int t, float ex, float ey, float ez)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -197,4 +197,10 @@ void SolidPrism::getTriangleData(triangle3dV* t)
 	t[11].colour = colour;
 
 	delete[] p;
+
+	nPoly = getTotalPoly();
+
+	Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }

@@ -6,15 +6,15 @@
 class SolidPrism: public SolidBody
 {
 
-	double			edgeX	= 0.0f;
-	double			edgeY	= 0.0f;
-	double			edgeZ	= 0.0f;
+	float			edgeX	= 0.0f;
+	float			edgeY	= 0.0f;
+	float			edgeZ	= 0.0f;
 
 public:
 
 	SolidPrism();
-	SolidPrism(double, double, double, Uint32, double, double, double);
-	SolidPrism(double, double, double, double, double, double, double, double, double, Uint32, int, double, double, double);
+	SolidPrism(float, float, float, Uint32, float, float, float);
+	SolidPrism(float, float, float, float, float, float, float, float, float, Uint32, int, float, float, float);
 	~SolidPrism();
 
 	int	getTotalVert();

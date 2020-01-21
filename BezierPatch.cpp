@@ -108,10 +108,10 @@ void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, vect3* V)
 	vect3 outTangent	= subVectors(backP, midP);
 	for (auto i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart	= addVectors(frontP,	scaleVector((1.0f / (double)lod) * i, inTangent	));
-		vect3 stringEnd		= addVectors(midP,		scaleVector((1.0f / (double)lod) * i, outTangent	));
+		vect3 stringStart	= addVectors(frontP,	scaleVector((1.0f / (float)lod) * i, inTangent	));
+		vect3 stringEnd		= addVectors(midP,		scaleVector((1.0f / (float)lod) * i, outTangent	));
 		vect3 stringVect	= subVectors(stringEnd, stringStart);
-		V[i] = addVectors(stringStart, scaleVector((1.0f / (double)lod) * i, stringVect));
+		V[i] = addVectors(stringStart, scaleVector((1.0f / (float)lod) * i, stringVect));
 	}
 }
 */
@@ -124,10 +124,10 @@ void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, vect3 * V
 	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
-		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		vect3 stringStart = frontP + inTangent * ((1.0f / (float)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (float)lod) * i);
 		vect3 stringVect = stringEnd - stringStart;
-		V[i] = stringStart + stringVect * ((1.0f / (double)lod) * i);
+		V[i] = stringStart + stringVect * ((1.0f / (float)lod) * i);
 	}
 }
 
@@ -140,10 +140,10 @@ void BezierPatch::getSpineCoord(vect3 frontP, vect3 midP, vect3 backP, std::shar
 	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
-		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		vect3 stringStart = frontP + inTangent * ((1.0f / (float)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (float)lod) * i);
 		vect3 stringVect = stringEnd - stringStart;
-		V[i] = stringStart + stringVect * ((1.0f / (double)lod) * i);
+		V[i] = stringStart + stringVect * ((1.0f / (float)lod) * i);
 	}
 }
 
@@ -156,8 +156,8 @@ void BezierPatch::getTangent(vect3 frontP, vect3 midP, vect3 backP, vect3 * T)
 	vect3 outTangent = backP - midCtrl;
 	for (unsigned int i = 0; i < lod + 1; i++)
 	{
-		vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
-		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+		vect3 stringStart = frontP + inTangent * ((1.0f / (float)lod) * i);
+		vect3 stringEnd = midCtrl + outTangent * ((1.0f / (float)lod) * i);
 		T[i] = unitVector(stringEnd - stringStart);
 	}
 }
@@ -170,8 +170,8 @@ vect3 BezierPatch::getTangent(vect3 frontP, vect3 midP, vect3 backP, int i)
 	vect3 inTangent = midCtrl - frontP;
 	vect3 outTangent = backP - midCtrl;
 
-	vect3 stringStart = frontP + inTangent * ((1.0f / (double)lod) * i);
-	vect3 stringEnd = midCtrl + outTangent * ((1.0f / (double)lod) * i);
+	vect3 stringStart = frontP + inTangent * ((1.0f / (float)lod) * i);
+	vect3 stringEnd = midCtrl + outTangent * ((1.0f / (float)lod) * i);
 
 	return unitVector(stringEnd - stringStart);
 }
@@ -297,9 +297,9 @@ void BezierPatch::getTriangleData(triangle3dV * t)
 				vect3 temp = (t[tCount].B - t[tCount].C) ^ (t[tCount].A - t[tCount].C);
 				t[tCount].N = unitVector(temp);
 
-				t[tCount].At.u = (1.0f / double(lod)) * double(i);				t[tCount].At.v = (1.0f / double(lod)) * double(j);
-				t[tCount].Bt.u = (1.0f / double(lod)) * (double(i) + 1.0f);		t[tCount].Bt.v = (1.0f / double(lod)) * (double(j) + 1.0f);
-				t[tCount].Ct.u = (1.0f / double(lod)) * (double(i) + 1.0f);		t[tCount].Ct.v = (1.0f / double(lod)) * double(j);
+				t[tCount].At.u = (1.0f / float(lod)) * float(i);				t[tCount].At.v = (1.0f / float(lod)) * float(j);
+				t[tCount].Bt.u = (1.0f / float(lod)) * (float(i) + 1.0f);		t[tCount].Bt.v = (1.0f / float(lod)) * (float(j) + 1.0f);
+				t[tCount].Ct.u = (1.0f / float(lod)) * (float(i) + 1.0f);		t[tCount].Ct.v = (1.0f / float(lod)) * float(j);
 
 				t[tCount].colour = colour;
 				t[tCount].texture = texture;
@@ -320,9 +320,9 @@ void BezierPatch::getTriangleData(triangle3dV * t)
 				vect3 temp = (t[tCount].A - t[tCount].B) ^ (t[tCount].C - t[tCount].B);
 				t[tCount].N = unitVector(temp);
 
-				t[tCount].At.u = (1.0f / double(lod)) * double(i);			t[tCount].At.v = (1.0f / double(lod)) * double(j);
-				t[tCount].Bt.u = (1.0f / double(lod)) * double(i);			t[tCount].Bt.v = (1.0f / double(lod)) * (double(j) + 1.0f);
-				t[tCount].Ct.u = (1.0f / double(lod)) * (double(i) + 1.0f);	t[tCount].Ct.v = (1.0f / double(lod)) * (double(j) + 1.0f);
+				t[tCount].At.u = (1.0f / float(lod)) * float(i);			t[tCount].At.v = (1.0f / float(lod)) * float(j);
+				t[tCount].Bt.u = (1.0f / float(lod)) * float(i);			t[tCount].Bt.v = (1.0f / float(lod)) * (float(j) + 1.0f);
+				t[tCount].Ct.u = (1.0f / float(lod)) * (float(i) + 1.0f);	t[tCount].Ct.v = (1.0f / float(lod)) * (float(j) + 1.0f);
 
 				t[tCount].colour = colour;
 				t[tCount].texture = texture;

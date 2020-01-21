@@ -32,21 +32,21 @@ public:
 	void deleteVertex3byID(int);
 	void moveVertex3byID(int, worldCoord);
 	void copyVertex3byID(int, int, worldCoord);
-	void rotVertex3byID(int, Side, worldCoord, double);
+	void rotVertex3byID(int, Side, worldCoord, float);
 
 	void selectVertex3byIndex(int);
 	void deselectVertex3byIndex(int);
 	void deleteVertex3byIndex(int);
 	void moveVertex3byIndex(int, worldCoord);
 	void copyVertex3byIndex(int, int, worldCoord);
-	void rotVertex3byIndex(int, Side, worldCoord, double);
+	void rotVertex3byIndex(int, Side, worldCoord, float);
 
 	void selectLine3byIndex(int);
 	void deselectLine3byIndex(int);
 	void deleteLine3byIndex(int);
 	void moveLine3byIndex(int, worldCoord);
 	void moveLine3EndPoint(int, int, Side, worldCoord);
-	void rotLine3byIndex(int, Side, worldCoord, double);
+	void rotLine3byIndex(int, Side, worldCoord, float);
 
 	bool isVertex3Selected(int);
 	bool isVertex3Deleted(int);

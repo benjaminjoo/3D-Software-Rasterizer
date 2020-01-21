@@ -6,7 +6,7 @@ SolidModel::SolidModel()
 }
 
 
-SolidModel::SolidModel(double px, double py, double pz, Uint32 c, int t)
+SolidModel::SolidModel(float px, float py, float pz, Uint32 c, int t)
 {
 	scale = { 1.0, 1.0, 1.0, 1.0 };
 	position = { px, py, pz, 1.0 };
@@ -20,7 +20,7 @@ SolidModel::SolidModel(double px, double py, double pz, Uint32 c, int t)
 }
 
 
-SolidModel::SolidModel(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz, Uint32 c, int t)
+SolidModel::SolidModel(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz, Uint32 c, int t)
 {
 	scale = { sx, sy, sz, 1.0 };
 	position = { px, py, pz, 1.0 };
@@ -54,10 +54,16 @@ int	SolidModel::getTotalPoly()
 
 void SolidModel::getTriangleData(triangle3dV* P)
 {
-	for (unsigned int i = 0; i < polyContainer.size(); i++)
+	nPoly = polyContainer.size();
+
+	for (auto i = 0; i < nPoly; i++)
 	{
 		P[i] = polyContainer[i];
 	}
+
+	Projector->transformMesh(nPoly, P, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }
 
 

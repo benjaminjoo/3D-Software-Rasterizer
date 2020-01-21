@@ -17,8 +17,8 @@ class SolidModel: public SolidBody
 
 public:
 	SolidModel();
-	SolidModel(double, double, double, Uint32, int);
-	SolidModel(double, double, double, double, double, double, double, double, double, Uint32, int);
+	SolidModel(float, float, float, Uint32, int);
+	SolidModel(float, float, float, float, float, float, float, float, float, Uint32, int);
 	~SolidModel();
 
 	virtual int	getTotalVert();

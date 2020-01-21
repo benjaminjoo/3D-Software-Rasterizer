@@ -16,7 +16,7 @@ public:
 	ViewVolume();
 	~ViewVolume();
 
-	void initFrustum(double, double, double, double);
+	void initFrustum(float, float, float, float);
 
 	plane getNearPlane();
 	plane getFarPlane();

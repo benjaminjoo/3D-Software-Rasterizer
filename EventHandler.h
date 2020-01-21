@@ -8,9 +8,9 @@ class EventHandler
 {
 public:
 
-	double stepP;
-	double turnP;
-	double sensitivity;
+	float stepP;
+	float turnP;
+	float sensitivity;
 
 	projectionStyle visualStyle		= wireframe;
 	aiGoal			purposeOfAI		= be_idle;
@@ -35,32 +35,31 @@ public:
 
 	bool quit						= false;
 
-	double turnH					= 0.0f;
-	double turnV					= 0.0f;
-	double turnR					= 0.0f;
+	float turnH					= 0.0f;
+	float turnV					= 0.0f;
+	float turnR					= 0.0f;
 
-	double moveP					= 0.0f;
-	double strafeP					= 0.0f;
-	double riseP					= 0.0f;
-	double tiltP					= 0.0f;
+	float moveP					= 0.0f;
+	float strafeP					= 0.0f;
+	float riseP					= 0.0f;
+	float tiltP					= 0.0f;
 
-	double turnHe					= 0.0f;
-	double turnVe					= 0.0f;
-	double turnRe					= 0.0f;
+	float turnHe					= 0.0f;
+	float turnVe					= 0.0f;
+	float turnRe					= 0.0f;
 
-	double moveE					= 0.0f;
-	double strafeE					= 0.0f;
-	double riseE					= 0.0f;
-	double tiltE					= 0.0f;
+	float moveE					= 0.0f;
+	float strafeE					= 0.0f;
+	float riseE					= 0.0f;
+	float tiltE					= 0.0f;
 
-	double turnVmin					= PI * 0.5f;
-	double turnVmax					= 3 * PI * 0.5f;
+	float turnVmin					= PI * 0.5f;
+	float turnVmax					= 3 * PI * 0.5f;
 
-	double torchIntensity			= 10.0f;
-	double maxIllumination			= 1.0f;
+	float torchIntensity			= 10.0f;
+	float maxIllumination			= 1.0f;
 
-
-	EventHandler(double step, double turn, double sens);
+	EventHandler(float step, float turn, float sens);
 	~EventHandler();
 
 	void toggleAIGoal();

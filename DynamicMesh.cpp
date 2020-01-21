@@ -1,7 +1,7 @@
 #include "DynamicMesh.h"
 
 
-DynamicMesh::DynamicMesh(int x, int y, double f, double s, double u, double a, Uint32 c, bool side) :
+DynamicMesh::DynamicMesh(int x, int y, float f, float s, float u, float a, Uint32 c, bool side) :
 	width(x), height(y), frequency(f), speed(s), unit(u), amplitude(a), colour(c), sidesOn(side)
 {
 	size = width * height;
@@ -266,7 +266,7 @@ void DynamicMesh::update()
 	{
 		for (int i = 0; i < width; i++)
 		{
-			double index = tick + static_cast<double>(i + j);
+			float index = tick + static_cast<float>(i + j);
 			phase = index * frequency;
 			pGrid[j * width + i].P.z = sin(phase * PI / 180.0f) * amplitude;
 		}
@@ -283,7 +283,7 @@ void DynamicMesh::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas
 
 
 void DynamicMesh::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource Sun,
-				const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+				const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	eye->renderMesh(polyCount, mesh, rot, mov, Sun, visualStyle, torchIntensity, maxIllumination);
 	eye->renderMesh(polyCountS, sideMesh, rot, mov, Sun, visualStyle, torchIntensity, maxIllumination);

@@ -18,6 +18,7 @@
 #include "Text.h"
 #include "ParticleSystem.h"
 #include "DynamicMesh.h"
+#include "Terrain.h"
 
 
 class Game
@@ -37,6 +38,7 @@ private:
 	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
 	std::vector<std::shared_ptr<DynamicMesh>>	DynamicSurfaces;
+	std::vector<std::shared_ptr<Terrain>>		StaticSurfaces;
 
 	std::unordered_map<std::string, std::shared_ptr<Text>>			TextScreens;
 	std::vector<std::shared_ptr<ParticleSystem>>					Emitters;
@@ -92,6 +94,7 @@ public:
 	void addTextScreen(std::string, std::shared_ptr<Text>);
 	void addEmitter(std::shared_ptr<ParticleSystem>);
 	void addDynamicSurface(std::shared_ptr<DynamicMesh>);
+	void addStaticSurface(std::shared_ptr<Terrain>);
 	void loadProjectile(unsigned);
 	void updateAll();
 

@@ -29,6 +29,8 @@ OpenGLCanvas::OpenGLCanvas(int w, int h, const std::string& title)
 		std::cerr << "Glew failed to initialise!" << std::endl;
 	}
 
+	SDL_ShowCursor(SDL_DISABLE);
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
@@ -61,6 +63,16 @@ void OpenGLCanvas::update()
 		if (event.type == SDL_QUIT)
 		{
 			closed = true;
+		}
+
+		if (event.type == SDL_KEYDOWN)
+		{
+			switch (event.key.keysym.sym)
+			{
+			case SDLK_ESCAPE:
+				closed = true;
+				break;
+			}
 		}
 	}
 }

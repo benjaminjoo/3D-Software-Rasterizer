@@ -47,6 +47,24 @@ void Shapes::addTextureData(txt t)
 }
 
 
+void Shapes::addTextureData(SDL_Surface* T)
+{
+	if (T == nullptr)
+	{
+		std::cout << "Image loading failed..." << std::endl;
+	}
+	else
+	{
+		txt tempTexture;
+		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
+		tempTexture.pixels = (Uint32*)tempImage->pixels;
+		tempTexture.w = T->w;
+		tempTexture.h = T->h;
+		textureDataContainer.push_back(tempTexture);
+	}
+}
+
+
 void Shapes::setPosition(unsigned int n, vect3 p)
 {
 	if (n < bodyContainer.size())

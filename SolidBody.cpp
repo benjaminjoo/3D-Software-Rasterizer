@@ -9,6 +9,8 @@ SolidBody::SolidBody()
 
 SolidBody::~SolidBody()
 {
+	if (mesh != nullptr)
+		delete[] mesh;
 }
 
 
@@ -84,7 +86,7 @@ void SolidBody::updateVelocity(vect3 v)
 }
 
 
-void SolidBody::updateVelocity(double drag)
+void SolidBody::updateVelocity(float drag)
 {
 	velocity = velocity * drag;
 }
@@ -174,13 +176,13 @@ boundingBox SolidBody::getBB()
 }
 
 
-double SolidBody::getBBRadius()
+float SolidBody::getBBRadius()
 {
 	return bbRadius;
 }
 
 
-void SolidBody::setBBRadius(double r)
+void SolidBody::setBBRadius(float r)
 {
 	bbRadius = r;
 }
@@ -339,7 +341,7 @@ void SolidBody::updateMesh()
 
 
 void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
-				LightSource sun, const projectionStyle& style, double torch, double ill)
+				LightSource sun, const projectionStyle& style, float torch, float ill)
 {
 	if (mesh != nullptr)
 		if (trans)

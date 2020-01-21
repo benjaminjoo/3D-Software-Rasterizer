@@ -10,8 +10,8 @@ private:
 	vect3 velocity		= { 0.0f, 0.0f, 0.0f, 1.0f };
 	vect3 acceleration	= { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	double mass			= 1.0f;
-	double kEnergy		= 0.0f;
+	float mass			= 1.0f;
+	float kEnergy		= 0.0f;
 
 	unsigned age		= 0;
 	unsigned lifetime	= 0;
@@ -22,7 +22,7 @@ private:
 	void reset();
 
 public:
-	Particle(const double& m, const unsigned& life);
+	Particle(const float& m, const unsigned& life);
 	~Particle();
 
 	bool isActive();
@@ -34,7 +34,7 @@ public:
 
 	vect3 getPosition();
 	vect3 getVelocity();
-	double getKineticEnergy();
-	double getAge();
+	float getKineticEnergy();
+	float getAge();
 };
 

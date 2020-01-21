@@ -22,7 +22,7 @@ SolidCube::SolidCube()
 }
 
 
-SolidCube::SolidCube(double px, double py, double pz, Uint32 c)
+SolidCube::SolidCube(float px, float py, float pz, Uint32 c)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -42,8 +42,8 @@ SolidCube::SolidCube(double px, double py, double pz, Uint32 c)
 }
 
 
-SolidCube::SolidCube(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz,
-	Uint32 c, int t, double e)
+SolidCube::SolidCube(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
+	Uint32 c, int t, float e)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -155,4 +155,10 @@ void SolidCube::getTriangleData(triangle3dV* t)
 	t[11].colour = colour;
 
 	delete[] p;
+
+	nPoly = getTotalPoly();
+
+	Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }

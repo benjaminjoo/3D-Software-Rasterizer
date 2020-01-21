@@ -3,10 +3,11 @@
 #include "Canvas.h"
 
 
-EventHandler::EventHandler(double step, double turn, double sens):
+EventHandler::EventHandler(float step, float turn, float sens):
 	stepP(step), turnP(turn), sensitivity(sens)
 {
 	std::cout << "EventHandler constructor called" << std::endl;
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 
@@ -346,20 +347,20 @@ void EventHandler::HandleUserEvents()
 
 		if (event.type == SDL_MOUSEMOTION && !mouseLookBlocked)
 		{
-			turnH = (double)event.motion.x * sensitivity;
-			turnV = (double)event.motion.y * sensitivity;
-			if ((double)event.motion.y * sensitivity > turnVmin &&
-				(double)event.motion.y * sensitivity < turnVmax)
+			turnH = (float)event.motion.x * sensitivity;
+			turnV = (float)event.motion.y * sensitivity;
+			if ((float)event.motion.y * sensitivity > turnVmin &&
+				(float)event.motion.y * sensitivity < turnVmax)
 			{
-				turnV = (double)event.motion.y * sensitivity;
+				turnV = (float)event.motion.y * sensitivity;
 			}
 			else
 			{
-				if ((double)event.motion.y * sensitivity < turnVmin)
+				if ((float)event.motion.y * sensitivity < turnVmin)
 				{
 					turnV = turnVmin;
 				}
-				else if ((double)event.motion.y * sensitivity > turnVmax)
+				else if ((float)event.motion.y * sensitivity > turnVmax)
 				{
 					turnV = turnVmax;
 				}

@@ -6,7 +6,7 @@
 #include "c64Fonts.h"
 
 
-#define GRAVITY				0.5
+#define GRAVITY				0.5f
 
 #define SCREEN_WIDTH		900
 #define SCREEN_HEIGHT		450
@@ -14,11 +14,11 @@
 #define EDITOR_HEIGHT		600
 #define MAX_MARGIN			200
 #define SENSITIVITY			0.01f
-#define PI					3.141592654
+#define PI					3.14159f
 #define MAXCLIPVERTS		10
 
-#define MIN_ILLUMINATION	0.1
-#define MAX_ILLUMINATION	1.25
+#define MIN_ILLUMINATION	0.1f
+#define MAX_ILLUMINATION	1.25f
 
 #define MAXENTITIES			1024
 
@@ -162,16 +162,16 @@ struct soundBite
 
 struct zColour
 {
-	double z		= 0.0f;
+	float z			= 0.0f;
 	Uint32 colour	= 0;
 };
 
 
 struct light
 {
-	double azm			= 0.0f;
-	double alt			= 0.0f;
-	double intensity	= 0.0f;
+	float azm			= 0.0f;
+	float alt			= 0.0f;
+	float intensity		= 0.0f;
 };
 
 
@@ -184,9 +184,9 @@ struct screenCoord
 
 struct worldCoord
 {
-	double x = 0.0f;
-	double y = 0.0f;
-	double z = 0.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
 
 	worldCoord operator + (const worldCoord& p)
@@ -219,7 +219,7 @@ struct worldCoord
 	}
 
 
-	double operator * (const worldCoord& p)		//Dot Product
+	float operator * (const worldCoord& p)		//Dot Product
 	{
 		return x * p.x + y * p.y + z * p.z;
 	}
@@ -246,8 +246,8 @@ struct line3
 
 struct textCoord
 {
-	double u = 0.0f;
-	double v = 0.0f;
+	float u = 0.0f;
+	float v = 0.0f;
 };
 
 
@@ -255,49 +255,49 @@ struct coord2
 {
 	int x		= 0;
 	int y		= 0;
-	double z	= 0.0;
+	float z		= 0.0f;
 };
 
 
 struct rect
 {
-	double xStart	= 0.0f;
-	double yStart	= 0.0f;
-	double xEnd		= 0.0f;
-	double yEnd		= 0.0f;
+	float xStart	= 0.0f;
+	float yStart	= 0.0f;
+	float xEnd		= 0.0f;
+	float yEnd		= 0.0f;
 };
 
 
 struct vect2
 {
-	double x = 0.0f;
-	double y = 0.0f;
-	double u = 0.0f;
-	double v = 0.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float u = 0.0f;
+	float v = 0.0f;
 };
 
 
 struct vect3
 {
-	double x = 0.0f;
-	double y = 0.0f;
-	double z = 0.0f;
-	double w = 0.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float w = 0.0f;
 
 
-	double len()
+	float len()
 	{
-		return sqrt(x * x + y * y + z * z);
+		return (float)sqrt(x * x + y * y + z * z);
 	}
 
-	double len2()
+	float len2()
 	{
 		return x * x + y * y + z * z;
 	}
 
 	vect3 norm()
 	{
-		double s = 1.0f / this->len();
+		float s = 1.0f / this->len();
 		return { x * s, y * s, z * s, 1.0f };
 	}
 
@@ -338,11 +338,11 @@ struct vect3
 		return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x, 1.0f };
 	}
 
-	double	operator * (const vect3& p)				//Dot Product
+	float	operator * (const vect3& p)				//Dot Product
 	{
 		return x * p.x + y * p.y + z * p.z;
 	}
-	vect3	operator *	(const double& s)			//Scale
+	vect3	operator *	(const float& s)			//Scale
 	{
 		return { x * s, y * s, z * s, 1.0f };
 	}
@@ -351,25 +351,25 @@ struct vect3
 
 struct mat4x4
 {
-	double _00 = 0.0f;
-	double _01 = 0.0f;
-	double _02 = 0.0f;
-	double _03 = 0.0f;
+	float _00 = 0.0f;
+	float _01 = 0.0f;
+	float _02 = 0.0f;
+	float _03 = 0.0f;
 
-	double _10 = 0.0f;
-	double _11 = 0.0f;
-	double _12 = 0.0f;
-	double _13 = 0.0f;
+	float _10 = 0.0f;
+	float _11 = 0.0f;
+	float _12 = 0.0f;
+	float _13 = 0.0f;
 
-	double _20 = 0.0f;
-	double _21 = 0.0f;
-	double _22 = 0.0f;
-	double _23 = 0.0f;
+	float _20 = 0.0f;
+	float _21 = 0.0f;
+	float _22 = 0.0f;
+	float _23 = 0.0f;
 
-	double _30 = 0.0f;
-	double _31 = 0.0f;
-	double _32 = 0.0f;
-	double _33 = 0.0f;
+	float _30 = 0.0f;
+	float _31 = 0.0f;
+	float _32 = 0.0f;
+	float _33 = 0.0f;
 
 	vect3 operator * (const vect3& v)
 	{
@@ -593,8 +593,8 @@ struct boundingBox
 
 struct polyNode
 {
-	double	x = 0.0f;
-	double 	y = 0.0f;
+	float	x = 0.0f;
+	float 	y = 0.0f;
 	int 	s = 0;
 };
 
@@ -610,8 +610,8 @@ struct polygon
 struct polygon4uv
 {
 	vect2 points[4];
-	polygon4uv* leftChild;
-	polygon4uv* rightChild;
+	polygon4uv* leftChild	= nullptr;
+	polygon4uv* rightChild	= nullptr;
 };
 
 
@@ -634,11 +634,11 @@ struct triangle2dG	//2D Triangle for Gouraud shading
 	Uint32 h		= 0;
 	int texture		= 0;
 
-	double illumA	= 0.0f;
-	double illumB	= 0.0f;
-	double illumC	= 0.0f;
+	float illumA	= 0.0f;
+	float illumB	= 0.0f;
+	float illumC	= 0.0f;
 
-	double illumFlat = 0.0f;
+	float illumFlat = 0.0f;
 
 	textCoord At;
 	textCoord Bt;
@@ -648,19 +648,19 @@ struct triangle2dG	//2D Triangle for Gouraud shading
 /*
 struct transform3d
 {
-	double x = 0.0f;
-	double y = 0.0f;
-	double z = 0.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
-	double sinAzm = 0.0f;
-	double cosAzm = 0.0f;
-	double sinAlt = 0.0f;
-	double cosAlt = 0.0f;
-	double sinRol = 0.0f;
-	double cosRol = 0.0f;
+	float sinAzm = 0.0f;
+	float cosAzm = 0.0f;
+	float sinAlt = 0.0f;
+	float cosAlt = 0.0f;
+	float sinRol = 0.0f;
+	float cosRol = 0.0f;
 };
 */
-double distancePN(polyNode a, polyNode b);
+float distancePN(polyNode a, polyNode b);
 
 polyNode subNodes(polyNode a, polyNode b);
 
@@ -668,7 +668,7 @@ polyNode addNodes(polyNode a, polyNode b);
 
 polyNode unitNode(polyNode a);
 
-double dotNodes(polyNode a, polyNode b);
+float dotNodes(polyNode a, polyNode b);
 
 polyNode getNormal(polyNode a, polyNode b);
 
@@ -688,27 +688,27 @@ vect3 subVectors(const vect3& a, const vect3& b);
 
 vect3 halfwayPoint(vect3 a, vect3 b);
 
-double distanceSquared(vect3 a, vect3 b);
+float distanceSquared(vect3 a, vect3 b);
 
-double lengthSquared(vect3 v);
+float lengthSquared(vect3 v);
 
 vect3 unitVector(vect3 v);
 
 worldCoord unitVector2(worldCoord v);
 
-vect3 dirVector(double azm, double alt);
+vect3 dirVector(float azm, float alt);
 
-double dotProduct(const vect3& a, const vect3& b);
+float dotProduct(const vect3& a, const vect3& b);
 
-worldCoord rotate2(worldCoord target, Side view, worldCoord origin, double angle);
+worldCoord rotate2(worldCoord target, Side view, worldCoord origin, float angle);
 
-double dotProductSquared(const vect3& a, const vect3& b);
+float dotProductSquared(const vect3& a, const vect3& b);
 
-double distPoint2Plane(vect3 P, triangle3dV T);
+float distPoint2Plane(vect3 P, triangle3dV T);
 
-double distPoint2Line(worldCoord P, Side view, line3 L);
+float distPoint2Line(worldCoord P, Side view, line3 L);
 
-double distPoint2LineSquared(vect3 p, vect3 a, vect3 b);
+float distPoint2LineSquared(vect3 p, vect3 a, vect3 b);
 
 bool pointIsAroundLine(worldCoord P, Side view, line3 L);
 
@@ -716,31 +716,31 @@ vect3 crossProduct(vect3 a, vect3 b);
 
 vect3 midPoint(vect3 a, vect3 b);
 
-coord2 view2screen(vect3 vertex, int width, int height, double hR, double vR);
+coord2 view2screen(vect3 vertex, int width, int height, float hR, float vR);
 
 Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
 
 bool onScreen(coord2 test, int w, int h);
 
-int sign(const double& a);
+int sign(const float& a);
 
-int roundInt(double a);
+int roundInt(float a);
 
 template <class T> T getMinN(int n, T* list);
 
-vect3 getXYZmin(int n, triangle3dV* T, double padding);
+vect3 getXYZmin(int n, triangle3dV* T, float padding);
 
-vect3 getXYZmax(int n, triangle3dV* T, double padding);
+vect3 getXYZmax(int n, triangle3dV* T, float padding);
 
 bool checkBoundingBoxForCollision(vect3 p, boundingBox B);
 
-double pow10(int n);
+float pow10(int n);
 
 int pow2(int n);
 
-int* getFractionals(double number, int nDecimals);
+int* getFractionals(float number, int nDecimals);
 
-int* getIntegers(double number, int* n);
+int* getIntegers(float number, int* n);
 
 void freePointerToPolyArray(triangle3dV** ptr, int nDimensions);
 

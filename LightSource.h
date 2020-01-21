@@ -5,28 +5,28 @@
 class LightSource
 {
 
-	double azm			= 0.0f;
-	double alt			= 0.0f;
+	float azm			= 0.0f;
+	float alt			= 0.0f;
 
-	double deltaAzm		= 1.0f;
-	double deltaAlt		= 0.0f;
+	float deltaAzm		= 1.0f;
+	float deltaAlt		= 0.0f;
 
 	vect3 direction		= { 0.0f, 0.0f, 0.0f, 0.0f };
 
-	double intensity	= 0.0f;
+	float intensity	= 0.0f;
 
 public:
 
 	LightSource();
-	LightSource(double, double);
-	LightSource(double, double, double);
+	LightSource(float, float);
+	LightSource(float, float, float);
 	~LightSource();
 
-	void setPosition(double, double);
+	void setPosition(float, float);
 	void update();
 
-	double getIllumination(vect3& N);
-	double getBlinnSpecular(vect3 N, vect3 V, double shine);
+	float getIllumination(vect3& N);
+	float getBlinnSpecular(vect3 N, vect3 V, float shine);
 
 	vect3 getVector();
 };

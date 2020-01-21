@@ -1,7 +1,7 @@
 #include "Particle.h"
 
 
-Particle::Particle(const double& m, const unsigned& life) : mass(m), age(0), lifetime(life)
+Particle::Particle(const float& m, const unsigned& life) : mass(m), age(0), lifetime(life)
 {
 	updateKineticEnergy();
 }
@@ -91,13 +91,13 @@ vect3 Particle::getVelocity()
 }
 
 
-double Particle::getKineticEnergy()
+float Particle::getKineticEnergy()
 {
 	return kEnergy;
 }
 
 
-double Particle::getAge()
+float Particle::getAge()
 {
-	return static_cast<double>(age) / lifetime;
+	return static_cast<float>(age) / lifetime;
 }

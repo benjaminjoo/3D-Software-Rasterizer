@@ -6,18 +6,19 @@
 class SolidSphere: public SolidBody
 {
 
-	double			radius	= 0.5f;
+	float			radius	= 0.5f;
 	int				resol	= 12;
 
 public:
 
 	SolidSphere();
-	SolidSphere(double, double, double, Uint32);
-	SolidSphere(double, double, double, double, double, double, double, double, double, Uint32, int, double, int);
+	SolidSphere(float, float, float, Uint32);
+	SolidSphere(float, float, float, float, float, float, float, float, float, Uint32, int, float, int);
+	SolidSphere(float, float, float, float, float, float, float, float, float, Uint32, int, float, int, bool);
 	~SolidSphere();
 
-	void setRadius(double);
-	double getRadius();
+	void setRadius(float);
+	float getRadius();
 	int	getTotalVert();
 	int	getTotalPoly();
 	void getVertexData(vect3*);

@@ -24,7 +24,7 @@ SolidCylinder::SolidCylinder()
 }
 
 
-SolidCylinder::SolidCylinder(double px, double py, double pz, Uint32 c)
+SolidCylinder::SolidCylinder(float px, float py, float pz, Uint32 c)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -46,8 +46,8 @@ SolidCylinder::SolidCylinder(double px, double py, double pz, Uint32 c)
 }
 
 
-SolidCylinder::SolidCylinder(double sx, double sy, double sz, double px, double py, double pz, double rx, double ry, double rz,
-								Uint32 c, int t, double r, double h, int res)
+SolidCylinder::SolidCylinder(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
+								Uint32 c, int t, float r, float h, int res)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -62,6 +62,31 @@ SolidCylinder::SolidCylinder(double sx, double sy, double sz, double px, double 
 	radius			= r;
 	height			= h;
 	resol			= res;
+
+	nPoly = getTotalPoly();
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
+}
+
+
+SolidCylinder::SolidCylinder(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
+	Uint32 c, int t, float r, float h, int res, bool dynamic)
+{
+	scale = { sx, sy, sz, 1.0f };
+	position = { px, py, pz, 1.0f };
+	rotation = { rx, ry, rz, 1.0f };
+
+	colour = c;
+	texture = t;
+	txU = 2.5;
+
+	castsShadows = false;
+
+	radius = r;
+	height = h;
+	resol = res;
+
+	isDynamic = dynamic;
 
 	nPoly = getTotalPoly();
 	mesh = new triangle3dV[nPoly];
@@ -88,8 +113,8 @@ int	SolidCylinder::getTotalPoly()
 
 void SolidCylinder::getVertexData(vect3* s)
 {
-	double angleH, stepH;
-	stepH = 360.0f / (double(resol) * 2);
+	float angleH, stepH;
+	stepH = 360.0f / (float(resol) * 2);
 	int cnt = 0;
 	int total;
 	total = 4 * resol;
@@ -109,7 +134,7 @@ void SolidCylinder::getVertexData(vect3* s)
 		}
 		for (int j = 0; j < 2 * resol; j++)
 		{
-			angleH = (j * stepH) * PI / 180.0;
+			angleH = (j * stepH) * PI / 180.0f;
 			if (cnt < total)
 			{
 				s[cnt].x = radius * cos(angleH);
@@ -135,9 +160,9 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 
 	int tCount = 0;
 
-	double uvStepHor;
-	double perimeter = 2 * radius * PI;
-	uvStepHor = (perimeter / txU) / (2 * double(resol));
+	float uvStepHor;
+	float perimeter = 2 * radius * PI;
+	uvStepHor = (perimeter / txU) / (2 * float(resol));
 
 	//Adding polygons forming the base
 
@@ -175,9 +200,9 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.0f);		t[tCount].At.v = 0.0f;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = 0.0f;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
+				t[tCount].At.u = uvStepHor * (float(i) + 0.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);		t[tCount].Bt.v = 0.0f;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -196,9 +221,9 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 0.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].At.u = uvStepHor * (float(i) + 0.0f);		t[tCount].At.v = 0.0f;
 				t[tCount].Bt.u = perimeter / txU;						t[tCount].Bt.v = 0.0f;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -223,9 +248,9 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 				t[tCount].texture = texture;
 				t[tCount].colour = colour;
 
-				t[tCount].At.u = uvStepHor * (double(i) + 1.0f);		t[tCount].At.v = 0.0f;
-				t[tCount].Bt.u = uvStepHor * (double(i) + 1.0f);		t[tCount].Bt.v = height / txU;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0f);		t[tCount].Ct.v = height / txU;
+				t[tCount].At.u = uvStepHor * (float(i) + 1.0f);		t[tCount].At.v = 0.0f;
+				t[tCount].Bt.u = uvStepHor * (float(i) + 1.0f);		t[tCount].Bt.v = height / txU;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -248,7 +273,7 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 
 				t[tCount].At.u = perimeter / txU;					t[tCount].At.v = 0.0f;
 				t[tCount].Bt.u = perimeter / txU;					t[tCount].Bt.v = height / txU;
-				t[tCount].Ct.u = uvStepHor * (double(i) + 0.0);		t[tCount].Ct.v = height / txU;
+				t[tCount].Ct.u = uvStepHor * (float(i) + 0.0f);		t[tCount].Ct.v = height / txU;
 
 				tCount++;
 			}
@@ -276,4 +301,13 @@ void SolidCylinder::getTriangleData(triangle3dV* t)
 	}
 
 	delete[] s;
+
+	nPoly = totalPoly;
+
+	if (!isDynamic)
+	{
+		Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+											position.x, position.y, position.z,
+											rotation.x, rotation.y, rotation.z);
+	}
 }

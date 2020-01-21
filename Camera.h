@@ -18,41 +18,41 @@ class Camera
 
 private:
 
-	double					x;
-	double					y;
-	double					z;
+	float					x;
+	float					y;
+	float					z;
 
-	double					azm;
-	double					alt;
-	double					rol;
+	float					azm;
+	float					alt;
+	float					rol;
 
 	vect3					viewDirection = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	double					step;
-	double					turn;
+	float					step;
+	float					turn;
 
-	double					fovH;
+	float					fovH;
 
-	double					zNear;
-	double					zFar;
+	float					zNear;
+	float					zFar;
 
 	int						w;
 	int						h;
 
-	double					hRatio;
-	double					vRatio;
+	float					hRatio;
+	float					vRatio;
 
 	Uint32*					pixelBuffer		= nullptr;
-	double*					depthBuffer		= nullptr;
+	float*					depthBuffer		= nullptr;
 
 	std::shared_ptr<Canvas> Screen			= nullptr;
 	std::shared_ptr<Projection> Renderer	= nullptr;
 
 	vect3					vertexList[MAXCLIPVERTS];
 	textCoord				uvList[MAXCLIPVERTS];
-	double					specularList[MAXCLIPVERTS];
+	float					specularList[MAXCLIPVERTS];
 
-	double					illSpec[3]		= { 0.0f };
+	float					illSpec[3]		= { 0.0f };
 
 	txt*					currentTexture = nullptr;
 	std::vector<txt>		textureData;
@@ -67,8 +67,8 @@ private:
 public:
 
 	Camera();
-	Camera(double, double, double, int, int, int);
-	Camera(double, double, double, double, double, double, double, double, double, double, double, int, int, int);
+	Camera(float, float, float, int, int, int);
+	Camera(float, float, float, float, float, float, float, float, float, float, float, int, int, int);
 	~Camera();
 
 	void linkToCanvas(std::shared_ptr<Canvas> screen);
@@ -77,23 +77,23 @@ public:
 
 	void addTexture(txt);
 
-	void renderPoint(point3, mat4x4&, Uint32*, double*);
+	void renderPoint(point3, mat4x4&, Uint32*, float*);
 
 	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
-		LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 private:
 
-	double getFovH();
+	float getFovH();
 
-	double getFovV();
+	float getFovV();
 
-	double getHRatio();
+	float getHRatio();
 
-	double getVRatio();
+	float getVRatio();
 
 	void updateViewDirection();
 
@@ -101,12 +101,12 @@ private:
 
 	void clearVertexList();
 
-	int clipToFrustum(const triangle3dV&, vect3*, textCoord*, double*);
+	int clipToFrustum(const triangle3dV&, vect3*, textCoord*, float*);
 
-	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, double* specList, plane clippingPlane);
+	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, float* specList, plane clippingPlane);
 
 	void clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
-		const double& startSpec, const double& endSpec, int* nResult, vect3* temp, textCoord* temp_uv, double* temp_spec);
+		const float& startSpec, const float& endSpec, int* nResult, vect3* temp, textCoord* temp_uv, float* temp_spec);
 
 	bool pointInsideFrustum(vect3& V);
 
@@ -118,7 +118,7 @@ private:
 
 	mat4x4 getTranslation();
 
-	mat4x4 getRotation(axis t, double a);
+	mat4x4 getRotation(axis t, float a);
 
 	mat4x4 getRotation();
 
@@ -128,16 +128,16 @@ private:
 
 	void world2viewPointM(point3& P, mat4x4& RM);
 
-	void projectPoint(point3, Uint32*, double*);
+	void projectPoint(point3, Uint32*, float*);
 
 	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
-		const projectionStyle& visualStyle, double torchIntensity, double maxIllumination);
+		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
-	void getSpec(double* illSpec, LightSource Light, const triangle3dV& worldT, double shine);
+	void getSpec(float* illSpec, LightSource Light, const triangle3dV& worldT, float shine);
 
-	coord2 view2screen(const vect3& vertex, const double& hR, const double& vR);
+	coord2 view2screen(const vect3& vertex, const float& hR, const float& vR);
 
-	void projectPoly(int, Uint32, projectionStyle, double, double, triangle3dV);
+	void projectPoly(int, Uint32, projectionStyle, float, float, triangle3dV);
 
 	void outputImage(Canvas);
 };

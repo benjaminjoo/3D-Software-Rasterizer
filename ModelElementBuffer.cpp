@@ -89,7 +89,7 @@ void ModelElementBuffer::copyVertex3byID(int ID, int newID, worldCoord move)
 }
 
 
-void ModelElementBuffer::rotVertex3byID(int ID, Side currentView, worldCoord origin, double angle)
+void ModelElementBuffer::rotVertex3byID(int ID, Side currentView, worldCoord origin, float angle)
 {
 	for (auto& i : vertex3Buffer)
 		if (i.id == ID)
@@ -141,7 +141,7 @@ void ModelElementBuffer::copyVertex3byIndex(int i, int newID, worldCoord move)
 }
 
 
-void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord origin, double angle)
+void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord origin, float angle)
 {
 	vertex3Buffer[i].pos = rotate2(vertex3Buffer[i].pos, currentView, origin, angle);
 }
@@ -198,7 +198,7 @@ void ModelElementBuffer::moveLine3EndPoint(int lineIndex, int vertIndex, Side vi
 }
 
 
-void ModelElementBuffer::rotLine3byIndex(int i, Side currentView, worldCoord origin, double angle)
+void ModelElementBuffer::rotLine3byIndex(int i, Side currentView, worldCoord origin, float angle)
 {
 	line3Buffer[i].vert[0] = rotate2(line3Buffer[i].vert[0], currentView, origin, angle);
 	line3Buffer[i].vert[1] = rotate2(line3Buffer[i].vert[1], currentView, origin, angle);
@@ -264,7 +264,7 @@ void ModelElementBuffer::exportTextFile()
 	{
 		for (auto& i : line3Buffer)
 		{
-			double x1, x2, y1, y2;
+			float x1, x2, y1, y2;
 			x1 = i.vert[0].x;
 			y1 = i.vert[0].y;
 			x2 = i.vert[1].x;

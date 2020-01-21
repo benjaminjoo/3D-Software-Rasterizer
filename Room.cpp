@@ -8,7 +8,7 @@ Room::Room()
 }
 
 
-Room::Room(double pX, double pY, double pZ, double sX, double sY, double sZ):
+Room::Room(float pX, float pY, float pZ, float sX, float sY, float sZ):
 	sizeX(sX), sizeY(sY), sizeZ(sZ)
 {
 	position = { pX, pY, pZ, 1.0f };
@@ -27,13 +27,13 @@ Room::~Room()
 }
 
 
-void Room::setPosition(double  px, double py, double pz)
+void Room::setPosition(float  px, float py, float pz)
 {
 	position	= { px, py, pz, 1.0 };
 }
 
 
-void Room::setDimension(double sx, double sy, double sz)
+void Room::setDimension(float sx, float sy, float sz)
 {
 	sizeX		= sx;
 	sizeY		= sy;
@@ -41,7 +41,7 @@ void Room::setDimension(double sx, double sy, double sz)
 }
 
 
-void Room::setRotation(double rx, double ry, double rz)
+void Room::setRotation(float rx, float ry, float rz)
 {
 	rotation.x	= rx;
 	rotation.y	= ry;
@@ -71,7 +71,7 @@ void Room::setTexture(int bottom, int top, int back, int front, int left, int ri
 }
 
 
-void Room::setTextureScale(double bottom, double top, double back, double front, double left, double right)
+void Room::setTextureScale(float bottom, float top, float back, float front, float left, float right)
 {
 	txUBottom	= bottom;
 	txUTop		= top;
@@ -93,165 +93,165 @@ void Room::setSideOn(bool bottom, bool top, bool back, bool front, bool left, bo
 }
 
 
-void Room::addOpening(Side currentSide, double bottomLeftX, double bottomLeftY, double width, double height)
+void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, float width, float height)
 {
 	switch (currentSide)
 	{
 	case Bottom:
 		openingOnBottom = true;
 		openingBottom = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25; }
-		if (bottomLeftY >= sizeY) { bottomLeftY = sizeY * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25f; }
+		if (bottomLeftY >= sizeY) { bottomLeftY = sizeY * 0.25f; }
 		if (bottomLeftX + width > sizeX) { width = sizeX - bottomLeftX; }
 		if (bottomLeftY + height > sizeY) { height = sizeY - bottomLeftY; }
 		openingBottom[0].x = bottomLeftX;
 		openingBottom[0].y = bottomLeftY;
-		openingBottom[0].z = 0.0;
-		openingBottom[0].w = 1.0;
+		openingBottom[0].z = 0.0f;
+		openingBottom[0].w = 1.0f;
 		openingBottom[1].x = bottomLeftX + width;
 		openingBottom[1].y = bottomLeftY;
-		openingBottom[1].z = 0.0;
-		openingBottom[1].w = 1.0;
+		openingBottom[1].z = 0.0f;
+		openingBottom[1].w = 1.0f;
 		openingBottom[2].x = bottomLeftX + width;
 		openingBottom[2].y = bottomLeftY + height;
-		openingBottom[2].z = 0.0;
-		openingBottom[2].w = 1.0;
+		openingBottom[2].z = 0.0f;
+		openingBottom[2].w = 1.0f;
 		openingBottom[3].x = bottomLeftX;
 		openingBottom[3].y = bottomLeftY + height;
-		openingBottom[3].z = 0.0;
-		openingBottom[3].w = 1.0;
+		openingBottom[3].z = 0.0f;
+		openingBottom[3].w = 1.0f;
 		break;
 	case Top:
 		openingOnTop = true;
 		openingTop = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25; }
-		if (bottomLeftY >= sizeY) { bottomLeftY = sizeY * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25f; }
+		if (bottomLeftY >= sizeY) { bottomLeftY = sizeY * 0.25f; }
 		if (bottomLeftX + width > sizeX) { width = sizeX - bottomLeftX; }
 		if (bottomLeftY + height > sizeY) { height = sizeY - bottomLeftY; }
 		openingTop[0].x = bottomLeftX;
 		openingTop[0].y = bottomLeftY;
 		openingTop[0].z = sizeZ;
-		openingTop[0].w = 1.0;
+		openingTop[0].w = 1.0f;
 		openingTop[1].x = bottomLeftX + width;
 		openingTop[1].y = bottomLeftY;
 		openingTop[1].z = sizeZ;
-		openingTop[1].w = 1.0;
+		openingTop[1].w = 1.0f;
 		openingTop[2].x = bottomLeftX + width;
 		openingTop[2].y = bottomLeftY + height;
 		openingTop[2].z = sizeZ;
-		openingTop[2].w = 1.0;
+		openingTop[2].w = 1.0f;
 		openingTop[3].x = bottomLeftX;
 		openingTop[3].y = bottomLeftY + height;
 		openingTop[3].z = sizeZ;
-		openingTop[3].w = 1.0;
+		openingTop[3].w = 1.0f;
 		break;
 	case Back:
 		openingOnBack = true;
 		openingBack = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25; }
-		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25f; }
+		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25f; }
 		if (bottomLeftX + width > sizeX) { width = sizeX - bottomLeftX; }
 		if (bottomLeftY + height > sizeZ) { height = sizeZ - bottomLeftY; }
 		openingBack[0].x = bottomLeftX;
 		openingBack[0].y = sizeY;
 		openingBack[0].z = bottomLeftY;
-		openingBack[0].w = 1.0;
+		openingBack[0].w = 1.0f;
 		openingBack[1].x = bottomLeftX + width;
 		openingBack[1].y = sizeY;
 		openingBack[1].z = bottomLeftY;
-		openingBack[1].w = 1.0;
+		openingBack[1].w = 1.0f;
 		openingBack[2].x = bottomLeftX + width;
 		openingBack[2].y = sizeY;
 		openingBack[2].z = bottomLeftY + height;
-		openingBack[2].w = 1.0;
+		openingBack[2].w = 1.0f;
 		openingBack[3].x = bottomLeftX;
 		openingBack[3].y = sizeY;
 		openingBack[3].z = bottomLeftY + height;
-		openingBack[3].w = 1.0;
+		openingBack[3].w = 1.0f;
 		break;
 	case Front:
 		openingOnFront = true;
 		openingFront = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25; }
-		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeX) { bottomLeftX = sizeX * 0.25f; }
+		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25f; }
 		if (bottomLeftX + width > sizeX) { width = sizeX - bottomLeftX; }
 		if (bottomLeftY + height > sizeZ) { height = sizeZ - bottomLeftY; }
 		openingFront[0].x = bottomLeftX;
-		openingFront[0].y = 0.0;
+		openingFront[0].y = 0.0f;
 		openingFront[0].z = bottomLeftY;
-		openingFront[0].w = 1.0;
+		openingFront[0].w = 1.0f;
 		openingFront[1].x = bottomLeftX + width;
-		openingFront[1].y = 0.0;
+		openingFront[1].y = 0.0f;
 		openingFront[1].z = bottomLeftY;
-		openingFront[1].w = 1.0;
+		openingFront[1].w = 1.0f;
 		openingFront[2].x = bottomLeftX + width;
-		openingFront[2].y = 0.0;
+		openingFront[2].y = 0.0f;
 		openingFront[2].z = bottomLeftY + height;
-		openingFront[2].w = 1.0;
+		openingFront[2].w = 1.0f;
 		openingFront[3].x = bottomLeftX;
-		openingFront[3].y = 0.0;
+		openingFront[3].y = 0.0f;
 		openingFront[3].z = bottomLeftY + height;
-		openingFront[3].w = 1.0;
+		openingFront[3].w = 1.0f;
 		break;
 	case Left:
 		openingOnLeft = true;
 		openingLeft = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeY) { bottomLeftX = sizeY * 0.25; }
-		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeY) { bottomLeftX = sizeY * 0.25f; }
+		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25f; }
 		if (bottomLeftX + width > sizeY) { width = sizeY - bottomLeftX; }
 		if (bottomLeftY + height > sizeZ) { height = sizeZ - bottomLeftY; }
-		openingLeft[0].x = 0.0;
+		openingLeft[0].x = 0.0f;
 		openingLeft[0].y = bottomLeftX;
 		openingLeft[0].z = bottomLeftY;
-		openingLeft[0].w = 1.0;
-		openingLeft[1].x = 0.0;
+		openingLeft[0].w = 1.0f;
+		openingLeft[1].x = 0.0f;
 		openingLeft[1].y = bottomLeftX + width;
 		openingLeft[1].z = bottomLeftY;
-		openingLeft[1].w = 1.0;
-		openingLeft[2].x = 0.0;
+		openingLeft[1].w = 1.0f;
+		openingLeft[2].x = 0.0f;
 		openingLeft[2].y = bottomLeftX + width;
 		openingLeft[2].z = bottomLeftY + height;
-		openingLeft[2].w = 1.0;
-		openingLeft[3].x = 0.0;
+		openingLeft[2].w = 1.0f;
+		openingLeft[3].x = 0.0f;
 		openingLeft[3].y = bottomLeftX;
 		openingLeft[3].z = bottomLeftY + height;
-		openingLeft[3].w = 1.0;
+		openingLeft[3].w = 1.0f;
 		break;
 	case Right:
 		openingOnRight = true;
 		openingRight = new vect3[4];
-		if (bottomLeftX < 0.0) { bottomLeftX = 0.0; }
-		if (bottomLeftY < 0.0) { bottomLeftY = 0.0; }
-		if (bottomLeftX >= sizeY) { bottomLeftX = sizeY * 0.25; }
-		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25; }
+		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
+		if (bottomLeftY < 0.0f) { bottomLeftY = 0.0f; }
+		if (bottomLeftX >= sizeY) { bottomLeftX = sizeY * 0.25f; }
+		if (bottomLeftY >= sizeZ) { bottomLeftY = sizeZ * 0.25f; }
 		if (bottomLeftX + width > sizeY) { width = sizeY - bottomLeftX; }
 		if (bottomLeftY + height > sizeZ) { height = sizeZ - bottomLeftY; }
 		openingRight[0].x = sizeX;
 		openingRight[0].y = bottomLeftX;
 		openingRight[0].z = bottomLeftY;
-		openingRight[0].w = 1.0;
+		openingRight[0].w = 1.0f;
 		openingRight[1].x = sizeX;
 		openingRight[1].y = bottomLeftX + width;
 		openingRight[1].z = bottomLeftY;
-		openingRight[1].w = 1.0;
+		openingRight[1].w = 1.0f;
 		openingRight[2].x = sizeX;
 		openingRight[2].y = bottomLeftX + width;
 		openingRight[2].z = bottomLeftY + height;
-		openingRight[2].w = 1.0;
+		openingRight[2].w = 1.0f;
 		openingRight[3].x = sizeX;
 		openingRight[3].y = bottomLeftX;
 		openingRight[3].z = bottomLeftY + height;
-		openingRight[3].w = 1.0;
+		openingRight[3].w = 1.0f;
 		break;
 	}
 }
@@ -332,7 +332,7 @@ void Room::splitPolygon(Side currentSide, polygon4uv* polyPtr, polyNode p, polyN
 {
 	handedness branch;
 	int leftCounter, rightCounter, totalCounter;
-	vect2 edgeStart, edgeEnd, intersectionPoint = { 0.0, 0.0, 0.0, 0.0 };
+	vect2 edgeStart, edgeEnd, intersectionPoint = { 0.0f, 0.0f, 0.0f, 0.0f };
 	
 	if (polyPtr->leftChild == nullptr && polyPtr->rightChild == nullptr)	//If polygon is childless
 	{
@@ -420,8 +420,8 @@ void Room::splitPolygon(Side currentSide, polygon4uv* polyPtr, polyNode p, polyN
 
 bool Room::checkForHole(Side currentSide, polygon4uv* poly, vect3* hole)
 {
-	double holeCentreX = 0.0, holeCentreY = 0.0;
-	double xMin, xMax, yMin, yMax;
+	float holeCentreX = 0.0f, holeCentreY = 0.0f;
+	float xMin, xMax, yMin, yMax;
 	xMin = poly->points[0].x;
 	xMax = poly->points[0].x;
 	yMin = poly->points[0].y;
@@ -482,8 +482,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 			{
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[1].x;	T.C.x	= polyTree->points[2].x;
 				T.A.y	= polyTree->points[0].y;	T.B.y	= polyTree->points[1].y;	T.C.y	= polyTree->points[2].y;
-				T.A.z	= 0.0;						T.B.z	= 0.0;						T.C.z	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.z	= 0.0f;						T.B.z	= 0.0f;						T.C.z	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -491,8 +491,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[2].x;	T.C.x	= polyTree->points[3].x;
 				T.A.y	= polyTree->points[0].y;	T.B.y	= polyTree->points[2].y;	T.C.y	= polyTree->points[3].y;
-				T.A.z	= 0.0;						T.B.z	= 0.0;						T.C.z	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.z	= 0.0f;						T.B.z	= 0.0f;						T.C.z	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -508,7 +508,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[1].x;	T.C.x	= polyTree->points[2].x;
 				T.A.y	= polyTree->points[0].y;	T.B.y	= polyTree->points[1].y;	T.C.y	= polyTree->points[2].y;
 				T.A.z	= sizeZ;					T.B.z	= sizeZ;					T.C.z	= sizeZ;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -517,7 +517,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[2].x;	T.C.x	= polyTree->points[3].x;
 				T.A.y	= polyTree->points[0].y;	T.B.y	= polyTree->points[2].y;	T.C.y	= polyTree->points[3].y;
 				T.A.z	= sizeZ;					T.B.z	= sizeZ;					T.C.z	= sizeZ;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -533,7 +533,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[1].x;	T.C.x	= polyTree->points[2].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[1].y;	T.C.z	= polyTree->points[2].y;
 				T.A.y	= sizeY;					T.B.y	= sizeY;					T.C.y	= sizeY;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -542,7 +542,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[2].x;	T.C.x	= polyTree->points[3].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[2].y;	T.C.z	= polyTree->points[3].y;
 				T.A.y	= sizeY;					T.B.y	= sizeY;					T.C.y	= sizeY;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -557,8 +557,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 			{
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[1].x;	T.C.x	= polyTree->points[2].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[1].y;	T.C.z	= polyTree->points[2].y;
-				T.A.y	= 0.0;						T.B.y	= 0.0;						T.C.y	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.y	= 0.0f;						T.B.y	= 0.0f;						T.C.y	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -566,8 +566,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 				T.A.x	= polyTree->points[0].x;	T.B.x	= polyTree->points[2].x;	T.C.x	= polyTree->points[3].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[2].y;	T.C.z	= polyTree->points[3].y;
-				T.A.y	= 0.0;						T.B.y	= 0.0;						T.C.y	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.y	= 0.0f;						T.B.y	= 0.0f;						T.C.y	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -582,8 +582,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 			{
 				T.A.y	= polyTree->points[0].x;	T.B.y	= polyTree->points[1].x;	T.C.y	= polyTree->points[2].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[1].y;	T.C.z	= polyTree->points[2].y;
-				T.A.x	= 0.0;						T.B.x	= 0.0;						T.C.x	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.x	= 0.0f;						T.B.x	= 0.0f;						T.C.x	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -591,8 +591,8 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 				T.A.y	= polyTree->points[0].x;	T.B.y	= polyTree->points[2].x;	T.C.y	= polyTree->points[3].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[2].y;	T.C.z	= polyTree->points[3].y;
-				T.A.x	= 0.0;						T.B.x	= 0.0;						T.C.x	= 0.0;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.x	= 0.0f;						T.B.x	= 0.0f;						T.C.x	= 0.0f;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -608,7 +608,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.y	= polyTree->points[0].x;	T.B.y	= polyTree->points[1].x;	T.C.y	= polyTree->points[2].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[1].y;	T.C.z	= polyTree->points[2].y;
 				T.A.x	= sizeX;					T.B.x	= sizeX;					T.C.x	= sizeX;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[1].u;	T.Ct.u	= polyTree->points[2].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[1].v;	T.Ct.v	= polyTree->points[2].v;
 
@@ -617,7 +617,7 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 				T.A.y	= polyTree->points[0].x;	T.B.y	= polyTree->points[2].x;	T.C.y	= polyTree->points[3].x;
 				T.A.z	= polyTree->points[0].y;	T.B.z	= polyTree->points[2].y;	T.C.z	= polyTree->points[3].y;
 				T.A.x	= sizeX;					T.B.x	= sizeX;					T.C.x	= sizeX;
-				T.A.w	= 1.0;						T.B.w	= 1.0;						T.C.w	= 1.0;
+				T.A.w	= 1.0f;						T.B.w	= 1.0f;						T.C.w	= 1.0f;
 				T.At.u	= polyTree->points[0].u;	T.Bt.u	= polyTree->points[2].u;	T.Ct.u	= polyTree->points[3].u;
 				T.At.v	= polyTree->points[0].v;	T.Bt.v	= polyTree->points[2].v;	T.Ct.v	= polyTree->points[3].v;
 
@@ -644,42 +644,42 @@ void Room::calculateMesh()
 
 	if (vC < 8)
 	{
-		p[vC].x = 0;			p[vC].y = 0;			p[vC].z = 0;			p[vC].w = 1.0;	//Bottom	-	Front	-	Left
+		p[vC].x = 0.0f;			p[vC].y = 0.0f;			p[vC].z = 0.0f;			p[vC].w = 1.0f;	//Bottom	-	Front	-	Left
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = sizeX;		p[vC].y = 0;			p[vC].z = 0;			p[vC].w = 1.0;	//Bottom	-	Front	-	Right
+		p[vC].x = sizeX;		p[vC].y = 0.0f;			p[vC].z = 0.0f;			p[vC].w = 1.0f;	//Bottom	-	Front	-	Right
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = sizeX;		p[vC].y = sizeY;		p[vC].z = 0;			p[vC].w = 1.0;	//Bottom	-	Back	-	Right
+		p[vC].x = sizeX;		p[vC].y = sizeY;		p[vC].z = 0.0f;			p[vC].w = 1.0f;	//Bottom	-	Back	-	Right
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = 0;			p[vC].y = sizeY;		p[vC].z = 0;			p[vC].w = 1.0;	//Bottom	-	Back	-	Left
+		p[vC].x = 0.0f;			p[vC].y = sizeY;		p[vC].z = 0.0f;			p[vC].w = 1.0f;	//Bottom	-	Back	-	Left
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = 0;			p[vC].y = 0;			p[vC].z = sizeZ;		p[vC].w = 1.0;	//Top		-	Front	-	Left
+		p[vC].x = 0.0f;			p[vC].y = 0.0f;			p[vC].z = sizeZ;		p[vC].w = 1.0f;	//Top		-	Front	-	Left
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = sizeX;		p[vC].y = 0;			p[vC].z = sizeZ;		p[vC].w = 1.0;	//Top		-	Front	-	Right
+		p[vC].x = sizeX;		p[vC].y = 0.0f;			p[vC].z = sizeZ;		p[vC].w = 1.0f;	//Top		-	Front	-	Right
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = sizeX;		p[vC].y = sizeY;		p[vC].z = sizeZ;		p[vC].w = 1.0;	//Top		-	Back	-	Right
+		p[vC].x = sizeX;		p[vC].y = sizeY;		p[vC].z = sizeZ;		p[vC].w = 1.0f;	//Top		-	Back	-	Right
 		vC++;
 	}
 	if (vC < 8)
 	{
-		p[vC].x = 0;			p[vC].y = sizeY;		p[vC].z = sizeZ;		p[vC].w = 1.0;	//Top		-	Back	-	Left
+		p[vC].x = 0.0f;			p[vC].y = sizeY;		p[vC].z = sizeZ;		p[vC].w = 1.0f;	//Top		-	Back	-	Left
 		vC++;
 	}
 
@@ -690,20 +690,20 @@ void Room::calculateMesh()
 	vect3 normal;
 	for (int i = 0; i < 4; i++)
 	{
-		pPoly[i] = { 0.0, 0.0, 0.0, 0.0 };
-		pHole[i] = { 0.0, 0.0, 0 };
+		pPoly[i] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		pHole[i] = { 0.0f, 0.0f, 0 };
 	}
 
 	if (isBottomOn)
 	{
-		normal = { 0.0,  0.0,  1.0,  0.0 };
+		normal = { 0.0f,  0.0f,  1.0f,  0.0f };
 
 		if (openingOnBottom)
 		{
-			pPoly[0].x = p[0].x;	pPoly[0].y = p[0].y;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[1].x;	pPoly[1].y = p[1].y;	pPoly[1].u = sizeX / txUBottom;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[0].x;	pPoly[0].y = p[0].y;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[1].x;	pPoly[1].y = p[1].y;	pPoly[1].u = sizeX / txUBottom;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[2].x;	pPoly[2].y = p[2].y;	pPoly[2].u = sizeX / txUBottom;		pPoly[2].v = sizeY / txUBottom;
-			pPoly[3].x = p[3].x;	pPoly[3].y = p[3].y;	pPoly[3].u = 0.0;					pPoly[3].v = sizeY / txUBottom;
+			pPoly[3].x = p[3].x;	pPoly[3].y = p[3].y;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeY / txUBottom;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -727,8 +727,8 @@ void Room::calculateMesh()
 
 			T.A = p[0];	T.B = p[3];	T.C = p[1];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = sizeY / txUBottom;
-			T.Bt.u = 0.0;					T.Bt.v = 0.0;
+			T.At.u = 0.0f;					T.At.v = sizeY / txUBottom;
+			T.Bt.u = 0.0f;					T.Bt.v = 0.0f;
 			T.Ct.u = sizeX / txUBottom;		T.Ct.v = sizeY / txUBottom;
 
 			T.texture = txtBottom;
@@ -739,8 +739,8 @@ void Room::calculateMesh()
 			T.A = p[1];	T.B = p[3];	T.C = p[2];		T.An = T.Bn = T.Cn = T.N = normal;
 
 			T.At.u = sizeX / txUBottom;		T.At.v = sizeY / txUBottom;
-			T.Bt.u = 0.0;					T.Bt.v = 0.0;
-			T.Ct.u = sizeX / txUBottom;		T.Ct.v = 0.0;
+			T.Bt.u = 0.0f;					T.Bt.v = 0.0f;
+			T.Ct.u = sizeX / txUBottom;		T.Ct.v = 0.0f;
 
 			this->addBottomPoly(T);
 		}
@@ -748,14 +748,14 @@ void Room::calculateMesh()
 
 	if (isFrontOn)
 	{
-		normal = { 0.0,  1.0,  0.0,  0.0 };
+		normal = { 0.0f,  1.0f,  0.0f,  0.0f };
 
 		if (openingOnFront)
 		{
-			pPoly[0].x = p[1].x;	pPoly[0].y = p[1].z;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[0].x;	pPoly[1].y = p[0].z;	pPoly[1].u = sizeX / txUFront;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[1].x;	pPoly[0].y = p[1].z;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[0].x;	pPoly[1].y = p[0].z;	pPoly[1].u = sizeX / txUFront;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[4].x;	pPoly[2].y = p[4].z;	pPoly[2].u = sizeX / txUFront;		pPoly[2].v = sizeZ / txUFront;
-			pPoly[3].x = p[5].x;	pPoly[3].y = p[5].z;	pPoly[3].u = 0.0;					pPoly[3].v = sizeZ / txUFront;
+			pPoly[3].x = p[5].x;	pPoly[3].y = p[5].z;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeZ / txUFront;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -778,9 +778,9 @@ void Room::calculateMesh()
 		{
 			T.A = p[0];	T.B = p[5];	T.C = p[4];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = 0.0;
+			T.At.u = 0.0f;					T.At.v = 0.0f;
 			T.Bt.u = sizeX / txUFront;		T.Bt.v = sizeZ / txUFront;
-			T.Ct.u = 0.0;					T.Ct.v = sizeZ / txUFront;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeZ / txUFront;
 
 			T.texture = txtFront;
 			T.colour = colFront;
@@ -789,8 +789,8 @@ void Room::calculateMesh()
 
 			T.A = p[0];	T.B = p[1];	T.C = p[5];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = 0.0;
-			T.Bt.u = sizeX / txUFront;		T.Bt.v = 0.0;
+			T.At.u = 0.0f;					T.At.v = 0.0f;
+			T.Bt.u = sizeX / txUFront;		T.Bt.v = 0.0f;
 			T.Ct.u = sizeX / txUFront;		T.Ct.v = sizeZ / txUFront;
 
 			this->addFrontPoly(T);
@@ -799,14 +799,14 @@ void Room::calculateMesh()
 
 	if (isBackOn)
 	{
-		normal = { 0.0, -1.0,  0.0,  0.0 };
+		normal = { 0.0f, -1.0f,  0.0f,  0.0f };
 
 		if (openingOnBack)
 		{
-			pPoly[0].x = p[3].x;	pPoly[0].y = p[3].z;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[2].x;	pPoly[1].y = p[2].z;	pPoly[1].u = sizeX / txUBack;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[3].x;	pPoly[0].y = p[3].z;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[2].x;	pPoly[1].y = p[2].z;	pPoly[1].u = sizeX / txUBack;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[6].x;	pPoly[2].y = p[6].z;	pPoly[2].u = sizeX / txUBack;		pPoly[2].v = sizeZ / txUBack;
-			pPoly[3].x = p[7].x;	pPoly[3].y = p[7].z;	pPoly[3].u = 0.0;					pPoly[3].v = sizeZ / txUBack;
+			pPoly[3].x = p[7].x;	pPoly[3].y = p[7].z;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeZ / txUBack;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -829,9 +829,9 @@ void Room::calculateMesh()
 		{
 			T.A = p[3];	T.B = p[7];	T.C = p[6];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = sizeX / txUBack;		T.At.v = 0.0;
+			T.At.u = sizeX / txUBack;		T.At.v = 0.0f;
 			T.Bt.u = sizeX / txUBack;		T.Bt.v = sizeZ / txUBack;
-			T.Ct.u = 0.0;					T.Ct.v = sizeZ / txUBack;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeZ / txUBack;
 
 			T.texture = txtBack;
 			T.colour = colBack;
@@ -840,9 +840,9 @@ void Room::calculateMesh()
 
 			T.A = p[3];	T.B = p[6];	T.C = p[2];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = sizeX / txUBack;		T.At.v = 0.0;
-			T.Bt.u = 0.0;					T.Bt.v = sizeZ / txUBack;
-			T.Ct.u = 0.0;					T.Ct.v = 0.0;
+			T.At.u = sizeX / txUBack;		T.At.v = 0.0f;
+			T.Bt.u = 0.0f;					T.Bt.v = sizeZ / txUBack;
+			T.Ct.u = 0.0f;					T.Ct.v = 0.0f;
 
 			this->addBackPoly(T);
 		}
@@ -850,14 +850,14 @@ void Room::calculateMesh()
 
 	if (isTopOn)
 	{
-		normal = { 0.0, 0.0, -1.0, 0.0 };
+		normal = { 0.0f, 0.0f, -1.0f, 0.0f };
 
 		if (openingOnTop)
 		{
-			pPoly[0].x = p[7].x;	pPoly[0].y = p[7].y;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[6].x;	pPoly[1].y = p[6].y;	pPoly[1].u = sizeX / txUTop;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[7].x;	pPoly[0].y = p[7].y;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[6].x;	pPoly[1].y = p[6].y;	pPoly[1].u = sizeX / txUTop;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[5].x;	pPoly[2].y = p[5].y;	pPoly[2].u = sizeX / txUTop;		pPoly[2].v = sizeY / txUTop;
-			pPoly[3].x = p[4].x;	pPoly[3].y = p[4].y;	pPoly[3].u = 0.0;					pPoly[3].v = sizeY / txUTop;
+			pPoly[3].x = p[4].x;	pPoly[3].y = p[4].y;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeY / txUTop;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -880,9 +880,9 @@ void Room::calculateMesh()
 		{
 			T.A = p[4];	T.B = p[5];	T.C = p[7];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = 0.0;
-			T.Bt.u = sizeX / txUTop;		T.Bt.v = 0.0;
-			T.Ct.u = 0.0;					T.Ct.v = sizeY / txUTop;
+			T.At.u = 0.0f;					T.At.v = 0.0f;
+			T.Bt.u = sizeX / txUTop;		T.Bt.v = 0.0f;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeY / txUTop;
 
 			T.texture = txtTop;
 			T.colour = colTop;
@@ -891,9 +891,9 @@ void Room::calculateMesh()
 
 			T.A = p[5];	T.B = p[6];	T.C = p[7];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = sizeX / txUTop;		T.At.v = 0.0;
+			T.At.u = sizeX / txUTop;		T.At.v = 0.0f;
 			T.Bt.u = sizeX / txUTop;		T.Bt.v = sizeY / txUTop;
-			T.Ct.u = 0.0;					T.Ct.v = sizeY / txUTop;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeY / txUTop;
 
 			this->addTopPoly(T);
 		}
@@ -901,14 +901,14 @@ void Room::calculateMesh()
 
 	if (isLeftOn)
 	{
-		normal = { 1.0,  0.0,  0.0,  0.0 };
+		normal = { 1.0f,  0.0f,  0.0f,  0.0f };
 
 		if (openingOnLeft)
 		{
-			pPoly[0].x = p[0].y;	pPoly[0].y = p[0].z;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[3].y;	pPoly[1].y = p[3].z;	pPoly[1].u = sizeY / txULeft;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[0].y;	pPoly[0].y = p[0].z;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[3].y;	pPoly[1].y = p[3].z;	pPoly[1].u = sizeY / txULeft;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[7].y;	pPoly[2].y = p[7].z;	pPoly[2].u = sizeY / txULeft;		pPoly[2].v = sizeZ / txULeft;
-			pPoly[3].x = p[4].y;	pPoly[3].y = p[4].z;	pPoly[3].u = 0.0;					pPoly[3].v = sizeZ / txULeft;
+			pPoly[3].x = p[4].y;	pPoly[3].y = p[4].z;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeZ / txULeft;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -931,9 +931,9 @@ void Room::calculateMesh()
 		{
 			T.A = p[0];	T.B = p[7];	T.C = p[3];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = sizeY / txULeft;		T.At.v = 0.0;
-			T.Bt.u = 0.0;					T.Bt.v = sizeZ / txULeft;
-			T.Ct.u = 0.0;					T.Ct.v = 0.0;
+			T.At.u = sizeY / txULeft;		T.At.v = 0.0f;
+			T.Bt.u = 0.0f;					T.Bt.v = sizeZ / txULeft;
+			T.Ct.u = 0.0f;					T.Ct.v = 0.0f;
 
 			T.texture = txtLeft;
 			T.colour = colLeft;
@@ -942,9 +942,9 @@ void Room::calculateMesh()
 
 			T.A = p[0];	T.B = p[4];	T.C = p[7];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = sizeY / txULeft;		T.At.v = 0.0;
+			T.At.u = sizeY / txULeft;		T.At.v = 0.0f;
 			T.Bt.u = sizeY / txULeft;		T.Bt.v = sizeZ / txULeft;
-			T.Ct.u = 0.0;					T.Ct.v = sizeZ / txULeft;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeZ / txULeft;
 
 			this->addLeftPoly(T);
 		}
@@ -952,14 +952,14 @@ void Room::calculateMesh()
 
 	if (isRightOn)
 	{
-		normal = { -1.0,  0.0,  0.0,  0.0 };
+		normal = { -1.0f,  0.0f,  0.0f,  0.0f };
 
 		if (openingOnRight)
 		{
-			pPoly[0].x = p[2].y;	pPoly[0].y = p[2].z;	pPoly[0].u = 0.0;					pPoly[0].v = 0.0;
-			pPoly[1].x = p[1].y;	pPoly[1].y = p[1].z;	pPoly[1].u = sizeY / txURight;		pPoly[1].v = 0.0;
+			pPoly[0].x = p[2].y;	pPoly[0].y = p[2].z;	pPoly[0].u = 0.0f;					pPoly[0].v = 0.0f;
+			pPoly[1].x = p[1].y;	pPoly[1].y = p[1].z;	pPoly[1].u = sizeY / txURight;		pPoly[1].v = 0.0f;
 			pPoly[2].x = p[5].y;	pPoly[2].y = p[5].z;	pPoly[2].u = sizeY / txURight;		pPoly[2].v = sizeZ / txURight;
-			pPoly[3].x = p[6].y;	pPoly[3].y = p[6].z;	pPoly[3].u = 0.0;					pPoly[3].v = sizeZ / txURight;
+			pPoly[3].x = p[6].y;	pPoly[3].y = p[6].z;	pPoly[3].u = 0.0f;					pPoly[3].v = sizeZ / txURight;
 
 			currentPoly.points[0]	= pPoly[0];
 			currentPoly.points[1]	= pPoly[1];
@@ -982,9 +982,9 @@ void Room::calculateMesh()
 		{
 			T.A = p[1];	T.B = p[6];	T.C = p[5];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = 0.0;
+			T.At.u = 0.0f;					T.At.v = 0.0f;
 			T.Bt.u = sizeY / txURight;		T.Bt.v = sizeZ / txURight;
-			T.Ct.u = 0.0;					T.Ct.v = sizeZ / txURight;
+			T.Ct.u = 0.0f;					T.Ct.v = sizeZ / txURight;
 
 			T.texture = txtRight;
 			T.colour = colRight;
@@ -993,8 +993,8 @@ void Room::calculateMesh()
 			
 			T.A = p[1];	T.B = p[2];	T.C = p[6];		T.An = T.Bn = T.Cn = T.N = normal;
 
-			T.At.u = 0.0;					T.At.v = 0.0;
-			T.Bt.u = sizeY / txURight;		T.Bt.v = 0.0;
+			T.At.u = 0.0f;					T.At.v = 0.0f;
+			T.Bt.u = sizeY / txURight;		T.Bt.v = 0.0f;
 			T.Ct.u = sizeY / txURight;		T.Ct.v = sizeZ / txURight;
 
 			this->addRightPoly(T);
@@ -1082,4 +1082,10 @@ void Room::getTriangleData(triangle3dV* t)
 			t[tC].C.x += position.x;	t[tC].C.y += position.y;	t[tC].C.z += position.z;
 		}
 	}
+
+	nPoly = tCount;
+
+	Projector->transformMesh(nPoly, t, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }

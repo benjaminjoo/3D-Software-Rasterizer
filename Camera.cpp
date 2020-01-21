@@ -26,7 +26,7 @@ Camera::Camera():
 }
 
 
-Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
+Camera::Camera(float cx, float cy, float cz, int width, int height, int s):
 	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
 	fovH(PI* 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
@@ -43,8 +43,8 @@ Camera::Camera(double cx, double cy, double cz, int width, int height, int s):
 }
 
 
-Camera::Camera(double cx, double cy, double cz, double az, double al, double rl, double stp, double trn,
-	double fov, double nr, double fr, int width, int height, int s):
+Camera::Camera(float cx, float cy, float cz, float az, float al, float rl, float stp, float trn,
+	float fov, float nr, float fr, int width, int height, int s):
 	x(cx), y(cy), z(cz), step(stp), turn(trn), azm(az), alt(al), rol(rl),
 	fovH(fov), zNear(nr), zFar(fr), w(width), h(height)
 {
@@ -101,25 +101,25 @@ void Camera::addTexture(txt t)
 }
 
 
-double Camera::getFovH()
+float Camera::getFovH()
 {
 	return fovH;
 }
 
 
-double Camera::getFovV()
+float Camera::getFovV()
 {
 	return (atan(tan(fovH * 0.5) / (w / h))) * 2;
 }
 
 
-double Camera::getHRatio()
+float Camera::getHRatio()
 {
 	return 1 / (tan(fovH / 2));
 }
 
 
-double Camera::getVRatio()
+float Camera::getVRatio()
 {
 	return 1 / (tan(atan(tan(fovH * 0.5) / (w / h) * 2)));
 }
@@ -149,9 +149,9 @@ void Camera::clearVertexList()
 }
 
 
-int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList, double* specList)
+int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList, float* specList)
 {
-	memset(vertList, 0, MAXCLIPVERTS * sizeof(double));
+	memset(vertList, 0, MAXCLIPVERTS * sizeof(float));
 
 	vertList[0] = viewT.A;	uvList[0] = viewT.At;	specList[0] = illSpec[0];
 	vertList[1] = viewT.B;	uvList[1] = viewT.Bt;	specList[1] = illSpec[1];
@@ -177,12 +177,12 @@ int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* 
 }
 
 
-inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, double* specList, plane clippingPlane)
+inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, float* specList, plane clippingPlane)
 {
 	int nResult = 0;
 	vect3 vTemp[MAXCLIPVERTS];
 	textCoord uvTemp[MAXCLIPVERTS];
-	double specTemp[MAXCLIPVERTS];
+	float specTemp[MAXCLIPVERTS];
 
 	for (int i = 0; i < *nVert; i++)
 	{
@@ -211,29 +211,29 @@ inline void Camera::clipPoly(int* nVert, vect3 * vertList, textCoord * uvList, d
 
 
 inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
-	const double& startSpec, const double& endSpec, int* nResult, vect3 * vTemp, textCoord * uvTemp, double* specTemp)
+	const float& startSpec, const float& endSpec, int* nResult, vect3 * vTemp, textCoord * uvTemp, float* specTemp)
 {
-	double t;
+	float t;
 	//vect3 a = subVectors(startV, p.P);
 	//vect3 a = startV - p.P;
 	vect3 a = { startV.x - p.P.x, startV.y - p.P.y, startV.z - p.P.z, 1.0 };
-	//double sStart = dotProduct(a, p.N);
-	//double sStart = a * p.N;
-	double sStart = a.x * p.N.x + a.y * p.N.y + a.z * p.N.z;
+	//float sStart = dotProduct(a, p.N);
+	//float sStart = a * p.N;
+	float sStart = a.x * p.N.x + a.y * p.N.y + a.z * p.N.z;
 	//vect3 b = subVectors(endV, p.P);
 	//vect3 b = endV - p.P;
 	vect3 b = { endV.x - p.P.x, endV.y - p.P.y, endV.z - p.P.z, 1.0 };
-	//double sEnd = dotProduct(b, p.N);	
-	//double sEnd = b * p.N;
-	double sEnd = b.x * p.N.x + b.y * p.N.y + b.z * p.N.z;
+	//float sEnd = dotProduct(b, p.N);	
+	//float sEnd = b * p.N;
+	float sEnd = b.x * p.N.x + b.y * p.N.y + b.z * p.N.z;
 	if (sign(sStart) != sign(sEnd))
 	{
 		//vect3 d = subVectors(endV, startV);
 		//vect3 d = endV - startV;
 		vect3 d = { endV.x - startV.x, endV.y - startV.y, endV.z - startV.z, 1.0f };
-		//double dist = dotProduct(d, p.N);	
-		//double dist = d * p.N;
-		double dist = d.x * p.N.x + d.y * p.N.y + d.z * p.N.z;
+		//float dist = dotProduct(d, p.N);	
+		//float dist = d * p.N;
+		float dist = d.x * p.N.x + d.y * p.N.y + d.z * p.N.z;
 		
 		if(sStart < 0)
 		{
@@ -370,7 +370,7 @@ bool Camera::pointInsideFrustum(vect3& V)
 bool Camera::pointBehindPlane(const plane& p, vect3& V)
 {
 	vect3 a = V - p.P;
-	double sa = a * p.N;
+	float sa = a * p.N;
 	if (sa <= 0.0f)
 		return true;
 	else
@@ -410,15 +410,15 @@ mat4x4 Camera::getTranslation()
 }
 
 
-mat4x4 Camera::getRotation(axis t, double a)
+mat4x4 Camera::getRotation(axis t, float a)
 {
 	mat4x4 result = {   1.0f, 0.0f, 0.0f, 0.0f,
 						0.0f, 1.0f, 0.0f, 0.0f,
 						0.0f, 0.0f, 1.0f, 0.0f,
 						0.0f, 0.0f, 0.0f, 1.0f };
 
-	double sinA = sin(a);
-	double cosA = cos(a);
+	float sinA = sin(a);
+	float cosA = cos(a);
 
 	switch (t)
 	{
@@ -492,7 +492,7 @@ void Camera::world2viewPointM(point3 & P, mat4x4 & RM)
 }
 
 
-void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, double* depthBuffer)
+void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float* depthBuffer)
 {
 	this->world2viewPointM(p, RM);
 	if (pointInsideFrustum(p.P))
@@ -500,7 +500,7 @@ void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, double* dept
 }
 
 
-void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
+void Camera::projectPoint(point3 P, Uint32* pixelBuffer, float* depthBuffer)
 {
 	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
 	if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
@@ -512,7 +512,7 @@ void Camera::projectPoint(point3 P, Uint32* pixelBuffer, double* depthBuffer)
 
 
 void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
-	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+	LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	mat4x4 RM	= rot * mov;
 	mat4x4 M	= mov;
@@ -528,7 +528,7 @@ void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4
 
 
 void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
-	LightSource Sun, const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+	LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	mat4x4 rotX	= getRotation(axis::x, rt.x);
 
@@ -558,7 +558,7 @@ void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4
 
 
 void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSource Sun,
-	const projectionStyle& visualStyle, double torchIntensity, double maxIllumination)
+	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	triangle3dV worldT = viewT;
 
@@ -583,7 +583,7 @@ void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSourc
 }
 
 
-void Camera::getSpec(double* illSp, LightSource Light, const triangle3dV& worldT, double shine)
+void Camera::getSpec(float* illSp, LightSource Light, const triangle3dV& worldT, float shine)
 {
 	illSp[0] = Light.getBlinnSpecular(worldT.An, viewDirection, shine);
 	illSp[1] = Light.getBlinnSpecular(worldT.Bn, viewDirection, shine);
@@ -591,11 +591,11 @@ void Camera::getSpec(double* illSp, LightSource Light, const triangle3dV& worldT
 }
 
 
-inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const double& vR)
+inline coord2 Camera::view2screen(const vect3& vertex, const float& hR, const float& vR)
 {
 	coord2 pixel;
 
-	double s = double(w) * 0.475f; //w* 0.5f* 0.95f
+	float s = float(w) * 0.475f; //w* 0.5f* 0.95f
 
 	pixel.x = (int)(w * 0.5 + (vertex.x / vertex.z) * s * hR);
 	pixel.y = (int)(h * 0.5 - (vertex.y / vertex.z) * s * vR);
@@ -605,7 +605,7 @@ inline coord2 Camera::view2screen(const vect3& vertex, const double& hR, const d
 }
 
 
-void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double torchI, double maxI, triangle3dV originalPoly)
+void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torchI, float maxI, triangle3dV originalPoly)
 {
 	if (style == wireframe)
 	{
@@ -676,7 +676,7 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, double tor
 			break;
 			case blinn_phong:
 			{
-				double specular[3];
+				float specular[3];
 				specular[0] = specularList[0];
 				specular[1] = specularList[1 + i];
 				specular[2] = specularList[2 + i];

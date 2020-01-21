@@ -14,10 +14,13 @@ class SolidSTL: public SolidBody
 
 	std::ifstream				modelFile;
 
+	bool						centered	= true;
+	float						rotZ		= -PI * 0.5f;
+
 public:
 	SolidSTL(std::string);
-	SolidSTL(double, double, double, Uint32, int, std::string);
-	SolidSTL(double, double, double, double, double, double, double, double, double, Uint32, int, std::string);
+	SolidSTL(float, float, float, Uint32, int, std::string);
+	SolidSTL(float, float, float, float, float, float, float, float, float, Uint32, int, std::string);
 	~SolidSTL();
 
 	virtual int	getTotalVert();
@@ -26,6 +29,7 @@ public:
 
 	void readSTLfile();
 	void smoothSurfaces();
+	void centreXY();
 
 	bool match(const vect3& a, const vect3& b)
 	{

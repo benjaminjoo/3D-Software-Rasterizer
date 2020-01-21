@@ -22,7 +22,7 @@ Canvas::Canvas(const std::string& windowTitle)
 	size = w * h;
 
 	pixelBuffer = new Uint32[size];
-	depthBuffer = new double[size];
+	depthBuffer = new float[size];
 
 	for (int i = 0; i < size; i++)
 	{
@@ -32,7 +32,7 @@ Canvas::Canvas(const std::string& windowTitle)
 }
 
 
-Canvas::Canvas(const std::string& windowTitle, int width, int height, double z):
+Canvas::Canvas(const std::string& windowTitle, int width, int height, float z):
 	w(width), h(height), zFar(z)
 {
 	std::cout << "Canvas constructor called" << std::endl;
@@ -48,7 +48,7 @@ Canvas::Canvas(const std::string& windowTitle, int width, int height, double z):
 	size = w * h;
 
 	pixelBuffer = new Uint32[size];
-	depthBuffer = new double[size];
+	depthBuffer = new float[size];
 
 	for (int i = 0; i < size; i++)
 	{
@@ -94,7 +94,7 @@ void Canvas::resetPixelBuffer()
 
 void Canvas::resetDepthBuffer()
 {
-	for (double* i = depthBuffer, *end = &depthBuffer[size]; i != end; i++)
+	for (float* i = depthBuffer, *end = &depthBuffer[size]; i != end; i++)
 		* i = zFar;
 }
 
@@ -580,7 +580,7 @@ void Canvas::drawSnapTarget(screenCoord P, Uint32 colour)
 }
 
 
-void Canvas::displayFps(double value, int dec, int shiftH, int shiftV)
+void Canvas::displayFps(float value, int dec, int shiftH, int shiftV)
 {
 	int* fract = getFractionals(value, dec);
 	int nInt = 0;
@@ -643,7 +643,7 @@ void Canvas::displayFps(double value, int dec, int shiftH, int shiftV)
 }
 
 
-void Canvas::displayValue(double value, int dec, int shiftH, int shiftV, Uint32 colour)
+void Canvas::displayValue(float value, int dec, int shiftH, int shiftV, Uint32 colour)
 {
 	bool isSigned;
 	isSigned = value >= 0.0 ? false : true;

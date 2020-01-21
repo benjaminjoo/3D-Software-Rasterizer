@@ -6,11 +6,13 @@
 
 
 
-BSP3Loader::BSP3Loader(std::string f, double sx, double sy, double sz)
+BSP3Loader::BSP3Loader(std::string f, float sx, float sy, float sz)
 {
 	fileName	= f;
 	scale		= { sx, sy, sz, 1.0f };
 	patchLod	= 12;
+
+	readData();
 }
 
 
@@ -19,6 +21,8 @@ BSP3Loader::BSP3Loader(std::string f, vect3 s)
 	fileName	= f;
 	scale		= s;
 	patchLod	= 12;
+
+	readData();
 }
 
 
@@ -104,9 +108,9 @@ void BSP3Loader::readData()
 			unsigned char vert_a = vertexString[3];
 
 			point3 tempPoint;
-			tempPoint.P.x = (double)vert_x * scale.x;
-			tempPoint.P.y = (double)vert_y * scale.y;
-			tempPoint.P.z = (double)vert_z * scale.z;
+			tempPoint.P.x = (float)vert_x * scale.x;
+			tempPoint.P.y = (float)vert_y * scale.y;
+			tempPoint.P.z = (float)vert_z * scale.z;
 			tempPoint.P.w = 1.0;
 			tempPoint.colour = getColour(vert_a, vert_r, vert_g, vert_b);
 
@@ -425,8 +429,13 @@ void BSP3Loader::getTriangleData(triangle3dV* T)
 	}
 	polyContainer.shrink_to_fit();
 
-	for (int i = 0; i < this->getTotalPoly(); i++)
+	nPoly = this->getTotalPoly();
+
+	for (int i = 0; i < nPoly; i++)
 	{
 		T[i] = polyContainer[i];
 	}
+	Projector->transformMesh(nPoly, T, scale.x, scale.y, scale.z,
+										position.x, position.y, position.z,
+										rotation.x, rotation.y, rotation.z);
 }

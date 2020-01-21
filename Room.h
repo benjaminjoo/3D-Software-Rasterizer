@@ -6,9 +6,9 @@
 class Room: public SolidBody
 {
 
-	double			sizeX				= 2.0f;
-	double			sizeY				= 2.0f;
-	double			sizeZ				= 2.0f;
+	float			sizeX				= 2.0f;
+	float			sizeY				= 2.0f;
+	float			sizeZ				= 2.0f;
 
 	Uint32			colBottom			= 0x000000ff;
 	Uint32			colTop				= 0x000000ff;
@@ -24,12 +24,12 @@ class Room: public SolidBody
 	int				txtLeft				= 1;
 	int				txtRight			= 1;
 
-	double			txUBottom			= 1.0f;
-	double			txUTop				= 1.0f;
-	double			txUBack				= 1.0f;
-	double			txUFront			= 1.0f;
-	double			txULeft				= 1.0f;
-	double			txURight			= 1.0f;
+	float			txUBottom			= 1.0f;
+	float			txUTop				= 1.0f;
+	float			txUBack				= 1.0f;
+	float			txUFront			= 1.0f;
+	float			txULeft				= 1.0f;
+	float			txURight			= 1.0f;
 
 	bool			isBottomOn			= true;
 	bool			isTopOn				= true;
@@ -62,18 +62,18 @@ class Room: public SolidBody
 public:
 
 	Room();
-	Room(double, double, double, double, double, double);
+	Room(float, float, float, float, float, float);
 	~Room();
 
-	void setPosition(double, double, double);
-	void setDimension(double, double, double);
-	void setRotation(double, double, double);
+	void setPosition(float, float, float);
+	void setDimension(float, float, float);
+	void setRotation(float, float, float);
 	void setColour(Uint32 bottom, Uint32 top, Uint32 back, Uint32 front, Uint32 left, Uint32 right);
 	void setTexture(int bottom, int top, int back, int front, int left, int right);
-	void setTextureScale(double bottom, double top, double back, double front, double left, double right);
+	void setTextureScale(float bottom, float top, float back, float front, float left, float right);
 	void setSideOn(bool bottom, bool top, bool back, bool front, bool left, bool right);
 
-	void addOpening(Side, double, double, double, double);
+	void addOpening(Side, float, float, float, float);
 
 	void addBottomPoly(triangle3dV);
 	void addTopPoly(triangle3dV);

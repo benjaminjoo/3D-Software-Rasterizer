@@ -16,7 +16,7 @@ class Canvas
 	int cursorSize	= 16;
 	int iconSize	= 32;
 
-	double zFar		= 100.0f;
+	float zFar		= 100.0f;
 
 public:
 
@@ -27,10 +27,10 @@ public:
 	SDL_Texture*	sdl_texture = nullptr;
 
 	Uint32* pixelBuffer;
-	double* depthBuffer;
+	float* depthBuffer;
 
 	Canvas(const std::string& windowTitle);
-	Canvas(const std::string& windowTitle, int, int, double);
+	Canvas(const std::string& windowTitle, int, int, float);
 	~Canvas();
 
 	void update();
@@ -49,8 +49,8 @@ public:
 	void drawCrosshair(int, int, Uint32);
 	void drawMouseCursor(editingMode, screenCoord position, Uint32 colour);
 	void drawSnapTarget(screenCoord position, Uint32 colour);
-	void displayFps(double value, int dec, int shiftH, int shiftV);
-	void displayValue(double value, int dec, int shiftH, int shiftV, Uint32 col);
+	void displayFps(float value, int dec, int shiftH, int shiftV);
+	void displayValue(float value, int dec, int shiftH, int shiftV, Uint32 col);
 	void displayString(const char* text, int shiftH, int shiftV, Uint32 col);
 };
 

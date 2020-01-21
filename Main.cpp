@@ -37,6 +37,7 @@
 #include "Player.h"
 #include "ParticleSystem.h"
 #include "DynamicMesh.h"
+#include "Terrain.h"
 
 
 void editor()
@@ -96,16 +97,19 @@ void water()
 
 	testWorld->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
 
-	auto Sea		= std::make_shared<DynamicMesh>(36, 36, 8.0f, 0.25f, 5.0f, 2.5f, 0x00007fbf, false);
+	auto Sea		= std::make_shared<DynamicMesh>(10, 10, 8.0f, 0.25f, 5.0f, 2.5f, 0x00007fbf, false);
 
-	testWorld->addDynamicSurface(Sea);
+	//testWorld->addDynamicSurface(Sea);
 
-	//testWorld->buildMesh();
+	auto asteroid_surface = std::make_shared<Terrain>("Assets/Textures/seafloor_large.jpg",
+													256, 256, 2125.0f, 1600.0f, 2.0f, 1.0f, -50.0f, 0x000000ff, false);
+
+	testWorld->addStaticSurface(asteroid_surface);
 
 	while (!Controls->quit)
+	{
 		testWorld->updateAll();
-
-	//testWorld->destroyMesh();
+	}	
 
 	IMG_Quit();
 
@@ -127,9 +131,9 @@ void fps_game()
 
 	auto Hero		= std::make_shared<Player>(15.0f, 20.0f, 2.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);	
 
-	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32);
+	auto weapon		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32, true);
 
-	Hero->addPart(weapon);
+	//Hero->addPart(weapon);
 
 	auto Observer	= std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
@@ -153,7 +157,7 @@ void fps_game()
 #ifdef _QUAKE_1_READER_
 
 	auto quake1Map = std::make_shared<BSP1Loader>("Assets/QuakeMaps/dm6.bsp", 0.01f, 0.01f, 0.01f);
-	quake1Map->readData();
+	//quake1Map->readData();
 	fpsGame->addEntity(quake1Map);
 
 	int nTxt = quake1Map->getTotalText();
@@ -176,8 +180,8 @@ void fps_game()
 #ifdef _STL_READER_
 
 	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
-	teapot->readSTLfile();
-	teapot->smoothSurfaces();
+	//teapot->readSTLfile();
+	//teapot->smoothSurfaces();
 	fpsGame->addEntity(teapot);
 
 	auto board = std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, -15.0f, -15.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0x0000007f, 6, 30.0f, 30.0f, 1.0f);
@@ -215,8 +219,8 @@ void fps_game()
 
 #ifdef _QUAKE_3_READER_
 
-	auto quake3Map = std::make_shared<BSP3Loader>("Assets/QuakeMaps/13ground.bsp", 0.01f, 0.01f, 0.01f);
-	quake3Map->readData();
+	auto quake3Map = std::make_shared<BSP3Loader>("Assets/QuakeMaps/13ground.bsp", 0.1f, 0.1f, 0.1f);
+	//quake3Map->readData();
 	fpsGame->addEntity(quake3Map);
 
 #endif//_QUAKE_3_READER_
@@ -257,20 +261,21 @@ void fps_game()
 	fpsGame->addEntity(box);
 	fpsGame->addEntity(pedestal);
 	fpsGame->addEntity(wall);
+	fpsGame->addEntity(dome);
 
 	//Add some spheres floating around
 	srand(unsigned int(time(NULL)));
 	for (int i = 0; i < 10; i++)
 	{
-		double x = double(rand() % 20) * 1.0f + 5.0f;
-		double y = double(rand() % 30) * 1.0f + 5.0f;
-		double z = double(rand() % 10) * 1.0f + 5.0f;
+		float x = float(rand() % 20) * 1.0f + 5.0f;
+		float y = float(rand() % 30) * 1.0f + 5.0f;
+		float z = float(rand() % 10) * 1.0f + 5.0f;
 	
-		double vx = (-5.0f + double(rand() % 10)) * 0.05f;
-		double vy = (-5.0f + double(rand() % 10)) * 0.05f;
-		double vz = (-5.0f + double(rand() % 10)) * 0.05f;
+		float vx = (-5.0f + float(rand() % 10)) * 0.05f;
+		float vy = (-5.0f + float(rand() % 10)) * 0.05f;
+		float vz = (-5.0f + float(rand() % 10)) * 0.05f;
 	
-		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 8);
+		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 8, true);
 	
 		ball->setBBRadius(1.0f);
 		ball->setGravity(false);
@@ -287,9 +292,9 @@ void fps_game()
 	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
-	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4);
-	auto e_031		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff00ff00, 7, 0.25f, 3.0f, 4);
-	auto e_041		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
+	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4, true);
+	auto e_031		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff00ff00, 7, 0.25f, 3.0f, 4, true);
+	auto e_041		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4, true);
 
 	Enemy1->addPart(e_011);
 	Enemy1->addPart(e_021);
@@ -301,9 +306,9 @@ void fps_game()
 	auto Enemy2		= std::make_shared<Player>(40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_012		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 7, 1.5f, 8);
-	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
-	auto e_032		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
-	auto e_042		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4);
+	auto e_022		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4, true);
+	auto e_032		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xff0000ff, 7, 0.25f, 3.0f, 4, true);
+	auto e_042		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xff0000ff, 7, 0.25f, 3.0f, 4, true);
 
 	Enemy2->addPart(e_012);
 	Enemy2->addPart(e_022);
@@ -315,9 +320,9 @@ void fps_game()
 	auto Enemy3 = std::make_shared<Player>(-40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_013 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, 7, 1.5f, 8);
-	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
-	auto e_033 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4);
-	auto e_043 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xffffff00, 7, 0.25f, 3.0f, 4);
+	auto e_023 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4, true);
+	auto e_033 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0xffffff00, 7, 0.25f, 3.0f, 4, true);
+	auto e_043 = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0xffffff00, 7, 0.25f, 3.0f, 4, true);
 
 	Enemy3->addPart(e_013);
 	Enemy3->addPart(e_023);
@@ -325,6 +330,9 @@ void fps_game()
 	Enemy3->addPart(e_043);
 
 	fpsGame->addEnemy(Enemy3);
+
+	auto cockpit = std::make_shared<SolidSTL>(0.1f, 0.1f, 0.1f, -0.2f, 0.0f, 0.0f, 0.0f, PI * 0.25f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/cockpit.stl");
+	Hero->addPart(cockpit);
 
 #endif//_SHOOTER_
 
@@ -344,7 +352,6 @@ void fps_game()
 	waterFountain->setDispersion(0.01f);
 	waterFountain->activate();
 	waterFountain->setGravity(true);
-
 
 	//Game->buildMesh();
 	fpsGame->addEmitter(waterFountain);
@@ -368,27 +375,40 @@ void fps_game()
 
 void opengl_renderer()
 {
-	OpenGLCanvas Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Renderer");
+	OpenGLCanvas Screen(1200, 600, "OpenGL Renderer");
 	OpenGLCamera Eye(glm::vec3(0.0f, 0.0f, 0.0f), 70.0f, Screen.getAspect(), 0.1f, 100.0f);
 	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	EventHandler Controls(0.01f, 0.01f, 0.01f);
+	//EventHandler Controls(0.1f, 10000.0f, 314.0f);
 
 	Shapes Solids;
 	Shapes Actors;
 
-
-	BSP1Loader quakeMap("dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
-	quakeMap.readData();
-	SolidBody* map = &quakeMap;
+	BSP3Loader q3map("Assets/QuakeMaps/13ground.bsp", 0.1f, 0.1f, 0.1f);
+	SolidBody* map = &q3map;
+	//BSP1Loader quakeMap("Assets/QuakeMaps/dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	//quakeMap.readData();
+	//SolidBody* map = &quakeMap;	
 	Solids.addSolid(map);
-	int nTxt = quakeMap.getTotalText();
-	txt* quakeTextures = new txt[nTxt];
-	for (int i = 0; i < nTxt; i++)
-	{
-		quakeTextures[i] = quakeMap.getTextureData(i);
-	}
-	Solids.textureLoaderQ(nTxt, quakeTextures);
+
+	Solids.addTextureData(IMG_Load("Assets/Textures/blue.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/wolf001.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/wolf002.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/mosaic001.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/brick001.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/concrete001.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/timber.jpg"));
+	Solids.addTextureData(IMG_Load("Assets/Textures/metal.jpg"));
+	
+
+	//int nTxt = quakeMap.getTotalText();
+	//txt* quakeTextures = new txt[nTxt];
+	//for (int i = 0; i < nTxt; i++)
+	//{
+	//	quakeTextures[i] = quakeMap.getTextureData(i);
+	//}
+	//Solids.textureLoaderQ(nTxt, quakeTextures);
 
 
 	OpenGLAdapter VertexPump(&Solids, &Actors);
@@ -402,19 +422,25 @@ void opengl_renderer()
 	SDL_Surface* textures[] = { IMG_Load("Textures/blue.jpg"),
 								IMG_Load("Textures/timber.jpg") };
 
+	float z = 0.001f;
+
 	while(!Controls.quit)
 	{
 		Screen.clear(0.5f, 0.5f, 1.0f, 0.0f);
+
+		Controls.HandleUserEvents();
+		View.updateAll(Controls);
+
 
 		shader_01.bind();
 		shader_01.update(View, Eye);
 		mesh_01.drawMesh();
 		
-		Controls.HandleUserEvents();
-		View.updateAll(Controls);
 		Controls.ceaseMotion();
 
 		Screen.update();
+
+		//std::cout << "z: " << Controls.turnH << std::endl;
 	}
 
 	delete[] vertices;
@@ -425,7 +451,7 @@ void opengl_renderer()
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to play the Game <P>, see some waves <W> or use the Editor <E>?" << std::endl;
+	std::cout << "Do you want to play the Game <P>, test the OpenGL version <O>, see some waves <W> or use the Editor <E>?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
@@ -438,6 +464,10 @@ int main(int argc, char** argv)
 	case 'w':
 	case 'W':
 		water();
+		break;
+	case 'o':
+	case 'O':
+		opengl_renderer();
 		break;
 	case 'p':
 	case 'P':

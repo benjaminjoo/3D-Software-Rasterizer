@@ -17,31 +17,31 @@ public:
 
 	int GetYMin3(coord2* p);
 
-	double getMax(int n, double* v);
+	float getMax(int n, float* v);
 
-	double getMin(int n, double* v);
+	float getMin(int n, float* v);
 
-	void clampValue(double* value, double lower, double upper);
+	void clampValue(float* value, float lower, float upper);
 
-	vect3 rotXrad(const double& sinA, const double& cosA, const vect3& v);
+	vect3 rotXrad(const float& sinA, const float& cosA, const vect3& v);
 
-	vect3 rotYrad(const double& sinA, const double& cosA, const vect3& v);
+	vect3 rotYrad(const float& sinA, const float& cosA, const vect3& v);
 
-	vect3 rotZrad(const double& sinA, const double& cosA, const vect3& v);
+	vect3 rotZrad(const float& sinA, const float& cosA, const vect3& v);
 
-	triangle3dV rotXT(double angle, triangle3dV T);
+	triangle3dV rotXT(float angle, triangle3dV T);
 
-	triangle3dV rotYT(double angle, triangle3dV T);
+	triangle3dV rotYT(float angle, triangle3dV T);
 
-	triangle3dV rotZT(double angle, triangle3dV T);
+	triangle3dV rotZT(float angle, triangle3dV T);
 
-	vect3 translate(double x, double y, double z, vect3 v);
+	vect3 translate(float x, float y, float z, vect3 v);
 
-	triangle3dV translateT(double x, double y, double z, triangle3dV T);
+	triangle3dV translateT(float x, float y, float z, triangle3dV T);
 
-	vect3 scale(double scaleX, double scaleY, double scaleZ, vect3 v);
+	vect3 scale(float scaleX, float scaleY, float scaleZ, vect3 v);
 
-	triangle3dV scaleT(double x, double y, double z, triangle3dV T);
+	triangle3dV scaleT(float x, float y, float z, triangle3dV T);
 
 	vect3 multiplyVxM(const mat4x4& m, const vect3& v);
 
@@ -51,14 +51,14 @@ public:
 
 	void movePoly(vect3 m, triangle3dV& poly);
 
-	void rotateMesh(int n, triangle3dV* object, double rx, double ry, double rz);
+	void rotateMesh(int n, triangle3dV* object, float rx, float ry, float rz);
 
-	void transformMesh(int n, triangle3dV* object, double scX, double scY, double scZ, double mvX, double mvY, double mvZ,
-		double rX, double rY, double rZ);
+	void transformMesh(int n, triangle3dV* object, float scX, float scY, float scZ, float mvX, float mvY, float mvZ,
+		float rX, float rY, float rZ);
 
 	mat4x4 getTranslation(vect3 mv);
 
-	mat4x4 getRotation(axis t, double a);
+	mat4x4 getRotation(axis t, float a);
 
 	void object2worldT(const vect3& sc, const vect3& mv, const vect3& rt, triangle3dV& T);
 
@@ -66,32 +66,32 @@ public:
 
 	point3 world2viewP(point3 p, mat4x4& rot, mat4x4& mov);
 
-	vect3 screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
+	vect3 screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
-	void illuminatePoly(LightSource L, vect3& V, triangle3dV* T, const triangle3dV& P, const projectionStyle& style, const double& min);
+	void illuminatePoly(LightSource L, vect3& V, triangle3dV* T, const triangle3dV& P, const projectionStyle& style, const float& min);
 
-	Uint32 modifyColour(const Uint32& inputColour, const double& illumination);
+	Uint32 modifyColour(const Uint32& inputColour, const float& illumination);
 
 	textCoord getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV);
 
-	void fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
+	void fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
-	void fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
+	void fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
 	void fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen);
 
-	void fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
+	void fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
-	void fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double zNear, double h_ratio, double v_ratio);
+	void fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float zNear, float h_ratio, float v_ratio);
 
-	void fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio, txt* texture);
+	void fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio, txt* texture);
 
-	void fillTriangleTorchlight(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio, txt* texture,
-		const double& lightIntensity, const double& maxIllumination);
+	void fillTriangleTorchlight(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio, txt* texture,
+		const float& lightIntensity, const float& maxIllumination);
 
-	void fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio,
-				const double& lightIntensity, const double& maxIllumination);
+	void fillTriangleTorchlightSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio,
+				const float& lightIntensity, const float& maxIllumination);
 
-	void fillTriangleBlinnPhong(const triangle2dG& t, double* spec, std::shared_ptr<Canvas> screen, double h_ratio, double v_ratio);
+	void fillTriangleBlinnPhong(const triangle2dG& t, float* spec, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 };
 
