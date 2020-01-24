@@ -69,6 +69,12 @@ void Game::addStaticSurface(std::shared_ptr<Terrain> t)
 }
 
 
+void Game::addPointCloud(std::shared_ptr<PointCloud> p)
+{
+	PointClouds.push_back(p);
+}
+
+
 void Game::loadProjectile(unsigned n)
 {
 	for (unsigned i = 0; i < n; i++)
@@ -549,6 +555,15 @@ void Game::renderAll()
 			//t->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
+
+	if (PointClouds.size())
+		for (auto& p : PointClouds)
+		{
+			p->renderCloud(Eye, Screen, RM);
+			//p->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+			//	Controls->torchIntensity, Controls->maxIllumination);
+		}
+
 
 }
 

@@ -8,7 +8,7 @@ class LightSource
 	float azm			= 0.0f;
 	float alt			= 0.0f;
 
-	float deltaAzm		= 1.0f;
+	float deltaAzm		= 0.0f;// 1.0f;
 	float deltaAlt		= 0.0f;
 
 	vect3 direction		= { 0.0f, 0.0f, 0.0f, 0.0f };

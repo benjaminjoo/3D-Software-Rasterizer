@@ -3,6 +3,7 @@
 #include <SDL/SDL.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "c64Fonts.h"
 
 
@@ -277,6 +278,16 @@ struct vect2
 };
 
 
+struct matRT
+{
+	Uint32 diff_colour	= 0x000000ff;
+	Uint32 spec_colour	= 0xffffffff;
+	float albedo[3]		= { 0.75f, 0.25f, 0.0f };
+	float spec_exp		= 32.0f;
+	float refractIndex	= 1.0f;
+};
+
+
 struct vect3
 {
 	float x = 0.0f;
@@ -287,7 +298,7 @@ struct vect3
 
 	float len()
 	{
-		return (float)sqrt(x * x + y * y + z * z);
+		return sqrtf(x * x + y * y + z * z);
 	}
 
 	float len2()
@@ -298,6 +309,11 @@ struct vect3
 	vect3 norm()
 	{
 		float s = 1.0f / this->len();
+		return { x * s, y * s, z * s, 1.0f };
+	}
+
+	vect3 scale(float s)
+	{
 		return { x * s, y * s, z * s, 1.0f };
 	}
 
@@ -342,9 +358,15 @@ struct vect3
 	{
 		return x * p.x + y * p.y + z * p.z;
 	}
+
 	vect3	operator *	(const float& s)			//Scale
 	{
 		return { x * s, y * s, z * s, 1.0f };
+	}
+
+	vect3 reflect(vect3 N)
+	{
+		return *this - N.scale(2.0f * (*this * N));
 	}
 };
 
@@ -418,6 +440,7 @@ bool match(const vect3& a, const vect3& b);
 struct point3
 {
 	vect3 P;
+	vect3 N;
 	Uint32 colour = 0;
 };
 
@@ -719,6 +742,8 @@ vect3 midPoint(vect3 a, vect3 b);
 coord2 view2screen(vect3 vertex, int width, int height, float hR, float vR);
 
 Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned char& g, const unsigned char& b);
+
+Uint32 getColour(const float& r, const float& g, const float& b);
 
 bool onScreen(coord2 test, int w, int h);
 

@@ -13,6 +13,31 @@ Uint32 getColour(const unsigned char& a, const unsigned char& r, const unsigned 
 }
 
 
+Uint32 getColour(const float& r, const float& g, const float& b)
+{
+	unsigned char aa = 0, rr = 0, gg = 0, bb = 0;
+	float rgbMax = std::max({ r, g, b });
+	if (rgbMax > 1.0f)
+	{
+		rr = static_cast<unsigned char>(r / rgbMax * 255.0f);
+		gg = static_cast<unsigned char>(g / rgbMax * 255.0f);
+		bb = static_cast<unsigned char>(b / rgbMax * 255.0f);
+	}
+	else
+	{
+		rr = static_cast<unsigned char>(r * 255.0f);
+		gg = static_cast<unsigned char>(g * 255.0f);
+		bb = static_cast<unsigned char>(b * 255.0f);
+	}
+
+	//rr = static_cast<unsigned char>(std::min(r * 255.0f, 255.0f));
+	//gg = static_cast<unsigned char>(std::min(g * 255.0f, 255.0f));
+	//bb = static_cast<unsigned char>(std::min(b * 255.0f, 255.0f));
+
+	return (aa << 24) | (rr << 16) | (gg << 8) | (bb << 0);
+}
+
+
 polyNode subNodes(polyNode a, polyNode b)
 {
 	polyNode t;

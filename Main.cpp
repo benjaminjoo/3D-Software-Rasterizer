@@ -38,6 +38,8 @@
 #include "ParticleSystem.h"
 #include "DynamicMesh.h"
 #include "Terrain.h"
+#include "PointCloud.h"
+#include "RayTracer.h"
 
 
 void editor()
@@ -52,7 +54,8 @@ void editor()
 
 	auto Controls	= std::make_shared<MessagePump>(Builder);
 
-	Shapes Solids;
+	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
+	Drawing->addPointCloud(model_test_1);
 
 	while (!Controls->quit)
 	{
@@ -65,6 +68,116 @@ void editor()
 	}
 
 	IMG_Quit();
+
+	SDL_Quit();
+}
+
+
+void ray_tracing()
+{
+	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+	auto Screen		= std::make_shared<Canvas>("Waves", 320, 200, 999.9f);
+	auto Eye		= std::make_shared<RayTracer>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, 320, 200);
+	auto Model		= std::make_shared<Scene>();
+
+	matRT ivory, red_rubber, mirror, shiny_blue;
+
+	ivory.diff_colour = getColour(0.4f, 0.4f, 0.3f);
+	ivory.spec_colour = getColour(1.0f, 1.0f, 1.0f);
+	ivory.albedo[0] = 0.6f;
+	ivory.albedo[1] = 0.3f;
+	ivory.albedo[2] = 0.1f;
+	ivory.spec_exp = 50.0f;
+	ivory.refractIndex = 1.0f;
+
+	red_rubber.diff_colour = getColour(0.3f, 0.1f, 0.1f);
+	red_rubber.spec_colour = getColour(1.0f, 1.0f, 1.0f);
+	red_rubber.albedo[0] = 0.9f;
+	red_rubber.albedo[1] = 0.1f;
+	red_rubber.albedo[2] = 0.0f;
+	red_rubber.spec_exp = 10.0f;
+	red_rubber.refractIndex = 1.0f;
+
+	mirror.diff_colour = getColour(1.0f, 1.0f, 1.0f);
+	mirror.spec_colour = getColour(1.0f, 1.0f, 1.0f);
+	mirror.albedo[0] = 0.0f;
+	mirror.albedo[1] = 10.0f;
+	mirror.albedo[2] = 0.8f;
+	mirror.spec_exp = 1425.0f;
+	mirror.refractIndex = 1.0f;
+
+	shiny_blue.diff_colour = getColour(0.5f, 0.5f, 1.0f);
+	shiny_blue.spec_colour = getColour(1.0f, 1.0f, 1.0f);
+	shiny_blue.albedo[0] = 0.6f;
+	shiny_blue.albedo[1] = 0.3f;
+	shiny_blue.albedo[2] = 0.1f;
+	shiny_blue.spec_exp = 50.0f;
+	shiny_blue.refractIndex = 1.0f;
+
+	auto sphere_1 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -3.0f, 0.0f, 16.0f, 0.0f, 0.0f, 0.0f,	getColour(0.4f, 0.4f, 0.3f), 1, 2.0f, 8, true);
+	auto sphere_2 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -10.0f, -1.5f, 12.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 2.0f, 8, true);
+	auto sphere_3 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 4.5f, -0.5f, 18.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 3.0f, 8, true);
+	auto sphere_4 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 7.0f, 5.0f, 18.0f, 0.0f, 0.0f, 0.0f,	getColour(0.4f, 0.4f, 0.3f), 1, 4.0f, 8, true);
+
+	sphere_1->setMaterial(shiny_blue);
+	sphere_2->setMaterial(ivory);
+	sphere_3->setMaterial(red_rubber);
+	sphere_4->setMaterial(shiny_blue);
+
+	Model->addSphere(sphere_1);
+	Model->addSphere(sphere_2);
+	Model->addSphere(sphere_3);
+	Model->addSphere(sphere_4);
+
+	Model->addLightSource({ -20.0f, 20.0f, -20.0f, 1.5f });
+	Model->addLightSource({ 30.0f, 50.0f, 25.0f, 1.8f });
+	Model->addLightSource({ 30.0f, 20.0f, -30.0f, 1.7f });
+
+
+	while (!Controls->quit)
+	{
+		Screen->resetPixelBuffer();
+		Screen->resetDepthBuffer();
+		Controls->HandleUserEvents();
+		Eye->update(Controls);
+		Controls->ceaseMotion();
+	
+		Eye->render(Screen, Model);
+	
+		if(true)
+		{
+			float azmToShow, altToShow, rolToShow;
+	
+			Screen->displayString("Position X", 30, 9, 0x00ff7f7f);
+			Screen->displayValue((float)Eye->x, 1, 2, 9, 0x00ff7f7f);
+			Screen->displayString("Position Y", 30, 8, 0x007fff7f);
+			Screen->displayValue((float)Eye->y, 1, 2, 8, 0x007fff7f);
+			Screen->displayString("Position Z", 30, 7, 0x007f7fff);
+			Screen->displayValue((float)Eye->z, 1, 2, 7, 0x007f7fff);
+	
+			azmToShow = Eye->azm * 180.0f / PI;
+			if (azmToShow > 360.0f) { azmToShow -= 360.0f; }
+			if (azmToShow < -360.0f) { azmToShow += 360.0f; }
+			altToShow = Eye->alt * 180.0f / PI - 180.0f;
+			if (altToShow > 360.0f) { altToShow -= 360.0f; }
+			if (altToShow < -360.0f) { altToShow += 360.0f; }
+			rolToShow = Eye->rol * 180.0f / PI;
+			if (rolToShow > 360.0f) { rolToShow -= 360.0f; }
+			if (rolToShow < -360.0f) { rolToShow += 360.0f; }
+	
+			Screen->displayString("Rotation X", 30, 5, 0x00ff3f3f);
+			Screen->displayValue(azmToShow, 1, 2, 5, 0x00ff3f3f);
+			Screen->displayString("Rotation Y", 30, 4, 0x003fff3f);
+			Screen->displayValue(altToShow, 1, 2, 4, 0x003fff3f);
+			Screen->displayString("Rotation Z", 30, 3, 0x003f3fff);
+			Screen->displayValue(rolToShow, 1, 2, 3, 0x003f3fff);
+	
+			Screen->displayFps((float)(30000.0f / Eye->frameTime), 1, 2, 0);
+		}
+	
+	
+		Screen->update();
+	}
 
 	SDL_Quit();
 }
@@ -89,7 +202,7 @@ void water()
 
 	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
 
-	auto Sun		= std::make_shared<LightSource>(300.0f, 75.0f, 0.95f);
+	auto Sun		= std::make_shared<LightSource>(300.0f, 75.0f, 1.0f);
 
 	auto Viewer		= std::make_shared<Player>(15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
@@ -99,12 +212,14 @@ void water()
 
 	auto Sea		= std::make_shared<DynamicMesh>(10, 10, 8.0f, 0.25f, 5.0f, 2.5f, 0x00007fbf, false);
 
-	//testWorld->addDynamicSurface(Sea);
+	//auto asteroid_surface = std::make_shared<Terrain>("Assets/Textures/seafloor_large.jpg",
+	//												256, 256, 2125.0f, 1600.0f, 2.0f, 1.0f, -50.0f, 0x000000ff, false);
 
-	auto asteroid_surface = std::make_shared<Terrain>("Assets/Textures/seafloor_large.jpg",
-													256, 256, 2125.0f, 1600.0f, 2.0f, 1.0f, -50.0f, 0x000000ff, false);
+	//testWorld->addStaticSurface(asteroid_surface);
 
-	testWorld->addStaticSurface(asteroid_surface);
+	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
+	testWorld->addEntity(model_test_1);
+
 
 	while (!Controls->quit)
 	{
@@ -380,17 +495,21 @@ void opengl_renderer()
 	OpenGLTransform View(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	EventHandler Controls(0.01f, 0.01f, 0.01f);
-	//EventHandler Controls(0.1f, 10000.0f, 314.0f);
 
 	Shapes Solids;
 	Shapes Actors;
 
-	BSP3Loader q3map("Assets/QuakeMaps/13ground.bsp", 0.1f, 0.1f, 0.1f);
-	SolidBody* map = &q3map;
-	//BSP1Loader quakeMap("Assets/QuakeMaps/dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
-	//quakeMap.readData();
-	//SolidBody* map = &quakeMap;	
-	Solids.addSolid(map);
+	//BSP3Loader q3map("Assets/QuakeMaps/13ground.bsp", 0.1f, 0.1f, 0.1f);
+	//SolidBody* map = &q3map;
+	////BSP1Loader quakeMap("Assets/QuakeMaps/dm6.bsp", { 0.01, 0.01, 0.01, 1.0 });
+	////quakeMap.readData();
+	////SolidBody* map = &quakeMap;	
+	//Solids.addSolid(map);
+
+	PointCloud cat_01("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
+	cat_01.invertFaces();
+	SolidBody* person = &cat_01;
+	Solids.addSolid(person);
 
 	Solids.addTextureData(IMG_Load("Assets/Textures/blue.jpg"));
 	Solids.addTextureData(IMG_Load("Assets/Textures/wolf001.jpg"));
@@ -439,8 +558,6 @@ void opengl_renderer()
 		Controls.ceaseMotion();
 
 		Screen.update();
-
-		//std::cout << "z: " << Controls.turnH << std::endl;
 	}
 
 	delete[] vertices;
@@ -451,7 +568,7 @@ void opengl_renderer()
 
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to play the Game <P>, test the OpenGL version <O>, see some waves <W> or use the Editor <E>?" << std::endl;
+	std::cout << "Do you want to play the Game <P>, test the OpenGL version <O>, see some point clouds <W> or use the Editor <E>?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
@@ -472,6 +589,10 @@ int main(int argc, char** argv)
 	case 'p':
 	case 'P':
 		fps_game();
+		break;
+	case 'r':
+	case 'R':
+		ray_tracing();
 		break;
 	default:
 

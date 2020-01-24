@@ -20,6 +20,7 @@ SolidSphere::SolidSphere(float px, float py, float pz, Uint32 c)
 	castsShadows	= false;
 
 	radius			= 1.0f;
+	radiusSquared	= 1.0f;
 	resol			= 24;
 
 	nPoly = getTotalPoly();
@@ -40,6 +41,7 @@ SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float
 	castsShadows	= false;
 
 	radius			= r;
+	radiusSquared	= r * r;
 	resol			= res;
 
 	nPoly = getTotalPoly();
@@ -51,18 +53,19 @@ SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float
 SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
 	Uint32 c, int t, float r, int res, bool dynamic)
 {
-	scale = { sx, sy, sz, 1.0f };
-	position = { px, py, pz, 1.0f };
-	rotation = { rx, ry, rz, 1.0f };
+	scale			= { sx, sy, sz, 1.0f };
+	position		= { px, py, pz, 1.0f };
+	rotation		= { rx, ry, rz, 1.0f };
 
-	colour = c;
-	texture = t;
-	castsShadows = false;
+	colour			= c;
+	texture			= t;
+	castsShadows	= false;
 
-	radius = r;
-	resol = res;
+	radius			= r;
+	radiusSquared	= r * r;
+	resol			= res;
 
-	isDynamic = dynamic;
+	isDynamic		= dynamic;
 
 	nPoly = getTotalPoly();
 	mesh = new triangle3dV[nPoly];
@@ -375,3 +378,21 @@ void SolidSphere::getTriangleData(triangle3dV* t)
 	}
 }
 
+
+bool SolidSphere::intersect(const vect3& eye_centre, const vect3& eye_direction, float& depth)
+{
+	vect3 eye2centre = position - eye_centre;
+	float dist2centre = eye2centre * eye_direction;
+	float distSquared = eye2centre.len2() - dist2centre * dist2centre;
+	if (distSquared > radiusSquared)									//Ray completely misses sphere, no intersection
+		return false;
+	float halfString = sqrt(radiusSquared - distSquared);
+	depth			= dist2centre - halfString;
+	float farDepth	= dist2centre + halfString;
+	if (depth < 0.0f)
+		depth = farDepth;
+	if (depth < 0.0f)
+		return false;
+
+	return true;
+}

@@ -118,6 +118,12 @@ void SolidBody::setTexture(int t)
 }
 
 
+void SolidBody::setMaterial(matRT m)
+{
+	material = m;
+}
+
+
 vect3 SolidBody::getVelocity()
 {
 	return velocity;
@@ -344,8 +350,10 @@ void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat
 				LightSource sun, const projectionStyle& style, float torch, float ill)
 {
 	if (mesh != nullptr)
+	{
 		if (trans)
 			eye->renderMesh(getTotalPoly(), mesh, rot, mov, position, rotation, sun, style, torch, ill);
 		else
 			eye->renderMesh(getTotalPoly(), mesh, rot, mov, sun, style, torch, ill);
+	}
 }

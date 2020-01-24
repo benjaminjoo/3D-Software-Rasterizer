@@ -8,9 +8,11 @@
 #include "SolidSphere.h"
 #include "Room.h"
 #include "SolidSTL.h"
+#include "PointCloud.h"
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 
 class ModelElementBuffer
 {
@@ -25,6 +27,7 @@ public:
 	~ModelElementBuffer();
 
 	void addVertex3(vertex3);
+	void addPointCloud(std::shared_ptr<PointCloud>);
 	void addLine3(line3);
 
 	void selectVertex3byID(int);

@@ -1,6 +1,157 @@
 #include "Terrain.h"
 
 
+Terrain::Terrain(std::string fn) : fileName(fn)
+{
+	std::ifstream dataInput(fileName);
+
+	if (dataInput.is_open())
+	{
+		std::string inputLine = "";
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_01(inputLine);
+		std::string numColText = "";
+		header_01 >> numColText >> sizeX;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_02(inputLine);
+		std::string numRowText = "";
+		header_02 >> numRowText >> sizeY;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_03(inputLine);
+		std::string cornerXText = "";
+		header_03 >> cornerXText >> nwX;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_04(inputLine);
+		std::string cornerYText = "";
+		header_04 >> cornerYText >> nwY;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_05(inputLine);
+		std::string cellSizeText = "";
+		header_05 >> cellSizeText >> unit;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_06(inputLine);
+
+		heightMap = new float[sizeX * sizeY];
+		pixelGrid = new Uint32[sizeX * sizeY];
+
+		//Reads height values from text file into heightMap, and finds min & max values at the same time
+
+		float hMin = 0.0f;
+		float hMax = 0.0f;
+
+		for (int j = 0; j < sizeY; j++)
+		{
+			std::getline(dataInput, inputLine);
+			std::stringstream currentLine(inputLine);
+			for (int i = 0; i < sizeX; i++)
+			{
+				currentLine >> heightMap[j * sizeX + i];
+				if (i == 0 && j == 0)
+				{
+					hMin = heightMap[0];
+					hMax = heightMap[0];
+				}
+				else
+				{
+					if (heightMap[j * sizeX + i] < hMin)
+						hMin = heightMap[j * sizeX + i];
+					if (heightMap[j * sizeX + i] > hMax)
+						hMax = heightMap[j * sizeX + i];
+				}			
+			}
+		}
+
+		std::cout << "Lowest point: " << hMin << std::endl;
+		std::cout << "Lighest point: " << hMax << std::endl;
+
+		calculatePixels(std::max(abs(hMin), abs(hMax)));
+		if (pixelGrid != nullptr)
+			outputImage("heightmap.ppm");
+
+		dataInput.close();
+	}
+	else
+	{
+		std::cout << "Could not read file: " << fileName << std::endl;
+	}
+}
+
+
+Terrain::Terrain(std::string fn, float x, float y, Uint32 col) :
+	fileName(fn), colour(col), offsetX(x), offsetY(y)
+{
+	std::ifstream dataInput(fileName);
+
+	if (dataInput.is_open())
+	{
+		std::string inputLine = "";
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_01(inputLine);
+		std::string numColText = "";
+		header_01 >> numColText >> sizeX;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_02(inputLine);
+		std::string numRowText = "";
+		header_02 >> numRowText >> sizeY;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_03(inputLine);
+		std::string cornerXText = "";
+		header_03 >> cornerXText >> nwX;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_04(inputLine);
+		std::string cornerYText = "";
+		header_04 >> cornerYText >> nwY;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_05(inputLine);
+		std::string cellSizeText = "";
+		header_05 >> cellSizeText >> unit;
+
+		std::getline(dataInput, inputLine);
+		std::stringstream header_06(inputLine);
+
+		pGrid = new point3[sizeX * sizeY];
+
+		for (int j = 0; j < sizeY; j++)
+		{
+			std::getline(dataInput, inputLine);
+			std::stringstream currentLine(inputLine);
+			for (int i = 0; i < sizeX; i++)
+			{
+				if (absolutePosition)
+				{
+					pGrid[j * sizeX + i].P.x = nwX + i * unit + offsetX;
+					pGrid[j * sizeX + i].P.y = nwY + j * unit + offsetY;
+				}
+				else
+				{
+					pGrid[j * sizeX + i].P.x = i * unit;
+					pGrid[j * sizeX + i].P.y = j * unit;
+				}
+				currentLine >> pGrid[j * sizeX + i].P.z;
+				pGrid[j * sizeX + i].P.w = 1.0f;
+				pGrid[j * sizeX + i].colour = colour;
+			}
+		}
+
+		dataInput.close();
+	}
+	else
+	{
+		std::cout << "Could not read file: " << fileName << std::endl;
+	}
+}
+
 
 Terrain::Terrain(std::string fn, int sx, int sy, float cx, float cy, float u, float sc, float dp, Uint32 col, bool side) :
 	fileName(fn), sizeX(sx), sizeY(sy), centreX(cx), centreY(cy), unit(u), scale(sc), depth(dp), colour(col), sidesOn(side)
@@ -171,6 +322,64 @@ void Terrain::displaySample(std::shared_ptr<Canvas> screen, int s)
 						screen->putPixel(x, y, p.argb);
 					}					
 				}
+}
+
+
+void Terrain::calculatePixels(float span)
+{
+	if (heightMap != nullptr && span > 0.0f)
+	{
+		float grade;
+		for (int j = 0; j < sizeY; j++)
+		{
+			for (int i = 0; i < sizeX; i++)
+			{
+				float zValue = heightMap[j * sizeX + i];
+				if (zValue >= 0.0f)
+				{
+					grade = (span - zValue) / span;
+					if (grade <= 0.5f)
+						pixelGrid[j * sizeX + i] = getColour(grade * 2.0f, 0.0f, 0.0f);
+					else
+						pixelGrid[j * sizeX + i] = getColour(1.0, (grade - 0.5f) * 2.0f, (grade - 0.5f) * 2.0f);
+				}
+				else
+				{
+					grade = (span - abs(zValue)) / span;
+					if (grade <= 0.5f)
+						pixelGrid[j * sizeX + i] = getColour(0.0f, 0.0f, grade * 2.0f);
+					else
+						pixelGrid[j * sizeX + i] = getColour((grade - 0.5f) * 2.0f, (grade - 0.5f) * 2.0f, 1.0f);
+				}
+			}
+		}
+	}
+}
+
+
+void Terrain::outputImage(std::string fName)
+{
+	std::ofstream outputFile(fName);
+	if (outputFile.is_open())
+	{
+		outputFile << "P3" << std::endl;
+		outputFile << sizeX << " " << sizeY << std::endl;
+		outputFile << "255" << std::endl;
+
+		for (int j = 0; j < sizeX; j++)
+		{
+			for (int i = 0; i < sizeY; i++)
+			{
+				colour32 temp;
+				temp.argb = pixelGrid[j * sizeX + i];
+				outputFile	<< static_cast<int>(temp.c[2]) << " "
+							<< static_cast<int>(temp.c[1]) << " "
+							<< static_cast<int>(temp.c[0]) << std::endl;
+			}
+		}
+
+		outputFile.close();
+	}
 }
 
 

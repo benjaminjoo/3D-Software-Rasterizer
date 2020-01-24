@@ -6,8 +6,9 @@
 class SolidSphere: public SolidBody
 {
 
-	float			radius	= 0.5f;
-	int				resol	= 12;
+	float			radius			= 0.5f;
+	float			radiusSquared	= 0.25f;
+	int				resol			= 12;
 
 public:
 
@@ -23,4 +24,6 @@ public:
 	int	getTotalPoly();
 	void getVertexData(vect3*);
 	void getTriangleData(triangle3dV*);
+
+	bool intersect(const vect3& eye_centre, const vect3& eye_direction, float& depth);
 };

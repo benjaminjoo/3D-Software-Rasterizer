@@ -23,6 +23,12 @@ void ModelElementBuffer::addVertex3(vertex3 P)
 }
 
 
+void ModelElementBuffer::addPointCloud(std::shared_ptr<PointCloud> P)
+{
+	P->getPoints(vertex3Buffer);
+}
+
+
 void ModelElementBuffer::addLine3(line3 L)
 {
 	line3Buffer.push_back(L);

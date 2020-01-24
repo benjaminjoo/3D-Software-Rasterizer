@@ -131,6 +131,13 @@ void Camera::updateViewDirection()
 }
 
 
+bool Camera::pointFacingCamera(const point3& p)
+{
+	vect3 eyeVector = subVectors(p.P, { x, y, z, 1.0 });
+	return dotProduct(p.N, eyeVector) < 0.0f ? true : false;
+}
+
+
 bool Camera::polyFacingCamera(const triangle3dV& worldT)
 {
 	vect3 eyeVector = subVectors(worldT.A, { x, y, z, 1.0 });
@@ -496,6 +503,14 @@ void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float* depth
 {
 	this->world2viewPointM(p, RM);
 	if (pointInsideFrustum(p.P))
+		projectPoint(p, pixelBuffer, depthBuffer);
+}
+
+
+void Camera::renderVisiblePoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float* depthBuffer)
+{
+	this->world2viewPointM(p, RM);
+	if (pointInsideFrustum(p.P) && pointFacingCamera(p))
 		projectPoint(p, pixelBuffer, depthBuffer);
 }
 

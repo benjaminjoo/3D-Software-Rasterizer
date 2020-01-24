@@ -66,6 +66,8 @@ void LightSource::update()
 	direction.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
 	direction.z = (float)sin(alt * PI / 180.0f);
 	direction.w = 0.0f;
+
+	direction.norm();
 }
 
 

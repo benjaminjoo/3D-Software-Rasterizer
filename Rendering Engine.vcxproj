@@ -198,8 +198,11 @@
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="PointCloud.cpp" />
     <ClCompile Include="Projection.cpp" />
+    <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="SolidBody.cpp" />
     <ClCompile Include="SolidCone.cpp">
@@ -248,8 +251,11 @@
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="PointCloud.h" />
     <ClInclude Include="Projection.h" />
+    <ClInclude Include="RayTracer.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="SolidBody.h" />
     <ClInclude Include="SolidCone.h" />

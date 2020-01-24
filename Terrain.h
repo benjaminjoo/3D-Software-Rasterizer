@@ -9,6 +9,9 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
 
 
 class Terrain
@@ -27,6 +30,10 @@ private:
 	int sizeY				= 10;
 	float centreX			= 0.0f;
 	float centreY			= 0.0f;
+	float nwX				= 0.0f;
+	float nwY				= 0.0f;
+	float offsetX			= 0.0f;
+	float offsetY			= 0.0f;
 	float unit				= 1.0f;
 	float scale				= 1.0f;
 	float depth				= -100.0f;
@@ -34,6 +41,7 @@ private:
 	Uint32 colour			= 0xffffffff;
 
 	bool sidesOn			= false;
+	bool absolutePosition	= false;
 
 	int polyCount			= 0;
 	int polyCountS			= 0;
@@ -51,12 +59,16 @@ private:
 	}
 
 public:
-	Terrain(std::string fn, int sx, int sy, float cx, float cy, float u, float sc, float dp, Uint32, bool side);
+	Terrain(std::string fn);
+	Terrain(std::string fn, float x, float y, Uint32 col);
+	Terrain(std::string fn, int sx, int sy, float cx, float cy, float u, float sc, float dp, Uint32 col, bool side);
 	~Terrain();
 
 	void addTexture(SDL_Surface* T);
 	void getSample();
 	void displaySample(std::shared_ptr<Canvas> screen, int s);
+	void calculatePixels(float s);
+	void outputImage(std::string fName);
 	void createPointCloud(float hg_scale);
 	void createMesh();
 	void renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);

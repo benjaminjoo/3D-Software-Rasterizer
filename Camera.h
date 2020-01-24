@@ -79,6 +79,8 @@ public:
 
 	void renderPoint(point3, mat4x4&, Uint32*, float*);
 
+	void renderVisiblePoint(point3 p, mat4x4&, Uint32*, float*);
+
 	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
@@ -96,6 +98,8 @@ private:
 	float getVRatio();
 
 	void updateViewDirection();
+
+	bool pointFacingCamera(const point3& p);
 
 	bool polyFacingCamera(const triangle3dV&);
 

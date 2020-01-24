@@ -18,6 +18,7 @@ public:
 	vect3			velocity		= { 0.0f, 0.0f, 0.0f, 1.0f };
 	vect3			angularVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 
+	matRT			material;
 	Uint32			colour			= 255;
 	int				texture			= 0;
 	float			txU				= 1.0f;
@@ -82,6 +83,7 @@ public:
 	void updateRotation();
 
 	void setTexture(int);
+	void setMaterial(matRT);
 
 	bool getBBState();
 	void activateBBox();
