@@ -27,6 +27,7 @@ RayTracer::RayTracer(float cx, float cy, float cz, float az, float al, float rl,
 
 RayTracer::~RayTracer()
 {
+	delete[] rays;
 }
 
 
