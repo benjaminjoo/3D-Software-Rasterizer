@@ -58,6 +58,5 @@ public:
 	void render(std::shared_ptr<Canvas> screen, std::shared_ptr<Scene> scene);
 	Uint32 castRay(std::shared_ptr<Scene> Scene, vect3& ray_origin, vect3& ray_direction, unsigned n);
 	bool intersectScene(std::shared_ptr<Scene> scene, vect3& origin, vect3& direction, vect3& intersectionPoint, vect3& surfaceNormal, matRT& mat);
-
 };
 

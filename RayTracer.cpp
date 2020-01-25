@@ -79,6 +79,12 @@ Uint32 RayTracer::castRay(std::shared_ptr<Scene> scene, vect3& ray_origin, vect3
 	colour32 reflectionColour;
 	reflectionColour.argb = castRay(scene, reflectionOrigin, reflectionDirection, n + 1);
 
+	vect3 refractionDirection = ray_direction.refract(normal, mat.refractIndex).norm();
+	vect3 refractionOrigin = refractionDirection * normal < 0.0f ?	point - normal.scale(0.0001f) :
+																	point + normal.scale(0.0001f);
+	colour32 refractionColour;
+	refractionColour.argb = castRay(scene, refractionOrigin, refractionDirection, n + 1);
+
 	float diffuseIllumination = 0.0f;
 	float specularIllumination = 0.0f;
 
@@ -105,16 +111,20 @@ Uint32 RayTracer::castRay(std::shared_ptr<Scene> scene, vect3& ray_origin, vect3
 	materialColour.argb = mat.diff_colour;
 	
 	float r = static_cast<float>(materialColour.c[2]) / 255.0f * diffuseIllumination * mat.albedo[0]
-		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[2]) / 255.0f * mat.albedo[2];
+		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[2]) / 255.0f * mat.albedo[2]
+		+ static_cast<float>(refractionColour.c[2]) / 255.0f * mat.albedo[3];
 
 	float g = static_cast<float>(materialColour.c[1]) / 255.0f * diffuseIllumination * mat.albedo[0]
-		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[1]) / 255.0f * mat.albedo[2];
+		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[1]) / 255.0f * mat.albedo[2]
+		+ static_cast<float>(refractionColour.c[1]) / 255.0f * mat.albedo[3];
 
 	float b = static_cast<float>(materialColour.c[0]) / 255.0f * diffuseIllumination * mat.albedo[0]
-		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[0]) / 255.0f * mat.albedo[2];
+		+ specularIllumination * mat.albedo[1] + static_cast<float>(reflectionColour.c[0]) / 255.0f * mat.albedo[2]
+		+ static_cast<float>(refractionColour.c[0]) / 255.0f * mat.albedo[3];
 
 	return getColour(r, g, b);
 }
+
 
 bool RayTracer::intersectScene(std::shared_ptr<Scene> scene, vect3& origin, vect3& direction,
 								vect3& intersectionPoint, vect3& surfaceNormal, matRT& mat)

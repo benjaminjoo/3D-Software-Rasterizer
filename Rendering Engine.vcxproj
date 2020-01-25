@@ -237,6 +237,7 @@
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Icons.h" />
+    <ClInclude Include="Materials.h" />
     <ClInclude Include="MessagePump.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="LightSource.h" />

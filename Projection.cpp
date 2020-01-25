@@ -455,7 +455,7 @@ void Projection::illuminatePoly(LightSource Light, vect3& View, triangle3dV* vie
 
 Uint32 Projection::modifyColour(const Uint32& inputColour, const float& illumination)
 {
-	bool red = true, green = true, blue = true;
+	//bool red = true, green = true, blue = true;
 	byte a = 0, r, g, b, r2fill = 0, g2fill = 0, b2fill = 0;
 	float illSurplus = 0.0f;
 
@@ -1238,11 +1238,10 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 	coord2 currentP, startP, endP;
 	vect3 currentVert, startVert, endVert;
 	textCoord startUV, endUV, sampleUV;
+	int textureWidth = texture->w;
+	int textureHeight = texture->h;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 	Uint32 finalPixel;
-
-	byte a = 0, r2fill = 0, g2fill = 0, b2fill = 0;
-	float illSurplus = 0.0f;
 
 	for (int hg = yMin; hg < yMax; hg++)
 	{
@@ -1384,27 +1383,27 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 					{
 						currentP.x = i;
 						currentP.z = zCurrent;
-
+						
 						currentVert.x = (currentP.x - float(halfW)) * invertCurrentZ / hCorr;
 						currentVert.y = (float(halfH) - currentP.y) * invertCurrentZ / vCorr;
 						currentVert.z = invertCurrentZ;
-
+						
 						sampleUV = getUVCoord(startVert, endVert, startUV, endUV, currentVert);
 
-						sampleXnew = ((int)(texture->w * sampleUV.u)) % texture->w;
-						sampleYnew = ((int)(texture->h * sampleUV.v)) % texture->h;
+						sampleXnew = ((int)(textureWidth * sampleUV.u)) % textureWidth;
+						sampleYnew = ((int)(textureHeight * sampleUV.v)) % textureHeight;
 
-						if (sampleXnew < 0) { sampleXnew = texture->w + sampleXnew % texture->w; }
-						if (sampleYnew < 0) { sampleYnew = texture->h + sampleYnew % texture->h; }
-
+						if (sampleXnew < 0) { sampleXnew = textureWidth + sampleXnew % textureWidth; }
+						if (sampleYnew < 0) { sampleYnew = textureHeight + sampleYnew % textureHeight; }
+						
 						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
 						{
-							finalPixel = texture->pixels[sampleYnew * texture->w + sampleXnew];
-						}
-
+							finalPixel = texture->pixels[sampleYnew * textureWidth + sampleXnew];
+						}							
+						
 						sampleXold = sampleXnew;
 						sampleYold = sampleYnew;
-
+						
 						screen->pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
 
 						screen->depthBuffer[hgw + i] = invertCurrentZ;

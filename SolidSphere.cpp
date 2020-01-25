@@ -396,3 +396,4 @@ bool SolidSphere::intersect(const vect3& eye_centre, const vect3& eye_direction,
 
 	return true;
 }
+

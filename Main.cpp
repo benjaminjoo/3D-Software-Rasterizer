@@ -40,6 +40,7 @@
 #include "Terrain.h"
 #include "PointCloud.h"
 #include "RayTracer.h"
+#include "Materials.h"
 
 
 void editor()
@@ -54,7 +55,7 @@ void editor()
 
 	auto Controls	= std::make_shared<MessagePump>(Builder);
 
-	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
+	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat9", 0x0066664c, false);
 	Drawing->addPointCloud(model_test_1);
 
 	while (!Controls->quit)
@@ -75,18 +76,14 @@ void editor()
 
 void ray_tracing()
 {
-	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
-	auto Screen		= std::make_shared<Canvas>("Waves", 320, 200, 999.9f);
-	auto Eye		= std::make_shared<RayTracer>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, 320, 200);
-	auto Model		= std::make_shared<Scene>();
-
-	matRT ivory, red_rubber, mirror, shiny_blue;
+	matRT ivory, red_rubber, mirror, shiny_blue, glass;
 
 	ivory.diff_colour = getColour(0.4f, 0.4f, 0.3f);
 	ivory.spec_colour = getColour(1.0f, 1.0f, 1.0f);
 	ivory.albedo[0] = 0.6f;
 	ivory.albedo[1] = 0.3f;
 	ivory.albedo[2] = 0.1f;
+	ivory.albedo[3] = 0.0f;
 	ivory.spec_exp = 50.0f;
 	ivory.refractIndex = 1.0f;
 
@@ -95,6 +92,7 @@ void ray_tracing()
 	red_rubber.albedo[0] = 0.9f;
 	red_rubber.albedo[1] = 0.1f;
 	red_rubber.albedo[2] = 0.0f;
+	red_rubber.albedo[3] = 0.0f;
 	red_rubber.spec_exp = 10.0f;
 	red_rubber.refractIndex = 1.0f;
 
@@ -103,26 +101,42 @@ void ray_tracing()
 	mirror.albedo[0] = 0.0f;
 	mirror.albedo[1] = 10.0f;
 	mirror.albedo[2] = 0.8f;
+	mirror.albedo[3] = 0.0f;
 	mirror.spec_exp = 1425.0f;
 	mirror.refractIndex = 1.0f;
+
+	glass.diff_colour = getColour(0.6f, 0.7f, 0.8f);
+	glass.spec_colour = getColour(1.0f, 1.0f, 1.0f);
+	glass.albedo[0] = 0.0f;
+	glass.albedo[1] = 0.5f;
+	glass.albedo[2] = 0.1f;
+	glass.albedo[3] = 0.8f;
+	glass.spec_exp = 125.0f;
+	glass.refractIndex = 1.5f;
 
 	shiny_blue.diff_colour = getColour(0.5f, 0.5f, 1.0f);
 	shiny_blue.spec_colour = getColour(1.0f, 1.0f, 1.0f);
 	shiny_blue.albedo[0] = 0.6f;
 	shiny_blue.albedo[1] = 0.3f;
 	shiny_blue.albedo[2] = 0.1f;
+	shiny_blue.albedo[2] = 0.0f;
 	shiny_blue.spec_exp = 50.0f;
 	shiny_blue.refractIndex = 1.0f;
 
-	auto sphere_1 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -3.0f, 0.0f, 16.0f, 0.0f, 0.0f, 0.0f,	getColour(0.4f, 0.4f, 0.3f), 1, 2.0f, 8, true);
-	auto sphere_2 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -10.0f, -1.5f, 12.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 2.0f, 8, true);
-	auto sphere_3 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 4.5f, -0.5f, 18.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 3.0f, 8, true);
+	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+	auto Screen		= std::make_shared<Canvas>("Waves", 320, 200, 999.9f);
+	auto Eye		= std::make_shared<RayTracer>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, 320, 200);
+	auto Model		= std::make_shared<Scene>();
+
+	auto sphere_1 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -3.0f, 0.0f, 16.0f, 0.0f, 0.0f, 0.0f,	getColour(0.4f, 0.4f, 0.3f), 1, 1.0f, 8, true);
+	auto sphere_2 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, -1.0f, -1.5f, 12.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 2.0f, 8, true);
+	auto sphere_3 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 1.5f, -0.5f, 18.0f, 0.0f, 0.0f, 0.0f,	getColour(0.3f, 0.1f, 0.1f), 1, 3.0f, 8, true);
 	auto sphere_4 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 7.0f, 5.0f, 18.0f, 0.0f, 0.0f, 0.0f,	getColour(0.4f, 0.4f, 0.3f), 1, 4.0f, 8, true);
 
-	sphere_1->setMaterial(shiny_blue);
-	sphere_2->setMaterial(ivory);
+	sphere_1->setMaterial(ivory);
+	sphere_2->setMaterial(glass);
 	sphere_3->setMaterial(red_rubber);
-	sphere_4->setMaterial(shiny_blue);
+	sphere_4->setMaterial(ivory);
 
 	Model->addSphere(sphere_1);
 	Model->addSphere(sphere_2);
@@ -217,8 +231,8 @@ void water()
 
 	//testWorld->addStaticSurface(asteroid_surface);
 
-	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
-	testWorld->addEntity(model_test_1);
+	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat9", 0x0066664c, false);
+	testWorld->addPointCloud(model_test_1);
 
 
 	while (!Controls->quit)
@@ -261,9 +275,9 @@ void fps_game()
 	//Fill up bullet pool
 	fpsGame->loadProjectile(200);
 
-#define _STL_READER_
+//#define _STL_READER_
 //#define _PLANETS_
-//#define _SHOOTER_
+#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
@@ -369,7 +383,7 @@ void fps_game()
 	//Add some basic shapes
 	auto pedestal	= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x0000ff00, 6, 20.0f, 30.0f, 5.0f);
 	auto wall		= std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, 5.0f, 19.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0x00ff0000, 4, 20.0f, 1.0f, 7.5f);
-	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 9, 5.0f, 24);
+	auto dome		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 15.0f, 12.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 7, 5.0f, 24);
 	auto box		= std::make_shared<Room>(0.0f, 0.0f, 0.0f, 30.0f, 40.0f, 20.0f);
 	box->calculateMesh();	
 
