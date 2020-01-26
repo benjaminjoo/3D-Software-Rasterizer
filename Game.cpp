@@ -91,6 +91,16 @@ void Game::loadProjectile(unsigned n)
 }
 
 
+void Game::addExplosion(unsigned n)
+{
+	for (unsigned i = 0; i < n; i++)
+	{
+		auto explosion = std::make_shared<Explosion>(5000, 0.1f, 60.0f);
+		Explosions.push_back(explosion);
+	}
+}
+
+
 void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 {
 	Eye->azm	= player->azm;
@@ -290,13 +300,14 @@ void Game::updateBalls()
 	{
 		if (Ball->isInMotion())
 			updateMovingObject(Ball);
-		if (Ball->isDestroyed() && !Ball->isVanished())
-		{			
-			Ball->incrementTicksSinceHit();
-			float ticks = float(Ball->getTicksSinceHit());
-			if (ticks >= 60.0f)
-				Ball->vanish();
-		}
+		//if (Ball->isDestroyed() && !Ball->isVanished())
+		//{			
+		//	Ball->explode();
+		//	Ball->incrementTicksSinceHit();
+		//	float ticks = float(Ball->getTicksSinceHit());
+		//	if (ticks >= 60.0f)
+		//		Ball->vanish();
+		//}
 	}
 }
 
@@ -332,6 +343,14 @@ void Game::updateProjectiles()
 			}
 		}
 	}
+}
+
+
+void Game::updateExplosions()
+{
+	for (auto& Exp : Explosions)
+		if (Exp->isActive())
+			Exp->update();
 }
 
 
@@ -384,6 +403,13 @@ bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 				targets[i]->destroy();
 				targets[i]->setMotion(false);
 				targets[i]->setBehaviour(penetrate);
+				for (auto& Exp : Explosions)
+					if (!Exp->isActive() && !Exp->isUsed())
+					{
+						targets[i]->vanish();
+						Exp->activate(targets[i]->getPosition());
+						break;
+					}
 
 				return true;
 			}
@@ -532,6 +558,10 @@ void Game::renderAll()
 			P->render(Eye, true, RotationM, TranslationM, *Sun,
 				Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
 
+	for (auto& Exp : Explosions)
+		if (Exp->isActive())
+			Exp->render(Eye, Screen, RM);
+
 	for (auto& B : Balls)
 		if (B->isVisible() && !B->isVanished())
 			B->render(Eye, true, RotationM, TranslationM, *Sun,
@@ -599,6 +629,7 @@ void Game::updateAll()
 		}
 
 		this->updateProjectiles();
+		this->updateExplosions();
 
 		if (Hero->lastShot < 5)
 			Hero->lastShot++;

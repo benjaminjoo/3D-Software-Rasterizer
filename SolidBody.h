@@ -129,6 +129,7 @@ public:
 	void incrementBounceCount();
 	int getBounceCount();
 
+	virtual void explode();
 	void updateMesh();
 	void render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
 		LightSource sun, const projectionStyle& style, float torch, float ill);

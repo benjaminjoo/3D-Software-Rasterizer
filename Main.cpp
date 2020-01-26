@@ -40,7 +40,6 @@
 #include "Terrain.h"
 #include "PointCloud.h"
 #include "RayTracer.h"
-#include "Materials.h"
 
 
 void editor()
@@ -274,6 +273,8 @@ void fps_game()
 
 	//Fill up bullet pool
 	fpsGame->loadProjectile(200);
+	//Fill up explosion pool
+	fpsGame->addExplosion(20);
 
 //#define _STL_READER_
 //#define _PLANETS_
@@ -390,7 +391,7 @@ void fps_game()
 	fpsGame->addEntity(box);
 	fpsGame->addEntity(pedestal);
 	fpsGame->addEntity(wall);
-	fpsGame->addEntity(dome);
+	//fpsGame->addEntity(dome);
 
 	//Add some spheres floating around
 	srand(unsigned int(time(NULL)));
@@ -418,7 +419,7 @@ void fps_game()
 	}
 
 	//Create enemies
-	auto Enemy1		= std::make_shared<Player>(20.0f, 20.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Enemy1		= std::make_shared<Player>(-20.0f, 60.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto e_011		= std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffffff, 7, 1.5f, 8);
 	auto e_021		= std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, PI * 0.5f, 0.0f, 0.0f, 0xffff0000, 7, 0.25f, 3.0f, 4, true);
@@ -460,8 +461,8 @@ void fps_game()
 
 	fpsGame->addEnemy(Enemy3);
 
-	auto cockpit = std::make_shared<SolidSTL>(0.1f, 0.1f, 0.1f, -0.2f, 0.0f, 0.0f, 0.0f, PI * 0.25f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/cockpit.stl");
-	Hero->addPart(cockpit);
+	//auto cockpit = std::make_shared<SolidSTL>(0.1f, 0.1f, 0.1f, -0.2f, 0.0f, 0.0f, 0.0f, PI * 0.25f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/cockpit.stl");
+	//Hero->addPart(cockpit);
 
 #endif//_SHOOTER_
 
@@ -520,7 +521,7 @@ void opengl_renderer()
 	////SolidBody* map = &quakeMap;	
 	//Solids.addSolid(map);
 
-	PointCloud cat_01("Assets/PointClouds/HighRes/cat2", 0x0066664c, false);
+	PointCloud cat_01("Assets/PointClouds/HighRes/cat9", 0x0066664c, false);
 	cat_01.invertFaces();
 	SolidBody* person = &cat_01;
 	Solids.addSolid(person);

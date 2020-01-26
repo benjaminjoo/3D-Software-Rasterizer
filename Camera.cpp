@@ -518,9 +518,19 @@ void Camera::renderVisiblePoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float
 void Camera::projectPoint(point3 P, Uint32* pixelBuffer, float* depthBuffer)
 {
 	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
-	if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
+	//if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
+	//{
+	//	pixelBuffer[cp.y * w + cp.x] = P.colour;
+	//	depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
+	//}
+	if ((cp.x >= 1) && (cp.x < w - 1) && (cp.y >= 1) && (cp.y < h - 1) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
 	{
+		pixelBuffer[(cp.y - 1) * w + cp.x] = P.colour;
+		pixelBuffer[cp.y * w + cp.x - 1] = P.colour;
 		pixelBuffer[cp.y * w + cp.x] = P.colour;
+		pixelBuffer[cp.y * w + cp.x + 1] = P.colour;
+		pixelBuffer[(cp.y + 1) * w + cp.x] = P.colour;
+	
 		depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
 	}
 }

@@ -54,6 +54,26 @@ public:
 
 	~RayTracer();
 
+	vect3 reflect(vect3 I, vect3 N)
+	{
+		return I - N.scale(2.0f * (I * N));
+	}
+
+	vect3 refract(vect3 I, vect3 N, const float eta_t, const float eta_i = 1.0f)
+	{
+		float cosI = -std::max(-1.0f, std::min(1.0f, I.norm() * N.norm()));
+		if (cosI < 0.0f)
+			return refract(I, N.scale(-1.0f), eta_i, eta_t);
+		float eta = eta_i / eta_t;
+		float k = 1.0f - eta * eta * (1.0f - cosI * cosI);
+		if (k < 0.0f)
+			return { 1.0f, 0.0f, 0.0f, 0.0f };
+		else
+		{
+			return I.scale(eta) + N.scale(eta * cosI - sqrtf(k));
+		}
+	}
+
 	void update(std::shared_ptr<EventHandler> controls);
 	void render(std::shared_ptr<Canvas> screen, std::shared_ptr<Scene> scene);
 	Uint32 castRay(std::shared_ptr<Scene> Scene, vect3& ray_origin, vect3& ray_direction, unsigned n);

@@ -338,6 +338,12 @@ int SolidBody::getBounceCount()
 }
 
 
+void SolidBody::explode()
+{
+
+}
+
+
 void SolidBody::updateMesh()
 {
 	Projector->transformMesh(nPoly, mesh, scale.x, scale.y, scale.z,

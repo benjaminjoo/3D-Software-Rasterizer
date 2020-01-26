@@ -73,13 +73,13 @@ Uint32 RayTracer::castRay(std::shared_ptr<Scene> scene, vect3& ray_origin, vect3
 	if (n > 4 || !intersectScene(scene, ray_origin, ray_direction, point, normal, mat))
 		return backgroundColour;
 
-	vect3 reflectionDirection = ray_direction.reflect(normal).norm();
+	vect3 reflectionDirection = reflect(ray_direction, normal).norm();
 	vect3 reflectionOrigin = reflectionDirection * normal < 0.0f ?	point - normal.scale(0.0001f) :
 																	point + normal.scale(0.0001f);
 	colour32 reflectionColour;
 	reflectionColour.argb = castRay(scene, reflectionOrigin, reflectionDirection, n + 1);
 
-	vect3 refractionDirection = ray_direction.refract(normal, mat.refractIndex).norm();
+	vect3 refractionDirection = refract(ray_direction, normal, mat.refractIndex).norm();
 	vect3 refractionOrigin = refractionDirection * normal < 0.0f ?	point - normal.scale(0.0001f) :
 																	point + normal.scale(0.0001f);
 	colour32 refractionColour;
@@ -104,7 +104,7 @@ Uint32 RayTracer::castRay(std::shared_ptr<Scene> scene, vect3& ray_origin, vect3
 			continue;
 
 		diffuseIllumination += std::max(0.0f, lightDirection * normal) * L.w;
-		specularIllumination += pow(std::max(0.0f, lightDirection.reflect(normal).norm() * ray_direction), mat.spec_exp) * L.w;
+		specularIllumination += pow(std::max(0.0f, reflect(lightDirection, normal).norm() * ray_direction), mat.spec_exp) * L.w;
 	}
 
 	colour32 materialColour;

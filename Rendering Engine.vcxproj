@@ -182,6 +182,7 @@
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EventHandler.cpp" />
+    <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="MessagePump.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="LightSource.cpp" />
@@ -236,8 +237,8 @@
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="Explosion.h" />
     <ClInclude Include="Icons.h" />
-    <ClInclude Include="Materials.h" />
     <ClInclude Include="MessagePump.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="LightSource.h" />

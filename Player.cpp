@@ -55,12 +55,11 @@ void Player::gotHitFrom(vect3 hit)
 void Player::moveOutOfHarmsWay()
 {
 	lastHit++;
-	if (lastHit <= 30)
+	if (lastHit <= 20)
 	{
 		vect3 currentPos = this->getPosition();
-		vect3 safety = unitVector(unitVector(hitFrom ^ vect3{ 0.0f, 0.0f, -1.0f, 1.0f }) + hitFrom);
-		//vect3 safety = unitVector(hitFrom ^ currentPos + hitFrom * -1.0f);
-		currentPos += safety * (2.0f * runningSpeed);
+		vect3 toSafety = (hitFrom ^ vect3{ 0.0f, 0.0f, -1.0f, 1.0f }).norm() + hitFrom.norm();
+		currentPos += toSafety * (3.0f * runningSpeed);
 		x = currentPos.x;
 		y = currentPos.y;
 		z = currentPos.z;

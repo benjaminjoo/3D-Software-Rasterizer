@@ -15,6 +15,7 @@
 #include "SolidSphere.h"
 #include "SolidCube.h"
 #include "Bullet.h"
+#include "Explosion.h"
 #include "Text.h"
 #include "ParticleSystem.h"
 #include "DynamicMesh.h"
@@ -38,6 +39,7 @@ private:
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
 	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
+	std::vector<std::shared_ptr<Explosion>>		Explosions;
 	std::vector<std::shared_ptr<DynamicMesh>>	DynamicSurfaces;
 	std::vector<std::shared_ptr<Terrain>>		StaticSurfaces;
 	std::vector<std::shared_ptr<PointCloud>>	PointClouds;
@@ -70,6 +72,7 @@ private:
 	void updateEntities();
 	void updateBalls();
 	void updateProjectiles();
+	void updateExplosions();
 
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::shared_ptr<Player>);
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
@@ -98,7 +101,8 @@ public:
 	void addDynamicSurface(std::shared_ptr<DynamicMesh>);
 	void addStaticSurface(std::shared_ptr<Terrain>);
 	void addPointCloud(std::shared_ptr<PointCloud>);
-	void loadProjectile(unsigned);
+	void loadProjectile(unsigned n);
+	void addExplosion(unsigned n);
 	void updateAll();
 
 };

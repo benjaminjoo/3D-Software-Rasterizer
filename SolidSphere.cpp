@@ -397,3 +397,26 @@ bool SolidSphere::intersect(const vect3& eye_centre, const vect3& eye_direction,
 	return true;
 }
 
+
+void SolidSphere::explode()
+{
+	float phase = ticksSinceHit / 60.0f;
+	if (phase > 0.0f && phase < 1.0f)
+	{
+		int n = getTotalPoly();
+		float sc = 0.01f / phase;
+		for (int i = 0; i < n; i++)
+		{
+			float bx = float(rand() % 10) / 100.0f;
+			float by = float(rand() % 10) / 100.0f;
+			float bz = float(rand() % 10) / 100.0f;
+			vect3 bias = { bx, by, bz, 1.0f };
+			vect3 expVect = (mesh[i].N.norm() + bias).scale(sc);
+			mesh[i].A += expVect;
+			mesh[i].B += expVect;
+			mesh[i].C += expVect;
+		}
+		std::cout << "*";
+	}
+}
+

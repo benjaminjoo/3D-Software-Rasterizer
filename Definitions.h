@@ -363,26 +363,6 @@ struct vect3
 	{
 		return { x * s, y * s, z * s, 1.0f };
 	}
-
-	vect3 reflect(vect3 N)
-	{
-		return *this - N.scale(2.0f * (*this * N));
-	}
-
-	vect3 refract(vect3 N, const float eta_t, const float eta_i = 1.0f)
-	{
-		float cosI = -std::max(-1.0f, std::min(1.0f, (*this).norm() * N.norm()));
-		if (cosI < 0.0f)
-			return refract(N.scale(-1.0f), eta_i, eta_t);
-		float eta = eta_i / eta_t;
-		float k = 1.0f - eta * eta * (1.0f - cosI * cosI);
-		if (k < 0.0f)
-			return { 1.0f, 0.0f, 0.0f, 0.0f };
-		else
-		{
-			return (*this).scale(eta) + N.scale(eta * cosI - sqrtf(k));
-		}
-	}
 };
 
 

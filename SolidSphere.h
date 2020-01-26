@@ -26,4 +26,6 @@ public:
 	void getTriangleData(triangle3dV*);
 
 	bool intersect(const vect3& eye_centre, const vect3& eye_direction, float& depth);
+
+	void explode();
 };
