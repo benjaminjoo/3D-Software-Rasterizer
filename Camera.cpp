@@ -593,11 +593,11 @@ void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSourc
 
 	if (visualStyle == projectionStyle::blinn_phong)
 	{
-		Renderer->illuminatePoly(Sun, viewDirection, &viewT, worldT, visualStyle, 0.0f);
-		getSpec(illSpec, Sun, worldT, 16.0f);
+		Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.0f);
+		getSpecular(illSpec, Sun, worldT, 16.0f);
 	}
 	else
-		Renderer->illuminatePoly(Sun, viewDirection, &viewT, worldT, visualStyle, 0.1f);
+		Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.1f);
 
 
 	int nVert = this->clipToFrustum(viewT, vertexList, uvList, specularList);
@@ -610,7 +610,7 @@ void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSourc
 }
 
 
-void Camera::getSpec(float* illSp, LightSource Light, const triangle3dV& worldT, float shine)
+void Camera::getSpecular(float* illSp, LightSource Light, const triangle3dV& worldT, float shine)
 {
 	illSp[0] = Light.getBlinnSpecular(worldT.An, viewDirection, shine);
 	illSp[1] = Light.getBlinnSpecular(worldT.Bn, viewDirection, shine);

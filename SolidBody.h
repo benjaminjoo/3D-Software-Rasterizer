@@ -2,6 +2,7 @@
 
 #include "Definitions.h"
 #include "Camera.h"
+#include "Lamp.h"
 #include "Projection.h"
 
 #include <memory>
@@ -131,6 +132,7 @@ public:
 
 	virtual void explode();
 	void updateMesh();
+	void scan(std::shared_ptr<Lamp> lamp, bool trans, mat4x4& rot, mat4x4& mov);
 	void render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
 		LightSource sun, const projectionStyle& style, float torch, float ill);
 };

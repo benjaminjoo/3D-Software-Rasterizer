@@ -187,6 +187,7 @@
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Explosion.cpp" />
+    <ClCompile Include="Lamp.cpp" />
     <ClCompile Include="MessagePump.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="LightSource.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Explosion.h" />
     <ClInclude Include="Icons.h" />
+    <ClInclude Include="Lamp.h" />
     <ClInclude Include="MessagePump.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="LightSource.h" />

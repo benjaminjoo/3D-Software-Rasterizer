@@ -79,7 +79,7 @@ private:
 	bool updateMovingObject(std::shared_ptr<SolidBody>);
 	bool objectApproachingWall(vect3&, vect3&, triangle3dV&);
 
-	void renderAll();
+	void renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method);
 
 	void updateFrameCounter();
 	void resetPolyCounter();

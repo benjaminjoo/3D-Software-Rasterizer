@@ -521,80 +521,78 @@ bool Game::objectApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 }
 
 
-void Game::renderAll()
+void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 {
 	polyCounter = 0;
 
-	mat4x4 RotationM = Eye->getRotation();
-	mat4x4 TranslationM = Eye->getTranslation();
+	mat4x4 RotationM = viewPort->getRotation();
+	mat4x4 TranslationM = viewPort->getTranslation();
 	mat4x4 RM = RotationM * TranslationM;
 
 	for (auto& E : Entities)
 		if (E->isVisible())
-			E->render(Eye, false, RotationM, TranslationM, *Sun,
-				Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+			E->render(viewPort, false, RotationM, TranslationM, *Sun,
+				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Hero != nullptr)
 		for (auto& P : Hero->Parts)
 			if (P->isVisible())
-				P->render(Eye, true, RotationM, TranslationM, *Sun,
-					Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+				P->render(viewPort, true, RotationM, TranslationM, *Sun,
+					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& E : Enemies)
 		if (!E->isDestroyed())
 			for (auto& P : E->Parts)
 				if (P->isVisible())
-					P->render(Eye, true, RotationM, TranslationM, *Sun,
-						Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+					P->render(viewPort, true, RotationM, TranslationM, *Sun,
+						method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Enemy != nullptr)
 		for (auto& P : Enemy->Parts)
 			if (P->isVisible())
-				P->render(Eye, true, RotationM, TranslationM, *Sun,
-					Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+				P->render(viewPort, true, RotationM, TranslationM, *Sun,
+					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& P : Projectiles)
 		if (P->isVisible())
-			P->render(Eye, true, RotationM, TranslationM, *Sun,
-				Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+			P->render(viewPort, true, RotationM, TranslationM, *Sun,
+				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& Exp : Explosions)
 		if (Exp->isActive())
-			Exp->render(Eye, Screen, RM);
+			Exp->render(viewPort, Screen, RM);
 
 	for (auto& B : Balls)
 		if (B->isVisible() && !B->isVanished())
-			B->render(Eye, true, RotationM, TranslationM, *Sun,
-				Controls->visualStyle, Controls->torchIntensity, Controls->maxIllumination);
+			B->render(viewPort, true, RotationM, TranslationM, *Sun,
+				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Emitters.size())
 	{
 		for (auto& e : Emitters)
-			e->render(Eye, Screen, RM);
+			e->render(viewPort, Screen, RM);
 	}
 
 	if (DynamicSurfaces.size())
 		for (auto& s : DynamicSurfaces)
-			s->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+			s->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
 				Controls->torchIntensity, Controls->maxIllumination);
 
 	if (StaticSurfaces.size())
 		for (auto& t : StaticSurfaces)
 		{
-			t->renderGrid(Eye, Screen, RM);
-			//t->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+			t->renderGrid(viewPort, Screen, RM);
+			//t->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
 
 	if (PointClouds.size())
 		for (auto& p : PointClouds)
 		{
-			p->renderCloud(Eye, Screen, RM);
-			//p->renderMesh(Eye, RotationM, TranslationM, *Sun, Controls->visualStyle,
+			p->renderCloud(viewPort, Screen, RM);
+			//p->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
-
-
 }
 
 
@@ -609,13 +607,15 @@ void Game::updateAll()
 	Screen->resetDepthBuffer();
 
 	if (Controls->playerControlled)
+	{
 		this->updateHeroPosition();
+		this->updateCameraPosition(Hero);
+	}		
 	else if (Controls->enemyControlled && Enemy != nullptr)
+	{
 		this->updateEnemyPosition();
-
-	this->updateCameraPosition(Hero);
-
-	//Hero->Parts[Hero->Parts.size() - 1]->position.x += Controls->mx;
+		this->updateCameraPosition(Enemy);
+	}
 
 	if (!Controls->isPaused)
 	{
@@ -692,7 +692,7 @@ void Game::updateAll()
 
 	Controls->ceaseMotion();
 
-	this->renderAll();
+	this->renderAll(Eye, Controls->visualStyle);
 
 	if (Controls->showHelp)
 		TextScreens["Controls Text"]->print(Screen);

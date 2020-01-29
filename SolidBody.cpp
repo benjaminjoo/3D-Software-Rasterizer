@@ -352,6 +352,18 @@ void SolidBody::updateMesh()
 }
 
 
+void SolidBody::scan(std::shared_ptr<Lamp> lamp, bool trans, mat4x4& rot, mat4x4& mov)
+{
+	if (mesh != nullptr)
+	{
+		if (trans)
+			lamp->scanMesh(getTotalPoly(), mesh, rot, mov, position, rotation);
+		else
+			lamp->scanMesh(getTotalPoly(), mesh, rot, mov);
+	}
+}
+
+
 void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
 				LightSource sun, const projectionStyle& style, float torch, float ill)
 {

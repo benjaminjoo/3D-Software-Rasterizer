@@ -428,7 +428,7 @@ vect3 Projection::screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, floa
 }
 
 
-void Projection::illuminatePoly(LightSource Light, vect3& View, triangle3dV* viewT, const triangle3dV& worldT, const projectionStyle& style, const float& min)
+void Projection::illuminatePoly(LightSource Light, triangle3dV* viewT, const triangle3dV& worldT, const projectionStyle& style, const float& min)
 {
 	float illumAll, illumA, illumB, illumC;
 	illumAll = illumA = illumB = illumC = 0.0f;
@@ -508,6 +508,124 @@ textCoord Projection::getUVCoord(const vect3& startV, const vect3& endV, const t
 	testC.v = startC.v + d * (endC.v - startC.v);
 
 	return testC;
+}
+
+
+void Projection::fillTriangleDepth(const triangle2dG& t, std::shared_ptr<Canvas> screen, float zNear, float h_ratio, float v_ratio)
+{
+	int w = screen->getWidth();
+	int h = screen->getHeight();
+
+	coord2 pt[3] = { t.a, t.b, t.c };
+	int yMin, yMax;
+
+	yMin = GetYMin3(pt);
+	yMax = GetYMax3(pt);
+
+	int wd = 0;
+	int dx, dy;
+	float xx, yy, zz, dz;
+	int lineEnd[2] = { 0, 0 };
+	float zLimit[2] = { 0.0f, 0.0f };
+
+	int endIndex, startX, endX;
+	float startZ, endZ, zCurrent, invertCurrentZ, deltaZ;
+
+	for (int hg = yMin; hg < yMax; hg++)
+	{
+		endIndex = 0;
+		//Side A-B:
+		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
+		{
+			dx = t.b.x - t.a.x;
+			dy = t.b.y - t.a.y;
+			dz = t.b.z - t.a.z;
+
+			yy = (float)hg - (float)t.a.y;
+			xx = dx * (yy / dy);
+			zz = t.a.z + dz * (yy / (float)dy);
+
+			wd = t.a.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				endIndex++;
+			}
+		}
+		//Side B-C:
+		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
+		{
+			dx = t.c.x - t.b.x;
+			dy = t.c.y - t.b.y;
+			dz = t.c.z - t.b.z;
+
+			yy = (float)hg - (float)t.b.y;
+			xx = dx * (yy / dy);
+			zz = t.b.z + dz * (yy / (float)dy);
+
+			wd = t.b.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				endIndex++;
+			}
+		}
+		//Side C-A:
+		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
+		{
+			dx = t.a.x - t.c.x;
+			dy = t.a.y - t.c.y;
+			dz = t.a.z - t.c.z;
+
+			yy = (float)hg - (float)t.c.y;
+			xx = dx * (yy / dy);
+			zz = t.c.z + dz * (yy / (float)dy);
+
+			wd = t.c.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+				endIndex++;
+			}
+		}
+		if (endIndex == 2)
+		{
+			if (lineEnd[0] <= lineEnd[1])
+			{
+				startX = lineEnd[0];
+				endX = lineEnd[1];
+				startZ = zLimit[0];
+				endZ = zLimit[1];
+			}
+			else
+			{
+				startX = lineEnd[1];
+				endX = lineEnd[0];
+				startZ = zLimit[1];
+				endZ = zLimit[0];
+			}
+			int span = abs(endX - startX + 1);
+			deltaZ = (endZ - startZ) / (float)span;
+			zCurrent = startZ;
+
+			for (int i = startX; i < endX + 1; i++)
+			{
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
+				{
+					invertCurrentZ = 1 / zCurrent;
+					if (invertCurrentZ < screen->depthBuffer[hg * w + i])
+					{
+						screen->pixelBuffer[hg * w + i] = getColour(0, 0, 0, (byte)(255.0f * zCurrent));
+						screen->depthBuffer[hg * w + i] = invertCurrentZ;
+					}
+					zCurrent += deltaZ;
+				}
+			}
+		}
+	}
 }
 
 

@@ -68,11 +68,13 @@ public:
 
 	vect3 screen2view(coord2 pixel, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
-	void illuminatePoly(LightSource L, vect3& V, triangle3dV* T, const triangle3dV& P, const projectionStyle& style, const float& min);
+	void illuminatePoly(LightSource L, triangle3dV* T, const triangle3dV& P, const projectionStyle& style, const float& min);
 
 	Uint32 modifyColour(const Uint32& inputColour, const float& illumination);
 
 	textCoord getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV);
+
+	void fillTriangleDepth(const triangle2dG& t, std::shared_ptr<Canvas> screen, float zNear, float h_ratio, float v_ratio);
 
 	void fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 

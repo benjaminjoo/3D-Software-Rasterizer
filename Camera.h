@@ -137,7 +137,7 @@ private:
 	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
 		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
-	void getSpec(float* illSpec, LightSource Light, const triangle3dV& worldT, float shine);
+	void getSpecular (float* illSpec, LightSource Light, const triangle3dV& worldT, float shine);
 
 	coord2 view2screen(const vect3& vertex, const float& hR, const float& vR);
 
