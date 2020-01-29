@@ -40,7 +40,7 @@ PointCloud::PointCloud(const std::string& fn, Uint32 col, bool sm) : fileName(fn
 	if (triangleInput.is_open())
 	{
 		std::string line = "";
-		int a_, b_, c_;
+		unsigned a_, b_, c_;
 		while (std::getline(triangleInput, line))
 		{
 			std::stringstream inputLine(line);
@@ -166,7 +166,7 @@ int	PointCloud::getTotalPoly()
 
 void PointCloud::invertFaces()
 {
-	for (int i = 0; i < nPoly; i++)
+	for (unsigned i = 0; i < nPoly; i++)
 	{
 		mesh[i].N = mesh[i].N.scale(-1.0f);
 		mesh[i].An = mesh[i].N;

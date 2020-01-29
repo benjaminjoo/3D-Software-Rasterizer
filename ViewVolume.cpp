@@ -5,12 +5,12 @@
 
 ViewVolume::ViewVolume()
 {
-	nearPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
-	farPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
-	leftPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
-	rightPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
-	topPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
-	bottomPlane		= { (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0) };
+	nearPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	farPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	leftPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	rightPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	topPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	bottomPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
 }
 
 
@@ -26,18 +26,18 @@ void ViewVolume::initFrustum(float fovH, float fovV, float zNear, float zFar)
 	float sinFovH2 = static_cast<float>(sin(fovH / 2));
 	float sinFovV2 = static_cast<float>(sin(fovV / 2));
 
-	nearPlane.N		= { 0.0,            0.0,            1.0,            0.0 };
-	nearPlane.P		= { 0.0,            0.0,          zNear,            1.0 };
-	farPlane.N		= { 0.0,            0.0,           -1.0,            0.0 };
-	farPlane.P		= { 0.0,            0.0,           zFar,            1.0 };
-	leftPlane.N		= { cosFovH2,		0.0,		sinFovH2, 	        0.0 };
-	leftPlane.P		= { 0.0,            0.0,            0.0001,         1.0 };
-	rightPlane.N	= { -cosFovH2,		0.0,		sinFovH2,            0.0 };
-	rightPlane.P	= { 0.0,            0.0,            0.0001,         1.0 };
-	topPlane.N		= { 0.0,		cosFovV2,		sinFovV2,             0.0 };
-	topPlane.P		= { 0.0,            0.0,            0.0001,         1.0 };
-	bottomPlane.N	= { 0.0,		-cosFovV2,		sinFovV2,           0.0 };
-	bottomPlane.P	= { 0.0,            0.0,            0.0001,         1.0 };
+	nearPlane.N		= { 0.0f,            0.0f,          1.0f,            0.0f };
+	nearPlane.P		= { 0.0f,            0.0f,         zNear,            1.0f };
+	farPlane.N		= { 0.0f,            0.0f,         -1.0f,            0.0f };
+	farPlane.P		= { 0.0f,            0.0f,          zFar,            1.0f };
+	leftPlane.N		= { cosFovH2,		 0.0f,		sinFovH2, 	         0.0f };
+	leftPlane.P		= { 0.0f,            0.0f,       0.0001f,            1.0f };
+	rightPlane.N	= { -cosFovH2,		 0.0f,		sinFovH2,            0.0f };
+	rightPlane.P	= { 0.0f,            0.0f,       0.0001f,            1.0f };
+	topPlane.N		= { 0.0f,		 cosFovV2,		sinFovV2,            0.0f };
+	topPlane.P		= { 0.0f,            0.0f,       0.0001f,            1.0f };
+	bottomPlane.N	= { 0.0f,		-cosFovV2,		sinFovV2,            0.0f };
+	bottomPlane.P	= { 0.0f,            0.0f,       0.0001f,            1.0f };
 }
 
 

@@ -211,10 +211,18 @@ triangle3dV Projection::scaleT(float x, float y, float z, triangle3dV T)
 	T.A = scale(x, y, z, T.A);
 	T.B = scale(x, y, z, T.B);
 	T.C = scale(x, y, z, T.C);
-	T.An = scale(sign(x), sign(y), sign(z), T.An);
-	T.Bn = scale(sign(x), sign(y), sign(z), T.Bn);
-	T.Cn = scale(sign(x), sign(y), sign(z), T.Cn);
-	T.N = scale(sign(x), sign(y), sign(z), T.N);
+	T.An = scale(	static_cast<float>(sign(x)),
+					static_cast<float>(sign(y)),
+					static_cast<float>(sign(z)), T.An);
+	T.Bn = scale(	static_cast<float>(sign(x)),
+					static_cast<float>(sign(y)),
+					static_cast<float>(sign(z)), T.Bn);
+	T.Cn = scale(	static_cast<float>(sign(x)),
+					static_cast<float>(sign(y)),
+					static_cast<float>(sign(z)), T.Cn);
+	T.N = scale(	static_cast<float>(sign(x)),
+					static_cast<float>(sign(y)),
+					static_cast<float>(sign(z)), T.N);
 
 	return T;
 }
@@ -546,7 +554,7 @@ void Projection::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -560,7 +568,7 @@ void Projection::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -574,7 +582,7 @@ void Projection::fillTriangleSolidColour(const triangle3dV& T, const triangle2dG
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -658,7 +666,7 @@ void Projection::fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Ca
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -671,7 +679,7 @@ void Projection::fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Ca
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -684,7 +692,7 @@ void Projection::fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Ca
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -768,7 +776,7 @@ void Projection::fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * ((yy + corr) / (float)dy);
 			illum = t.illumA + dIllum * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -783,7 +791,7 @@ void Projection::fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * ((yy + corr) / (float)dy);
 			illum = t.illumB + dIllum * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -798,7 +806,7 @@ void Projection::fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * ((yy + corr) / (float)dy);
 			illum = t.illumC + dIllum * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -875,8 +883,8 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = std::round(w * 0.5f);
-	int halfH = std::round(h * 0.5f);
+	int halfW = static_cast<int>(std::round(w * 0.5f));
+	int halfH = static_cast<int>(std::round(h * 0.5f));
 	int dx, dy;
 	float dIllum, illum;
 	float xx, yy, zz, dz;
@@ -915,7 +923,7 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
 			illum = t.illumA + dIllum * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -936,7 +944,7 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
 			illum = t.illumB + dIllum * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -957,7 +965,7 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
 			illum = t.illumC + dIllum * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1125,7 +1133,7 @@ void Projection::fillTriangleDepthVisualised(const triangle3dV& T, const triangl
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1138,7 +1146,7 @@ void Projection::fillTriangleDepthVisualised(const triangle3dV& T, const triangl
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1151,7 +1159,7 @@ void Projection::fillTriangleDepthVisualised(const triangle3dV& T, const triangl
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1211,8 +1219,8 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = std::round(w * 0.5f);
-	int halfH = std::round(h * 0.5f);
+	int halfW = static_cast<int>(std::round(w * 0.5f));
+	int halfH = static_cast<int>(std::round(h * 0.5f));
 	int dx, dy;
 	float dIllum, illum;
 	float xx, yy, zz, dz;
@@ -1255,7 +1263,7 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
 			illum = t.illumA + dIllum * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1276,7 +1284,7 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
 			illum = t.illumB + dIllum * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1297,7 +1305,7 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
 			illum = t.illumC + dIllum * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1432,8 +1440,8 @@ void Projection::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG&
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = std::round(w * 0.5f);
-	int halfH = std::round(h * 0.5f);
+	int halfW = static_cast<int>(std::round(w * 0.5f));
+	int halfH = static_cast<int>(std::round(h * 0.5f));
 	int dx, dy;
 	float xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1472,7 +1480,7 @@ void Projection::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG&
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1490,7 +1498,7 @@ void Projection::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG&
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1508,7 +1516,7 @@ void Projection::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG&
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1643,8 +1651,8 @@ void Projection::fillTriangleTorchlightSolidColour(const triangle3dV& T, const t
 	yMax = GetYMax3(pt);
 
 	int wd = 0;
-	int halfW = std::round(w * 0.5);
-	int halfH = std::round(h * 0.5);
+	int halfW = static_cast<int>(std::round(w * 0.5));
+	int halfH = static_cast<int>(std::round(h * 0.5));
 	int dx, dy;
 	float xx, yy, zz, dz;
 	int lineEnd[2] = { 0, 0 };
@@ -1677,7 +1685,7 @@ void Projection::fillTriangleTorchlightSolidColour(const triangle3dV& T, const t
 		{
 			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
 			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1693,7 +1701,7 @@ void Projection::fillTriangleTorchlightSolidColour(const triangle3dV& T, const t
 		{
 			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
 			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1709,7 +1717,7 @@ void Projection::fillTriangleTorchlightSolidColour(const triangle3dV& T, const t
 		{
 			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
 			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1834,7 +1842,7 @@ void Projection::fillTriangleBlinnPhong(const triangle2dG& t, float* spL, std::s
 			zz = t.a.z + dz * (yy / (float)dy);
 			illum = t.illumA + dIllum * (yy / (float)dy);
 			spec = spL[0] + dSpec * (yy / (float)dy);
-			wd = t.a.x + std::round(xx);
+			wd = t.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1852,7 +1860,7 @@ void Projection::fillTriangleBlinnPhong(const triangle2dG& t, float* spL, std::s
 			zz = t.b.z + dz * (yy / (float)dy);
 			illum = t.illumB + dIllum * (yy / (float)dy);
 			spec = spL[1] + dSpec * (yy / (float)dy);
-			wd = t.b.x + std::round(xx);
+			wd = t.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
@@ -1870,7 +1878,7 @@ void Projection::fillTriangleBlinnPhong(const triangle2dG& t, float* spL, std::s
 			zz = t.c.z + dz * (yy / (float)dy);
 			illum = t.illumC + dIllum * (yy / (float)dy);
 			spec = spL[2] + dSpec * (yy / (float)dy);
-			wd = t.c.x + std::round(xx);
+			wd = t.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;

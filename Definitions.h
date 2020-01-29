@@ -21,15 +21,6 @@
 #define MIN_ILLUMINATION	0.1f
 #define MAX_ILLUMINATION	1.25f
 
-#define MAXENTITIES			1024
-
-#define MAXLIGHTSOURCES		64
-#define MAXSPHERES			64
-#define MAXCUBES			64
-#define MAXPRISMS			64
-#define MAXCYLINDERS		64
-#define MAXCONES			64
-
 #define RED			getColour(0, 255,   0,   0)
 #define GREEN		getColour(0,   0, 255,   0)
 #define BLUE		getColour(0,   0,   0, 255)

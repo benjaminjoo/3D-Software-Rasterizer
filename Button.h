@@ -9,7 +9,7 @@
 
 class Button
 {
-	std::shared_ptr<Canvas> S = std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9);
+	std::shared_ptr<Canvas> S = std::make_shared<Canvas>("Editor", EDITOR_WIDTH, EDITOR_HEIGHT, 999.9f);
 	screenCoord				size = { 32, 32 };
 	screenCoord				position = { 0 * 32, 1 * 32 };;
 	bool					isActive = false;

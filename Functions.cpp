@@ -3,7 +3,7 @@
 
 float distancePN(polyNode a, polyNode b)
 {
-	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+	return sqrtf((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
 
@@ -66,7 +66,7 @@ polyNode unitNode(polyNode a)
 {
 	polyNode t;
 
-	float length = sqrt(a.x * a.x + a.y * a.y);
+	float length = sqrtf(a.x * a.x + a.y * a.y);
 	t.x = a.x / length;
 	t.y = a.y / length;
 	t.s = a.s;
@@ -291,7 +291,7 @@ vect3 unitVector(vect3 v)
 {
 	vect3 temp;
 
-	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 
 	temp.x = v.x / length;
 	temp.y = v.y / length;
@@ -306,7 +306,7 @@ worldCoord unitVector2(worldCoord v)
 {
 	worldCoord temp;
 
-	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 
 	temp.x = v.x / length;
 	temp.y = v.y / length;
@@ -320,9 +320,9 @@ vect3 dirVector(float azm, float alt)
 {
 	vect3 temp;
 
-	temp.x = (float)cos(alt * PI / 180.0f) * (float)cos(azm * PI / 180.0f);
-	temp.y = (float)cos(alt * PI / 180.0f) * (float)sin(azm * PI / 180.0f);
-	temp.z = (float)sin(alt * PI / 180.0f);
+	temp.x = cosf(alt * PI / 180.0f) * cosf(azm * PI / 180.0f);
+	temp.y = cosf(alt * PI / 180.0f) * sinf(azm * PI / 180.0f);
+	temp.z = sinf(alt * PI / 180.0f);
 	temp.w = 1.0f;
 
 	return temp;
@@ -342,21 +342,21 @@ worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, float
 
 	if (currentView == Side::Top)
 	{
-		result.x = temp.x * (float)cos(angle) - temp.y * (float)sin(angle);
-		result.y = temp.y * (float)cos(angle) + temp.x * (float)sin(angle);
+		result.x = temp.x * cosf(angle) - temp.y * sinf(angle);
+		result.y = temp.y * cosf(angle) + temp.x * sinf(angle);
 		result.z = target.z;
 	}
 	else if (currentView == Side::Front)
 	{
-		result.x = temp.x * (float)cos(angle) - temp.z * (float)sin(angle);
+		result.x = temp.x * cosf(angle) - temp.z * sinf(angle);
 		result.y = target.y;
-		result.z = temp.z * (float)cos(angle) + temp.x * (float)sin(angle);
+		result.z = temp.z * cosf(angle) + temp.x * sinf(angle);
 	}
 	else if (currentView == Side::Right)
 	{
 		result.x = target.x;
-		result.y = temp.y * (float)cos(angle) - temp.z * (float)sin(angle);
-		result.z = temp.z * (float)cos(angle) + temp.y * (float)sin(angle);
+		result.y = temp.y * cosf(angle) - temp.z * sinf(angle);
+		result.z = temp.z * cosf(angle) + temp.y * sinf(angle);
 	}
 
 	result.x += origin.x;

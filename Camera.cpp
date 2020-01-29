@@ -7,11 +7,9 @@
 #include "Canvas.h"
 
 
-#define PI					3.141592654
-
 Camera::Camera() :
 	x(0.0f), y(0.0f), z(0.0f), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
-	fovH(PI * 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(320), h(200)
+	fovH(PI * 0.5f / 90.0f * 85.0f), zNear(1.0f), zFar(99.9f), w(320), h(200)
 {
 	std::cout << "Camera constructor called" << std::endl;
 
@@ -28,7 +26,7 @@ Camera::Camera() :
 
 Camera::Camera(float cx, float cy, float cz, int width, int height, int s) :
 	x(cx), y(cy), z(cz), step(1.0f), turn(0.1f), azm(0.0f), alt(0.0f), rol(0.0f),
-	fovH(PI * 0.5 / 90 * 85), zNear(1.0f), zFar(99.9f), w(width), h(height)
+	fovH(PI * 0.5f / 90.0f * 85.0f), zNear(1.0f), zFar(99.9f), w(width), h(height)
 {
 	std::cout << "Camera constructor called" << std::endl;
 
@@ -109,19 +107,19 @@ float Camera::getFovH()
 
 float Camera::getFovV()
 {
-	return (atan(tan(fovH * 0.5) / (w / h))) * 2;
+	return (atanf(tanf(fovH * 0.5f) / (w / h))) * 2.0f;
 }
 
 
 float Camera::getHRatio()
 {
-	return 1 / (tan(fovH / 2));
+	return 1 / (tan(fovH / 2.0f));
 }
 
 
 float Camera::getVRatio()
 {
-	return 1 / (tan(atan(tan(fovH * 0.5) / (w / h) * 2)));
+	return 1 / (tanf(atanf(tanf(fovH * 0.5f) / (w / h) * 2.0f)));
 }
 
 
@@ -428,8 +426,8 @@ mat4x4 Camera::getRotation(axis t, float a)
 						0.0f, 0.0f, 1.0f, 0.0f,
 						0.0f, 0.0f, 0.0f, 1.0f };
 
-	float sinA = sin(a);
-	float cosA = cos(a);
+	float sinA = sinf(a);
+	float cosA = cosf(a);
 
 	switch (t)
 	{
@@ -626,8 +624,8 @@ inline coord2 Camera::view2screen(const vect3& vertex, const float& hR, const fl
 
 	float s = float(w) * 0.475f; //w* 0.5f* 0.95f
 
-	pixel.x = (int)(w * 0.5 + (vertex.x / vertex.z) * s * hR);
-	pixel.y = (int)(h * 0.5 - (vertex.y / vertex.z) * s * vR);
+	pixel.x = (int)(w * 0.5f + static_cast<float>(vertex.x / vertex.z) * s * hR);
+	pixel.y = (int)(h * 0.5f - static_cast<float>(vertex.y / vertex.z) * s * vR);
 	pixel.z = 1 / vertex.z;
 
 	return pixel;

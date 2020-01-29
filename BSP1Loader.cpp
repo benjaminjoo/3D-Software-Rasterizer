@@ -197,7 +197,8 @@ void BSP1Loader::readData()
 		}
 		for (unsigned long i = 0; i < numtex; i++)
 		{
-			modelFile.seekg(unsigned long(direntry[2].offset) + unsigned long(offset[i]), modelFile.beg);
+			modelFile.seekg(static_cast<unsigned long>(direntry[2].offset) +
+							static_cast<unsigned long>(offset[i]), modelFile.beg);
 
 			miptex_t temp;
 
@@ -235,7 +236,8 @@ void BSP1Loader::readData()
 
 			tempTexture.pixels = new Uint32[nPixel];
 
-			modelFile.seekg(unsigned long(direntry[2].offset) + unsigned long(offset[i]) + temp.offset_1, modelFile.beg);
+			modelFile.seekg(static_cast<unsigned long>(direntry[2].offset) +
+							static_cast<unsigned long>(offset[i]) + temp.offset_1, modelFile.beg);
 			for (int p = 0; p < nPixel; p++)
 			{
 				char colour;
@@ -469,7 +471,7 @@ line3d BSP1Loader::getLine(unsigned int n)
 	}
 	else
 	{
-		return { (0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 1.0), 255 };
+		return { (0.0f, 0.0f, 0.0f, 1.0f), (0.0f, 0.0f, 0.0f, 1.0f), 255 };
 	}
 }
 

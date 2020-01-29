@@ -41,9 +41,9 @@ void Explosion::loadPoints()
 		float bz = -0.5f + float(rand() % 10) / 10.0f;
 		vect3 bias = { bx, by, bz, 1.0f };
 
-		float bs = (rand() % 10 > 7) ? float(rand() % 100) / 100.0f * 2.0 : float(rand() % 100) / 100.0f;
+		float bs = (rand() % 10 > 7) ? float(rand() % 100) / 100.0f * 2.0f : float(rand() % 100) / 100.0f;
 
-		temp.N = temp.P.norm().scale(bs) + bias.norm().scale(0.1 * bs);
+		temp.N = temp.P.norm().scale(bs) + bias.norm().scale(0.1f * bs);
 
 		int c = rand() % 4;
 		switch (c)

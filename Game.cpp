@@ -783,17 +783,17 @@ void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 	}
 	if (polyN)
 	{
-		Screen->displayValue(polyCounter, 0, 2, 53, 0x00ff0000);
+		Screen->displayValue(static_cast<float>(polyCounter), 0, 2, 53, 0x00ff0000);
 	}
 	if (amm)
 	{
-		Screen->displayValue(ammo, 0, 100, 3, 0x007f7f00);
+		Screen->displayValue(static_cast<float>(ammo), 0, 100, 3, 0x007f7f00);
 	}
 
-	Screen->displayValue(Hero->health, 0, 90, 3, 0x000000ff);
+	Screen->displayValue(static_cast<float>(Hero->health), 0, 90, 3, 0x000000ff);
 
 	for (unsigned int i = 0; i < Enemies.size(); i++)
-		Screen->displayValue(Enemies[i]->health, 0, 80, 3 + i, 0x00ffffff);
+		Screen->displayValue(static_cast<float>(Enemies[i]->health), 0, 80, 3 + i, 0x00ffffff);
 
 	switch (Controls->purposeOfAI)
 	{
