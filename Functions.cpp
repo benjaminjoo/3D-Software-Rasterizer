@@ -340,19 +340,19 @@ worldCoord rotate2(worldCoord target, Side currentView, worldCoord origin, float
 	worldCoord temp = target - origin;
 	worldCoord result = { 0.0f, 0.0f, 0.0f };
 
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		result.x = temp.x * (float)cos(angle) - temp.y * (float)sin(angle);
 		result.y = temp.y * (float)cos(angle) + temp.x * (float)sin(angle);
 		result.z = target.z;
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		result.x = temp.x * (float)cos(angle) - temp.z * (float)sin(angle);
 		result.y = target.y;
 		result.z = temp.z * (float)cos(angle) + temp.x * (float)sin(angle);
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		result.x = target.x;
 		result.y = temp.y * (float)cos(angle) - temp.z * (float)sin(angle);
@@ -385,13 +385,13 @@ float distPoint2Line(worldCoord P, Side view, line3 L)
 	worldCoord normal = rotate2(unitVector2(L.vert[1] - L.vert[0]), view, { 0.0f, 0.0f, 0.0f }, PI * 0.5f);
 	switch (view)
 	{
-	case Top:
+	case Side::Top:
 		normal.z = 0.0f;
 		break;
-	case Front:
+	case Side::Front:
 		normal.y = 0.0f;
 		break;
-	case Right:
+	case Side::Right:
 		normal.x = 0.0f;
 		break;
 	}
@@ -410,21 +410,21 @@ bool pointIsAroundLine(worldCoord P, Side view, line3 L)
 	worldCoord A = L.vert[0], B = L.vert[1];
 	switch (view)
 	{
-	case Top:
+	case Side::Top:
 	{
 		A.z = 0.0f;
 		B.z = 0.0f;
 		P.z = 0.0f;
 	}
 	break;
-	case Front:
+	case Side::Front:
 	{
 		A.y = 0.0f;
 		B.y = 0.0f;
 		P.y = 0.0f;
 	}
 	break;
-	case Right:
+	case Side::Right:
 	{
 		A.x = 0.0f;
 		B.x = 0.0f;

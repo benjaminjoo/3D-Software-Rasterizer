@@ -9,8 +9,8 @@
 
 #define GRAVITY				0.5f
 
-#define SCREEN_WIDTH		900
-#define SCREEN_HEIGHT		450
+#define SCREEN_WIDTH		1200
+#define SCREEN_HEIGHT		600
 #define EDITOR_WIDTH		1200
 #define EDITOR_HEIGHT		600
 #define MAX_MARGIN			200
@@ -44,7 +44,7 @@
 enum class axis { x, y, z };
 
 
-enum Side
+enum class Side
 {
 	Bottom,
 	Top,
@@ -55,7 +55,7 @@ enum Side
 };
 
 
-enum editingMode
+enum class editingMode
 {
 	Selection,
 	Placement,
@@ -67,7 +67,7 @@ enum editingMode
 };
 
 
-enum tool
+enum class tool
 {
 	none,
 	arrow,
@@ -85,21 +85,21 @@ enum tool
 };
 
 
-enum toolStatus
+enum class toolStatus
 {
 	active,
 	inactive
 };
 
 
-enum handedness
+enum class handedness
 {
 	left,
 	right
 };
 
 
-enum projectionStyle
+enum class projectionStyle
 {
 	wireframe,
 	solid_colour,
@@ -115,14 +115,14 @@ enum projectionStyle
 };
 
 
-enum model
+enum class model
 {
 	solid,
 	actor
 };
 
 
-enum hit_response
+enum class hit_response
 {
 	penetrate,
 	stick,
@@ -131,7 +131,7 @@ enum hit_response
 };
 
 
-enum aiGoal
+enum class aiGoal
 {
 	be_idle,
 	follow_player,

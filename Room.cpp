@@ -97,7 +97,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 {
 	switch (currentSide)
 	{
-	case Bottom:
+	case Side::Bottom:
 		openingOnBottom = true;
 		openingBottom = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -123,7 +123,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 		openingBottom[3].z = 0.0f;
 		openingBottom[3].w = 1.0f;
 		break;
-	case Top:
+	case Side::Top:
 		openingOnTop = true;
 		openingTop = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -149,7 +149,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 		openingTop[3].z = sizeZ;
 		openingTop[3].w = 1.0f;
 		break;
-	case Back:
+	case Side::Back:
 		openingOnBack = true;
 		openingBack = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -175,7 +175,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 		openingBack[3].z = bottomLeftY + height;
 		openingBack[3].w = 1.0f;
 		break;
-	case Front:
+	case Side::Front:
 		openingOnFront = true;
 		openingFront = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -201,7 +201,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 		openingFront[3].z = bottomLeftY + height;
 		openingFront[3].w = 1.0f;
 		break;
-	case Left:
+	case Side::Left:
 		openingOnLeft = true;
 		openingLeft = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -227,7 +227,7 @@ void Room::addOpening(Side currentSide, float bottomLeftX, float bottomLeftY, fl
 		openingLeft[3].z = bottomLeftY + height;
 		openingLeft[3].w = 1.0f;
 		break;
-	case Right:
+	case Side::Right:
 		openingOnRight = true;
 		openingRight = new vect3[4];
 		if (bottomLeftX < 0.0f) { bottomLeftX = 0.0f; }
@@ -350,7 +350,7 @@ void Room::splitPolygon(Side currentSide, polygon4uv* polyPtr, polyNode p, polyN
 			polyPtr->rightChild->rightChild = nullptr;
 			//printf("...and rightChild.\n");
 
-			branch = left;
+			branch = handedness::left;
 			leftCounter = 0;
 			rightCounter = 0;
 			totalCounter = 0;
@@ -370,21 +370,21 @@ void Room::splitPolygon(Side currentSide, polygon4uv* polyPtr, polyNode p, polyN
 				if (iSect2dLine(edgeStart, edgeEnd, p, q, &intersectionPoint))
 				{
 					//printf("Edge is split...\n");
-					if (branch == left)
+					if (branch == handedness::left)
 					{
 						polyPtr->leftChild->points[leftCounter] = intersectionPoint;
 						leftCounter++;
-						branch = right;
+						branch = handedness::right;
 						polyPtr->rightChild->points[rightCounter] = intersectionPoint;
 						rightCounter++;
 						polyPtr->rightChild->points[rightCounter] = edgeEnd;
 						rightCounter++;
 					}
-					else if (branch == right)
+					else if (branch == handedness::right)
 					{
 						polyPtr->rightChild->points[rightCounter] = intersectionPoint;
 						rightCounter++;
-						branch = left;
+						branch = handedness::left;
 						polyPtr->leftChild->points[leftCounter] = intersectionPoint;
 						leftCounter++;
 						polyPtr->leftChild->points[leftCounter] = edgeEnd;
@@ -394,12 +394,12 @@ void Room::splitPolygon(Side currentSide, polygon4uv* polyPtr, polyNode p, polyN
 				else
 				{
 					//printf("Edge doesn't need to be split...\n");
-					if (branch == left)
+					if (branch == handedness::left)
 					{
 						polyPtr->leftChild->points[leftCounter] = edgeEnd;
 						leftCounter++;
 					}
-					else if (branch == right)
+					else if (branch == handedness::right)
 					{
 						polyPtr->rightChild->points[rightCounter] = edgeEnd;
 						rightCounter++;
@@ -435,18 +435,18 @@ bool Room::checkForHole(Side currentSide, polygon4uv* poly, vect3* hole)
 	}
 	switch (currentSide)
 	{
-	case Bottom:
-	case Top:
+	case Side::Bottom:
+	case Side::Top:
 		holeCentreX = (hole[0].x + hole[2].x) / 2;
 		holeCentreY = (hole[0].y + hole[2].y) / 2;
 		break;
-	case Back:
-	case Front:
+	case Side::Back:
+	case Side::Front:
 		holeCentreX = (hole[0].x + hole[2].x) / 2;
 		holeCentreY = (hole[0].z + hole[2].z) / 2;
 		break;
-	case Left:
-	case Right:
+	case Side::Left:
+	case Side::Right:
 		holeCentreX = (hole[0].y + hole[2].y) / 2;
 		holeCentreY = (hole[0].z + hole[2].z) / 2;
 		break;
@@ -476,9 +476,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 		switch (currentSide)
 		{
-		case Bottom:
+		case Side::Bottom:
 
-			if (this->checkForHole(Bottom, polyTree, openingBottom))
+			if (this->checkForHole(Side::Bottom, polyTree, openingBottom))
 			{
 				T.A.x = polyTree->points[0].x;	T.B.x = polyTree->points[1].x;	T.C.x = polyTree->points[2].x;
 				T.A.y = polyTree->points[0].y;	T.B.y = polyTree->points[1].y;	T.C.y = polyTree->points[2].y;
@@ -501,9 +501,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 			break;
 
-		case Top:
+		case Side::Top:
 
-			if (this->checkForHole(Top, polyTree, openingTop))
+			if (this->checkForHole(Side::Top, polyTree, openingTop))
 			{
 				T.A.x = polyTree->points[0].x;	T.B.x = polyTree->points[1].x;	T.C.x = polyTree->points[2].x;
 				T.A.y = polyTree->points[0].y;	T.B.y = polyTree->points[1].y;	T.C.y = polyTree->points[2].y;
@@ -526,9 +526,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 			break;
 
-		case Back:
+		case Side::Back:
 
-			if (this->checkForHole(Back, polyTree, openingBack))
+			if (this->checkForHole(Side::Back, polyTree, openingBack))
 			{
 				T.A.x = polyTree->points[0].x;	T.B.x = polyTree->points[1].x;	T.C.x = polyTree->points[2].x;
 				T.A.z = polyTree->points[0].y;	T.B.z = polyTree->points[1].y;	T.C.z = polyTree->points[2].y;
@@ -551,9 +551,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 			break;
 
-		case Front:
+		case Side::Front:
 
-			if (this->checkForHole(Front, polyTree, openingFront))
+			if (this->checkForHole(Side::Front, polyTree, openingFront))
 			{
 				T.A.x = polyTree->points[0].x;	T.B.x = polyTree->points[1].x;	T.C.x = polyTree->points[2].x;
 				T.A.z = polyTree->points[0].y;	T.B.z = polyTree->points[1].y;	T.C.z = polyTree->points[2].y;
@@ -576,9 +576,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 			break;
 
-		case Left:
+		case Side::Left:
 
-			if (this->checkForHole(Left, polyTree, openingLeft))
+			if (this->checkForHole(Side::Left, polyTree, openingLeft))
 			{
 				T.A.y = polyTree->points[0].x;	T.B.y = polyTree->points[1].x;	T.C.y = polyTree->points[2].x;
 				T.A.z = polyTree->points[0].y;	T.B.z = polyTree->points[1].y;	T.C.z = polyTree->points[2].y;
@@ -601,9 +601,9 @@ void Room::traversePolygonTree(Side currentSide, polygon4uv* polyTree, vect3 N, 
 
 			break;
 
-		case Right:
+		case Side::Right:
 
-			if (this->checkForHole(Right, polyTree, openingRight))
+			if (this->checkForHole(Side::Right, polyTree, openingRight))
 			{
 				T.A.y = polyTree->points[0].x;	T.B.y = polyTree->points[1].x;	T.C.y = polyTree->points[2].x;
 				T.A.z = polyTree->points[0].y;	T.B.z = polyTree->points[1].y;	T.C.z = polyTree->points[2].y;
@@ -720,7 +720,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingBottom[3].x;	pHole[3].y = openingBottom[3].y;
 			}
 
-			this->breakUpFace(Bottom, &currentPoly, pHole, normal, colBottom, txtBottom);
+			this->breakUpFace(Side::Bottom, &currentPoly, pHole, normal, colBottom, txtBottom);
 		}
 		else
 		{
@@ -772,7 +772,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingFront[3].x;		pHole[3].y = openingFront[3].z;
 			}
 
-			this->breakUpFace(Front, &currentPoly, pHole, normal, colFront, txtFront);
+			this->breakUpFace(Side::Front, &currentPoly, pHole, normal, colFront, txtFront);
 		}
 		else
 		{
@@ -823,7 +823,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingBack[3].x;		pHole[3].y = openingBack[3].z;
 			}
 
-			this->breakUpFace(Back, &currentPoly, pHole, normal, colBack, txtBack);
+			this->breakUpFace(Side::Back, &currentPoly, pHole, normal, colBack, txtBack);
 		}
 		else
 		{
@@ -874,7 +874,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingTop[3].x;		pHole[3].y = openingTop[3].y;
 			}
 
-			this->breakUpFace(Top, &currentPoly, pHole, normal, colTop, txtTop);
+			this->breakUpFace(Side::Top, &currentPoly, pHole, normal, colTop, txtTop);
 		}
 		else
 		{
@@ -925,7 +925,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingLeft[3].y;		pHole[3].y = openingLeft[3].z;
 			}
 
-			this->breakUpFace(Left, &currentPoly, pHole, normal, colLeft, txtLeft);
+			this->breakUpFace(Side::Left, &currentPoly, pHole, normal, colLeft, txtLeft);
 		}
 		else
 		{
@@ -976,7 +976,7 @@ void Room::calculateMesh()
 				pHole[3].x = openingRight[3].y;		pHole[3].y = openingRight[3].z;
 			}
 
-			this->breakUpFace(Right, &currentPoly, pHole, normal, colRight, txtRight);
+			this->breakUpFace(Side::Right, &currentPoly, pHole, normal, colRight, txtRight);
 		}
 		else
 		{

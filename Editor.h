@@ -18,22 +18,22 @@ public:
 	std::shared_ptr<Canvas>				Screen;
 	std::shared_ptr<ModelElementBuffer> Model;
 
-	Button				arrowButton = { Screen, 0, 0, false,	arrow,		LIGHT_GRAY };
-	Button				crossButton = { Screen, 1, 0, true,		cross,		LIGHT_GRAY };
-	Button				lineButton = { Screen, 2, 0, false,	line,		LIGHT_GRAY };
-	Button				moveButton = { Screen, 3, 0, false,	move,		LIGHT_GRAY };
-	Button				rotateButton = { Screen, 4, 0, false,	rotate,		LIGHT_GRAY };
+	Button				arrowButton = { Screen, 0, 0, false,	tool::arrow,		LIGHT_GRAY };
+	Button				crossButton = { Screen, 1, 0, true,		tool::cross,		LIGHT_GRAY };
+	Button				lineButton = { Screen, 2, 0, false,		tool::line,			LIGHT_GRAY };
+	Button				moveButton = { Screen, 3, 0, false,		tool::move,			LIGHT_GRAY };
+	Button				rotateButton = { Screen, 4, 0, false,	tool::rotate,		LIGHT_GRAY };
 
-	Button				topViewButton = { Screen, 5, 0, true,		view_top,	LIGHT_GRAY };
-	Button				frontViewButton = { Screen, 6, 0, false,	view_front,	LIGHT_GRAY };
-	Button				sideViewButton = { Screen, 7, 0, false,	view_side,	LIGHT_GRAY };
+	Button				topViewButton = { Screen, 5, 0, true,	tool::view_top,		LIGHT_GRAY };
+	Button				frontViewButton = { Screen, 6, 0, false,tool::view_front,	LIGHT_GRAY };
+	Button				sideViewButton = { Screen, 7, 0, false,	tool::view_side,	LIGHT_GRAY };
 
-	Button				objSnapButton = { Screen, 8, 0, false,	obj_snap,	LIGHT_GRAY };
-	Button				grdSnapButton = { Screen, 9, 0, false,	grid_snap,	LIGHT_GRAY };
+	Button				objSnapButton = { Screen, 8, 0, false,	tool::obj_snap,		LIGHT_GRAY };
+	Button				grdSnapButton = { Screen, 9, 0, false,	tool::grid_snap,	LIGHT_GRAY };
 
-	Side				currentView = Top;
-	editingMode			currentMode = Placement;
-	tool				currentTool = cross;
+	Side				currentView = Side::Top;
+	editingMode			currentMode = editingMode::Placement;
+	tool				currentTool = tool::cross;
 
 	bool				isObjectSnapOn = false;
 	bool				isGridSnapOn = false;

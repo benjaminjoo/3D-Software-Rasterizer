@@ -12,8 +12,8 @@ public:
 	float turnP;
 	float sensitivity;
 
-	projectionStyle visualStyle = wireframe;
-	aiGoal			purposeOfAI = be_idle;
+	projectionStyle visualStyle = projectionStyle::wireframe;
+	aiGoal			purposeOfAI = aiGoal::be_idle;
 
 	bool gouraudShading = true;
 	bool visualiseDepth = false;

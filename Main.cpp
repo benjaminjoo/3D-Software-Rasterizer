@@ -1,7 +1,7 @@
 #include <SDL/SDL.h>
 #include <SDLImage/SDL_image.h>
-#include <GLEW/glew.h>
-#include <GLM/glm.hpp>
+//#include <GLEW/glew.h>
+//#include <GLM/glm.hpp>
 #include <stdlib.h>
 #include <time.h>
 #include "Definitions.h"
@@ -401,9 +401,9 @@ void fps_game()
 		float y = float(rand() % 30) * 1.0f + 5.0f;
 		float z = float(rand() % 10) * 1.0f + 5.0f;
 
-		float vx = (-5.0f + float(rand() % 10)) * 0.05f;
-		float vy = (-5.0f + float(rand() % 10)) * 0.05f;
-		float vz = (-5.0f + float(rand() % 10)) * 0.05f;
+		float vx = (-5.0f + float(rand() % 10)) * 0.01f;
+		float vy = (-5.0f + float(rand() % 10)) * 0.01f;
+		float vz = (-5.0f + float(rand() % 10)) * 0.01f;
 
 		auto ball = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, x, y, z, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 1.0f, 8, true);
 
@@ -412,7 +412,7 @@ void fps_game()
 		ball->setMotion(true);
 		ball->setVelocity({ vx, vy, vz, 1.0f });
 		ball->setAngularVelocity({ 0.01f, 0.0f, 0.0f, 1.0f });
-		ball->setBehaviour(bounce);
+		ball->setBehaviour(hit_response::bounce);
 		ball->setBreakability(true);
 
 		fpsGame->addBall(ball);
@@ -502,7 +502,7 @@ void fps_game()
 	SDL_Quit();
 }
 
-
+/*
 void opengl_renderer()
 {
 	OpenGLCanvas Screen(1200, 600, "OpenGL Renderer");
@@ -579,7 +579,7 @@ void opengl_renderer()
 
 	for (int i = 0; i < (sizeof(textures) / sizeof(SDL_Surface*)); i++) { SDL_FreeSurface(textures[i]); }
 }
-
+*/
 
 int main(int argc, char** argv)
 {
@@ -599,7 +599,7 @@ int main(int argc, char** argv)
 		break;
 	case 'o':
 	case 'O':
-		opengl_renderer();
+		//opengl_renderer();
 		break;
 	case 'p':
 	case 'P':

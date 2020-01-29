@@ -426,7 +426,9 @@ void Projection::illuminatePoly(LightSource Light, vect3& View, triangle3dV* vie
 	illumAll = illumA = illumB = illumC = 0.0f;
 	vect3 n;
 
-	if (style == sunlight || style == gouraud_shaded || style == blinn_phong)
+	if (style == projectionStyle::sunlight ||
+		style == projectionStyle::gouraud_shaded ||
+		style == projectionStyle::blinn_phong)
 	{
 		n = worldT.An;
 		illumA = Light.getIllumination(n);

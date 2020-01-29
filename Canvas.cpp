@@ -478,7 +478,7 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 {
 	switch (mode)
 	{
-	case Selection:
+	case editingMode::Selection:
 	{
 		for (int j = 0; j < cursorSize; j++)
 		{
@@ -497,8 +497,8 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 		}
 	}
 	break;
-	case Placement:
-	case LineDrawing:
+	case editingMode::Placement:
+	case editingMode::LineDrawing:
 	{
 		for (int i = 0; i < w; i += 2)
 		{
@@ -510,8 +510,8 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 		}
 	}
 	break;
-	case Relocation:
-	case CopyRelocation:
+	case editingMode::Relocation:
+	case editingMode::CopyRelocation:
 	{
 		for (int j = 0; j < cursorSize; j++)
 		{
@@ -530,8 +530,8 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 		}
 	}
 	break;
-	case Rotation:
-	case CopyRotation:
+	case editingMode::Rotation:
+	case editingMode::CopyRotation:
 	{
 		for (int j = 0; j < cursorSize; j++)
 		{

@@ -18,19 +18,19 @@ worldCoord Editor::screen2world(screenCoord Sc)
 {
 	worldCoord temp = { 0.0f, 0.0f, 0.0f };
 
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		temp.x = ((float)(Sc.x) / scale) + viewportCentre.x;
 		temp.y = ((float)(Sc.y) / scale) + viewportCentre.y;
 		temp.z = 0.0f;
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		temp.x = ((float)(Sc.x) / scale) + viewportCentre.x;
 		temp.y = 0.0f;
 		temp.z = ((float)(Sc.y) / scale) + viewportCentre.y;
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		temp.x = 0.0f;
 		temp.y = ((float)(Sc.x) / scale) + viewportCentre.x;
@@ -52,17 +52,17 @@ screenCoord Editor::world2screen(worldCoord Wc)
 {
 	screenCoord temp = { 0, 0 };
 
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		temp.x = (int)(((Wc.x) - viewportCentre.x) * scale);
 		temp.y = (int)(((Wc.y) - viewportCentre.y) * scale);
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		temp.x = (int)(((Wc.x) - viewportCentre.x) * scale);
 		temp.y = (int)(((Wc.z) - viewportCentre.y) * scale);
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		temp.x = (int)(((Wc.y) - viewportCentre.x) * scale);
 		temp.y = (int)(((Wc.z) - viewportCentre.y) * scale);
@@ -74,19 +74,19 @@ screenCoord Editor::world2screen(worldCoord Wc)
 
 void Editor::updateWorldPosition()
 {
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		worldPosition.x = viewportCentre.x + (float)planPosition.x / scale;
 		worldPosition.y = -(viewportCentre.y + (float)planPosition.y / scale);
 		worldPosition.z = 0.0f;
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		worldPosition.x = viewportCentre.x + (float)frontPosition.x / scale;
 		worldPosition.y = 0.0f;
 		worldPosition.z = -(viewportCentre.y + (float)frontPosition.y / scale);
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		worldPosition.x = 0.0f;
 		worldPosition.y = viewportCentre.x + (float)rightPosition.x / scale;
@@ -110,17 +110,17 @@ void Editor::compensateZoom()
 {
 	mouseAfterZoom = screen2world(mousePosition);
 
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		viewportCentre.x += (mouseBeforeZoom.x - mouseAfterZoom.x);
 		viewportCentre.y += (mouseBeforeZoom.y - mouseAfterZoom.y);
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		viewportCentre.x += (mouseBeforeZoom.x - mouseAfterZoom.x);
 		viewportCentre.y += (mouseBeforeZoom.z - mouseAfterZoom.z);
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		viewportCentre.x += (mouseBeforeZoom.y - mouseAfterZoom.y);
 		viewportCentre.y += (mouseBeforeZoom.z - mouseAfterZoom.z);
@@ -135,7 +135,7 @@ void Editor::updateUtilities()
 
 	this->updateWorldPosition();
 
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
@@ -143,7 +143,7 @@ void Editor::updateUtilities()
 			Screen->drawSnapTarget(planPosition, WHITE);
 		}
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
@@ -151,7 +151,7 @@ void Editor::updateUtilities()
 			Screen->drawSnapTarget(frontPosition, WHITE);
 		}
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
@@ -224,7 +224,9 @@ void Editor::updateLines()
 				Screen->drawLine(tempStart, tempEnd, 1, BLUE);
 			}
 		}
-		if ((currentMode == Relocation || currentMode == CopyRelocation) && clicksInQueue == 1)
+		if ((	currentMode == editingMode::Relocation ||
+				currentMode == editingMode::CopyRelocation) &&
+				clicksInQueue == 1)
 		{
 			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))						//Draw all visible lines currently being moved
 			{
@@ -241,7 +243,9 @@ void Editor::updateLines()
 				Screen->drawLine(tempStart, tempEnd, 1, ORANGE);
 			}
 		}
-		if ((currentMode == Rotation || currentMode == CopyRotation) && clicksInQueue == 2)		//Draw all visible lines currently being rotated
+		if ((	currentMode == editingMode::Rotation ||
+				currentMode == editingMode::CopyRotation) &&
+				clicksInQueue == 2)		//Draw all visible lines currently being rotated
 		{
 			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))
 			{
@@ -283,7 +287,9 @@ void Editor::updateVertices()
 				Screen->drawSpot(temp, BLUE);
 			}
 		}
-		if ((currentMode == Relocation || currentMode == CopyRelocation) && clicksInQueue == 1)
+		if ((	currentMode == editingMode::Relocation ||
+				currentMode == editingMode::CopyRelocation) &&
+				clicksInQueue == 1)
 		{
 			if (Model->isVertex3Selected(i) && !Model->isVertex3Deleted(i))					//Draw all visible vertices currently being moved
 			{
@@ -295,7 +301,9 @@ void Editor::updateVertices()
 				Screen->drawSpot(temp, ORANGE);
 			}
 		}
-		if ((currentMode == Rotation || currentMode == CopyRotation) && clicksInQueue == 2)		//Draw all visible vertices currently being rotated
+		if ((	currentMode == editingMode::Rotation ||
+				currentMode == editingMode::CopyRotation) &&
+				clicksInQueue == 2)		//Draw all visible vertices currently being rotated
 		{
 			if (Model->isVertex3Selected(i) && !Model->isVertex3Deleted(i))
 			{
@@ -320,7 +328,8 @@ void Editor::updateVertices()
 
 void Editor::hintResult()
 {
-	if (currentMode == Relocation || currentMode == CopyRelocation)								//Hint line of movement
+	if (currentMode == editingMode::Relocation ||
+		currentMode == editingMode::CopyRelocation)								//Hint line of movement
 	{
 		if (clicksInQueue == 1)
 		{
@@ -333,7 +342,8 @@ void Editor::hintResult()
 		}
 	}
 
-	if (currentMode == Rotation || currentMode == CopyRotation)								//Hint rotation angle
+	if (currentMode == editingMode::Rotation ||
+		currentMode == editingMode::CopyRotation)								//Hint rotation angle
 	{
 		if (clicksInQueue == 1)
 		{
@@ -358,7 +368,7 @@ void Editor::hintResult()
 		}
 	}
 
-	if (currentMode == LineDrawing)								//Hint line of movement
+	if (currentMode == editingMode::LineDrawing)								//Hint line of movement
 	{
 		if (clicksInQueue == 1)
 		{
@@ -406,7 +416,7 @@ void Editor::drawIcons()
 
 void Editor::mouseMotion(int mx, int my)
 {
-	if (currentView == Top)
+	if (currentView == Side::Top)
 	{
 		planPosition.x = mx;
 		planPosition.y = my;
@@ -415,7 +425,7 @@ void Editor::mouseMotion(int mx, int my)
 		if (planPosition.y < 0) { planPosition.y = 0; }
 		if (planPosition.y > EDITOR_HEIGHT - 1) { planPosition.y = EDITOR_HEIGHT - 1; }
 	}
-	else if (currentView == Front)
+	else if (currentView == Side::Front)
 	{
 		frontPosition.x = mx;
 		frontPosition.y = my;
@@ -424,7 +434,7 @@ void Editor::mouseMotion(int mx, int my)
 		if (frontPosition.y < 0) { frontPosition.y = 0; }
 		if (frontPosition.y > EDITOR_HEIGHT - 1) { frontPosition.y = EDITOR_HEIGHT - 1; }
 	}
-	else if (currentView == Right)
+	else if (currentView == Side::Right)
 	{
 		rightPosition.x = mx;
 		rightPosition.y = my;
@@ -442,7 +452,7 @@ void Editor::leftMouseClick(screenCoord X)
 	if (isObjectSnapOn) { this->snapToVert(&P); }
 	if (X.y > 31)
 	{
-		if (currentMode == Selection)
+		if (currentMode == editingMode::Selection)
 		{
 			for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 			{
@@ -514,14 +524,14 @@ void Editor::leftMouseClick(screenCoord X)
 				}
 			}
 		}
-		if (currentMode == Placement)
+		if (currentMode == editingMode::Placement)
 		{
 			worldCoord temp = P;
 			vertex3 tempVert = { currentID, temp, false, false };
 			Model->addVertex3(tempVert);
 			currentID++;
 		}
-		if (currentMode == LineDrawing)
+		if (currentMode == editingMode::LineDrawing)
 		{
 			if (clicksInQueue == 0)
 			{
@@ -536,7 +546,8 @@ void Editor::leftMouseClick(screenCoord X)
 				clicksInQueue = 0;
 			}
 		}
-		if (currentMode == Relocation || currentMode == CopyRelocation)
+		if (currentMode == editingMode::Relocation ||
+			currentMode == editingMode::CopyRelocation)
 		{
 			if (clicksInQueue == 0)
 			{
@@ -546,18 +557,19 @@ void Editor::leftMouseClick(screenCoord X)
 			else
 			{
 				movementEnd = P;
-				if (currentMode == Relocation)
+				if (currentMode == editingMode::Relocation)
 				{
 					this->moveSelected();
 				}
-				else if (currentMode == CopyRelocation)
+				else if (currentMode == editingMode::CopyRelocation)
 				{
 					this->copyMoveSelected();
 				}
 				clicksInQueue = 0;
 			}
 		}
-		if (currentMode == Rotation || currentMode == CopyRotation)
+		if (currentMode == editingMode::Rotation ||
+			currentMode == editingMode::CopyRotation)
 		{
 			if (clicksInQueue == 0)
 			{
@@ -584,11 +596,11 @@ void Editor::leftMouseClick(screenCoord X)
 					this->alignToAxis(&temp);
 					rotationEnd = rotationCentre + temp;
 				}
-				if (currentMode == Rotation)
+				if (currentMode == editingMode::Rotation)
 				{
 					this->rotateSelected();
 				}
-				else if (currentMode == CopyRotation)
+				else if (currentMode == editingMode::CopyRotation)
 				{
 					this->copyRotateSelected();
 				}
@@ -640,8 +652,8 @@ void Editor::leftMouseClick(screenCoord X)
 
 void Editor::activateSelection()
 {
-	currentTool = arrow;
-	currentMode = Selection;
+	currentTool = tool::arrow;
+	currentMode = editingMode::Selection;
 	arrowButton.turnOn();
 	crossButton.turnOff();
 	lineButton.turnOff();
@@ -652,8 +664,8 @@ void Editor::activateSelection()
 
 void Editor::activatePlacement()
 {
-	currentTool = cross;
-	currentMode = Placement;
+	currentTool = tool::cross;
+	currentMode = editingMode::Placement;
 	arrowButton.turnOff();
 	crossButton.turnOn();
 	lineButton.turnOff();
@@ -664,8 +676,8 @@ void Editor::activatePlacement()
 
 void Editor::activateLineDrawing()
 {
-	currentTool = line;
-	currentMode = LineDrawing;
+	currentTool = tool::line;
+	currentMode = editingMode::LineDrawing;
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOn();
@@ -676,8 +688,8 @@ void Editor::activateLineDrawing()
 
 void Editor::activateRelocation()
 {
-	currentTool = move;
-	currentMode = Relocation;
+	currentTool = tool::move;
+	currentMode = editingMode::Relocation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
@@ -688,8 +700,8 @@ void Editor::activateRelocation()
 
 void Editor::activateRotation()
 {
-	currentTool = rotate;
-	currentMode = Rotation;
+	currentTool = tool::rotate;
+	currentMode = editingMode::Rotation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
@@ -700,8 +712,8 @@ void Editor::activateRotation()
 
 void Editor::activateCopyRelocation()
 {
-	currentTool = copy_move;
-	currentMode = CopyRelocation;
+	currentTool = tool::copy_move;
+	currentMode = editingMode::CopyRelocation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
@@ -712,8 +724,8 @@ void Editor::activateCopyRelocation()
 
 void Editor::activateCopyRotation()
 {
-	currentTool = copy_rotate;
-	currentMode = CopyRotation;
+	currentTool = tool::copy_rotate;
+	currentMode = editingMode::CopyRotation;
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
@@ -724,7 +736,7 @@ void Editor::activateCopyRotation()
 
 void Editor::activateTopView()
 {
-	currentView = Top;
+	currentView = Side::Top;
 	topViewButton.turnOn();
 	frontViewButton.turnOff();
 	sideViewButton.turnOff();
@@ -733,7 +745,7 @@ void Editor::activateTopView()
 
 void Editor::activateFrontView()
 {
-	currentView = Front;
+	currentView = Side::Front;
 	topViewButton.turnOff();
 	frontViewButton.turnOn();
 	sideViewButton.turnOff();
@@ -742,7 +754,7 @@ void Editor::activateFrontView()
 
 void Editor::activateRightView()
 {
-	currentView = Right;
+	currentView = Side::Right;
 	topViewButton.turnOff();
 	frontViewButton.turnOff();
 	sideViewButton.turnOn();
@@ -840,7 +852,7 @@ void Editor::alignToAxis(worldCoord* V)
 
 	switch (currentView)
 	{
-	case Top:
+	case Side::Top:
 	{
 		maxExtent = abs(V->x); greatest = 'x';
 		if (abs(V->y) > maxExtent) { maxExtent = abs(V->y); greatest = 'y'; }
@@ -848,7 +860,7 @@ void Editor::alignToAxis(worldCoord* V)
 		else if (greatest == 'y') { V->x = 0.0f; }
 	}
 	break;
-	case Front:
+	case Side::Front:
 	{
 		maxExtent = abs(V->x); greatest = 'x';
 		if (abs(V->z) > maxExtent) { maxExtent = abs(V->z); greatest = 'z'; }
@@ -856,7 +868,7 @@ void Editor::alignToAxis(worldCoord* V)
 		else if (greatest == 'z') { V->x = 0.0f; }
 	}
 	break;
-	case Right:
+	case Side::Right:
 	{
 		maxExtent = abs(V->y); greatest = 'y';
 		if (abs(V->z) > maxExtent) { maxExtent = abs(V->z); greatest = 'z'; }
@@ -872,13 +884,13 @@ void Editor::flattenVector(worldCoord* V)
 {
 	switch (currentView)
 	{
-	case Top:
+	case Side::Top:
 		V->z = 0.0f;
 		break;
-	case Front:
+	case Side::Front:
 		V->y = 0.0f;
 		break;
-	case Right:
+	case Side::Right:
 		V->x = 0.0f;
 		break;
 	}
@@ -891,13 +903,13 @@ float Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
 	worldCoord cp = rotStart ^ rotEnd;
 	switch (currentView)
 	{
-	case Top:
+	case Side::Top:
 		rotAngle = atan2(cp.z, rotStart * rotEnd);
 		break;
-	case Front:
+	case Side::Front:
 		rotAngle = -atan2(cp.y, rotStart * rotEnd);
 		break;
-	case Right:
+	case Side::Right:
 		rotAngle = atan2(cp.x, rotStart * rotEnd);
 		break;
 	}

@@ -13,7 +13,7 @@ class Button
 	screenCoord				size = { 32, 32 };
 	screenCoord				position = { 0 * 32, 1 * 32 };;
 	bool					isActive = false;
-	tool					toolName = none;
+	tool					toolName = tool::none;
 	Uint32					colour = BLUE;
 
 public:

@@ -593,7 +593,7 @@ void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSourc
 
 	this->world2view(RM, R, viewT);
 
-	if (visualStyle == blinn_phong)
+	if (visualStyle == projectionStyle::blinn_phong)
 	{
 		Renderer->illuminatePoly(Sun, viewDirection, &viewT, worldT, visualStyle, 0.0f);
 		getSpec(illSpec, Sun, worldT, 16.0f);
@@ -636,7 +636,7 @@ inline coord2 Camera::view2screen(const vect3& vertex, const float& hR, const fl
 
 void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torchI, float maxI, triangle3dV originalPoly)
 {
-	if (style == wireframe)
+	if (style == projectionStyle::wireframe)
 	{
 		coord2 startP, endP;
 		for (int i = 0; i < n; i++)
@@ -683,27 +683,27 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torc
 
 			switch (style)
 			{
-			case solid_colour:
+			case projectionStyle::solid_colour:
 			{
 				Renderer->fillTriangleSolidColour(originalT, screenT, Screen, hRatio, vRatio);
 			}
 			break;
-			case checkerboard:
+			case projectionStyle::checkerboard:
 			{
 				Renderer->fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
 			}
 			break;
-			case flat_shaded:
+			case projectionStyle::flat_shaded:
 			{
 				Renderer->fillTriangleFlatShaded(screenT, Screen);
 			}
 			break;
-			case gouraud_shaded:
+			case projectionStyle::gouraud_shaded:
 			{
 				Renderer->fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
 			}
 			break;
-			case blinn_phong:
+			case projectionStyle::blinn_phong:
 			{
 				float specular[3];
 				specular[0] = specularList[0];
@@ -712,27 +712,27 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torc
 				Renderer->fillTriangleBlinnPhong(screenT, specular, Screen, hRatio, vRatio);
 			}
 			break;
-			case depth_visualised:
+			case projectionStyle::depth_visualised:
 			{
 				Renderer->fillTriangleDepthVisualised(originalT, screenT, Screen, zNear, hRatio, vRatio);
 			}
 			break;
-			case sunlight:
+			case projectionStyle::sunlight:
 			{
 				Renderer->fillTriangleSunlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture);
 			}
 			break;
-			case torchlight:
+			case projectionStyle::torchlight:
 			{
 				Renderer->fillTriangleTorchlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture, torchI, maxI);
 			}
 			break;
-			case torchlight_solid:
+			case projectionStyle::torchlight_solid:
 			{
 				Renderer->fillTriangleTorchlightSolidColour(originalT, screenT, Screen, hRatio, vRatio, torchI, maxI);
 			}
 			break;
-			case test:
+			case projectionStyle::test:
 			{
 
 			}

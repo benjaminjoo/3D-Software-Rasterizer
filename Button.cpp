@@ -28,34 +28,34 @@ void Button::displayIcon()
 	const bool* currentIcon;
 	switch (toolName)
 	{
-	case arrow:
+	case tool::arrow:
 		currentIcon = arrow_inactive;
 		break;
-	case cross:
+	case tool::cross:
 		currentIcon = cross_inactive;
 		break;
-	case line:
+	case tool::line:
 		currentIcon = line_inactive;
 		break;
-	case move:
+	case tool::move:
 		currentIcon = move_inactive;
 		break;
-	case rotate:
+	case tool::rotate:
 		currentIcon = rotate_inactive;
 		break;
-	case view_top:
+	case tool::view_top:
 		currentIcon = top_inactive;
 		break;
-	case view_front:
+	case tool::view_front:
 		currentIcon = front_inactive;
 		break;
-	case view_side:
+	case tool::view_side:
 		currentIcon = side_inactive;
 		break;
-	case obj_snap:
+	case tool::obj_snap:
 		currentIcon = osnap_inactive;
 		break;
-	case grid_snap:
+	case tool::grid_snap:
 		currentIcon = grdsnap_inactive;
 		break;
 	default:

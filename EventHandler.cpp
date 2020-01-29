@@ -255,34 +255,34 @@ void EventHandler::HandleUserEvents()
 				showHelp = showHelp ? false : true;
 				break;
 			case SDLK_z:
-				visualStyle = wireframe;
+				visualStyle = projectionStyle::wireframe;
 				break;
 			case SDLK_x:
-				visualStyle = solid_colour;
+				visualStyle = projectionStyle::solid_colour;
 				break;
 			case SDLK_c:
-				visualStyle = checkerboard;
+				visualStyle = projectionStyle::checkerboard;
 				break;
 			case SDLK_v:
-				visualStyle = flat_shaded;
+				visualStyle = projectionStyle::flat_shaded;
 				break;
 			case SDLK_b:
-				visualStyle = gouraud_shaded;
+				visualStyle = projectionStyle::gouraud_shaded;
 				break;
 			case SDLK_n:
-				visualStyle = blinn_phong;
+				visualStyle = projectionStyle::blinn_phong;
 				break;
 			case SDLK_m:
-				visualStyle = depth_visualised;
+				visualStyle = projectionStyle::depth_visualised;
 				break;
 			case SDLK_COMMA:
-				visualStyle = sunlight;
+				visualStyle = projectionStyle::sunlight;
 				break;
 			case SDLK_PERIOD:
-				visualStyle = torchlight;
+				visualStyle = projectionStyle::torchlight;
 				break;
 			case SDLK_SLASH:
-				visualStyle = torchlight_solid;
+				visualStyle = projectionStyle::torchlight_solid;
 				break;
 			case SDLK_g:
 				gravityOn = gravityOn ? false : true;
@@ -376,26 +376,26 @@ void EventHandler::toggleAIGoal()
 {
 	switch (purposeOfAI)
 	{
-	case be_idle:
-		purposeOfAI = follow_player;
+	case aiGoal::be_idle:
+		purposeOfAI = aiGoal::follow_player;
 		break;
-	case follow_player:
-		purposeOfAI = kill_player;
+	case aiGoal::follow_player:
+		purposeOfAI = aiGoal::kill_player;
 		break;
-	case kill_player:
-		purposeOfAI = follow_others;
+	case aiGoal::kill_player:
+		purposeOfAI = aiGoal::follow_others;
 		break;
-	case follow_others:
-		purposeOfAI = kill_others;
+	case aiGoal::follow_others:
+		purposeOfAI = aiGoal::kill_others;
 		break;
-	case kill_others:
-		purposeOfAI = follow_each_other;
+	case aiGoal::kill_others:
+		purposeOfAI = aiGoal::follow_each_other;
 		break;
-	case follow_each_other:
-		purposeOfAI = kill_each_other;
+	case aiGoal::follow_each_other:
+		purposeOfAI = aiGoal::kill_each_other;
 		break;
-	case kill_each_other:
-		purposeOfAI = be_idle;
+	case aiGoal::kill_each_other:
+		purposeOfAI = aiGoal::be_idle;
 		break;
 	}
 }

@@ -44,7 +44,7 @@ protected:
 	boundingBox		BB = { (0.0f, 0.0f, 0.0f, 1.0f), (0.0f, 0.0f, 0.0f, 1.0f) };
 	float			bbRadius = 0.25f;
 
-	hit_response	behaviour = penetrate;
+	hit_response	behaviour = hit_response::penetrate;
 	unsigned int	ticksSinceHit = 0;
 	unsigned int	ticksSinceFired = 0;
 

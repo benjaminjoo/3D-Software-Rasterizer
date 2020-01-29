@@ -82,7 +82,7 @@ void Game::loadProjectile(unsigned n)
 		auto bullet = std::make_shared<Bullet>(0.0f, 0.0f, 0.0f, 0.25f, 0.5f, 1.0f, 0xffffffff);
 		bullet->setGravity(true);
 		bullet->setVisibility(false);
-		bullet->setBehaviour(stick);
+		bullet->setBehaviour(hit_response::stick);
 		bullet->setBBRadius(0.05f);
 		Projectiles.push_back(bullet);
 		ammo++;
@@ -161,19 +161,19 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 			{
 				switch (goal)
 				{
-				case be_idle:
+				case aiGoal::be_idle:
 				{
 					Enemies[i]->isFiring = false;
 					Enemies[i]->idle();
 					break;
 				}
-				case follow_player:
+				case aiGoal::follow_player:
 				{
 					Enemies[i]->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f });
 					Enemies[i]->idle();
 					break;
 				}
-				case kill_player:
+				case aiGoal::kill_player:
 				{
 					if (Enemies[i]->lockOnTarget(vect3{ Hero->x, Hero->y, Hero->z, 1.0f }))
 						Enemies[i]->isFiring = true;
@@ -184,7 +184,7 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 					}
 					break;
 				}
-				case follow_others:
+				case aiGoal::follow_others:
 				{
 					Enemies[i]->isFiring = false;
 					unsigned int targetIndex = Enemies[i]->pickTarget(Balls);
@@ -197,7 +197,7 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 						Enemies[i]->idle();
 					break;
 				}
-				case kill_others:
+				case aiGoal::kill_others:
 				{
 					unsigned int targetIndex = Enemies[i]->pickTarget(Balls);
 
@@ -218,7 +218,7 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 					}
 					break;
 				}
-				case follow_each_other:
+				case aiGoal::follow_each_other:
 				{
 					Enemies[i]->isFiring = false;
 					unsigned int targetIndex = Enemies[i]->pickTarget(Enemies, i);
@@ -231,7 +231,7 @@ void Game::updateEnemiesPositionsAI(aiGoal goal)
 						Enemies[i]->idle();
 					break;
 				}
-				case kill_each_other:
+				case aiGoal::kill_each_other:
 				{
 					unsigned int targetIndex = Enemies[i]->pickTarget(Enemies, i);
 
@@ -402,7 +402,7 @@ bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 			{
 				targets[i]->destroy();
 				targets[i]->setMotion(false);
-				targets[i]->setBehaviour(penetrate);
+				targets[i]->setBehaviour(hit_response::penetrate);
 				for (auto& Exp : Explosions)
 					if (!Exp->isActive() && !Exp->isUsed())
 					{
@@ -451,19 +451,19 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 
 				switch (object->getBehaviour())
 				{
-				case penetrate:
+				case hit_response::penetrate:
 				{
 
 				}
 				break;
-				case stick:
+				case hit_response::stick:
 				{
 					vect3 newVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 					object->setMotion(false);
 					object->setVelocity(newVelocity);
 				}
 				break;
-				case bounce:
+				case hit_response::bounce:
 				{
 					if (Controls->gravityOn)
 					{
@@ -477,7 +477,7 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 					}
 				}
 				break;
-				case slide:
+				case hit_response::slide:
 				{
 
 				}
@@ -797,32 +797,32 @@ void Game::displayStats(bool crosshair, bool fps, bool position, bool polyN, boo
 
 	switch (Controls->purposeOfAI)
 	{
-	case follow_player:
+	case aiGoal::follow_player:
 	{
 		Screen->displayString("<FOLLOW PLAYER>", 60, 3, 0x000000ff);
 		break;
 	}
-	case kill_player:
+	case aiGoal::kill_player:
 	{
 		Screen->displayString("<KILL PLAYER>", 60, 3, 0x00ff0000);
 		break;
 	}
-	case follow_others:
+	case aiGoal::follow_others:
 	{
 		Screen->displayString("<FOLLOW BALLS>", 60, 3, 0x000000ff);
 		break;
 	}
-	case kill_others:
+	case aiGoal::kill_others:
 	{
 		Screen->displayString("<SHOOT BALLS>", 60, 3, 0x00ff0000);
 		break;
 	}
-	case follow_each_other:
+	case aiGoal::follow_each_other:
 	{
 		Screen->displayString("<FOLLOW EACH OTHER>", 60, 3, 0x000000ff);
 		break;
 	}
-	case kill_each_other:
+	case aiGoal::kill_each_other:
 	{
 		Screen->displayString("<SHOOT EACH OTHER>", 60, 3, 0x00ff0000);
 		break;

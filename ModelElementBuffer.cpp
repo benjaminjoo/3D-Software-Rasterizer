@@ -188,15 +188,15 @@ void ModelElementBuffer::moveLine3EndPoint(int lineIndex, int vertIndex, Side vi
 {
 	switch (view)
 	{
-	case Top:
+	case Side::Top:
 		line3Buffer[lineIndex].vert[vertIndex].x += move.x;
 		line3Buffer[lineIndex].vert[vertIndex].y += move.y;
 		break;
-	case Front:
+	case Side::Front:
 		line3Buffer[lineIndex].vert[vertIndex].x += move.x;
 		line3Buffer[lineIndex].vert[vertIndex].z += move.z;
 		break;
-	case Right:
+	case Side::Right:
 		line3Buffer[lineIndex].vert[vertIndex].y += move.y;
 		line3Buffer[lineIndex].vert[vertIndex].z += move.z;
 		break;
