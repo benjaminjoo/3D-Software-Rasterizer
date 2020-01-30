@@ -12,11 +12,19 @@ class ViewVolume
 	plane topPlane;
 	plane bottomPlane;
 
+	plane nearPlaneT;
+	plane farPlaneT;
+	plane leftPlaneT;
+	plane rightPlaneT;
+	plane topPlaneT;
+	plane bottomPlaneT;
+
 public:
 	ViewVolume();
 	~ViewVolume();
 
 	void initFrustum(float, float, float, float);
+	void transformFrustum(mat4x4& RM, mat4x4& R);
 
 	plane getNearPlane();
 	plane getFarPlane();
@@ -24,5 +32,12 @@ public:
 	plane getRightPlane();
 	plane getTopPlane();
 	plane getBottomPlane();
+
+	plane getNearPlaneT();
+	plane getFarPlaneT();
+	plane getLeftPlaneT();
+	plane getRightPlaneT();
+	plane getTopPlaneT();
+	plane getBottomPlaneT();
 };
 

@@ -103,6 +103,7 @@ enum class projectionStyle
 	torchlight,
 	torchlight_solid,
 	fill_depth_buffer,
+	shadow_test,
 	test
 };
 

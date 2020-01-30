@@ -80,6 +80,8 @@ public:
 
 	void fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
+	void fillTriangleShadows(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
+
 	void fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen);
 
 	void fillTriangleGouraudShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);

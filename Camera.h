@@ -49,6 +49,7 @@ private:
 	std::shared_ptr<Projection> Renderer	= nullptr;
 
 	vect3					vertexList[MAXCLIPVERTS];
+	vect3					vertexListT[MAXCLIPVERTS];
 	textCoord				uvList[MAXCLIPVERTS];
 	float					specularList[MAXCLIPVERTS];
 
@@ -99,6 +100,8 @@ private:
 
 	void updateViewDirection();
 
+	void updateViewVolume();
+
 	bool pointFacingCamera(const point3& p);
 
 	bool polyFacingCamera(const triangle3dV&);
@@ -106,6 +109,8 @@ private:
 	void clearVertexList();
 
 	int clipToFrustum(const triangle3dV&, vect3*, textCoord*, float*);
+
+	int clipToFrustumT(const triangle3dV&, vect3*, textCoord*, float*);
 
 	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, float* specList, plane clippingPlane);
 
@@ -129,6 +134,8 @@ private:
 	void object2world(mat4x4& MR, mat4x4& R, triangle3dV& T);
 
 	void world2view(mat4x4& RM, mat4x4& R, triangle3dV& T);
+
+	void world2view(mat4x4& RM, int n);
 
 	void world2viewPointM(point3& P, mat4x4& RM);
 

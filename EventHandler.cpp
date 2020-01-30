@@ -254,6 +254,9 @@ void EventHandler::HandleUserEvents()
 			case SDLK_h:
 				showHelp = showHelp ? false : true;
 				break;
+			case SDLK_t:
+				visualStyle = projectionStyle::shadow_test;
+				break;
 			case SDLK_z:
 				visualStyle = projectionStyle::wireframe;
 				break;

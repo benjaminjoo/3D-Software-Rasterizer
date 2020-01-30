@@ -23,7 +23,7 @@
 *         Z-Buffer Visualised : M                          *
 *        Materials (Sunlight) : COMMA                      *
 *      Materials (Torchlight) : FULL STOP                  *
-*  Solid Colours (Torchlight) : SLASH			   		   *
+*  Solid Colours (Torchlight) : SLASH                      *
 *                  Show Stats : TAB                        *
 *          Torch Intensity Up : KEYPAD PLUS                *
 *        Torch Intensity Down : KEYPAD MINUS               *

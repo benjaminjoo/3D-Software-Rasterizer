@@ -1219,6 +1219,167 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 }
 
 
+void Projection::fillTriangleShadows(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio)
+{
+	int w = screen->getWidth();
+	int h = screen->getHeight();
+
+	coord2 pt[3] = { t.a, t.b, t.c };
+	int yMin, yMax;
+
+	yMin = GetYMin3(pt);
+	yMax = GetYMax3(pt);
+
+	int wd = 0;
+	int halfW = static_cast<int>(std::round(w * 0.5f));
+	int halfH = static_cast<int>(std::round(h * 0.5f));
+	int dx, dy;
+	float xx, yy, zz, dz;
+	int lineEnd[2] = { 0, 0 };
+	float zLimit[2] = { 0.0f, 0.0f };
+
+	//vect3 nullVect = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//vect3 sides[4] = { nullVect, nullVect, nullVect, nullVect };
+	//vect3 sideL[2] = { nullVect, nullVect };
+	//vect3 sideR[2] = { nullVect, nullVect };
+
+	int endIndex;
+	int startX, endX;
+	float startZ, endZ, zCurrent;
+	float invertStartPz, invertEndPz, invertCurrentPz;
+	float hCorr = w * 0.475f * h_ratio;
+	float vCorr = w * 0.475f * v_ratio;
+	float deltaZ;
+
+	//coord2 currentP, startP, endP;
+	//vect3 currentVert, startVert, endVert;
+	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
+
+	for (int hg = yMin; hg < yMax; hg++)
+	{
+		endIndex = 0;
+		//Side A-B:
+		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
+		{
+			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
+			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
+			wd = t.a.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+
+				//sides[endIndex * 2] = T.A;
+				//sides[endIndex * 2 + 1] = T.B;
+
+				endIndex++;
+			}
+		}
+		//Side B-C:
+		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
+		{
+			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
+			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
+			wd = t.b.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+
+				//sides[endIndex * 2] = T.B;
+				//sides[endIndex * 2 + 1] = T.C;
+
+				endIndex++;
+			}
+		}
+		//Side C-A:
+		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
+		{
+			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
+			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
+
+			wd = t.c.x + static_cast<int>(std::round(xx));
+			if (endIndex < 2)
+			{
+				lineEnd[endIndex] = wd;
+				zLimit[endIndex] = zz;
+
+				//sides[endIndex * 2] = T.C;
+				//sides[endIndex * 2 + 1] = T.A;
+
+				endIndex++;
+			}
+		}
+		if (endIndex == 2)
+		{
+			if (lineEnd[0] <= lineEnd[1])
+			{
+				startX = lineEnd[0];
+				endX = lineEnd[1];
+				startZ = zLimit[0];
+				endZ = zLimit[1];
+
+				//sideL[0] = sides[0];
+				//sideL[1] = sides[1];
+				//sideR[0] = sides[2];
+				//sideR[1] = sides[3];
+			}
+			else
+			{
+				startX = lineEnd[1];
+				endX = lineEnd[0];
+				startZ = zLimit[1];
+				endZ = zLimit[0];
+
+				//sideL[0] = sides[2];
+				//sideL[1] = sides[3];
+				//sideR[0] = sides[0];
+				//sideR[1] = sides[1];
+			}
+			int span = abs(endX - startX + 1);
+			deltaZ = (endZ - startZ) / (float)span;
+			zCurrent = startZ;
+
+			//startP.x = startX;	startP.y = hg;	startP.z = startZ;
+			//endP.x = endX;		endP.y = hg;	endP.z = endZ;
+			//
+			//invertStartPz = 1 / startP.z;
+			//startVert.x = (startP.x - float(halfW)) * invertStartPz / hCorr;
+			//startVert.y = (float(halfH) - startP.y) * invertStartPz / vCorr;
+			//startVert.z = invertStartPz;
+			//
+			//invertEndPz = 1 / endP.z;
+			//endVert.x = (endP.x - float(halfW)) * invertEndPz / hCorr;
+			//endVert.y = (float(halfH) - endP.y) * invertEndPz / vCorr;
+			//endVert.z = invertEndPz;
+			//
+			//currentP.y = hg;
+
+			for (int i = startX; i < endX + 1; i++)
+			{
+				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
+				{
+					if (1 / zCurrent < screen->depthBuffer[hg * w + i])
+					{
+						//currentP.x = i;
+						//currentP.z = zCurrent;
+						//
+						//invertCurrentPz = 1 / currentP.z;
+						//currentVert.x = (currentP.x - float(halfW)) * invertCurrentPz / hCorr;
+						//currentVert.y = (float(halfH) - currentP.y) * invertCurrentPz / vCorr;
+						//currentVert.z = invertCurrentPz;
+
+						screen->pixelBuffer[hg * w + i] = getColour(0, (byte)(255.0f * zCurrent), 0, 0);
+						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
+					}
+					zCurrent += deltaZ;
+				}
+			}
+		}
+	}
+}
+
+
 void Projection::fillTriangleDepthVisualised(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float zNear, float h_ratio, float v_ratio)
 {
 	int w = screen->getWidth();

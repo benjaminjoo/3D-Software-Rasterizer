@@ -11,6 +11,13 @@ ViewVolume::ViewVolume()
 	rightPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
 	topPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
 	bottomPlane		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+
+	nearPlaneT		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	farPlaneT		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	leftPlaneT		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	rightPlaneT		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	topPlaneT		= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
+	bottomPlaneT	= { (0.0f, 0.0f, 0.0f, 0.0f), (0.0f, 0.0f, 0.0f, 0.0f) };
 }
 
 
@@ -38,6 +45,23 @@ void ViewVolume::initFrustum(float fovH, float fovV, float zNear, float zFar)
 	topPlane.P		= { 0.0f,            0.0f,       0.0001f,            1.0f };
 	bottomPlane.N	= { 0.0f,		-cosFovV2,		sinFovV2,            0.0f };
 	bottomPlane.P	= { 0.0f,            0.0f,       0.0001f,            1.0f };
+}
+
+
+void ViewVolume::transformFrustum(mat4x4& MR, mat4x4& R)
+{
+	nearPlaneT.N	= R * nearPlane.N;
+	nearPlaneT.P	= MR * nearPlane.P;
+	farPlaneT.N		= R * farPlane.N;
+	farPlaneT.P		= MR * farPlane.P;
+	leftPlaneT.N	= R * leftPlane.N;
+	leftPlaneT.P	= MR * leftPlane.P;
+	rightPlaneT.N	= R * rightPlane.N;
+	rightPlaneT.P	= MR * rightPlane.P;
+	topPlaneT.N		= R * topPlane.N;
+	topPlaneT.P		= MR * topPlane.P;
+	bottomPlaneT.N	= R * bottomPlane.N;
+	bottomPlaneT.P	= MR * bottomPlane.P;
 }
 
 
@@ -74,4 +98,40 @@ plane ViewVolume::getTopPlane()
 plane ViewVolume::getBottomPlane()
 {
 	return bottomPlane;
+}
+
+
+plane ViewVolume::getNearPlaneT()
+{
+	return nearPlaneT;
+}
+
+
+plane ViewVolume::getFarPlaneT()
+{
+	return farPlaneT;
+}
+
+
+plane ViewVolume::getLeftPlaneT()
+{
+	return leftPlaneT;
+}
+
+
+plane ViewVolume::getRightPlaneT()
+{
+	return rightPlaneT;
+}
+
+
+plane ViewVolume::getTopPlaneT()
+{
+	return topPlaneT;
+}
+
+
+plane ViewVolume::getBottomPlaneT()
+{
+	return bottomPlaneT;
 }

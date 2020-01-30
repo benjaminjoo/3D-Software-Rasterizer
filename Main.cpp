@@ -257,11 +257,11 @@ void fps_game()
 
 	auto Sun = std::make_shared<LightSource>(300.0f, 22.5f, 1.0f);
 
-	auto Hero = std::make_shared<Player>(15.0f, 20.0f, 2.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Hero = std::make_shared<Player>(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto weapon = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32, true);
 
-	//Hero->addPart(weapon);
+	Hero->addPart(weapon);
 
 	auto Observer = std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
@@ -417,6 +417,15 @@ void fps_game()
 
 		fpsGame->addBall(ball);
 	}
+
+	auto ball_01 = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff7f7fff, 1, 4.0f, 16, true);
+	ball_01->setBBRadius(4.0f);
+	ball_01->setGravity(false);
+	ball_01->setMotion(true);
+	ball_01->setAngularVelocity({ 0.0f, 0.0f, 0.01f, 1.0f });
+	ball_01->setBehaviour(hit_response::bounce);
+	ball_01->setBreakability(true);
+	fpsGame->addBall(ball_01);
 
 	//Create enemies
 	auto Enemy1 = std::make_shared<Player>(-20.0f, 60.0f, 10.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);

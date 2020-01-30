@@ -129,6 +129,24 @@ void Camera::updateViewDirection()
 }
 
 
+void Camera::updateViewVolume()
+{
+	mat4x4 rotX = getRotation(axis::x, -alt - PI * 0.5f);
+	
+	mat4x4 rotY = getRotation(axis::y, rol);
+	
+	mat4x4 rotZ = getRotation(axis::z, azm - PI * 0.5f);
+	
+	mat4x4 R = rotZ * rotY * rotX;
+
+	mat4x4 MOV = getTranslation({ x, y, z, 1.0f });
+
+	mat4x4 MR = MOV * R;
+
+	Frustum.transformFrustum(MR, R);
+}
+
+
 bool Camera::pointFacingCamera(const point3& p)
 {
 	vect3 eyeVector = subVectors(p.P, { x, y, z, 1.0 });
@@ -147,9 +165,10 @@ void Camera::clearVertexList()
 {
 	for (int v = 0; v < MAXCLIPVERTS; v++)
 	{
-		vertexList[v] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		uvList[v] = { 0.0f, 0.0f };
-		specularList[v] = { 0 };
+		vertexList[v]	= { 0.0f, 0.0f, 0.0f, 0.0f };
+		vertexListT[v]	= { 0.0f, 0.0f, 0.0f, 0.0f };
+		uvList[v]		= { 0.0f, 0.0f };
+		specularList[v] = { 0.0f };
 	}
 }
 
@@ -176,6 +195,34 @@ int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* 
 	currentPlane = Frustum.getRightPlane();
 	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 	currentPlane = Frustum.getFarPlane();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+
+	return nVert;
+}
+
+
+int Camera::clipToFrustumT(const triangle3dV& worldT, vect3* vertList, textCoord* uvList, float* specList)
+{
+	memset(vertList, 0, MAXCLIPVERTS * sizeof(float));
+
+	vertList[0] = worldT.A;	uvList[0] = worldT.At;	specList[0] = illSpec[0];
+	vertList[1] = worldT.B;	uvList[1] = worldT.Bt;	specList[1] = illSpec[1];
+	vertList[2] = worldT.C;	uvList[2] = worldT.Ct;	specList[2] = illSpec[2];
+
+	int nVert = 3;
+	plane currentPlane;
+
+	currentPlane = Frustum.getNearPlaneT();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+	currentPlane = Frustum.getTopPlaneT();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+	currentPlane = Frustum.getBottomPlaneT();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+	currentPlane = Frustum.getLeftPlaneT();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+	currentPlane = Frustum.getRightPlaneT();
+	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
+	currentPlane = Frustum.getFarPlaneT();
 	this->clipPoly(&nVert, vertList, uvList, specList, currentPlane);
 
 	return nVert;
@@ -495,6 +542,13 @@ void Camera::world2view(mat4x4& RM, mat4x4& R, triangle3dV& T)
 }
 
 
+void Camera::world2view(mat4x4& RM, int n)
+{
+	for (int i = 0; i < n; i++)
+		vertexListT[i] = RM * vertexListT[i];
+}
+
+
 void Camera::world2viewPointM(point3& P, mat4x4& RM)
 {
 	P.P = RM * P.P;
@@ -587,26 +641,42 @@ void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4
 void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, LightSource Sun,
 	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	triangle3dV worldT = viewT;
-
-	this->world2view(RM, R, viewT);
-
-	if (visualStyle == projectionStyle::blinn_phong)
+	if (visualStyle == projectionStyle::shadow_test)
 	{
-		Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.0f);
-		getSpecular(illSpec, Sun, worldT, 16.0f);
+		triangle3dV worldT = viewT;
+
+		int nVert = this->clipToFrustumT(worldT, vertexListT, uvList, specularList); //CLIPPING IN WORLD SPACE
+
+		this->world2view(RM, nVert);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+
+		Uint32 colour = worldT.colour;
+
+		currentTexture = &textureData[viewT.texture];
+
+		this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
 	}
 	else
-		Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.1f);
+	{
+		triangle3dV worldT = viewT;
 
+		this->world2view(RM, R, viewT);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
 
-	int nVert = this->clipToFrustum(viewT, vertexList, uvList, specularList);
+		if (visualStyle == projectionStyle::blinn_phong)
+		{
+			Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.0f);
+			getSpecular(illSpec, Sun, worldT, 16.0f);
+		}
+		else
+			Renderer->illuminatePoly(Sun, &viewT, worldT, visualStyle, 0.1f);
 
-	Uint32 colour = worldT.colour;
+		int nVert = this->clipToFrustum(viewT, vertexList, uvList, specularList); //CLIPPING IN VIEW SPACE
 
-	currentTexture = &textureData[viewT.texture];
+		Uint32 colour = worldT.colour;
 
-	this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
+		currentTexture = &textureData[viewT.texture];
+
+		this->projectPoly(nVert, colour, visualStyle, torchIntensity, maxIllumination, viewT);
+	}
 }
 
 
@@ -634,6 +704,36 @@ inline coord2 Camera::view2screen(const vect3& vertex, const float& hR, const fl
 
 void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torchI, float maxI, triangle3dV originalPoly)
 {
+	if (style == projectionStyle::shadow_test)
+	{
+		triangle2dG screenT;
+		triangle3dV originalT;	//To be passed on to polygon filling routine
+
+		for (int i = 0; i < n - 2; i++)
+		{
+			screenT.a = this->view2screen(vertexListT[0], hRatio, vRatio);
+			screenT.b = this->view2screen(vertexListT[1 + i], hRatio, vRatio);
+			screenT.c = this->view2screen(vertexListT[2 + i], hRatio, vRatio);
+
+			originalT.A = vertexListT[0];
+			originalT.B = vertexListT[1 + i];
+			originalT.C = vertexListT[2 + i];
+
+			originalT.N = originalPoly.N;
+
+			screenT.illumA = vertexListT[0].w;
+			screenT.illumB = vertexListT[1 + i].w;
+			screenT.illumC = vertexListT[2 + i].w;
+
+			screenT.At = uvList[0];
+			screenT.Bt = uvList[1 + i];
+			screenT.Ct = uvList[2 + i];
+
+			screenT.h = colour;
+
+			Renderer->fillTriangleShadows(originalT, screenT, Screen, hRatio, vRatio);
+		}
+	}
 	if (style == projectionStyle::wireframe)
 	{
 		coord2 startP, endP;
@@ -652,97 +752,102 @@ void Camera::projectPoly(int n, Uint32 colour, projectionStyle style, float torc
 			Screen->drawLine(startP, endP, colour);
 		}
 	}
-	else
-	{
-		triangle2dG screenT;
-		triangle3dV originalT;	//To be passed on to polygon filling routine
-
-		for (int i = 0; i < n - 2; i++)
-		{
-			screenT.a = this->view2screen(vertexList[0], hRatio, vRatio);
-			screenT.b = this->view2screen(vertexList[1 + i], hRatio, vRatio);
-			screenT.c = this->view2screen(vertexList[2 + i], hRatio, vRatio);
-
-			originalT.A = vertexList[0];
-			originalT.B = vertexList[1 + i];
-			originalT.C = vertexList[2 + i];
-
-			originalT.N = originalPoly.N;
-
-			screenT.illumA = vertexList[0].w;
-			screenT.illumB = vertexList[1 + i].w;
-			screenT.illumC = vertexList[2 + i].w;
-
-			screenT.At = uvList[0];
-			screenT.Bt = uvList[1 + i];
-			screenT.Ct = uvList[2 + i];
-
-			screenT.h = colour;
-
-			switch (style)
-			{
-			case projectionStyle::solid_colour:
-			{
-				Renderer->fillTriangleSolidColour(originalT, screenT, Screen, hRatio, vRatio);
-			}
-			break;
-			case projectionStyle::checkerboard:
-			{
-				Renderer->fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
-			}
-			break;
-			case projectionStyle::flat_shaded:
-			{
-				Renderer->fillTriangleFlatShaded(screenT, Screen);
-			}
-			break;
-			case projectionStyle::gouraud_shaded:
-			{
-				Renderer->fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
-			}
-			break;
-			case projectionStyle::blinn_phong:
-			{
-				float specular[3];
-				specular[0] = specularList[0];
-				specular[1] = specularList[1 + i];
-				specular[2] = specularList[2 + i];
-				Renderer->fillTriangleBlinnPhong(screenT, specular, Screen, hRatio, vRatio);
-			}
-			break;
-			case projectionStyle::depth_visualised:
-			{
-				Renderer->fillTriangleDepthVisualised(originalT, screenT, Screen, zNear, hRatio, vRatio);
-			}
-			break;
-			case projectionStyle::sunlight:
-			{
-				Renderer->fillTriangleSunlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture);
-			}
-			break;
-			case projectionStyle::torchlight:
-			{
-				Renderer->fillTriangleTorchlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture, torchI, maxI);
-			}
-			break;
-			case projectionStyle::torchlight_solid:
-			{
-				Renderer->fillTriangleTorchlightSolidColour(originalT, screenT, Screen, hRatio, vRatio, torchI, maxI);
-			}
-			break;
-			case projectionStyle::test:
-			{
-
-			}
-			break;
-			default:
-			{
-				Renderer->fillTriangleFlatShaded(screenT, Screen);
-			}
-			break;
-			}
-		}
-	}
+	//else
+	//{
+	//	triangle2dG screenT;
+	//	triangle3dV originalT;	//To be passed on to polygon filling routine
+	//
+	//	for (int i = 0; i < n - 2; i++)
+	//	{
+	//		screenT.a = this->view2screen(vertexList[0], hRatio, vRatio);
+	//		screenT.b = this->view2screen(vertexList[1 + i], hRatio, vRatio);
+	//		screenT.c = this->view2screen(vertexList[2 + i], hRatio, vRatio);
+	//
+	//		originalT.A = vertexList[0];
+	//		originalT.B = vertexList[1 + i];
+	//		originalT.C = vertexList[2 + i];
+	//
+	//		originalT.N = originalPoly.N;
+	//
+	//		screenT.illumA = vertexList[0].w;
+	//		screenT.illumB = vertexList[1 + i].w;
+	//		screenT.illumC = vertexList[2 + i].w;
+	//
+	//		screenT.At = uvList[0];
+	//		screenT.Bt = uvList[1 + i];
+	//		screenT.Ct = uvList[2 + i];
+	//
+	//		screenT.h = colour;
+	//
+	//		switch (style)
+	//		{
+	//		//case projectionStyle::shadow_test:
+	//		//{
+	//		//	Renderer->fillTriangleShadows(originalT, screenT, Screen, hRatio, vRatio);
+	//		//}
+	//		//break;
+	//		case projectionStyle::solid_colour:
+	//		{
+	//			Renderer->fillTriangleSolidColour(originalT, screenT, Screen, hRatio, vRatio);
+	//		}
+	//		break;
+	//		case projectionStyle::checkerboard:
+	//		{
+	//			Renderer->fillTriangleCheckerboard(originalT, screenT, Screen, hRatio, vRatio);
+	//		}
+	//		break;
+	//		case projectionStyle::flat_shaded:
+	//		{
+	//			Renderer->fillTriangleFlatShaded(screenT, Screen);
+	//		}
+	//		break;
+	//		case projectionStyle::gouraud_shaded:
+	//		{
+	//			Renderer->fillTriangleGouraudShaded(screenT, Screen, hRatio, vRatio);
+	//		}
+	//		break;
+	//		case projectionStyle::blinn_phong:
+	//		{
+	//			float specular[3];
+	//			specular[0] = specularList[0];
+	//			specular[1] = specularList[1 + i];
+	//			specular[2] = specularList[2 + i];
+	//			Renderer->fillTriangleBlinnPhong(screenT, specular, Screen, hRatio, vRatio);
+	//		}
+	//		break;
+	//		case projectionStyle::depth_visualised:
+	//		{
+	//			Renderer->fillTriangleDepthVisualised(originalT, screenT, Screen, zNear, hRatio, vRatio);
+	//		}
+	//		break;
+	//		case projectionStyle::sunlight:
+	//		{
+	//			Renderer->fillTriangleSunlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture);
+	//		}
+	//		break;
+	//		case projectionStyle::torchlight:
+	//		{
+	//			Renderer->fillTriangleTorchlight(originalT, screenT, Screen, hRatio, vRatio, currentTexture, torchI, maxI);
+	//		}
+	//		break;
+	//		case projectionStyle::torchlight_solid:
+	//		{
+	//			Renderer->fillTriangleTorchlightSolidColour(originalT, screenT, Screen, hRatio, vRatio, torchI, maxI);
+	//		}
+	//		break;
+	//		case projectionStyle::test:
+	//		{
+	//
+	//		}
+	//		break;
+	//		default:
+	//		{
+	//			Renderer->fillTriangleFlatShaded(screenT, Screen);
+	//		}
+	//		break;
+	//		}
+	//	}
+	//}
 }
 
 

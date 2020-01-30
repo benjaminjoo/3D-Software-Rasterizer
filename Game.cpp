@@ -112,6 +112,7 @@ void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 	Eye->z = player->z;
 
 	Eye->updateViewDirection();
+	Eye->updateViewVolume();
 }
 
 
