@@ -23,19 +23,90 @@ Lamp::Lamp(float cx, float cy, float cz, float az, float al, float rl,
 
 	this->clearVertexList();
 
-	depthBuffer = new float[w * h];
+	//depthBuffer = new float[w * h];
+	depthBuffer = new int[w * h];
 }
 
 
 Lamp::~Lamp()
 {
+	//if (depthBuffer != nullptr)
+	//{
+	//	std::ofstream outputFile("StencilBuffer.txt");
+	//	if (outputFile.is_open())
+	//	{
+	//		outputFile << "P3" << std::endl;
+	//		outputFile << w << " " << h << std::endl;
+	//		outputFile << "255" << std::endl;
+	//
+	//		for (int j = 0; j < h; j++)
+	//		{
+	//			for (int i = 0; i < w; i++)
+	//			{
+	//				outputFile << depthBuffer[j * w + i] << std::endl;
+	//				//outputFile	<< static_cast<unsigned char>(255.0f * depthBuffer[j * w + i]) << " "
+	//				//			<< 0 << " "
+	//				//			<< 0 << std::endl;
+	//			}
+	//		}
+	//
+	//		outputFile.close();
+	//	}
+	//}
+
 	delete[] depthBuffer;
+}
+
+
+void Lamp::printDepthBuffer()
+{
+	if (depthBuffer != nullptr)
+	{
+		std::ofstream outputFile("StencilBuffer.ppm");
+		if (outputFile.is_open())
+		{
+			outputFile << "P3" << std::endl;
+			outputFile << w << " " << h << std::endl;
+			outputFile << "255" << std::endl;
+	
+			for (int j = 0; j < h; j++)
+			{
+				for (int i = 0; i < w; i++)
+				{
+					outputFile	<< static_cast<unsigned char>(depthBuffer[j * w + i] / zFar * 255.0f) << " "
+								<< 0 << " "
+								<< 0 << std::endl;
+				}
+			}
+	
+			outputFile.close();
+		}
+	}
 }
 
 
 void Lamp::update()
 {
+	resetDepthBuffer();
 
+	mat4x4 rotX = getRotation(axis::x, -alt - PI * 0.5f);
+
+	mat4x4 rotY = getRotation(axis::y, rol);
+
+	mat4x4 rotZ = getRotation(axis::z, azm - PI * 0.5f);
+
+	mat4x4 R = rotZ * rotY * rotX;
+
+	mat4x4 MOV = getTranslation({ x, y, z, 1.0f });
+
+	mat4x4 MR = MOV * R;
+
+	Frustum.transformFrustum(MR, R);
+
+	M = getTranslation();
+	R = getRotation();
+	RM = R * M;
+	MR = M * R;
 }
 
 
@@ -51,6 +122,17 @@ float Lamp::getIllumination(vect3& P, vect3& N)
 float Lamp::getBlinnSpecular(vect3& P, vect3& N, vect3& V, float& shine)
 {
 	return 0.0f;
+}
+
+
+void Lamp::resetDepthBuffer()
+{
+	//for (float* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
+	//	*i = zFar;
+
+	int zzz = static_cast<int>(zFar);
+	for (int* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
+		*i = zzz;
 }
 
 
@@ -75,6 +157,84 @@ float Lamp::getHRatio()
 float Lamp::getVRatio()
 {
 	return 1 / (tanf(atanf(tanf(fovH * 0.5f) / (w / h) * 2.0f)));
+}
+
+
+mat4x4 Lamp::getTranslation(vect3 mv)
+{
+	mat4x4 result;
+
+	result = {	1.0f,          0.0f,         0.0f,		 mv.x,
+				0.0f,          1.0f,         0.0f,		 mv.y,
+				0.0f,          0.0f,         1.0f,		 mv.z,
+				0.0f,          0.0f,         0.0f,       1.0f };
+
+	return result;
+}
+
+
+mat4x4 Lamp::getTranslation()
+{
+	mat4x4 result;
+
+	result = {	1.0f,          0.0f,         0.0f,		-x,
+				0.0f,          1.0f,         0.0f,		-y,
+				0.0f,          0.0f,         1.0f,		-z,
+				0.0f,          0.0f,         0.0f,       1.0f };
+
+	return result;
+}
+
+
+mat4x4 Lamp::getRotation(axis t, float a)
+{
+	mat4x4 result = {	1.0f, 0.0f, 0.0f, 0.0f,
+						0.0f, 1.0f, 0.0f, 0.0f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f };
+
+	float sinA = sinf(a);
+	float cosA = cosf(a);
+
+	switch (t)
+	{
+	case axis::x:
+	{
+		result = {	1.0f,       0.0f,       0.0f,       0.0f,
+					0.0f,       cosA,       sinA,       0.0f,
+					0.0f,      -sinA,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::y:
+	{
+		result = {	cosA,       0.0f,      -sinA,       0.0f,
+					0.0f,       1.0f,       0.0f,       0.0f,
+					sinA,       0.0f,       cosA,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	case axis::z:
+	{
+		result = {	cosA,       sinA,       0.0f,       0.0f,
+				   -sinA,       cosA,       0.0f,       0.0f,
+					0.0f,       0.0f,       1.0f,       0.0f,
+					0.0f,       0.0f,       0.0f,       1.0f };
+	}
+	break;
+	}
+
+	return result;
+}
+
+
+mat4x4 Lamp::getRotation()
+{
+	mat4x4 result = getRotation(axis::z, rol) *
+		getRotation(axis::x, -(alt + PI * 0.5f)) *
+		getRotation(axis::z, -(azm + PI * 0.5f));
+
+	return result;
 }
 
 
@@ -112,61 +272,6 @@ bool Lamp::polyFacingLamp(const triangle3dV& worldT)
 }
 
 
-mat4x4 Lamp::getTranslation(vect3 mv)
-{
-	mat4x4 result;
-
-	result = { 1.0f,          0.0f,         0.0f,		 mv.x,
-				0.0f,          1.0f,         0.0f,		 mv.y,
-				0.0f,          0.0f,         1.0f,		 mv.z,
-				0.0f,          0.0f,         0.0f,       1.0f };
-
-	return result;
-}
-
-
-mat4x4 Lamp::getRotation(axis t, float a)
-{
-	mat4x4 result = { 1.0f, 0.0f, 0.0f, 0.0f,
-						0.0f, 1.0f, 0.0f, 0.0f,
-						0.0f, 0.0f, 1.0f, 0.0f,
-						0.0f, 0.0f, 0.0f, 1.0f };
-
-	float sinA = sinf(a);
-	float cosA = cosf(a);
-
-	switch (t)
-	{
-	case axis::x:
-	{
-		result = { 1.0f,       0.0f,       0.0f,       0.0f,
-					0.0f,       cosA,       sinA,       0.0f,
-					0.0f,      -sinA,       cosA,       0.0f,
-					0.0f,       0.0f,       0.0f,       1.0f };
-	}
-	break;
-	case axis::y:
-	{
-		result = { cosA,       0.0f,      -sinA,       0.0f,
-					0.0f,       1.0f,       0.0f,       0.0f,
-					sinA,       0.0f,       cosA,       0.0f,
-					0.0f,       0.0f,       0.0f,       1.0f };
-	}
-	break;
-	case axis::z:
-	{
-		result = { cosA,       sinA,       0.0f,       0.0f,
-				   -sinA,       cosA,       0.0f,       0.0f,
-					0.0f,       0.0f,       1.0f,       0.0f,
-					0.0f,       0.0f,       0.0f,       1.0f };
-	}
-	break;
-	}
-
-	return result;
-}
-
-
 void Lamp::object2world(mat4x4& MR, mat4x4& R, triangle3dV& T)
 {
 	T.A = MR * T.A;
@@ -179,7 +284,7 @@ void Lamp::object2world(mat4x4& MR, mat4x4& R, triangle3dV& T)
 }
 
 
-void Lamp::world2view(mat4x4& RM, mat4x4& R, triangle3dV& T)
+void Lamp::world2view(triangle3dV& T)
 {
 	T.A = RM * T.A;
 	T.B = RM * T.B;
@@ -191,45 +296,69 @@ void Lamp::world2view(mat4x4& RM, mat4x4& R, triangle3dV& T)
 }
 
 
-inline coord2 Lamp::view2screen(const vect3& vertex, const float& hR, const float& vR)
+inline coord2 Lamp::view2screen(const vect3& vertex)
 {
 	coord2 pixel;
 
-	float s = float(w) * 0.475f; //w* 0.5f* 0.95f
+	float s = static_cast<float>(w) * 0.475f; //w* 0.5f* 0.95f
 
-	pixel.x = (int)(w * 0.5f + static_cast<float>(vertex.x / vertex.z)* s* hR);
-	pixel.y = (int)(h * 0.5f - static_cast<float>(vertex.y / vertex.z)* s* vR);
-	pixel.z = 1 / vertex.z;
+	pixel.x = static_cast<int>(w * 0.5f + static_cast<float>(vertex.x / vertex.z)* s * hRatio);
+	pixel.y = static_cast<int>(h * 0.5f - static_cast<float>(vertex.y / vertex.z)* s * vRatio);
+	pixel.z = 1.0f / vertex.z;
 
 	return pixel;
 }
 
 
-bool Lamp::pointInsideFrustum(vect3& V)
+bool Lamp::pointLit(const vect3& V)
+{
+	bool result = false;
+
+	vect3 sampleVert = RM * V;
+	coord2 sampleCoord = view2screen(sampleVert);
+
+	int x = sampleCoord.x;
+	int y = sampleCoord.y;
+	//float z = abs(sampleCoord.z > 1e-5) ? 1.0f / sampleCoord.z : zFar;
+	int zzz = abs(sampleCoord.z > 1e-5) ? static_cast<int>(1.0f / sampleCoord.z) : static_cast<int>(zFar);
+
+	//if (x >= 0 && x < w && y >= 0 && y < h)
+	//	if (z < depthBuffer[y * w + x] + 0.25f)
+	//		result = true;
+
+	if (x >= 0 && x < w && y >= 0 && y < h)
+		if (zzz < depthBuffer[y * w + x] + 2)
+			result = true;
+
+	return result;
+}
+
+
+bool Lamp::pointInsideFrustum(const vect3& V)
 {
 	plane currentPlane;
 
-	currentPlane = Frustum.getNearPlane();
+	currentPlane = Frustum.getNearPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
-	currentPlane = Frustum.getTopPlane();
+	currentPlane = Frustum.getTopPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
-	currentPlane = Frustum.getBottomPlane();
+	currentPlane = Frustum.getBottomPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
-	currentPlane = Frustum.getLeftPlane();
+	currentPlane = Frustum.getLeftPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
-	currentPlane = Frustum.getRightPlane();
+	currentPlane = Frustum.getRightPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
-	currentPlane = Frustum.getFarPlane();
+	currentPlane = Frustum.getFarPlaneT();
 	if (pointBehindPlane(currentPlane, V))
 		return false;
 
@@ -237,11 +366,11 @@ bool Lamp::pointInsideFrustum(vect3& V)
 }
 
 
-bool Lamp::pointBehindPlane(const plane& p, vect3& V)
+bool Lamp::pointBehindPlane(const plane& p, const vect3& V)
 {
 	vect3 a = V - p.P;
 	float sa = a * p.N;
-	if (sa <= 0.0f)
+	if (sa < 0.0f)
 		return true;
 	else
 		return false;
@@ -366,22 +495,19 @@ inline void Lamp::clipEdge(const plane& p, const vect3& startV, const vect3& end
 }
 
 
-void Lamp::scanMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov)
+void Lamp::scanMesh(const int& nPoly, triangle3dV* mesh)
 {
-	mat4x4 RM = rot * mov;
-	mat4x4 M = mov;
-
 	for (int i = 0; i < nPoly; i++)
 	{
 		triangle3dV worldT = mesh[i];
 
 		if (polyFacingLamp(worldT))
-			scanPolygon(RM, M, worldT);
+			scanPolygon(worldT);
 	}
 }
 
 
-void Lamp::scanMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt)
+void Lamp::scanMesh(const int& nPoly, triangle3dV* mesh, vect3 mv, vect3 rt)
 {
 	mat4x4 rotX = getRotation(axis::x, rt.x);
 
@@ -389,30 +515,27 @@ void Lamp::scanMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mo
 
 	mat4x4 rotZ = getRotation(axis::z, -rt.z);
 
-	mat4x4 R = rotZ * rotY * rotX;
+	mat4x4 Rotation = rotZ * rotY * rotX;
 
-	mat4x4 MOV = getTranslation(mv);
+	mat4x4 Translation = getTranslation(mv);
 
-	mat4x4 MR = MOV * R;
-
-	mat4x4 RM = rot * mov;
-	mat4x4 M = mov;
+	mat4x4 TR = Translation * Rotation;
 
 	for (int i = 0; i < nPoly; i++)
 	{
 		triangle3dV worldT = mesh[i];
 
-		this->object2world(MR, R, worldT);
+		this->object2world(TR, Rotation, worldT);
 
 		if (polyFacingLamp(worldT))
-			scanPolygon(RM, M, worldT);
+			scanPolygon(worldT);
 	}
 }
 
 
-void Lamp::scanPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT)
+void Lamp::scanPolygon(triangle3dV& viewT)
 {
-	this->world2view(RM, R, viewT);
+	this->world2view(viewT);
 
 	int nVert = this->clipToFrustum(viewT, vertexList);
 
@@ -426,9 +549,9 @@ void Lamp::projectPoly(int n)
 
 	for (int i = 0; i < n - 2; i++)
 	{
-		screenT.a = this->view2screen(vertexList[0], hRatio, vRatio);
-		screenT.b = this->view2screen(vertexList[1 + i], hRatio, vRatio);
-		screenT.c = this->view2screen(vertexList[2 + i], hRatio, vRatio);
+		screenT.a = this->view2screen(vertexList[0]);
+		screenT.b = this->view2screen(vertexList[1 + i]);
+		screenT.c = this->view2screen(vertexList[2 + i]);
 
 		this->fillTriangleDepth(screenT);
 	}
@@ -536,11 +659,11 @@ void Lamp::fillTriangleDepth(const triangle2dG& t)
 			{
 				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
-					invertCurrentZ = 1 / zCurrent;
+					invertCurrentZ = 1.0f / zCurrent;
+					//if (invertCurrentZ < depthBuffer[hg * w + i])
+					//	depthBuffer[hg * w + i] = invertCurrentZ;
 					if (invertCurrentZ < depthBuffer[hg * w + i])
-					{
-						depthBuffer[hg * w + i] = invertCurrentZ;
-					}
+						depthBuffer[hg * w + i] = static_cast<int>(invertCurrentZ);
 					zCurrent += deltaZ;
 				}
 			}

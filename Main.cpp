@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Canvas.h"
 #include "LightSource.h"
+#include "Lamp.h"
 #include "Shapes.h"
 #include "SolidBody.h"
 #include "SolidCube.h"
@@ -257,6 +258,12 @@ void fps_game()
 
 	auto Sun = std::make_shared<LightSource>(300.0f, 22.5f, 1.0f);
 
+	auto Lamp1 = std::make_shared<Lamp>(-50.0f, 25.0f, 45.0f,
+										PI * 0.125f, PI * 0.25f, 0.0f,
+										PI * 0.5f,
+										1.0f, 100.0f,
+										1200, 600);
+
 	auto Hero = std::make_shared<Player>(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto weapon = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32, true);
@@ -271,6 +278,7 @@ void fps_game()
 
 	auto fpsGame = std::make_shared<Game>(Screen, Eye, Controls, Sun, Hero, Observer);
 
+	fpsGame->addLamp(Lamp1);
 	//Fill up bullet pool
 	fpsGame->loadProjectile(200);
 	//Fill up explosion pool

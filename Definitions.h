@@ -289,39 +289,39 @@ struct vect3
 	float w = 0.0f;
 
 
-	float len()
+	float len() const
 	{
 		return sqrtf(x * x + y * y + z * z);
 	}
 
-	float len2()
+	float len2() const
 	{
 		return x * x + y * y + z * z;
 	}
 
-	vect3 norm()
+	vect3 norm() const
 	{
 		float s = 1.0f / this->len();
 		return { x * s, y * s, z * s, 1.0f };
 	}
 
-	vect3 scale(float s)
+	vect3 scale(float s) const
 	{
 		return { x * s, y * s, z * s, 1.0f };
 	}
 
-	vect3 operator | (const vect3& p)
+	vect3 operator | (const vect3& p) const
 	{
 		vect3 sum = { x + p.x, y + p.y, z + p.z, 1.0f };
 		return sum.norm();
 	}
 
-	vect3 operator + (const vect3& p)
+	vect3 operator + (const vect3& p) const
 	{
 		return { x + p.x, y + p.y, z + p.z, 1.0f };
 	}
 
-	vect3 operator - (const vect3& p)
+	vect3 operator - (const vect3& p) const
 	{
 		return { x - p.x, y - p.y, z - p.z, 1.0f };
 	}
@@ -342,17 +342,17 @@ struct vect3
 		return *this;
 	}
 
-	vect3 operator ^ (const vect3& p)				//Cross Product
+	vect3 operator ^ (const vect3& p) const				//Cross Product
 	{
 		return { y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x, 1.0f };
 	}
 
-	float operator * (const vect3& p)				//Dot Product
+	float operator * (const vect3& p) const				//Dot Product
 	{
 		return x * p.x + y * p.y + z * p.z;
 	}
 
-	vect3 operator * (const float& s)			//Scale
+	vect3 operator * (const float& s) const			//Scale
 	{
 		return { x * s, y * s, z * s, 1.0f };
 	}

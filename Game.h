@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "EventHandler.h"
 #include "LightSource.h"
+#include "Lamp.h"
 #include "Player.h"
 #include "SolidBody.h"
 #include "SolidSphere.h"
@@ -27,13 +28,14 @@ class Game
 {
 private:
 
-	std::shared_ptr<Canvas>						Screen = nullptr;
-	std::shared_ptr<Camera>						Eye = nullptr;
-	std::shared_ptr<Projection>					Renderer = nullptr;
-	std::shared_ptr<EventHandler>				Controls = nullptr;
-	std::shared_ptr<LightSource>				Sun = nullptr;
-	std::shared_ptr<Player>						Hero = nullptr;
-	std::shared_ptr<Player>						Enemy = nullptr;
+	std::shared_ptr<Canvas>						Screen		= nullptr;
+	std::shared_ptr<Camera>						Eye			= nullptr;
+	std::shared_ptr<Projection>					Renderer	= nullptr;
+	std::shared_ptr<EventHandler>				Controls	= nullptr;
+	std::shared_ptr<LightSource>				Sun			= nullptr;
+	std::shared_ptr<Lamp>						SpotLight	= nullptr;
+	std::shared_ptr<Player>						Hero		= nullptr;
+	std::shared_ptr<Player>						Enemy		= nullptr;
 
 	std::vector<std::shared_ptr<SolidBody>>		Entities;
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
@@ -80,6 +82,7 @@ private:
 	bool objectApproachingWall(vect3&, vect3&, triangle3dV&);
 
 	void renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method);
+	void scanAll();
 
 	void updateFrameCounter();
 	void resetPolyCounter();
@@ -93,6 +96,7 @@ public:
 		std::shared_ptr<LightSource>, std::shared_ptr<Player>, std::shared_ptr<Player>);
 	~Game();
 
+	void addLamp(std::shared_ptr<Lamp>);
 	void addEntity(std::shared_ptr<SolidBody>);
 	void addBall(std::shared_ptr<SolidBody>);
 	void addEnemy(std::shared_ptr<Player>);

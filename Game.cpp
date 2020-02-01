@@ -20,6 +20,12 @@ Game::~Game()
 }
 
 
+void Game::addLamp(std::shared_ptr<Lamp> lamp)
+{
+	SpotLight = lamp;
+}
+
+
 void Game::addEntity(std::shared_ptr<SolidBody> entity)
 {
 	Entities.push_back(entity);
@@ -522,6 +528,43 @@ bool Game::objectApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 }
 
 
+void Game::scanAll()
+{
+	if (SpotLight != nullptr && SpotLight->isDynamic)
+	{
+		SpotLight->update();
+		
+		for (auto& E : Entities)
+			if (E->isVisible())
+				E->scan(SpotLight, false);
+		
+		if (Hero != nullptr)
+			for (auto& P : Hero->Parts)
+				if (P->isVisible())
+					P->scan(SpotLight, true);
+		
+		for (auto& E : Enemies)
+			if (!E->isDestroyed())
+				for (auto& P : E->Parts)
+					if (P->isVisible())
+						P->scan(SpotLight, true);
+		
+		if (Enemy != nullptr)
+			for (auto& P : Enemy->Parts)
+				if (P->isVisible())
+					P->scan(SpotLight, true);
+		
+		for (auto& P : Projectiles)
+			if (P->isVisible())
+				P->scan(SpotLight, true);
+		
+		for (auto& B : Balls)
+			if (B->isVisible() && !B->isVanished())
+				B->scan(SpotLight, true);
+	}
+}
+
+
 void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 {
 	polyCounter = 0;
@@ -532,31 +575,31 @@ void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 
 	for (auto& E : Entities)
 		if (E->isVisible())
-			E->render(viewPort, false, RotationM, TranslationM, *Sun,
+			E->render(viewPort, false, RotationM, TranslationM, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Hero != nullptr)
 		for (auto& P : Hero->Parts)
 			if (P->isVisible())
-				P->render(viewPort, true, RotationM, TranslationM, *Sun,
+				P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
 					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& E : Enemies)
 		if (!E->isDestroyed())
 			for (auto& P : E->Parts)
 				if (P->isVisible())
-					P->render(viewPort, true, RotationM, TranslationM, *Sun,
+					P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
 						method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Enemy != nullptr)
 		for (auto& P : Enemy->Parts)
 			if (P->isVisible())
-				P->render(viewPort, true, RotationM, TranslationM, *Sun,
+				P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
 					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& P : Projectiles)
 		if (P->isVisible())
-			P->render(viewPort, true, RotationM, TranslationM, *Sun,
+			P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& Exp : Explosions)
@@ -565,7 +608,7 @@ void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 
 	for (auto& B : Balls)
 		if (B->isVisible() && !B->isVanished())
-			B->render(viewPort, true, RotationM, TranslationM, *Sun,
+			B->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Emitters.size())
@@ -591,7 +634,7 @@ void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 		for (auto& p : PointClouds)
 		{
 			p->renderCloud(viewPort, Screen, RM);
-			//p->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
+			//p->renderMesh(viewPort, RotationM, TranslationM, SpotLight, *Sun, method,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
 }
@@ -694,6 +737,7 @@ void Game::updateAll()
 	Controls->ceaseMotion();
 
 	this->renderAll(Eye, Controls->visualStyle);
+	this->scanAll();
 
 	if (Controls->showHelp)
 		TextScreens["Controls Text"]->print(Screen);

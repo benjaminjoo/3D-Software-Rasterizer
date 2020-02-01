@@ -214,9 +214,9 @@ void PointCloud::renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas
 }
 
 
-void PointCloud::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource Sun,
+void PointCloud::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource sun,
 	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	if (mesh != nullptr)
-		eye->renderMesh(nPoly, mesh, rot, mov, Sun, visualStyle, torchIntensity, maxIllumination);
+		eye->renderMesh(nPoly, mesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
 }

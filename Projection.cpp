@@ -1219,12 +1219,22 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 }
 
 
-void Projection::fillTriangleShadows(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio)
+void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V, const triangle2dG& S,
+								std::shared_ptr<Lamp> spotlight, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio)
 {
+	//W - World Space triangle
+	//V - View Space triangle
+	//S - Screen Space triangle
+
+	//The goal of this routine is to keep track of the World Space coordinates belonging to the current
+	//pixel being drawn on screen so a query as to whether the point lies in shadow can be directed to the
+	//light source in the scene, where a test is undertaken to see if the point in question is occluded from
+	//the light source's point of view
+
 	int w = screen->getWidth();
 	int h = screen->getHeight();
 
-	coord2 pt[3] = { t.a, t.b, t.c };
+	coord2 pt[3] = { S.a, S.b, S.c };
 	int yMin, yMax;
 
 	yMin = GetYMin3(pt);
@@ -1238,74 +1248,88 @@ void Projection::fillTriangleShadows(const triangle3dV& T, const triangle2dG& t,
 	int lineEnd[2] = { 0, 0 };
 	float zLimit[2] = { 0.0f, 0.0f };
 
-	//vect3 nullVect = { 0.0f, 0.0f, 0.0f, 0.0f };
-	//vect3 sides[4] = { nullVect, nullVect, nullVect, nullVect };
-	//vect3 sideL[2] = { nullVect, nullVect };
-	//vect3 sideR[2] = { nullVect, nullVect };
+	float sidesZ[4] = { 0.0f };
+	float sideLZ[2] = { 0.0f };
+	float sideRZ[2] = { 0.0f };
+
+	vect3 nullVect = { 0.0f, 0.0f, 0.0f, 0.0f };
+	vect3 sides[4] = { nullVect, nullVect, nullVect, nullVect };
+	vect3 sideL[2] = { nullVect, nullVect };
+	vect3 sideR[2] = { nullVect, nullVect };
 
 	int endIndex;
 	int startX, endX;
 	float startZ, endZ, zCurrent;
-	float invertStartPz, invertEndPz, invertCurrentPz;
 	float hCorr = w * 0.475f * h_ratio;
 	float vCorr = w * 0.475f * v_ratio;
 	float deltaZ;
 
-	//coord2 currentP, startP, endP;
-	//vect3 currentVert, startVert, endVert;
+	float invertStartZ, invertEndZ;
+	float invertDeltaZLeft, invertDeltaZRight, invertDeltaZ;
+
+	vect3 currentVert, startVert, endVert;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 
 	for (int hg = yMin; hg < yMax; hg++)
 	{
 		endIndex = 0;
 		//Side A-B:
-		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
+		if ((S.a.y <= hg && S.b.y > hg) || (S.b.y <= hg && S.a.y > hg))
 		{
-			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z;
-			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			wd = t.a.x + static_cast<int>(std::round(xx));
+			dx = S.b.x - S.a.x; dy = S.b.y - S.a.y; dz = S.b.z - S.a.z;
+			yy = (float)hg - (float)S.a.y; xx = dx * (yy / dy); zz = S.a.z + dz * (yy / (float)dy);
+			wd = S.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
+				lineEnd[endIndex] = wd;						//Screen Space x coordinate
+				zLimit[endIndex] = zz;						//Screen Space z coordinate (1 / z)
 
-				//sides[endIndex * 2] = T.A;
-				//sides[endIndex * 2 + 1] = T.B;
+				sidesZ[endIndex * 2] = 1.0f / S.a.z;		//Screen Space z coordinate of point A
+				sidesZ[endIndex * 2 + 1] = 1.0f / S.b.z;	//Screen Space z coordinate of point B
+
+				sides[endIndex * 2] = W.A;					//World Space vertex A(x, y, z, w)
+				sides[endIndex * 2 + 1] = W.B;				//World Space vertex B(x, y, z, w)
 
 				endIndex++;
 			}
 		}
 		//Side B-C:
-		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
+		if ((S.b.y <= hg && S.c.y > hg) || (S.c.y <= hg && S.b.y > hg))
 		{
-			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z;
-			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			wd = t.b.x + static_cast<int>(std::round(xx));
+			dx = S.c.x - S.b.x; dy = S.c.y - S.b.y; dz = S.c.z - S.b.z;
+			yy = (float)hg - (float)S.b.y; xx = dx * (yy / dy); zz = S.b.z + dz * (yy / (float)dy);
+			wd = S.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
+				lineEnd[endIndex] = wd;						//Screen Space x coordinate
+				zLimit[endIndex] = zz;						//Screen Space z coordinate (1 / z)
 
-				//sides[endIndex * 2] = T.B;
-				//sides[endIndex * 2 + 1] = T.C;
+				sidesZ[endIndex * 2] = 1.0f / S.b.z;		//Screen Space z coordinate of point B
+				sidesZ[endIndex * 2 + 1] = 1.0f / S.c.z;	//Screen Space z coordinate of point C
+
+				sides[endIndex * 2] = W.B;					//World Space vertex B(x, y, z, w)
+				sides[endIndex * 2 + 1] = W.C;				//World Space vertex C(x, y, z, w)
 
 				endIndex++;
 			}
 		}
 		//Side C-A:
-		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
+		if ((S.c.y <= hg && S.a.y > hg) || (S.a.y <= hg && S.c.y > hg))
 		{
-			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z;
-			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
+			dx = S.a.x - S.c.x; dy = S.a.y - S.c.y; dz = S.a.z - S.c.z;
+			yy = (float)hg - (float)S.c.y; xx = dx * (yy / dy); zz = S.c.z + dz * (yy / (float)dy);
 
-			wd = t.c.x + static_cast<int>(std::round(xx));
+			wd = S.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
-				lineEnd[endIndex] = wd;
-				zLimit[endIndex] = zz;
+				lineEnd[endIndex] = wd;						//Screen Space x coordinate
+				zLimit[endIndex] = zz;						//Screen Space z coordinate (1 / z)
 
-				//sides[endIndex * 2] = T.C;
-				//sides[endIndex * 2 + 1] = T.A;
+				sidesZ[endIndex * 2] = 1.0f / S.c.z;		//Screen Space z coordinate of point C
+				sidesZ[endIndex * 2 + 1] = 1.0f / S.a.z;	//Screen Space z coordinate of point A
+
+				sides[endIndex * 2] = W.C;					//World Space vertex C(x, y, z, w)
+				sides[endIndex * 2 + 1] = W.A;				//World Space vertex A(x, y, z, w)
 
 				endIndex++;
 			}
@@ -1314,46 +1338,56 @@ void Projection::fillTriangleShadows(const triangle3dV& T, const triangle2dG& t,
 		{
 			if (lineEnd[0] <= lineEnd[1])
 			{
-				startX = lineEnd[0];
-				endX = lineEnd[1];
-				startZ = zLimit[0];
-				endZ = zLimit[1];
+				startX = lineEnd[0];						//Screen Space - start of scanline
+				endX = lineEnd[1];							//Screen Space - end of scanline
+				startZ = zLimit[0];							//Screen Space z at start point (1 / z)
+				endZ = zLimit[1];							//Screen Space z at end point (1 / z)
 
-				//sideL[0] = sides[0];
-				//sideL[1] = sides[1];
-				//sideR[0] = sides[2];
-				//sideR[1] = sides[3];
+				sideLZ[0] = sidesZ[0];						//Screen Space z coordinate of start point on left side
+				sideLZ[1] = sidesZ[1];						//Screen Space z coordinate of end point on left side
+				sideRZ[0] = sidesZ[2];						//Screen Space z coordinate of start point on right side
+				sideRZ[1] = sidesZ[3];						//Screen Space z coordinate of end point on right side
+
+				sideL[0] = sides[0];						//World Space start point on left side
+				sideL[1] = sides[1];						//World Space end point on left side
+				sideR[0] = sides[2];						//World Space start point on right side
+				sideR[1] = sides[3];						//World Space end point on right side
 			}
 			else
 			{
-				startX = lineEnd[1];
-				endX = lineEnd[0];
-				startZ = zLimit[1];
-				endZ = zLimit[0];
+				startX = lineEnd[1];						//Screen Space - start of scanline
+				endX = lineEnd[0];							//Screen Space - end of scanline
+				startZ = zLimit[1];							//Screen Space z at start point (1 / z)
+				endZ = zLimit[0];							//Screen Space z at end point (1 / z)
 
-				//sideL[0] = sides[2];
-				//sideL[1] = sides[3];
-				//sideR[0] = sides[0];
-				//sideR[1] = sides[1];
+				sideLZ[0] = sidesZ[2];						//Screen Space z coordinate of start point on left side
+				sideLZ[1] = sidesZ[3];						//Screen Space z coordinate of end point on left side
+				sideRZ[0] = sidesZ[0];						//Screen Space z coordinate of start point on right side
+				sideRZ[1] = sidesZ[1];						//Screen Space z coordinate of end point on right side
+
+				sideL[0] = sides[2];						//World Space start point on left side
+				sideL[1] = sides[3];						//World Space end point on left side
+				sideR[0] = sides[0];						//World Space start point on right side
+				sideR[1] = sides[1];						//World Space end point on right side
 			}
 			int span = abs(endX - startX + 1);
 			deltaZ = (endZ - startZ) / (float)span;
 			zCurrent = startZ;
 
-			//startP.x = startX;	startP.y = hg;	startP.z = startZ;
-			//endP.x = endX;		endP.y = hg;	endP.z = endZ;
-			//
-			//invertStartPz = 1 / startP.z;
-			//startVert.x = (startP.x - float(halfW)) * invertStartPz / hCorr;
-			//startVert.y = (float(halfH) - startP.y) * invertStartPz / vCorr;
-			//startVert.z = invertStartPz;
-			//
-			//invertEndPz = 1 / endP.z;
-			//endVert.x = (endP.x - float(halfW)) * invertEndPz / hCorr;
-			//endVert.y = (float(halfH) - endP.y) * invertEndPz / vCorr;
-			//endVert.z = invertEndPz;
-			//
-			//currentP.y = hg;
+			invertDeltaZLeft = sideLZ[1] - sideLZ[0];					//Change in z over the total length of left side (World Space)
+			invertDeltaZRight = sideRZ[1] - sideRZ[0];					//Change in z over the total length of right side (World Space)
+
+			invertStartZ = startZ != 0.0f ? 1.0f / startZ : 999.9f;		//Screen Space z at start point
+			invertEndZ = endZ != 0.0f ? 1.0f / endZ : 999.9f;			//Screen Space z at end point
+			invertDeltaZ = invertEndZ - invertStartZ;					//Change in z over length of scanline (Screen Space)
+
+			//Current rate of change in z on left side
+			float sLeft = invertDeltaZLeft != 0.0f ? (invertStartZ - sideLZ[0]) / invertDeltaZLeft : 1.0f;
+			//Current rate of change in z on right side
+			float sRight = invertDeltaZRight != 0.0f ? (invertEndZ - sideRZ[0]) / invertDeltaZRight : 1.0f;
+
+			startVert = sideL[0] + (sideL[1] - sideL[0]).scale(sLeft);	//World Space coordinate of scanline start point
+			endVert = sideR[0] + (sideR[1] - sideR[0]).scale(sRight);	//World Space coordinate of scanline end point
 
 			for (int i = startX; i < endX + 1; i++)
 			{
@@ -1361,15 +1395,30 @@ void Projection::fillTriangleShadows(const triangle3dV& T, const triangle2dG& t,
 				{
 					if (1 / zCurrent < screen->depthBuffer[hg * w + i])
 					{
-						//currentP.x = i;
-						//currentP.z = zCurrent;
-						//
-						//invertCurrentPz = 1 / currentP.z;
-						//currentVert.x = (currentP.x - float(halfW)) * invertCurrentPz / hCorr;
-						//currentVert.y = (float(halfH) - currentP.y) * invertCurrentPz / vCorr;
-						//currentVert.z = invertCurrentPz;
+						//Current rate of change in z on scanline
+						float s = invertDeltaZ != 0.0f ? ((1.0f / zCurrent) - invertStartZ) / invertDeltaZ : 1.0f;
+						
+						//World Space coordinate of current pixel
+						currentVert = startVert + (endVert - startVert).scale(s);
 
-						screen->pixelBuffer[hg * w + i] = getColour(0, (byte)(255.0f * zCurrent), 0, 0);
+
+
+						//currentVert += (W.A - currentVert).scale(W.N * (W.A - currentVert));
+
+
+
+
+
+
+
+
+
+
+
+						//bool isPointLit = spotlight->pointInsideFrustum(currentVert);
+						bool isPointLit = spotlight->pointLit(currentVert);
+
+						screen->pixelBuffer[hg * w + i] = isPointLit ? S.h : 0x0000000f;
 						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
 					}
 					zCurrent += deltaZ;
@@ -1486,12 +1535,12 @@ void Projection::fillTriangleDepthVisualised(const triangle3dV& T, const triangl
 }
 
 
-void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio, txt* texture)
+void Projection::fillTriangleSunlight(const triangle3dV& V, const triangle2dG& S, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio, txt* texture)
 {
 	int w = screen->getWidth();
 	int h = screen->getHeight();
 
-	coord2 pt[3] = { t.a, t.b, t.c };
+	coord2 pt[3] = { S.a, S.b, S.c };
 	int yMin, yMax;
 
 	yMin = GetYMin3(pt);
@@ -1537,64 +1586,64 @@ void Projection::fillTriangleSunlight(const triangle3dV& T, const triangle2dG& t
 		int hgw = hg * w;
 		endIndex = 0;
 		//Side A-B:
-		if ((t.a.y <= hg && t.b.y > hg) || (t.b.y <= hg && t.a.y > hg))
+		if ((S.a.y <= hg && S.b.y > hg) || (S.b.y <= hg && S.a.y > hg))
 		{
-			dx = t.b.x - t.a.x; dy = t.b.y - t.a.y; dz = t.b.z - t.a.z; dIllum = t.illumB - t.illumA;
-			yy = (float)hg - (float)t.a.y; xx = dx * (yy / dy); zz = t.a.z + dz * (yy / (float)dy);
-			illum = t.illumA + dIllum * (yy / (float)dy);
-			wd = t.a.x + static_cast<int>(std::round(xx));
+			dx = S.b.x - S.a.x; dy = S.b.y - S.a.y; dz = S.b.z - S.a.z; dIllum = S.illumB - S.illumA;
+			yy = (float)hg - (float)S.a.y; xx = dx * (yy / dy); zz = S.a.z + dz * (yy / (float)dy);
+			illum = S.illumA + dIllum * (yy / (float)dy);
+			wd = S.a.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
 				zLimit[endIndex] = zz;
 				illLimit[endIndex] = illum * 100.0f;
 
-				sides[endIndex * 2] = T.A;
-				sides[endIndex * 2 + 1] = T.B;
-				uvSides[endIndex * 2] = t.At;
-				uvSides[endIndex * 2 + 1] = t.Bt;
+				sides[endIndex * 2] = V.A;
+				sides[endIndex * 2 + 1] = V.B;
+				uvSides[endIndex * 2] = S.At;
+				uvSides[endIndex * 2 + 1] = S.Bt;
 
 				endIndex++;
 			}
 		}
 		//Side B-C:
-		if ((t.b.y <= hg && t.c.y > hg) || (t.c.y <= hg && t.b.y > hg))
+		if ((S.b.y <= hg && S.c.y > hg) || (S.c.y <= hg && S.b.y > hg))
 		{
-			dx = t.c.x - t.b.x; dy = t.c.y - t.b.y; dz = t.c.z - t.b.z; dIllum = t.illumC - t.illumB;
-			yy = (float)hg - (float)t.b.y; xx = dx * (yy / dy); zz = t.b.z + dz * (yy / (float)dy);
-			illum = t.illumB + dIllum * (yy / (float)dy);
-			wd = t.b.x + static_cast<int>(std::round(xx));
+			dx = S.c.x - S.b.x; dy = S.c.y - S.b.y; dz = S.c.z - S.b.z; dIllum = S.illumC - S.illumB;
+			yy = (float)hg - (float)S.b.y; xx = dx * (yy / dy); zz = S.b.z + dz * (yy / (float)dy);
+			illum = S.illumB + dIllum * (yy / (float)dy);
+			wd = S.b.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
 				zLimit[endIndex] = zz;
 				illLimit[endIndex] = illum * 100.0f;
 
-				sides[endIndex * 2] = T.B;
-				sides[endIndex * 2 + 1] = T.C;
-				uvSides[endIndex * 2] = t.Bt;
-				uvSides[endIndex * 2 + 1] = t.Ct;
+				sides[endIndex * 2] = V.B;
+				sides[endIndex * 2 + 1] = V.C;
+				uvSides[endIndex * 2] = S.Bt;
+				uvSides[endIndex * 2 + 1] = S.Ct;
 
 				endIndex++;
 			}
 		}
 		//Side C-A:
-		if ((t.c.y <= hg && t.a.y > hg) || (t.a.y <= hg && t.c.y > hg))
+		if ((S.c.y <= hg && S.a.y > hg) || (S.a.y <= hg && S.c.y > hg))
 		{
-			dx = t.a.x - t.c.x; dy = t.a.y - t.c.y; dz = t.a.z - t.c.z; dIllum = t.illumA - t.illumC;
-			yy = (float)hg - (float)t.c.y; xx = dx * (yy / dy); zz = t.c.z + dz * (yy / (float)dy);
-			illum = t.illumC + dIllum * (yy / (float)dy);
-			wd = t.c.x + static_cast<int>(std::round(xx));
+			dx = S.a.x - S.c.x; dy = S.a.y - S.c.y; dz = S.a.z - S.c.z; dIllum = S.illumA - S.illumC;
+			yy = (float)hg - (float)S.c.y; xx = dx * (yy / dy); zz = S.c.z + dz * (yy / (float)dy);
+			illum = S.illumC + dIllum * (yy / (float)dy);
+			wd = S.c.x + static_cast<int>(std::round(xx));
 			if (endIndex < 2)
 			{
 				lineEnd[endIndex] = wd;
 				zLimit[endIndex] = zz;
 				illLimit[endIndex] = illum * 100.0f;
 
-				sides[endIndex * 2] = T.C;
-				sides[endIndex * 2 + 1] = T.A;
-				uvSides[endIndex * 2] = t.Ct;
-				uvSides[endIndex * 2 + 1] = t.At;
+				sides[endIndex * 2] = V.C;
+				sides[endIndex * 2 + 1] = V.A;
+				uvSides[endIndex * 2] = S.Ct;
+				uvSides[endIndex * 2 + 1] = S.At;
 
 				endIndex++;
 			}

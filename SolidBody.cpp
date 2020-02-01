@@ -2,6 +2,7 @@
 
 #include "Definitions.h"
 
+
 SolidBody::SolidBody()
 {
 }
@@ -352,26 +353,26 @@ void SolidBody::updateMesh()
 }
 
 
-void SolidBody::scan(std::shared_ptr<Lamp> lamp, bool trans, mat4x4& rot, mat4x4& mov)
+void SolidBody::scan(std::shared_ptr<Lamp> lamp, bool trans)
 {
 	if (mesh != nullptr)
 	{
 		if (trans)
-			lamp->scanMesh(getTotalPoly(), mesh, rot, mov, position, rotation);
+			lamp->scanMesh(getTotalPoly(), mesh, position, rotation);
 		else
-			lamp->scanMesh(getTotalPoly(), mesh, rot, mov);
+			lamp->scanMesh(getTotalPoly(), mesh);
 	}
 }
 
 
-void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov,
+void SolidBody::render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov, std::shared_ptr<Lamp> spotlight,
 				LightSource sun, const projectionStyle& style, float torch, float ill)
 {
 	if (mesh != nullptr)
 	{
 		if (trans)
-			eye->renderMesh(getTotalPoly(), mesh, rot, mov, position, rotation, sun, style, torch, ill);
+			eye->renderMesh(getTotalPoly(), mesh, rot, mov, position, rotation, spotlight, sun, style, torch, ill);
 		else
-			eye->renderMesh(getTotalPoly(), mesh, rot, mov, sun, style, torch, ill);
+			eye->renderMesh(getTotalPoly(), mesh, rot, mov, spotlight, sun, style, torch, ill);
 	}
 }

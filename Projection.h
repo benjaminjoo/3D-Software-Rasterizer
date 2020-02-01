@@ -3,6 +3,7 @@
 #include "Definitions.h"
 #include "Canvas.h"
 #include "LightSource.h"
+#include "Lamp.h"
 
 #include <cmath>
 #include <memory>
@@ -80,7 +81,8 @@ public:
 
 	void fillTriangleCheckerboard(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
-	void fillTriangleShadows(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
+	void fillTriangleShadows(const triangle3dV& W, const triangle3dV& V, const triangle2dG& S,
+							std::shared_ptr<Lamp> spotlight, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);
 
 	void fillTriangleFlatShaded(const triangle2dG& t, std::shared_ptr<Canvas> screen);
 

@@ -282,9 +282,9 @@ void DynamicMesh::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas
 }
 
 
-void DynamicMesh::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource Sun,
+void DynamicMesh::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource sun,
 				const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	eye->renderMesh(polyCount, mesh, rot, mov, Sun, visualStyle, torchIntensity, maxIllumination);
-	eye->renderMesh(polyCountS, sideMesh, rot, mov, Sun, visualStyle, torchIntensity, maxIllumination);
+	eye->renderMesh(polyCount, mesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
+	eye->renderMesh(polyCountS, sideMesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
 }

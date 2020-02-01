@@ -2,6 +2,7 @@
 
 #include "Definitions.h"
 #include "LightSource.h"
+#include "Lamp.h"
 #include "ViewVolume.h"
 #include "Canvas.h"
 #include "Projection.h"
@@ -48,8 +49,8 @@ private:
 	std::shared_ptr<Canvas> Screen			= nullptr;
 	std::shared_ptr<Projection> Renderer	= nullptr;
 
-	vect3					vertexList[MAXCLIPVERTS];
-	vect3					vertexListT[MAXCLIPVERTS];
+	vect3					vertexListV[MAXCLIPVERTS];
+	vect3					vertexListW[MAXCLIPVERTS];
 	textCoord				uvList[MAXCLIPVERTS];
 	float					specularList[MAXCLIPVERTS];
 
@@ -82,10 +83,10 @@ public:
 
 	void renderVisiblePoint(point3 p, mat4x4&, Uint32*, float*);
 
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov,
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt,
+	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 private:
@@ -141,14 +142,14 @@ private:
 
 	void projectPoint(point3, Uint32*, float*);
 
-	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, LightSource Sun,
+	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource Sun,
 		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 	void getSpecular (float* illSpec, LightSource Light, const triangle3dV& worldT, float shine);
 
 	coord2 view2screen(const vect3& vertex, const float& hR, const float& vR);
 
-	void projectPoly(int, Uint32, projectionStyle, float, float, triangle3dV);
+	void projectPoly(int, Uint32, std::shared_ptr<Lamp> spotlight, projectionStyle, float, float, triangle3dV);
 
 	void outputImage(Canvas);
 };
