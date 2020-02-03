@@ -34,6 +34,9 @@ private:
 	mat4x4					translation = { 0.0f };
 	mat4x4					transformation = { 0.0f };
 
+	mat4x4SIMD				rotationSIMD;
+	mat4x4SIMD				transformationSIMD;
+
 	float					step;
 	float					turn;
 
@@ -144,6 +147,8 @@ private:
 	void object2world(const mat4x4& MR, const mat4x4& R, triangle3dV& T) const;
 
 	void world2view(triangle3dV& T) const;
+
+	void world2viewSIMD(triangle3dV& T) const;
 
 	void world2view(int n);
 

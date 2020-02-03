@@ -243,6 +243,8 @@ void Camera::update()
 	updateViewVolume();
 
 	//rotation = getRotation();
+	//translation = getTranslation();
+	//transformation = rotation * translation;
 
 	float sinAz = sinf(rol);
 	float cosAz = cosf(rol);
@@ -261,36 +263,69 @@ void Camera::update()
 		0.0f,										0.0f,										0.0f,			1.0f
 	};
 
-	translation =
+	rotationSIMD.col_0 = _mm_set_ps(	cosAz * cosAz_ + sinAz * cosAx * -sinAz_,
+										-sinAz * cosAz_ + cosAz * cosAx * -sinAz_,
+										-sinAx * -sinAz_,
+										0.0f);
+
+	rotationSIMD.col_1 = _mm_set_ps(	cosAz * sinAz_ + sinAz * cosAx * cosAz_,
+										-sinAz * sinAz_ + cosAz * cosAx * cosAz_,
+										-sinAx * cosAz_,
+										0.0f);
+
+	rotationSIMD.col_2 = _mm_set_ps(	sinAz * sinAx,
+										cosAz * sinAx,
+										cosAx,
+										0.0f);
+
+	rotationSIMD.col_3 = _mm_set_ps(	0.0f,
+										0.0f,
+										0.0f,
+										1.0f);
+
+
+	transformation =
 	{
-			1.0f,          0.0f,         0.0f,		-x,
-			0.0f,          1.0f,         0.0f,		-y,
-			0.0f,          0.0f,         1.0f,		-z,
-			0.0f,          0.0f,         0.0f,       1.0f
+		cosAz * cosAz_ + sinAz * cosAx * -sinAz_,
+		cosAz * sinAz_ + sinAz * cosAx * cosAz_,
+		sinAz * sinAx,
+		(cosAz * cosAz_ + sinAz * cosAx * -sinAz_) * (-x) + (cosAz * sinAz_ + sinAz * cosAx * cosAz_) * (-y) + (sinAz * sinAx) * (-z),
+
+		-sinAz * cosAz_ + cosAz * cosAx * -sinAz_,
+		-sinAz * sinAz_ + cosAz * cosAx * cosAz_,
+		cosAz * sinAx,
+		(-sinAz * cosAz_ + cosAz * cosAx * -sinAz_) * (-x) + (-sinAz * sinAz_ + cosAz * cosAx * cosAz_) * (-y) + (cosAz * sinAx) * (-z),
+
+		-sinAx * -sinAz_,
+		-sinAx * cosAz_,
+		cosAx,
+		-sinAx * sinAz_ * x + sinAx * cosAz_ * y - cosAx * z,
+
+		0.0f,
+		0.0f,
+		0.0f,
+		1.0f
 	};
 
-	//translation = getTranslation();
-	transformation = rotation * translation;
+	transformationSIMD.col_0 = _mm_set_ps(	cosAz * cosAz_ + sinAz * cosAx * -sinAz_,
+											-sinAz * cosAz_ + cosAz * cosAx * -sinAz_,
+											-sinAx * -sinAz_,
+											0.0f);
 
-	//transformation =
-	//{
-	//	cosAz * cosAz_ + sinAz * cosAx * -sinAz_ + cosAz * sinAz_,
-	//	cosAz * cosAz_ + cosAz * sinAz_ + sinAz * cosAx * cosAz_,
-	//	cosAz * cosAz_ + cosAz * sinAz_ + sinAz * sinAx,
-	//	cosAz * cosAz_ + sinAz * cosAx * -sinAz_ * -x + cosAz * sinAz_ + sinAz * cosAx * cosAz_ * -y + sinAz * sinAx * -z,
-	//	-sinAz * cosAz_ + cosAz * cosAx * -sinAz_ - sinAz * sinAz_,
-	//	-sinAz * cosAz_ - sinAz * sinAz_ + cosAz * cosAx * cosAz_,
-	//	-sinAz * cosAz_ - sinAz * sinAz_ + cosAz * sinAx,
-	//	-sinAz * cosAz_ + cosAz * cosAx * -sinAz_ * -x + -sinAz * sinAz_ + cosAz * cosAx * cosAz_ * -y + cosAz * sinAx * -z,
-	//	-sinAx * -sinAz_ ,
-	//	-sinAx * cosAz_,
-	//	cosAx,
-	//	-sinAx * -sinAz_ * -x + -sinAx * cosAz_ * -y + cosAx * -z,
-	//	0.0f,
-	//	0.0f,
-	//	0.0f,
-	//	1.0f
-	//};
+	transformationSIMD.col_1 = _mm_set_ps(	cosAz * sinAz_ + sinAz * cosAx * cosAz_,
+											-sinAz * sinAz_ + cosAz * cosAx * cosAz_,
+											-sinAx * cosAz_,
+											0.0f);
+
+	transformationSIMD.col_2 = _mm_set_ps(	sinAz * sinAx,
+											cosAz * sinAx,
+											cosAx,
+											0.0f);
+
+	transformationSIMD.col_3 = _mm_set_ps(	(cosAz * cosAz_ + sinAz * cosAx * -sinAz_) * (-x) + (cosAz * sinAz_ + sinAz * cosAx * cosAz_) * (-y) + (sinAz * sinAx) * (-z),
+											(-sinAz * cosAz_ + cosAz * cosAx * -sinAz_) * (-x) + (-sinAz * sinAz_ + cosAz * cosAx * cosAz_) * (-y) + (cosAz * sinAx) * (-z),
+											-sinAx * sinAz_ * x + sinAx * cosAz_ * y - cosAx * z,
+											1.0f);
 }
 
 
@@ -690,26 +725,6 @@ mat4x4 Camera::getRotation(vect3 rt) const
 
 	const mat4x4 rotZrotYrotX =
 	{
-		//cosAz	* cosAy	* 1.0f			+		sinAz	* 0.0f		+		cosAz	* -sinAy * 0.0f			+		0.0f * 0.0f,
-		//cosAz	* cosAy	* 0.0f			+		sinAz	* cosAx		+		cosAz	* -sinAy * -sinAx		+		0.0f * 0.0f,
-		//cosAz	* cosAy	* 0.0f			+		sinAz	* sinAx		+		cosAz	* -sinAy * cosAx		+		0.0f * 0.0f,
-		//cosAz	* cosAy	* 0.0f			+		sinAz	* 0.0f		+		cosAz	* -sinAy * 0.0f			+		0.0f * 1.0f,
-		//
-		//-sinAz	* cosAy	* 1.0f		+		cosAz	* 0.0f		+		-sinAz	* -sinAy * 0.0f			+		0.0f * 0.0f,
-		//-sinAz	* cosAy	* 0.0f		+		cosAz	* cosAx		+		-sinAz	* -sinAy * -sinAx		+		0.0f * 0.0f,
-		//-sinAz	* cosAy	* 0.0f		+		cosAz	* sinAx		+		-sinAz	* -sinAy * cosAx		+		0.0f * 0.0f,
-		//-sinAz	* cosAy	* 0.0f		+		cosAz	* 0.0f		+		-sinAz	* -sinAy * 0.0f			+		0.0f * 1.0f,
-		//
-		//sinAy			* 1.0f			+		0.0f	* 0.0f		+		cosAy	* 0.0f					+		0.0f * 0.0f,
-		//sinAy			* 0.0f			+		0.0f	* cosAx		+		cosAy	* -sinAx				+		0.0f * 0.0f,
-		//sinAy			* 0.0f			+		0.0f	* sinAx		+		cosAy	* cosAx					+		0.0f * 0.0f,
-		//sinAy			* 0.0f			+		0.0f	* 0.0f		+		cosAy	* 0.0f					+		0.0f * 1.0f,
-		//
-		//0.0f			* 1.0f			+		0.0f	* 0.0f		+		0.0f	* 0.0f					+		1.0f * 0.0f,
-		//0.0f			* 0.0f			+		0.0f	* cosAx		+		0.0f	* -sinAx				+		1.0f * 0.0f,
-		//0.0f			* 0.0f			+		0.0f	* sinAx		+		0.0f	* cosAx					+		1.0f * 0.0f,
-		//0.0f			* 0.0f			+		0.0f	* 0.0f		+		0.0f	* 0.0f					+		1.0f * 1.0f
-
 		cosAz* cosAy,	sinAz * cosAx + cosAz * -sinAy * -sinAx,	sinAz * sinAx + cosAz * -sinAy * cosAx,	0.0f,
 		-sinAz * cosAy,	cosAz * cosAx + -sinAz * -sinAy * -sinAx,	cosAz * sinAx + -sinAz * -sinAy * cosAx,0.0f,
 		sinAy,			cosAy * -sinAx,								cosAy * cosAx,							0.0f,
@@ -738,27 +753,6 @@ mat4x4 Camera::getRotation() const
 		-sinAx * -sinAz_,							-sinAx * cosAz_,							cosAx,			0.0f,
 		0.0f,										0.0f,										0.0f,			1.0f
 	};
-	//{
-	//	cosAz * cosAz_		+	sinAz * cosAx	* -sinAz_		+ sinAz * sinAx * 0.0f		+		0.0f * 0.0f,
-	//	cosAz * sinAz_		+	sinAz * cosAx	* cosAz_		+ sinAz * sinAx * 0.0f		+		0.0f * 0.0f,
-	//	cosAz * 0.0f		+	sinAz * cosAx	* 0.0f			+ sinAz * sinAx * 1.0f		+		0.0f * 0.0f,
-	//	cosAz * 0.0f		+	sinAz * cosAx	* 0.0f			+ sinAz * sinAx * 0.0f		+		0.0f * 1.0f,
-	//	
-	//	-sinAz * cosAz_		+	cosAz * cosAx	* -sinAz_		+ cosAz * sinAx * 0.0f		+		0.0f * 0.0f,
-	//	-sinAz * sinAz_		+	cosAz * cosAx	* cosAz_		+ cosAz * sinAx * 0.0f		+		0.0f * 0.0f,
-	//	-sinAz * 0.0f		+	cosAz * cosAx	* 0.0f			+ cosAz * sinAx * 1.0f		+		0.0f * 0.0f,
-	//	-sinAz * 0.0f		+	cosAz * cosAx	* 0.0f			+ cosAz * sinAx * 0.0f		+		0.0f * 1.0f,
-	//	
-	//	0.0f * cosAz_		+	-sinAx			* -sinAz_		+ cosAx			* 0.0f		+		0.0f * 0.0f,
-	//	0.0f * sinAz_		+	-sinAx			* cosAz_		+ cosAx			* 0.0f		+		0.0f * 0.0f,
-	//	0.0f * 0.0f			+	-sinAx			* 0.0f			+ cosAx			* 1.0f		+		0.0f * 0.0f,
-	//	0.0f * 0.0f			+	-sinAx			* 0.0f			+ cosAx			* 0.0f		+		0.0f * 1.0f,
-	//	
-	//	0.0f * cosAz_		+	0.0f			* -sinAz_		+ 0.0f			* 0.0f		+		1.0f * 0.0f,
-	//	0.0f * sinAz_		+	0.0f			* cosAz_		+ 0.0f			* 0.0f		+		1.0f * 0.0f,
-	//	0.0f * 0.0f			+	0.0f			* 0.0f			+ 0.0f			* 1.0f		+		1.0f * 0.0f,
-	//	0.0f * 0.0f			+	0.0f			* 0.0f			+ 0.0f			* 0.0f		+		1.0f * 1.0f
-	//};
 
 	return rotZrotXrotZ;
 }
@@ -785,6 +779,99 @@ void Camera::world2view(triangle3dV& T) const
 	T.Bn = rotation * T.Bn;
 	T.Cn = rotation * T.Cn;
 	T.N = rotation * T.N;
+}
+
+
+void Camera::world2viewSIMD(triangle3dV& T) const
+{
+	const mat4x4SIMD& TR	= transformationSIMD;
+	const mat4x4SIMD& R		= rotationSIMD;
+
+	//Packing triangle
+
+	__m128 xxxxA = _mm_set_ps1(T.A.x);
+	__m128 yyyyA = _mm_set_ps1(T.A.y);
+	__m128 zzzzA = _mm_set_ps1(T.A.z);
+	__m128 wwwwA = _mm_set_ps1(T.A.w);
+
+	__m128 xxxxB = _mm_set_ps1(T.B.x);
+	__m128 yyyyB = _mm_set_ps1(T.B.y);
+	__m128 zzzzB = _mm_set_ps1(T.B.z);
+	__m128 wwwwB = _mm_set_ps1(T.B.w);
+
+	__m128 xxxxC = _mm_set_ps1(T.C.x);
+	__m128 yyyyC = _mm_set_ps1(T.C.y);
+	__m128 zzzzC = _mm_set_ps1(T.C.z);
+	__m128 wwwwC = _mm_set_ps1(T.C.w);
+
+	__m128 xxxxN = _mm_set_ps1(T.N.x);
+	__m128 yyyyN = _mm_set_ps1(T.N.y);
+	__m128 zzzzN = _mm_set_ps1(T.N.z);
+	__m128 wwwwN = _mm_set_ps1(T.N.w);
+
+	__m128 xxxxAn = _mm_set_ps1(T.An.x);
+	__m128 yyyyAn = _mm_set_ps1(T.An.y);
+	__m128 zzzzAn = _mm_set_ps1(T.An.z);
+	__m128 wwwwAn = _mm_set_ps1(T.An.w);
+
+	__m128 xxxxBn = _mm_set_ps1(T.Bn.x);
+	__m128 yyyyBn = _mm_set_ps1(T.Bn.y);
+	__m128 zzzzBn = _mm_set_ps1(T.Bn.z);
+	__m128 wwwwBn = _mm_set_ps1(T.Bn.w);
+
+	__m128 xxxxCn = _mm_set_ps1(T.Cn.x);
+	__m128 yyyyCn = _mm_set_ps1(T.Cn.y);
+	__m128 zzzzCn = _mm_set_ps1(T.Cn.z);
+	__m128 wwwwCn = _mm_set_ps1(T.Cn.w);
+
+	//Calculation
+
+	__m128 resultA = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxA, TR.col_0), _mm_mul_ps(yyyyA, TR.col_1)), _mm_add_ps(_mm_mul_ps(zzzzA, TR.col_2), _mm_mul_ps(wwwwA, TR.col_3)));
+	__m128 resultB = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxB, TR.col_0), _mm_mul_ps(yyyyB, TR.col_1)), _mm_add_ps(_mm_mul_ps(zzzzB, TR.col_2), _mm_mul_ps(wwwwB, TR.col_3)));
+	__m128 resultC = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxC, TR.col_0), _mm_mul_ps(yyyyC, TR.col_1)), _mm_add_ps(_mm_mul_ps(zzzzC, TR.col_2), _mm_mul_ps(wwwwC, TR.col_3)));
+
+	__m128 resultN = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxN, R.col_0), _mm_mul_ps(yyyyN, R.col_1)), _mm_add_ps(_mm_mul_ps(zzzzN, R.col_2), _mm_mul_ps(wwwwN, R.col_3)));
+
+	__m128 resultAn = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxAn, R.col_0), _mm_mul_ps(yyyyAn, R.col_1)), _mm_add_ps(_mm_mul_ps(zzzzAn, R.col_2), _mm_mul_ps(wwwwAn, R.col_3)));
+	__m128 resultBn = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxBn, R.col_0), _mm_mul_ps(yyyyBn, R.col_1)), _mm_add_ps(_mm_mul_ps(zzzzBn, R.col_2), _mm_mul_ps(wwwwBn, R.col_3)));
+	__m128 resultCn = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxxCn, R.col_0), _mm_mul_ps(yyyyCn, R.col_1)), _mm_add_ps(_mm_mul_ps(zzzzCn, R.col_2), _mm_mul_ps(wwwwCn, R.col_3)));
+
+	//Unpacking triangle
+
+	T.A.x = resultA.m128_f32[3];
+	T.A.y = resultA.m128_f32[2];
+	T.A.z = resultA.m128_f32[1];
+	T.A.w = resultA.m128_f32[0];
+
+	T.B.x = resultB.m128_f32[3];
+	T.B.y = resultB.m128_f32[2];
+	T.B.z = resultB.m128_f32[1];
+	T.B.w = resultB.m128_f32[0];
+
+	T.C.x = resultC.m128_f32[3];
+	T.C.y = resultC.m128_f32[2];
+	T.C.z = resultC.m128_f32[1];
+	T.C.w = resultC.m128_f32[0];
+
+	T.N.x = resultN.m128_f32[3];
+	T.N.y = resultN.m128_f32[2];
+	T.N.z = resultN.m128_f32[1];
+	T.N.w = resultN.m128_f32[0];
+
+	T.An.x = resultAn.m128_f32[3];
+	T.An.y = resultAn.m128_f32[2];
+	T.An.z = resultAn.m128_f32[1];
+	T.An.w = resultAn.m128_f32[0];
+
+	T.Bn.x = resultBn.m128_f32[3];
+	T.Bn.y = resultBn.m128_f32[2];
+	T.Bn.z = resultBn.m128_f32[1];
+	T.Bn.w = resultBn.m128_f32[0];
+
+	T.Cn.x = resultCn.m128_f32[3];
+	T.Cn.y = resultCn.m128_f32[2];
+	T.Cn.z = resultCn.m128_f32[1];
+	T.Cn.w = resultCn.m128_f32[0];
 }
 
 
@@ -905,7 +992,9 @@ void Camera::renderPolygon(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, 
 {
 	triangle3dV worldT = viewT;
 
-	this->world2view(viewT);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+	//this->world2view(viewT);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+
+	this->world2viewSIMD(viewT);
 
 	if (visualStyle == projectionStyle::blinn_phong)
 	{

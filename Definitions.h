@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <immintrin.h>
 #include "c64Fonts.h"
 
 
@@ -419,6 +420,15 @@ struct mat4x4
 
 		return t;
 	}
+};
+
+
+struct mat4x4SIMD
+{
+	__m128 col_0;
+	__m128 col_1;
+	__m128 col_2;
+	__m128 col_3;
 };
 
 
