@@ -118,9 +118,9 @@ void Explosion::update()
 }
 
 
-void Explosion::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM)
+void Explosion::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (auto& grain : container)
-		eye->renderPoint(grain, RM, screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(grain, screen->pixelBuffer, screen->depthBuffer);
 }
 

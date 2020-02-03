@@ -168,7 +168,7 @@ bool ParticleSystem::particleApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 }
 
 
-void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM)
+void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (auto& i : particles)
 		if (i.isActive())
@@ -200,6 +200,6 @@ void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas>
 			point3 p;
 			p.P = i.getPosition();
 			p.colour = getColour(0, r, g, b);
-			eye->renderPoint(p, RM, screen->pixelBuffer, screen->depthBuffer);
+			eye->renderPoint(p, screen->pixelBuffer, screen->depthBuffer);
 		}
 }

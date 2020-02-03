@@ -133,13 +133,15 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AssemblerOutput>AssemblyCode</AssemblerOutput>
+      <AssemblerOutput>NoListing</AssemblerOutput>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,6 +164,9 @@
       <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

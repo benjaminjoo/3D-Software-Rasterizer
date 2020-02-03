@@ -57,7 +57,7 @@ void Shapes::addTextureData(SDL_Surface* T)
 	{
 		txt tempTexture;
 		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
-		tempTexture.pixels = (Uint32*)tempImage->pixels;
+		tempTexture.pixelsH = (Uint32*)tempImage->pixels;
 		tempTexture.w = T->w;
 		tempTexture.h = T->h;
 		textureDataContainer.push_back(tempTexture);
@@ -226,7 +226,7 @@ void Shapes::textureLoader(int nTextures, SDL_Surface** T)
 		{
 			txt tempTexture;
 			SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T[i], SDL_PIXELFORMAT_ARGB8888, 0);
-			tempTexture.pixels = (Uint32*)tempImage->pixels;
+			tempTexture.pixelsH = (Uint32*)tempImage->pixels;
 			tempTexture.ID = i;
 			tempTexture.w = T[i]->w;
 			tempTexture.h = T[i]->h;

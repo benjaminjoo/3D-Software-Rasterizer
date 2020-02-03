@@ -46,8 +46,7 @@ private:
 
 	vect3 vertexList[MAXCLIPVERTS];
 
-	//float* depthBuffer	= nullptr;
-	int* depthBuffer = nullptr;
+	float* depthBuffer	= nullptr;
 
 public:
 

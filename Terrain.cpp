@@ -213,7 +213,7 @@ void Terrain::addTexture(SDL_Surface* T)
 	else
 	{
 		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
-		texture.pixels = (Uint32*)tempImage->pixels;
+		texture.pixelsH = (Uint32*)tempImage->pixels;
 		texture.w = T->w;
 		texture.h = T->h;
 		std::cout << "Image succesfully loaded (" << texture.w << "x" << texture.h << ")" << std::endl;
@@ -223,7 +223,7 @@ void Terrain::addTexture(SDL_Surface* T)
 
 void Terrain::getSample()
 {
-	if (texture.pixels != nullptr)
+	if (texture.pixelsH != nullptr)
 	{
 		std::cout << "Sampling image file..." << std::endl;
 		float totalW = texture.w * scale;
@@ -269,7 +269,7 @@ void Terrain::getSample()
 						wrap(y, texture.h);
 						int index = y * texture.w + x;
 						colour32 temp;
-						temp.argb = texture.pixels[index];
+						temp.argb = texture.pixelsH[index];
 						rAcc += temp.c[2];
 						gAcc += temp.c[1];
 						bAcc += temp.c[0];
@@ -443,17 +443,17 @@ void Terrain::createMesh()
 }
 
 
-void Terrain::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM)
+void Terrain::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (int i = 0; i < sizeX * sizeY; i++)
-		eye->renderPoint(pGrid[i], RM, screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(pGrid[i], screen->pixelBuffer, screen->depthBuffer);
 }
 
 
-void Terrain::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource sun,
+void Terrain::renderMesh(std::shared_ptr<Camera> eye, LightSource sun,
 	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	eye->renderMesh(polyCount, mesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
+	eye->renderMesh(polyCount, mesh, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
 }
 
 

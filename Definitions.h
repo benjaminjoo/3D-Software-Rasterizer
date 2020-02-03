@@ -381,7 +381,7 @@ struct mat4x4
 	float _32 = 0.0f;
 	float _33 = 0.0f;
 
-	vect3 operator * (const vect3& v)
+	vect3 operator * (const vect3& v) const
 	{
 		vect3 t;
 
@@ -393,7 +393,7 @@ struct mat4x4
 		return t;
 	}
 
-	mat4x4 operator * (const mat4x4& m)
+	mat4x4 operator * (const mat4x4& m) const
 	{
 		mat4x4 t;
 
@@ -552,7 +552,10 @@ struct txt
 	int w = 0;
 	int h = 0;
 
-	Uint32* pixels = nullptr;
+	Uint32* pixelsH = nullptr;
+	Uint32* pixelsM = nullptr;
+	Uint32* pixelsL = nullptr;
+	Uint32* pixelsT = nullptr;
 };
 
 

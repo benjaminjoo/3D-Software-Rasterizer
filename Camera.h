@@ -9,6 +9,7 @@
 
 #include <time.h>
 #include <memory>
+#include <string>
 
 
 class Camera
@@ -28,6 +29,10 @@ private:
 	float					rol;
 
 	vect3					viewDirection = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	mat4x4					rotation = { 0.0f };
+	mat4x4					translation = { 0.0f };
+	mat4x4					transformation = { 0.0f };
 
 	float					step;
 	float					turn;
@@ -79,14 +84,16 @@ public:
 
 	void addTexture(txt);
 
-	void renderPoint(point3, mat4x4&, Uint32*, float*);
+	void update();
 
-	void renderVisiblePoint(point3 p, mat4x4&, Uint32*, float*);
+	void renderPoint(point3, Uint32*, float*);
 
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, std::shared_ptr<Lamp> spotlight,
+	void renderVisiblePoint(point3 p, Uint32*, float*);
+
+	void renderMesh(const int& nPoly, triangle3dV* mesh, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
-	void renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt, std::shared_ptr<Lamp> spotlight,
+	void renderMesh(const int& nPoly, triangle3dV* mesh, vect3 mv, vect3 rt, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 private:
@@ -124,25 +131,30 @@ private:
 
 	void centreLook();
 
-	mat4x4 getTranslation(vect3 mv);
+	mat4x4 getTranslation(vect3 mv) const;
 
-	mat4x4 getTranslation();
+	mat4x4 getTranslation() const;
 
-	mat4x4 getRotation(axis t, float a);
+	mat4x4 getRotation(axis t, float a) const;
 
-	mat4x4 getRotation();
+	mat4x4 getRotation(vect3 rt) const;
 
-	void object2world(mat4x4& MR, mat4x4& R, triangle3dV& T);
+	mat4x4 getRotation() const;
 
-	void world2view(mat4x4& RM, mat4x4& R, triangle3dV& T);
+	void object2world(const mat4x4& MR, const mat4x4& R, triangle3dV& T) const;
 
-	void world2view(mat4x4& RM, int n);
+	void world2view(triangle3dV& T) const;
 
-	void world2viewPointM(point3& P, mat4x4& RM);
+	void world2view(int n);
+
+	void world2viewPointM(point3& P) const;
 
 	void projectPoint(point3, Uint32*, float*);
 
-	void renderPolygon(mat4x4& rot, mat4x4& mov, triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource Sun,
+	void renderPolygon(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource Sun,
+		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
+
+	void renderPolygonShadows(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource Sun,
 		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
 	void getSpecular (float* illSpec, LightSource Light, const triangle3dV& worldT, float shine);
@@ -150,6 +162,4 @@ private:
 	coord2 view2screen(const vect3& vertex, const float& hR, const float& vR);
 
 	void projectPoly(int, Uint32, std::shared_ptr<Lamp> spotlight, projectionStyle, float, float, triangle3dV);
-
-	void outputImage(Canvas);
 };

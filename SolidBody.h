@@ -133,7 +133,7 @@ public:
 	virtual void explode();
 	void updateMesh();
 	void scan(std::shared_ptr<Lamp> lamp, bool trans);
-	void render(std::shared_ptr<Camera> eye, bool trans, mat4x4& rot, mat4x4& mov, std::shared_ptr<Lamp> spotlight,
+	void render(std::shared_ptr<Camera> eye, bool trans, std::shared_ptr<Lamp> spotlight,
 		LightSource sun, const projectionStyle& style, float torch, float ill);
 };
 

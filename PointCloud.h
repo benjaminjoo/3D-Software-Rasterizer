@@ -38,8 +38,8 @@ public:
 
 	void invertFaces();
 	void smoothSurfaces();
-	void renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
-	void renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource Sun,
+	void renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen);
+	void renderMesh(std::shared_ptr<Camera> eye, LightSource Sun,
 		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 };
 

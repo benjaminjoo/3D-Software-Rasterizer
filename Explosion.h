@@ -35,7 +35,6 @@ public:
 	bool isUsed();
 	void updateCloudPosition(const vect3& p);
 	void update();
-	void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
-	//void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
+	void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen);
 };
 

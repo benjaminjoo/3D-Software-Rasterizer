@@ -62,6 +62,6 @@ public:
 	void handleCollisions();
 	bool particleApproachingWall(vect3& p, vect3& v, triangle3dV& T);
 
-	void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM);
+	void render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen);
 };
 

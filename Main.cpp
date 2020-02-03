@@ -232,7 +232,7 @@ void water()
 	//testWorld->addStaticSurface(asteroid_surface);
 
 	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat9", 0x0066664c, false);
-	testWorld->addPointCloud(model_test_1);
+	testWorld->addEntity(model_test_1);
 
 
 	while (!Controls->quit)
@@ -258,8 +258,8 @@ void fps_game()
 
 	auto Sun = std::make_shared<LightSource>(300.0f, 22.5f, 1.0f);
 
-	auto Lamp1 = std::make_shared<Lamp>(-50.0f, 25.0f, 45.0f,
-										PI * 0.125f, PI * 0.25f, 0.0f,
+	auto Lamp1 = std::make_shared<Lamp>(-30.0f, 60.0f, 45.0f,
+										PI * 0.375f, PI * 0.25f, 0.0f,
 										PI * 0.5f,
 										1.0f, 100.0f,
 										1200, 600);
@@ -270,7 +270,7 @@ void fps_game()
 
 	Hero->addPart(weapon);
 
-	auto Observer = std::make_shared<Player>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+	auto Observer = std::make_shared<Player>(10.0f, 10.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
 	auto cone = std::make_shared<SolidCone>(0.0f, 0.0f, 0.0f, 0x000000ff);
 
@@ -317,12 +317,10 @@ void fps_game()
 
 #ifdef _STL_READER_
 
-	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
-	//teapot->readSTLfile();
-	//teapot->smoothSurfaces();
+	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
 	fpsGame->addEntity(teapot);
 
-	auto board = std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, -15.0f, -15.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0x0000007f, 6, 30.0f, 30.0f, 1.0f);
+	auto board = std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, -30.0f, -30.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0x0000007f, 6, 60.0f, 60.0f, 1.0f);
 	fpsGame->addEntity(board);
 
 #endif//_STL_READER_
@@ -358,7 +356,6 @@ void fps_game()
 #ifdef _QUAKE_3_READER_
 
 	auto quake3Map = std::make_shared<BSP3Loader>("Assets/QuakeMaps/13ground.bsp", 0.1f, 0.1f, 0.1f);
-	//quake3Map->readData();
 	fpsGame->addEntity(quake3Map);
 
 #endif//_QUAKE_3_READER_

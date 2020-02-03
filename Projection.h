@@ -75,6 +75,8 @@ public:
 
 	textCoord getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV);
 
+	vect3 getWCoord(const vect3& startV, const vect3& endV, const vect3& startW, const vect3& endW, const vect3& testV);
+
 	void fillTriangleDepth(const triangle2dG& t, std::shared_ptr<Canvas> screen, float zNear, float h_ratio, float v_ratio);
 
 	void fillTriangleSolidColour(const triangle3dV& T, const triangle2dG& t, std::shared_ptr<Canvas> screen, float h_ratio, float v_ratio);

@@ -496,18 +496,53 @@ Uint32 Projection::modifyColour(const Uint32& inputColour, const float& illumina
 }
 
 
-textCoord Projection::getUVCoord(const vect3& startV, const vect3& endV, const textCoord& startC, const textCoord& endC, const vect3& testV)
+textCoord Projection::getUVCoord(	const vect3& startV, const vect3& endV,
+									const textCoord& startC, const textCoord& endC,
+									const vect3& testV)
 {
 	textCoord testC;
-
+	
 	float a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
 	float b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
 	float d = (b != 0.0f) ? (a / b) : (0.0f);
-
+	
 	testC.u = startC.u + d * (endC.u - startC.u);
 	testC.v = startC.v + d * (endC.v - startC.v);
-
+	
 	return testC;
+
+	//textCoord testC;
+	//
+	//float esX = endV.x - startV.x;
+	//float esY = endV.y - startV.y;
+	//float esZ = endV.z - startV.z;
+	//
+	//float a =	(testV.x - startV.x) * esX +
+	//			(testV.y - startV.y) * esY +
+	//			(testV.z - startV.z) * esZ;
+	//
+	//float b = esX * esX + esY * esY + esZ * esZ;
+	//
+	//float d = a / b;
+	//
+	//testC.u = startC.u + d * (endC.u - startC.u);
+	//testC.v = startC.v + d * (endC.v - startC.v);
+	//
+	//return testC;
+}
+
+
+vect3 Projection::getWCoord(const vect3& startV, const vect3& endV,
+							const vect3& startW, const vect3& endW,
+							const vect3& testV)
+{
+	float a = (testV - startV) * (endV - startV);
+	float b = (endV - startV) * (endV - startV);
+	float d = (b != 0.0f) ? (a / b) : (0.0f);
+
+	vect3 testW = startW + (endW - startW).scale(d);
+
+	return testW;
 }
 
 
@@ -1161,7 +1196,6 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 			startUV = getUVCoord(sideL[0], sideL[1], uvSideL[0], uvSideL[1], startVert);
 			endUV = getUVCoord(sideR[0], sideR[1], uvSideR[0], uvSideR[1], endVert);
 
-
 			currentP.y = hg;
 
 			for (int i = startX; i < endX + 1; i++)
@@ -1201,13 +1235,14 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 						{
 							if (int(sampleYnew / 16) % 2)
 							{
-								screen->pixelBuffer[hg * w + i] = blue;
+								screen->pixelBuffer[hg * w + i] = white;
 							}
 							else
 							{
-								screen->pixelBuffer[hg * w + i] = white;
+								screen->pixelBuffer[hg * w + i] = blue;
 							}
 						}
+
 						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
 					}
 					zCurrent += deltaZ;
@@ -1253,9 +1288,14 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 	float sideRZ[2] = { 0.0f };
 
 	vect3 nullVect = { 0.0f, 0.0f, 0.0f, 0.0f };
-	vect3 sides[4] = { nullVect, nullVect, nullVect, nullVect };
-	vect3 sideL[2] = { nullVect, nullVect };
-	vect3 sideR[2] = { nullVect, nullVect };
+
+	vect3 sidesW[4] = { nullVect, nullVect, nullVect, nullVect };
+	vect3 sideLW[2] = { nullVect, nullVect };
+	vect3 sideRW[2] = { nullVect, nullVect };
+
+	vect3 sidesV[4] = { nullVect, nullVect, nullVect, nullVect };
+	vect3 sideLV[2] = { nullVect, nullVect };
+	vect3 sideRV[2] = { nullVect, nullVect };
 
 	int endIndex;
 	int startX, endX;
@@ -1264,15 +1304,14 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 	float vCorr = w * 0.475f * v_ratio;
 	float deltaZ;
 
-	float invertStartZ, invertEndZ;
-	float invertDeltaZLeft, invertDeltaZRight, invertDeltaZ;
-
 	vect3 currentVert, startVert, endVert;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 
 	for (int hg = yMin; hg < yMax; hg++)
 	{
+		int hgw = hg * w;
 		endIndex = 0;
+		
 		//Side A-B:
 		if ((S.a.y <= hg && S.b.y > hg) || (S.b.y <= hg && S.a.y > hg))
 		{
@@ -1287,8 +1326,11 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 				sidesZ[endIndex * 2] = 1.0f / S.a.z;		//Screen Space z coordinate of point A
 				sidesZ[endIndex * 2 + 1] = 1.0f / S.b.z;	//Screen Space z coordinate of point B
 
-				sides[endIndex * 2] = W.A;					//World Space vertex A(x, y, z, w)
-				sides[endIndex * 2 + 1] = W.B;				//World Space vertex B(x, y, z, w)
+				sidesV[endIndex * 2] = V.A;					//View Space vertex A(x, y, z, w)
+				sidesV[endIndex * 2 + 1] = V.B;				//View Space vertex B(x, y, z, w)
+
+				sidesW[endIndex * 2] = W.A;					//World Space vertex A(x, y, z, w)
+				sidesW[endIndex * 2 + 1] = W.B;				//World Space vertex B(x, y, z, w)
 
 				endIndex++;
 			}
@@ -1307,8 +1349,11 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 				sidesZ[endIndex * 2] = 1.0f / S.b.z;		//Screen Space z coordinate of point B
 				sidesZ[endIndex * 2 + 1] = 1.0f / S.c.z;	//Screen Space z coordinate of point C
 
-				sides[endIndex * 2] = W.B;					//World Space vertex B(x, y, z, w)
-				sides[endIndex * 2 + 1] = W.C;				//World Space vertex C(x, y, z, w)
+				sidesV[endIndex * 2] = V.B;					//View Space vertex B(x, y, z, w)
+				sidesV[endIndex * 2 + 1] = V.C;				//View Space vertex C(x, y, z, w)
+
+				sidesW[endIndex * 2] = W.B;					//World Space vertex B(x, y, z, w)
+				sidesW[endIndex * 2 + 1] = W.C;				//World Space vertex C(x, y, z, w)
 
 				endIndex++;
 			}
@@ -1328,8 +1373,11 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 				sidesZ[endIndex * 2] = 1.0f / S.c.z;		//Screen Space z coordinate of point C
 				sidesZ[endIndex * 2 + 1] = 1.0f / S.a.z;	//Screen Space z coordinate of point A
 
-				sides[endIndex * 2] = W.C;					//World Space vertex C(x, y, z, w)
-				sides[endIndex * 2 + 1] = W.A;				//World Space vertex A(x, y, z, w)
+				sidesV[endIndex * 2] = V.C;					//View Space vertex C(x, y, z, w)
+				sidesV[endIndex * 2 + 1] = V.A;				//View Space vertex A(x, y, z, w)
+
+				sidesW[endIndex * 2] = W.C;					//World Space vertex C(x, y, z, w)
+				sidesW[endIndex * 2 + 1] = W.A;				//World Space vertex A(x, y, z, w)
 
 				endIndex++;
 			}
@@ -1348,10 +1396,15 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 				sideRZ[0] = sidesZ[2];						//Screen Space z coordinate of start point on right side
 				sideRZ[1] = sidesZ[3];						//Screen Space z coordinate of end point on right side
 
-				sideL[0] = sides[0];						//World Space start point on left side
-				sideL[1] = sides[1];						//World Space end point on left side
-				sideR[0] = sides[2];						//World Space start point on right side
-				sideR[1] = sides[3];						//World Space end point on right side
+				sideLV[0] = sidesV[0];						//View Space start point on left side
+				sideLV[1] = sidesV[1];						//View Space end point on left side
+				sideRV[0] = sidesV[2];						//View Space start point on right side
+				sideRV[1] = sidesV[3];						//View Space end point on right side
+
+				sideLW[0] = sidesW[0];						//World Space start point on left side
+				sideLW[1] = sidesW[1];						//World Space end point on left side
+				sideRW[0] = sidesW[2];						//World Space start point on right side
+				sideRW[1] = sidesW[3];						//World Space end point on right side
 			}
 			else
 			{
@@ -1365,61 +1418,71 @@ void Projection::fillTriangleShadows(const triangle3dV& W, const triangle3dV& V,
 				sideRZ[0] = sidesZ[0];						//Screen Space z coordinate of start point on right side
 				sideRZ[1] = sidesZ[1];						//Screen Space z coordinate of end point on right side
 
-				sideL[0] = sides[2];						//World Space start point on left side
-				sideL[1] = sides[3];						//World Space end point on left side
-				sideR[0] = sides[0];						//World Space start point on right side
-				sideR[1] = sides[1];						//World Space end point on right side
+				sideLV[0] = sidesV[2];						//View Space start point on left side
+				sideLV[1] = sidesV[3];						//View Space end point on left side
+				sideRV[0] = sidesV[0];						//View Space start point on right side
+				sideRV[1] = sidesV[1];						//View Space end point on right side
+
+				sideLW[0] = sidesW[2];						//World Space start point on left side
+				sideLW[1] = sidesW[3];						//World Space end point on left side
+				sideRW[0] = sidesW[0];						//World Space start point on right side
+				sideRW[1] = sidesW[1];						//World Space end point on right side
 			}
 			int span = abs(endX - startX + 1);
 			deltaZ = (endZ - startZ) / (float)span;
 			zCurrent = startZ;
 
-			invertDeltaZLeft = sideLZ[1] - sideLZ[0];					//Change in z over the total length of left side (World Space)
-			invertDeltaZRight = sideRZ[1] - sideRZ[0];					//Change in z over the total length of right side (World Space)
+			coord2 startP, endP, currentP;
+			float invertStartPz, invertEndPz, invertCurrentZ;
+			vect3 startV, endV, currentV;
+			vect3 startW, endW, currentW;
 
-			invertStartZ = startZ != 0.0f ? 1.0f / startZ : 999.9f;		//Screen Space z at start point
-			invertEndZ = endZ != 0.0f ? 1.0f / endZ : 999.9f;			//Screen Space z at end point
-			invertDeltaZ = invertEndZ - invertStartZ;					//Change in z over length of scanline (Screen Space)
+			startP.x = startX;	startP.y = hg;	startP.z = startZ;
+			endP.x = endX;		endP.y = hg;	endP.z = endZ;
 
-			//Current rate of change in z on left side
-			float sLeft = invertDeltaZLeft != 0.0f ? (invertStartZ - sideLZ[0]) / invertDeltaZLeft : 1.0f;
-			//Current rate of change in z on right side
-			float sRight = invertDeltaZRight != 0.0f ? (invertEndZ - sideRZ[0]) / invertDeltaZRight : 1.0f;
+			invertStartPz = 1 / startP.z;
+			startV.x = (startP.x - float(halfW)) * invertStartPz / hCorr;
+			startV.y = (float(halfH) - startP.y) * invertStartPz / vCorr;
+			startV.z = invertStartPz;
 
-			startVert = sideL[0] + (sideL[1] - sideL[0]).scale(sLeft);	//World Space coordinate of scanline start point
-			endVert = sideR[0] + (sideR[1] - sideR[0]).scale(sRight);	//World Space coordinate of scanline end point
+			invertEndPz = 1 / endP.z;
+			endV.x = (endP.x - float(halfW)) * invertEndPz / hCorr;
+			endV.y = (float(halfH) - endP.y) * invertEndPz / vCorr;
+			endV.z = invertEndPz;
+
+			startW= getWCoord(sideLV[0], sideLV[1], sideLW[0], sideLW[1], startV);
+			endW = getWCoord(sideRV[0], sideRV[1], sideRW[0], sideRW[1], endV);
+
+			currentP.y = hg;
 
 			for (int i = startX; i < endX + 1; i++)
 			{
 				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
-					if (1 / zCurrent < screen->depthBuffer[hg * w + i])
+					invertCurrentZ = 1 / zCurrent;
+					if (invertCurrentZ < screen->depthBuffer[hgw + i])
 					{
-						//Current rate of change in z on scanline
-						float s = invertDeltaZ != 0.0f ? ((1.0f / zCurrent) - invertStartZ) / invertDeltaZ : 1.0f;
-						
-						//World Space coordinate of current pixel
-						currentVert = startVert + (endVert - startVert).scale(s);
+						currentP.x = i;
+						currentP.z = zCurrent;
 
+						currentV.x = (currentP.x - float(halfW)) * invertCurrentZ / hCorr;
+						currentV.y = (float(halfH) - currentP.y) * invertCurrentZ / vCorr;
+						currentV.z = invertCurrentZ;
 
+						currentW = getWCoord(startV, endV, startW, endW, currentV);
 
-						//currentVert += (W.A - currentVert).scale(W.N * (W.A - currentVert));
+						bool isPointLit = spotlight->pointLit(currentW);
 
+						colour32 col;
+						col.argb = S.h;
 
+						Uint32 shColour = getColour(0, static_cast<unsigned char>((static_cast<float>(col.c[2]) * 0.25f)),
+							static_cast<unsigned char>((static_cast<float>(col.c[1]) * 0.25f)),
+							static_cast<unsigned char>((static_cast<float>(col.c[0]) * 0.25f)));
 
+						screen->pixelBuffer[hg * w + i] = isPointLit ? S.h : shColour;
 
-
-
-
-
-
-
-
-						//bool isPointLit = spotlight->pointInsideFrustum(currentVert);
-						bool isPointLit = spotlight->pointLit(currentVert);
-
-						screen->pixelBuffer[hg * w + i] = isPointLit ? S.h : 0x0000000f;
-						screen->depthBuffer[hg * w + i] = 1 / zCurrent;
+						screen->depthBuffer[hgw + i] = invertCurrentZ;
 					}
 					zCurrent += deltaZ;
 				}
@@ -1573,11 +1636,16 @@ void Projection::fillTriangleSunlight(const triangle3dV& V, const triangle2dG& S
 	float vCorr = w * 0.475f * v_ratio;
 	float deltaZ, deltaIll;
 
-	coord2 currentP, startP, endP;
 	vect3 currentVert, startVert, endVert;
 	textCoord startUV, endUV, sampleUV;
 	int textureWidth = texture->w;
 	int textureHeight = texture->h;
+	int textureWMedium = textureWidth >> 1;
+	int textureHMedium = textureHeight >> 1;
+	int textureWLow = textureWidth >> 2;
+	int textureHLow = textureHeight >> 2;
+	int textureWTiny = textureWidth >> 4;
+	int textureHTiny = textureHeight >> 4;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 	Uint32 finalPixel;
 
@@ -1694,61 +1762,105 @@ void Projection::fillTriangleSunlight(const triangle3dV& V, const triangle2dG& S
 			zCurrent = startZ;
 			illCurrent = startIll / 100.0f;
 
-			startP.x = startX;	startP.y = hg;	startP.z = startZ;
-			endP.x = endX;		endP.y = hg;	endP.z = endZ;
-
-			invertStartPz = 1 / startP.z;
-			startVert.x = (startP.x - float(halfW)) * invertStartPz / hCorr;
-			startVert.y = (float(halfH) - startP.y) * invertStartPz / vCorr;
+			invertStartPz = 1.0f / startZ;
+			startVert.x = (startX - float(halfW)) * invertStartPz / hCorr;
+			startVert.y = (float(halfH) - hg) * invertStartPz / vCorr;
 			startVert.z = invertStartPz;
 
-			invertEndPz = 1 / endP.z;
-			endVert.x = (endP.x - float(halfW)) * invertEndPz / hCorr;
-			endVert.y = (float(halfH) - endP.y) * invertEndPz / vCorr;
+			invertEndPz = 1.0f / endZ;
+			endVert.x = (endX - float(halfW)) * invertEndPz / hCorr;
+			endVert.y = (float(halfH) - hg) * invertEndPz / vCorr;
 			endVert.z = invertEndPz;
 
 			startUV = getUVCoord(sideL[0], sideL[1], uvSideL[0], uvSideL[1], startVert);
 			endUV = getUVCoord(sideR[0], sideR[1], uvSideR[0], uvSideR[1], endVert);
 
-			currentP.y = hg;
-
 			for (int i = startX; i < endX + 1; i++)
 			{
-				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
+				invertCurrentZ = 1 / zCurrent;
+				if (invertCurrentZ < screen->depthBuffer[hgw + i])
 				{
-					invertCurrentZ = 1 / zCurrent;
-					if (invertCurrentZ < screen->depthBuffer[hgw + i])
+					currentVert.x = (i - float(halfW)) * invertCurrentZ / hCorr;
+					currentVert.y = (float(halfH) - hg) * invertCurrentZ / vCorr;
+					currentVert.z = invertCurrentZ;
+
+					//sampleUV = getUVCoord(startVert, endVert, startUV, endUV, currentVert);	
+
+					float esX = endVert.x - startVert.x;
+					float esY = endVert.y - startVert.y;
+					float esZ = endVert.z - startVert.z;
+					
+					float a =	(currentVert.x - startVert.x) * esX +
+								(currentVert.y - startVert.y) * esY +
+								(currentVert.z - startVert.z) * esZ;
+					
+					float b =	esX * esX + esY * esY + esZ * esZ;
+					
+					float d = a / b;
+					
+					sampleUV.u = startUV.u + d * (endUV.u - startUV.u);
+					sampleUV.v = startUV.v + d * (endUV.v - startUV.v);
+
+					if (currentVert.z < 45.0f)
 					{
-						currentP.x = i;
-						currentP.z = zCurrent;
+						if (currentVert.z < 20.0f)
+						{
+							if (currentVert.z < 5.0f)
+							{
+								sampleXnew = ((int)(textureWidth * sampleUV.u)) % textureWidth;
+								sampleYnew = ((int)(textureHeight * sampleUV.v)) % textureHeight;
 
-						currentVert.x = (currentP.x - float(halfW)) * invertCurrentZ / hCorr;
-						currentVert.y = (float(halfH) - currentP.y) * invertCurrentZ / vCorr;
-						currentVert.z = invertCurrentZ;
+								if (sampleXnew < 0) { sampleXnew = textureWidth + sampleXnew; }
+								if (sampleYnew < 0) { sampleYnew = textureHeight + sampleYnew; }
 
-						sampleUV = getUVCoord(startVert, endVert, startUV, endUV, currentVert);
+								if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
+									finalPixel = texture->pixelsH[sampleYnew * textureWidth + sampleXnew];
+							}
+							else
+							{
+								sampleXnew = ((int)(textureWMedium * sampleUV.u)) % textureWMedium;
+								sampleYnew = ((int)(textureHMedium * sampleUV.v)) % textureHMedium;
 
-						sampleXnew = ((int)(textureWidth * sampleUV.u)) % textureWidth;
-						sampleYnew = ((int)(textureHeight * sampleUV.v)) % textureHeight;
+								if (sampleXnew < 0) { sampleXnew = textureWMedium + sampleXnew; }
+								if (sampleYnew < 0) { sampleYnew = textureHMedium + sampleYnew; }
 
-						if (sampleXnew < 0) { sampleXnew = textureWidth + sampleXnew % textureWidth; }
-						if (sampleYnew < 0) { sampleYnew = textureHeight + sampleYnew % textureHeight; }
+								if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
+									finalPixel = texture->pixelsM[sampleYnew * textureWMedium + sampleXnew];
+							}
+						}
+						else
+						{
+							sampleXnew = ((int)(textureWLow * sampleUV.u)) % textureWLow;
+							sampleYnew = ((int)(textureHLow * sampleUV.v)) % textureHLow;
+
+							if (sampleXnew < 0) { sampleXnew = textureWLow + sampleXnew; }
+							if (sampleYnew < 0) { sampleYnew = textureHLow + sampleYnew; }
+
+							if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
+								finalPixel = texture->pixelsL[sampleYnew * textureWLow + sampleXnew];
+						}
+					}
+					else
+					{
+						sampleXnew = ((int)(textureWTiny * sampleUV.u)) % textureWTiny;
+						sampleYnew = ((int)(textureHTiny * sampleUV.v)) % textureHTiny;
+
+						if (sampleXnew < 0) { sampleXnew = textureWTiny + sampleXnew; }
+						if (sampleYnew < 0) { sampleYnew = textureHTiny + sampleYnew; }
 
 						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
-						{
-							finalPixel = texture->pixels[sampleYnew * textureWidth + sampleXnew];
-						}
-
-						sampleXold = sampleXnew;
-						sampleYold = sampleYnew;
-
-						screen->pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
-
-						screen->depthBuffer[hgw + i] = invertCurrentZ;
+							finalPixel = texture->pixelsT[sampleYnew * textureWTiny + sampleXnew];
 					}
-					zCurrent += deltaZ;
-					illCurrent += deltaIll;
+
+					sampleXold = sampleXnew;
+					sampleYold = sampleYnew;
+
+					screen->pixelBuffer[hgw + i] = modifyColour(finalPixel, illCurrent);
+
+					screen->depthBuffer[hgw + i] = invertCurrentZ;
 				}
+				zCurrent += deltaZ;
+				illCurrent += deltaIll;
 			}
 		}
 	}
@@ -1949,7 +2061,7 @@ void Projection::fillTriangleTorchlight(const triangle3dV& T, const triangle2dG&
 
 						if ((sampleXnew != sampleXold) || (sampleYnew != sampleYold))
 						{
-							finalPixel = texture->pixels[sampleYnew * texture->w + sampleXnew];
+							finalPixel = texture->pixelsH[sampleYnew * texture->w + sampleXnew];
 						}
 
 						sampleXold = sampleXnew;

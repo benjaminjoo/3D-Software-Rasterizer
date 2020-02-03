@@ -275,16 +275,16 @@ void DynamicMesh::update()
 }
 
 
-void DynamicMesh::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM)
+void DynamicMesh::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (int i = 0; i < size; i++)
-		eye->renderPoint(pGrid[i], RM, screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(pGrid[i], screen->pixelBuffer, screen->depthBuffer);
 }
 
 
-void DynamicMesh::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource sun,
+void DynamicMesh::renderMesh(std::shared_ptr<Camera> eye, LightSource sun,
 				const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	eye->renderMesh(polyCount, mesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
-	eye->renderMesh(polyCountS, sideMesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
+	eye->renderMesh(polyCount, mesh, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
+	eye->renderMesh(polyCountS, sideMesh, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
 }

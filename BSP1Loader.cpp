@@ -230,11 +230,11 @@ void BSP1Loader::readData()
 			tempTexture.ID = i;
 			tempTexture.w = temp.width;
 			tempTexture.h = temp.height;
-			tempTexture.pixels = nullptr;
+			tempTexture.pixelsH = nullptr;
 
 			int nPixel = temp.width * temp.height;
 
-			tempTexture.pixels = new Uint32[nPixel];
+			tempTexture.pixelsH = new Uint32[nPixel];
 
 			modelFile.seekg(static_cast<unsigned long>(direntry[2].offset) +
 							static_cast<unsigned long>(offset[i]) + temp.offset_1, modelFile.beg);
@@ -243,7 +243,7 @@ void BSP1Loader::readData()
 				char colour;
 				modelFile.read(&colour, 1);
 				unsigned char currentPixel = (unsigned char)colour;
-				tempTexture.pixels[p] = palette[currentPixel];
+				tempTexture.pixelsH[p] = palette[currentPixel];
 			}
 
 			textureDataContainer.push_back(tempTexture);

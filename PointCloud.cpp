@@ -85,6 +85,8 @@ PointCloud::PointCloud(const std::string& fn, Uint32 col, bool sm) : fileName(fn
 		std::cout << "Could not read file: " << fileName << ".tri" << std::endl;
 	}
 
+	//smoothSurfaces();
+
 	std::cout << nPoly << " polygons created..." << std::endl;
 	mesh = new triangle3dV[nPoly];
 	getTriangleData(mesh);
@@ -207,16 +209,16 @@ void PointCloud::getPoints(std::vector<vertex3>& P)
 }
 
 
-void PointCloud::renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen, mat4x4& RM)
+void PointCloud::renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (auto& p : pointArray)
-		eye->renderPoint(p, RM, screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(p, screen->pixelBuffer, screen->depthBuffer);
 }
 
 
-void PointCloud::renderMesh(std::shared_ptr<Camera> eye, mat4x4& rot, mat4x4& mov, LightSource sun,
+void PointCloud::renderMesh(std::shared_ptr<Camera> eye, LightSource sun,
 	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
 	if (mesh != nullptr)
-		eye->renderMesh(nPoly, mesh, rot, mov, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
+		eye->renderMesh(nPoly, mesh, nullptr, sun, visualStyle, torchIntensity, maxIllumination);
 }

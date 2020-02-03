@@ -23,37 +23,12 @@ Lamp::Lamp(float cx, float cy, float cz, float az, float al, float rl,
 
 	this->clearVertexList();
 
-	//depthBuffer = new float[w * h];
-	depthBuffer = new int[w * h];
+	depthBuffer = new float[w * h];
 }
 
 
 Lamp::~Lamp()
 {
-	//if (depthBuffer != nullptr)
-	//{
-	//	std::ofstream outputFile("StencilBuffer.txt");
-	//	if (outputFile.is_open())
-	//	{
-	//		outputFile << "P3" << std::endl;
-	//		outputFile << w << " " << h << std::endl;
-	//		outputFile << "255" << std::endl;
-	//
-	//		for (int j = 0; j < h; j++)
-	//		{
-	//			for (int i = 0; i < w; i++)
-	//			{
-	//				outputFile << depthBuffer[j * w + i] << std::endl;
-	//				//outputFile	<< static_cast<unsigned char>(255.0f * depthBuffer[j * w + i]) << " "
-	//				//			<< 0 << " "
-	//				//			<< 0 << std::endl;
-	//			}
-	//		}
-	//
-	//		outputFile.close();
-	//	}
-	//}
-
 	delete[] depthBuffer;
 }
 
@@ -106,7 +81,6 @@ void Lamp::update()
 	M = getTranslation();
 	R = getRotation();
 	RM = R * M;
-	MR = M * R;
 }
 
 
@@ -127,12 +101,8 @@ float Lamp::getBlinnSpecular(vect3& P, vect3& N, vect3& V, float& shine)
 
 void Lamp::resetDepthBuffer()
 {
-	//for (float* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
-	//	*i = zFar;
-
-	int zzz = static_cast<int>(zFar);
-	for (int* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
-		*i = zzz;
+	for (float* i = depthBuffer, *end = &depthBuffer[w * h]; i != end; i++)
+		*i = zFar;
 }
 
 
@@ -319,15 +289,10 @@ bool Lamp::pointLit(const vect3& V)
 
 	int x = sampleCoord.x;
 	int y = sampleCoord.y;
-	//float z = abs(sampleCoord.z > 1e-5) ? 1.0f / sampleCoord.z : zFar;
-	int zzz = abs(sampleCoord.z > 1e-5) ? static_cast<int>(1.0f / sampleCoord.z) : static_cast<int>(zFar);
-
-	//if (x >= 0 && x < w && y >= 0 && y < h)
-	//	if (z < depthBuffer[y * w + x] + 0.25f)
-	//		result = true;
+	float z = abs(sampleCoord.z > 1e-5) ? 1.0f / sampleCoord.z : zFar;
 
 	if (x >= 0 && x < w && y >= 0 && y < h)
-		if (zzz < depthBuffer[y * w + x] + 2)
+		if (z < depthBuffer[y * w + x] + 0.5f)
 			result = true;
 
 	return result;
@@ -660,10 +625,8 @@ void Lamp::fillTriangleDepth(const triangle2dG& t)
 				if ((i >= 0 && i < w) && (hg >= 0 && hg < h))
 				{
 					invertCurrentZ = 1.0f / zCurrent;
-					//if (invertCurrentZ < depthBuffer[hg * w + i])
-					//	depthBuffer[hg * w + i] = invertCurrentZ;
 					if (invertCurrentZ < depthBuffer[hg * w + i])
-						depthBuffer[hg * w + i] = static_cast<int>(invertCurrentZ);
+						depthBuffer[hg * w + i] = invertCurrentZ;
 					zCurrent += deltaZ;
 				}
 			}

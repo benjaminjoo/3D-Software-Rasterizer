@@ -84,10 +84,124 @@ void Camera::addTexture(SDL_Surface* T)
 	{
 		txt tempTexture;
 		SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
-		tempTexture.pixels = (Uint32*)tempImage->pixels;
-		tempTexture.ID = textureData.size();
 		tempTexture.w = T->w;
 		tempTexture.h = T->h;
+		tempTexture.pixelsH = new Uint32[tempTexture.w * tempTexture.h];
+		tempTexture.pixelsH = (Uint32*)tempImage->pixels;
+		tempTexture.ID = textureData.size();
+
+		tempTexture.pixelsM = new Uint32[(tempTexture.w / 2) * (tempTexture.h / 2)];
+		unsigned rAcc = 0;
+		unsigned gAcc = 0;
+		unsigned bAcc = 0;
+		for (int j = 0; j < tempTexture.h; j += 2)
+		{
+			for (int i = 0; i < tempTexture.w; i += 2)
+			{
+				for (int y = 0; y < 2; y++)
+				{
+					for (int x = 0; x < 2; x++)
+					{
+						colour32 sample;
+						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
+						rAcc += static_cast<int>(sample.c[2]);
+						gAcc += static_cast<int>(sample.c[1]);
+						bAcc += static_cast<int>(sample.c[0]);
+					}
+				}
+				colour32 final;
+				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 4.0f);
+				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 4.0f);
+				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 4.0f);
+				tempTexture.pixelsM[(j / 2) * (tempTexture.w / 2) + (i / 2)] = final.argb;
+				rAcc = 0;
+				gAcc = 0;
+				bAcc = 0;
+			}
+		}
+
+		tempTexture.pixelsL = new Uint32[(tempTexture.w / 4) * (tempTexture.h / 4)];
+		rAcc = 0;
+		gAcc = 0;
+		bAcc = 0;
+		for (int j = 0; j < tempTexture.h; j += 4)
+		{
+			for (int i = 0; i < tempTexture.w; i += 4)
+			{
+				for (int y = 0; y < 4; y++)
+				{
+					for (int x = 0; x < 4; x++)
+					{
+						colour32 sample;
+						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
+						rAcc += static_cast<int>(sample.c[2]);
+						gAcc += static_cast<int>(sample.c[1]);
+						bAcc += static_cast<int>(sample.c[0]);
+					}
+				}
+				colour32 final;
+				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 16.0f);
+				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 16.0f);
+				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 16.0f);
+				tempTexture.pixelsL[(j / 4) * (tempTexture.w / 4) + (i / 4)] = final.argb;
+				rAcc = 0;
+				gAcc = 0;
+				bAcc = 0;
+			}
+		}
+
+		tempTexture.pixelsT = new Uint32[(tempTexture.w / 16) * (tempTexture.h / 16)];
+		rAcc = 0;
+		gAcc = 0;
+		bAcc = 0;
+		for (int j = 0; j < tempTexture.h; j += 16)
+		{
+			for (int i = 0; i < tempTexture.w; i += 16)
+			{
+				for (int y = 0; y < 16; y++)
+				{
+					for (int x = 0; x < 16; x++)
+					{
+						colour32 sample;
+						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
+						rAcc += static_cast<int>(sample.c[2]);
+						gAcc += static_cast<int>(sample.c[1]);
+						bAcc += static_cast<int>(sample.c[0]);
+					}
+				}
+				colour32 final;
+				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 256.0f);
+				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 256.0f);
+				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 256.0f);
+				tempTexture.pixelsT[(j / 16) * (tempTexture.w / 16) + (i / 16)] = final.argb;
+				rAcc = 0;
+				gAcc = 0;
+				bAcc = 0;
+			}
+		}
+
+		std::ofstream outputFileT(std::to_string(tempTexture.ID) + "tiny" + ".ppm");
+		if (outputFileT.is_open())
+		{
+			outputFileT << "P3" << std::endl;
+			outputFileT << tempTexture.w / 16 << " " << tempTexture.h / 16 << std::endl;
+			outputFileT << "255" << std::endl;
+
+			for (int j = 0; j < (tempTexture.h / 16); j++)
+			{
+				for (int i = 0; i < (tempTexture.w / 16); i++)
+				{
+					colour32 ccc;
+					ccc.argb = tempTexture.pixelsT[j * (tempTexture.w / 16) + i];
+					outputFileT << std::to_string(ccc.c[2]) << " "
+								<< std::to_string(ccc.c[1]) << " "
+								<< std::to_string(ccc.c[0]) << std::endl;
+				}
+			}
+
+			outputFileT.close();
+		}
+
 		textureData.push_back(tempTexture);
 	}
 }
@@ -120,6 +234,63 @@ float Camera::getHRatio()
 float Camera::getVRatio()
 {
 	return 1 / (tanf(atanf(tanf(fovH * 0.5f) / (w / h) * 2.0f)));
+}
+
+
+void Camera::update()
+{
+	updateViewDirection();
+	updateViewVolume();
+
+	//rotation = getRotation();
+
+	float sinAz = sinf(rol);
+	float cosAz = cosf(rol);
+
+	float sinAx = sinf(-(alt + PI * 0.5f));
+	float cosAx = cosf(-(alt + PI * 0.5f));
+
+	float sinAz_ = sinf(-(azm + PI * 0.5f));
+	float cosAz_ = cosf(-(azm + PI * 0.5f));
+
+	rotation =
+	{
+		cosAz * cosAz_ + sinAz * cosAx * -sinAz_,	cosAz * sinAz_ + sinAz * cosAx * cosAz_,	sinAz * sinAx,	0.0f,
+		-sinAz * cosAz_ + cosAz * cosAx * -sinAz_,	-sinAz * sinAz_ + cosAz * cosAx * cosAz_,	cosAz * sinAx,	0.0f,
+		-sinAx * -sinAz_,							-sinAx * cosAz_,							cosAx,			0.0f,
+		0.0f,										0.0f,										0.0f,			1.0f
+	};
+
+	translation =
+	{
+			1.0f,          0.0f,         0.0f,		-x,
+			0.0f,          1.0f,         0.0f,		-y,
+			0.0f,          0.0f,         1.0f,		-z,
+			0.0f,          0.0f,         0.0f,       1.0f
+	};
+
+	//translation = getTranslation();
+	transformation = rotation * translation;
+
+	//transformation =
+	//{
+	//	cosAz * cosAz_ + sinAz * cosAx * -sinAz_ + cosAz * sinAz_,
+	//	cosAz * cosAz_ + cosAz * sinAz_ + sinAz * cosAx * cosAz_,
+	//	cosAz * cosAz_ + cosAz * sinAz_ + sinAz * sinAx,
+	//	cosAz * cosAz_ + sinAz * cosAx * -sinAz_ * -x + cosAz * sinAz_ + sinAz * cosAx * cosAz_ * -y + sinAz * sinAx * -z,
+	//	-sinAz * cosAz_ + cosAz * cosAx * -sinAz_ - sinAz * sinAz_,
+	//	-sinAz * cosAz_ - sinAz * sinAz_ + cosAz * cosAx * cosAz_,
+	//	-sinAz * cosAz_ - sinAz * sinAz_ + cosAz * sinAx,
+	//	-sinAz * cosAz_ + cosAz * cosAx * -sinAz_ * -x + -sinAz * sinAz_ + cosAz * cosAx * cosAz_ * -y + cosAz * sinAx * -z,
+	//	-sinAx * -sinAz_ ,
+	//	-sinAx * cosAz_,
+	//	cosAx,
+	//	-sinAx * -sinAz_ * -x + -sinAx * cosAz_ * -y + cosAx * -z,
+	//	0.0f,
+	//	0.0f,
+	//	0.0f,
+	//	1.0f
+	//};
 }
 
 
@@ -440,11 +611,11 @@ void Camera::centreLook()
 }
 
 
-mat4x4 Camera::getTranslation(vect3 mv)
+mat4x4 Camera::getTranslation(vect3 mv) const
 {
 	mat4x4 result;
 
-	result = { 1.0f,          0.0f,         0.0f,		 mv.x,
+	result = {  1.0f,          0.0f,         0.0f,		 mv.x,
 				0.0f,          1.0f,         0.0f,		 mv.y,
 				0.0f,          0.0f,         1.0f,		 mv.z,
 				0.0f,          0.0f,         0.0f,       1.0f };
@@ -453,11 +624,11 @@ mat4x4 Camera::getTranslation(vect3 mv)
 }
 
 
-mat4x4 Camera::getTranslation()
+mat4x4 Camera::getTranslation() const
 {
 	mat4x4 result;
 
-	result = { 1.0f,          0.0f,         0.0f,		-x,
+	result = {  1.0f,          0.0f,         0.0f,		-x,
 				0.0f,          1.0f,         0.0f,		-y,
 				0.0f,          0.0f,         1.0f,		-z,
 				0.0f,          0.0f,         0.0f,       1.0f };
@@ -466,7 +637,7 @@ mat4x4 Camera::getTranslation()
 }
 
 
-mat4x4 Camera::getRotation(axis t, float a)
+mat4x4 Camera::getRotation(axis t, float a) const
 {
 	mat4x4 result = { 1.0f, 0.0f, 0.0f, 0.0f,
 						0.0f, 1.0f, 0.0f, 0.0f,
@@ -480,7 +651,7 @@ mat4x4 Camera::getRotation(axis t, float a)
 	{
 	case axis::x:
 	{
-		result = { 1.0f,       0.0f,       0.0f,       0.0f,
+		result = {  1.0f,       0.0f,       0.0f,       0.0f,
 					0.0f,       cosA,       sinA,       0.0f,
 					0.0f,      -sinA,       cosA,       0.0f,
 					0.0f,       0.0f,       0.0f,       1.0f };
@@ -488,7 +659,7 @@ mat4x4 Camera::getRotation(axis t, float a)
 	break;
 	case axis::y:
 	{
-		result = { cosA,       0.0f,      -sinA,       0.0f,
+		result = {  cosA,       0.0f,      -sinA,       0.0f,
 					0.0f,       1.0f,       0.0f,       0.0f,
 					sinA,       0.0f,       cosA,       0.0f,
 					0.0f,       0.0f,       0.0f,       1.0f };
@@ -496,7 +667,7 @@ mat4x4 Camera::getRotation(axis t, float a)
 	break;
 	case axis::z:
 	{
-		result = { cosA,       sinA,       0.0f,       0.0f,
+		result = {  cosA,       sinA,       0.0f,       0.0f,
 				   -sinA,       cosA,       0.0f,       0.0f,
 					0.0f,       0.0f,       1.0f,       0.0f,
 					0.0f,       0.0f,       0.0f,       1.0f };
@@ -508,17 +679,92 @@ mat4x4 Camera::getRotation(axis t, float a)
 }
 
 
-mat4x4 Camera::getRotation()
+mat4x4 Camera::getRotation(vect3 rt) const
 {
-	mat4x4 result = getRotation(axis::z, rol) *
-		getRotation(axis::x, -(alt + PI * 0.5f)) *
-		getRotation(axis::z, -(azm + PI * 0.5f));
+	const float sinAx = sinf(rt.x);
+	const float cosAx = cosf(rt.x);
+	const float sinAy = sinf(-rt.y);
+	const float cosAy = cosf(-rt.y);
+	const float sinAz = sinf(-rt.z);
+	const float cosAz = cosf(-rt.z);
 
-	return result;
+	const mat4x4 rotZrotYrotX =
+	{
+		//cosAz	* cosAy	* 1.0f			+		sinAz	* 0.0f		+		cosAz	* -sinAy * 0.0f			+		0.0f * 0.0f,
+		//cosAz	* cosAy	* 0.0f			+		sinAz	* cosAx		+		cosAz	* -sinAy * -sinAx		+		0.0f * 0.0f,
+		//cosAz	* cosAy	* 0.0f			+		sinAz	* sinAx		+		cosAz	* -sinAy * cosAx		+		0.0f * 0.0f,
+		//cosAz	* cosAy	* 0.0f			+		sinAz	* 0.0f		+		cosAz	* -sinAy * 0.0f			+		0.0f * 1.0f,
+		//
+		//-sinAz	* cosAy	* 1.0f		+		cosAz	* 0.0f		+		-sinAz	* -sinAy * 0.0f			+		0.0f * 0.0f,
+		//-sinAz	* cosAy	* 0.0f		+		cosAz	* cosAx		+		-sinAz	* -sinAy * -sinAx		+		0.0f * 0.0f,
+		//-sinAz	* cosAy	* 0.0f		+		cosAz	* sinAx		+		-sinAz	* -sinAy * cosAx		+		0.0f * 0.0f,
+		//-sinAz	* cosAy	* 0.0f		+		cosAz	* 0.0f		+		-sinAz	* -sinAy * 0.0f			+		0.0f * 1.0f,
+		//
+		//sinAy			* 1.0f			+		0.0f	* 0.0f		+		cosAy	* 0.0f					+		0.0f * 0.0f,
+		//sinAy			* 0.0f			+		0.0f	* cosAx		+		cosAy	* -sinAx				+		0.0f * 0.0f,
+		//sinAy			* 0.0f			+		0.0f	* sinAx		+		cosAy	* cosAx					+		0.0f * 0.0f,
+		//sinAy			* 0.0f			+		0.0f	* 0.0f		+		cosAy	* 0.0f					+		0.0f * 1.0f,
+		//
+		//0.0f			* 1.0f			+		0.0f	* 0.0f		+		0.0f	* 0.0f					+		1.0f * 0.0f,
+		//0.0f			* 0.0f			+		0.0f	* cosAx		+		0.0f	* -sinAx				+		1.0f * 0.0f,
+		//0.0f			* 0.0f			+		0.0f	* sinAx		+		0.0f	* cosAx					+		1.0f * 0.0f,
+		//0.0f			* 0.0f			+		0.0f	* 0.0f		+		0.0f	* 0.0f					+		1.0f * 1.0f
+
+		cosAz* cosAy,	sinAz * cosAx + cosAz * -sinAy * -sinAx,	sinAz * sinAx + cosAz * -sinAy * cosAx,	0.0f,
+		-sinAz * cosAy,	cosAz * cosAx + -sinAz * -sinAy * -sinAx,	cosAz * sinAx + -sinAz * -sinAy * cosAx,0.0f,
+		sinAy,			cosAy * -sinAx,								cosAy * cosAx,							0.0f,
+		0.0f,			0.0f,										0.0f,									1.0f
+	};
+
+	return rotZrotYrotX;
 }
 
 
-void Camera::object2world(mat4x4& MR, mat4x4& R, triangle3dV& T)
+mat4x4 Camera::getRotation() const
+{
+	float sinAz = sinf(rol);
+	float cosAz = cosf(rol);
+
+	float sinAx = sinf(-(alt + PI * 0.5f));
+	float cosAx = cosf(-(alt + PI * 0.5f));
+
+	float sinAz_ = sinf(-(azm + PI * 0.5f));
+	float cosAz_ = cosf(-(azm + PI * 0.5f));
+
+	mat4x4 rotZrotXrotZ =
+	{
+		cosAz * cosAz_ + sinAz * cosAx * -sinAz_,	cosAz * sinAz_ + sinAz * cosAx * cosAz_,	sinAz * sinAx,	0.0f,
+		-sinAz * cosAz_ + cosAz * cosAx * -sinAz_,	-sinAz * sinAz_ + cosAz * cosAx * cosAz_,	cosAz * sinAx,	0.0f,
+		-sinAx * -sinAz_,							-sinAx * cosAz_,							cosAx,			0.0f,
+		0.0f,										0.0f,										0.0f,			1.0f
+	};
+	//{
+	//	cosAz * cosAz_		+	sinAz * cosAx	* -sinAz_		+ sinAz * sinAx * 0.0f		+		0.0f * 0.0f,
+	//	cosAz * sinAz_		+	sinAz * cosAx	* cosAz_		+ sinAz * sinAx * 0.0f		+		0.0f * 0.0f,
+	//	cosAz * 0.0f		+	sinAz * cosAx	* 0.0f			+ sinAz * sinAx * 1.0f		+		0.0f * 0.0f,
+	//	cosAz * 0.0f		+	sinAz * cosAx	* 0.0f			+ sinAz * sinAx * 0.0f		+		0.0f * 1.0f,
+	//	
+	//	-sinAz * cosAz_		+	cosAz * cosAx	* -sinAz_		+ cosAz * sinAx * 0.0f		+		0.0f * 0.0f,
+	//	-sinAz * sinAz_		+	cosAz * cosAx	* cosAz_		+ cosAz * sinAx * 0.0f		+		0.0f * 0.0f,
+	//	-sinAz * 0.0f		+	cosAz * cosAx	* 0.0f			+ cosAz * sinAx * 1.0f		+		0.0f * 0.0f,
+	//	-sinAz * 0.0f		+	cosAz * cosAx	* 0.0f			+ cosAz * sinAx * 0.0f		+		0.0f * 1.0f,
+	//	
+	//	0.0f * cosAz_		+	-sinAx			* -sinAz_		+ cosAx			* 0.0f		+		0.0f * 0.0f,
+	//	0.0f * sinAz_		+	-sinAx			* cosAz_		+ cosAx			* 0.0f		+		0.0f * 0.0f,
+	//	0.0f * 0.0f			+	-sinAx			* 0.0f			+ cosAx			* 1.0f		+		0.0f * 0.0f,
+	//	0.0f * 0.0f			+	-sinAx			* 0.0f			+ cosAx			* 0.0f		+		0.0f * 1.0f,
+	//	
+	//	0.0f * cosAz_		+	0.0f			* -sinAz_		+ 0.0f			* 0.0f		+		1.0f * 0.0f,
+	//	0.0f * sinAz_		+	0.0f			* cosAz_		+ 0.0f			* 0.0f		+		1.0f * 0.0f,
+	//	0.0f * 0.0f			+	0.0f			* 0.0f			+ 0.0f			* 1.0f		+		1.0f * 0.0f,
+	//	0.0f * 0.0f			+	0.0f			* 0.0f			+ 0.0f			* 0.0f		+		1.0f * 1.0f
+	//};
+
+	return rotZrotXrotZ;
+}
+
+
+void Camera::object2world(const mat4x4& MR, const mat4x4& R, triangle3dV& T) const
 {
 	T.A = MR * T.A;
 	T.B = MR * T.B;
@@ -530,42 +776,42 @@ void Camera::object2world(mat4x4& MR, mat4x4& R, triangle3dV& T)
 }
 
 
-void Camera::world2view(mat4x4& RM, mat4x4& R, triangle3dV& T)
+void Camera::world2view(triangle3dV& T) const
 {
-	T.A = RM * T.A;
-	T.B = RM * T.B;
-	T.C = RM * T.C;
-	T.An = R * T.An;
-	T.Bn = R * T.Bn;
-	T.Cn = R * T.Cn;
-	T.N = R * T.N;
+	T.A = transformation * T.A;
+	T.B = transformation * T.B;
+	T.C = transformation * T.C;
+	T.An = rotation * T.An;
+	T.Bn = rotation * T.Bn;
+	T.Cn = rotation * T.Cn;
+	T.N = rotation * T.N;
 }
 
 
-void Camera::world2view(mat4x4& RM, int n)
+void Camera::world2view(int n)
 {
 	for (int i = 0; i < n; i++)
-		vertexListV[i] = RM * vertexListW[i];
+		vertexListV[i] = transformation * vertexListW[i];
 }
 
 
-void Camera::world2viewPointM(point3& P, mat4x4& RM)
+void Camera::world2viewPointM(point3& P) const
 {
-	P.P = RM * P.P;
+	P.P = transformation * P.P;
 }
 
 
-void Camera::renderPoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float* depthBuffer)
+void Camera::renderPoint(point3 p, Uint32* pixelBuffer, float* depthBuffer)
 {
-	this->world2viewPointM(p, RM);
+	this->world2viewPointM(p);
 	if (pointInsideFrustum(p.P))
 		projectPoint(p, pixelBuffer, depthBuffer);
 }
 
 
-void Camera::renderVisiblePoint(point3 p, mat4x4& RM, Uint32* pixelBuffer, float* depthBuffer)
+void Camera::renderVisiblePoint(point3 p, Uint32* pixelBuffer, float* depthBuffer)
 {
-	this->world2viewPointM(p, RM);
+	this->world2viewPointM(p);
 	if (pointInsideFrustum(p.P) && pointFacingCamera(p))
 		projectPoint(p, pixelBuffer, depthBuffer);
 }
@@ -592,93 +838,107 @@ void Camera::projectPoint(point3 P, Uint32* pixelBuffer, float* depthBuffer)
 }
 
 
-void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, std::shared_ptr<Lamp> spotlight,
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, std::shared_ptr<Lamp> spotlight,
 	LightSource sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	mat4x4 RM = rot * mov;
-	//mat4x4 M = mov;
-
-	for (int i = 0; i < nPoly; i++)
+	if (visualStyle == projectionStyle::shadow_test)
 	{
-		triangle3dV worldT = mesh[i];
+		for (int i = 0; i < nPoly; i++)
+		{
+			triangle3dV worldT = mesh[i];
 
-		if (polyFacingCamera(worldT))
-			renderPolygon(RM, rot, worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
-			//renderPolygon(RM, M, worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+			if (polyFacingCamera(worldT))
+				renderPolygonShadows(worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < nPoly; i++)
+		{
+			triangle3dV worldT = mesh[i];
+
+			if (polyFacingCamera(worldT))
+				renderPolygon(worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+		}
 	}
 }
 
 
-void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, mat4x4& rot, mat4x4& mov, vect3 mv, vect3 rt, std::shared_ptr<Lamp> spotlight,
+void Camera::renderMesh(const int& nPoly, triangle3dV* mesh, vect3 mv, vect3 rt, std::shared_ptr<Lamp> spotlight,
 	LightSource sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	mat4x4 rotX = getRotation(axis::x, rt.x);
-
-	mat4x4 rotY = getRotation(axis::y, -rt.y);
-
-	mat4x4 rotZ = getRotation(axis::z, -rt.z);
-
-	mat4x4 R = rotZ * rotY * rotX;
+	mat4x4 R = getRotation(rt);
 
 	mat4x4 MOV = getTranslation(mv);
 
 	mat4x4 MR = MOV * R;
 
-	mat4x4 RM = rot * mov;
-	//mat4x4 M = mov;
-
-	for (int i = 0; i < nPoly; i++)
+	if (visualStyle == projectionStyle::shadow_test)
 	{
-		triangle3dV worldT = mesh[i];
+		for (int i = 0; i < nPoly; i++)
+		{
+			triangle3dV worldT = mesh[i];
 
-		this->object2world(MR, R, worldT);
+			this->object2world(MR, R, worldT);
 
-		if (polyFacingCamera(worldT))
-			renderPolygon(RM, rot, worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
-			//renderPolygon(RM, M, worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+			if (polyFacingCamera(worldT))
+				renderPolygonShadows(worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < nPoly; i++)
+		{
+			triangle3dV worldT = mesh[i];
+
+			this->object2world(MR, R, worldT);
+
+			if (polyFacingCamera(worldT))
+				renderPolygon(worldT, spotlight, sun, visualStyle, torchIntensity, maxIllumination);
+		}
 	}
 }
 
 
-void Camera::renderPolygon(mat4x4& RM, mat4x4& R, triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource sun,
+void Camera::renderPolygon(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource sun,
 	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
 {
-	if (visualStyle == projectionStyle::shadow_test)
+	triangle3dV worldT = viewT;
+
+	this->world2view(viewT);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+
+	if (visualStyle == projectionStyle::blinn_phong)
 	{
-		triangle3dV worldT = viewT;
-
-		int nVert = this->clipToFrustumT(worldT, vertexListW, uvList, specularList); //CLIPPING IN WORLD SPACE
-
-		this->world2view(RM, nVert);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
-
-		Uint32 colour = worldT.colour;
-
-		currentTexture = &textureData[viewT.texture];
-
-		this->projectPoly(nVert, colour, spotlight, visualStyle, torchIntensity, maxIllumination, viewT);
+		Renderer->illuminatePoly(sun, &viewT, worldT, visualStyle, 0.0f);
+		getSpecular(illSpec, sun, worldT, 16.0f);
 	}
 	else
-	{
-		triangle3dV worldT = viewT;
+		Renderer->illuminatePoly(sun, &viewT, worldT, visualStyle, 0.1f);
 
-		this->world2view(RM, R, viewT);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+	int nVert = this->clipToFrustum(viewT, vertexListV, uvList, specularList); //CLIPPING IN VIEW SPACE
 
-		if (visualStyle == projectionStyle::blinn_phong)
-		{
-			Renderer->illuminatePoly(sun, &viewT, worldT, visualStyle, 0.0f);
-			getSpecular(illSpec, sun, worldT, 16.0f);
-		}
-		else
-			Renderer->illuminatePoly(sun, &viewT, worldT, visualStyle, 0.1f);
+	Uint32 colour = worldT.colour;
 
-		int nVert = this->clipToFrustum(viewT, vertexListV, uvList, specularList); //CLIPPING IN VIEW SPACE
+	currentTexture = &textureData[viewT.texture];
 
-		Uint32 colour = worldT.colour;
+	this->projectPoly(nVert, colour, spotlight, visualStyle, torchIntensity, maxIllumination, viewT);
+}
 
-		currentTexture = &textureData[viewT.texture];
 
-		this->projectPoly(nVert, colour, spotlight, visualStyle, torchIntensity, maxIllumination, viewT);
-	}
+void Camera::renderPolygonShadows(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource sun,
+	const projectionStyle& visualStyle, float torchIntensity, float maxIllumination)
+{
+	triangle3dV worldT = viewT;
+
+	int nVert = this->clipToFrustumT(worldT, vertexListW, uvList, specularList); //CLIPPING IN WORLD SPACE
+
+	this->world2view(nVert);	//WORLD SPACE TO VIEW SPACE TRANSFORMATION
+
+	Uint32 colour = worldT.colour;
+
+	currentTexture = &textureData[viewT.texture];
+
+	this->projectPoly(nVert, colour, spotlight, visualStyle, torchIntensity, maxIllumination, viewT);
 }
 
 
@@ -717,8 +977,6 @@ void Camera::projectPoly(int n, Uint32 colour, std::shared_ptr<Lamp> spotlight, 
 			worldT.A = vertexListW[0];
 			worldT.B = vertexListW[1 + i];
 			worldT.C = vertexListW[2 + i];
-
-			worldT.N = ((worldT.B - worldT.A) ^ (worldT.C - worldT.A)).norm();
 
 			viewT.A = vertexListV[0];
 			viewT.B = vertexListV[1 + i];
@@ -845,34 +1103,5 @@ void Camera::projectPoly(int n, Uint32 colour, std::shared_ptr<Lamp> spotlight, 
 			break;
 			}
 		}
-	}
-}
-
-
-void Camera::outputImage(Canvas screen)
-{
-	FILE* f = fopen("screenshot_scanline.ppm", "w");
-	if (f == NULL)
-	{
-		printf("Could not write to file...\n");
-	}
-	else
-	{
-		fprintf(f, "P3\n");
-		fprintf(f, "%d %d\n", w, h);
-		fprintf(f, "255\n");
-
-		byte r, g, b;
-		Uint32 colour;
-		for (int i = 0; i < w * h; i++)
-		{
-			colour = screen.pixelBuffer[i];
-			r = colour >> 16 & 0xFF;
-			g = colour >> 8 & 0xFF;
-			b = colour & 0xFF;
-			fprintf(f, "%d %d %d\n", r, g, b);
-		}
-
-		fclose(f);
 	}
 }

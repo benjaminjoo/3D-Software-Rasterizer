@@ -117,8 +117,7 @@ void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 	Eye->y = player->y;
 	Eye->z = player->z;
 
-	Eye->updateViewDirection();
-	Eye->updateViewVolume();
+	Eye->update();
 }
 
 
@@ -507,8 +506,8 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 
 bool Game::objectApproachingWall(vect3& p, vect3& v, triangle3dV& T)
 {
-	float v2n = v * T.N;							//Magnitude of velocity projected to plane normal
-	float dist = distPoint2Plane(p, T);			//Distance from point to plane
+	float v2n = v * T.N;								//Magnitude of velocity projected to plane normal
+	float dist = distPoint2Plane(p, T);					//Distance from point to plane
 	if (dist >= 0.0f && v2n < 0.0f)
 	{
 		float t = dist / -v2n;
@@ -567,74 +566,68 @@ void Game::scanAll()
 
 void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 {
-	polyCounter = 0;
-
-	mat4x4 RotationM = viewPort->getRotation();
-	mat4x4 TranslationM = viewPort->getTranslation();
-	mat4x4 RM = RotationM * TranslationM;
-
 	for (auto& E : Entities)
 		if (E->isVisible())
-			E->render(viewPort, false, RotationM, TranslationM, SpotLight, *Sun,
+			E->render(viewPort, false, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Hero != nullptr)
 		for (auto& P : Hero->Parts)
 			if (P->isVisible())
-				P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
+				P->render(viewPort, true, SpotLight, *Sun,
 					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& E : Enemies)
 		if (!E->isDestroyed())
 			for (auto& P : E->Parts)
 				if (P->isVisible())
-					P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
+					P->render(viewPort, true, SpotLight, *Sun,
 						method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Enemy != nullptr)
 		for (auto& P : Enemy->Parts)
 			if (P->isVisible())
-				P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
+				P->render(viewPort, true, SpotLight, *Sun,
 					method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& P : Projectiles)
 		if (P->isVisible())
-			P->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
+			P->render(viewPort, true, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	for (auto& Exp : Explosions)
 		if (Exp->isActive())
-			Exp->render(viewPort, Screen, RM);
+			Exp->render(viewPort, Screen);
 
 	for (auto& B : Balls)
 		if (B->isVisible() && !B->isVanished())
-			B->render(viewPort, true, RotationM, TranslationM, SpotLight, *Sun,
+			B->render(viewPort, true, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
 	if (Emitters.size())
 	{
 		for (auto& e : Emitters)
-			e->render(viewPort, Screen, RM);
+			e->render(viewPort, Screen);
 	}
 
 	if (DynamicSurfaces.size())
 		for (auto& s : DynamicSurfaces)
-			s->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
+			s->renderMesh(viewPort, *Sun, method,
 				Controls->torchIntensity, Controls->maxIllumination);
 
 	if (StaticSurfaces.size())
 		for (auto& t : StaticSurfaces)
 		{
-			t->renderGrid(viewPort, Screen, RM);
-			//t->renderMesh(viewPort, RotationM, TranslationM, *Sun, method,
+			t->renderGrid(viewPort, Screen);
+			//t->renderMesh(viewPort, *Sun, method,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
 
 	if (PointClouds.size())
 		for (auto& p : PointClouds)
 		{
-			p->renderCloud(viewPort, Screen, RM);
-			//p->renderMesh(viewPort, RotationM, TranslationM, SpotLight, *Sun, method,
+			p->renderCloud(viewPort, Screen);
+			//p->renderMesh(viewPort, SpotLight, *Sun, method,
 			//	Controls->torchIntensity, Controls->maxIllumination);
 		}
 }
@@ -737,11 +730,11 @@ void Game::updateAll()
 	Controls->ceaseMotion();
 
 	this->renderAll(Eye, Controls->visualStyle);
-	this->scanAll();
+	if (Controls->visualStyle == projectionStyle::shadow_test)
+		this->scanAll();
 
 	if (Controls->showHelp)
 		TextScreens["Controls Text"]->print(Screen);
-
 
 	this->displayStats(Controls->showCrosshair, Controls->showFPS, Controls->showPosition, Controls->showPolyN, Controls->showAmmo, Screen);
 
