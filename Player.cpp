@@ -79,6 +79,12 @@ float Player::getBBRadius()
 }
 
 
+vect3 Player::getVelocity()
+{
+	return velocity;
+}
+
+
 vect3 Player::getPosition()
 {
 	return { x, y, z, 1.0f };
@@ -118,6 +124,45 @@ void Player::addPart(std::shared_ptr<SolidBody> p)
 void Player::setAmmo(unsigned int a)
 {
 	ammo = a;
+}
+
+
+void Player::updateDirection(const float& turnH, const float& turnV, const float& tiltP)
+{
+	azm = -turnH;
+	alt = -turnV;
+	rol = tiltP;
+}
+
+
+void Player::updateVelocity(const float& move, const float& strafe, const float& rise)
+{
+	velocity = {	-move * cosf(azm) + strafe * cosf(azm + PI * 0.5),
+					move * sinf(azm) - strafe * sinf(azm + PI * 0.5),
+					rise,
+					1.0f };
+}
+
+
+void Player::setVelocity(vect3 v)
+{
+	velocity = v;
+}
+
+
+void Player::updatePosition()
+{
+	x += velocity.x;
+	y += velocity.y;
+	z += velocity.z;
+}
+
+
+void Player::updatePosition(vect3 p)
+{
+	x = p.x;
+	y = p.y;
+	z = p.z;
 }
 
 

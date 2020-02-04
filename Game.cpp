@@ -123,13 +123,11 @@ void Game::updateCameraPosition(const std::shared_ptr<Player>& player)
 
 void Game::updateHeroPosition()
 {
-	Hero->azm = -Controls->turnH;
-	Hero->alt = -Controls->turnV;
-	Hero->rol = Controls->tiltP;
-
-	Hero->x -= Controls->moveP * (float)cos(Hero->azm) - Controls->strafeP * (float)cos(Hero->azm + PI * 0.5);
-	Hero->y += Controls->moveP * (float)sin(Hero->azm) - Controls->strafeP * (float)sin(Hero->azm + PI * 0.5);
-	Hero->z += Controls->riseP;
+	Hero->updateDirection(Controls->turnH, Controls->turnV, Controls->tiltP);
+	Hero->updateVelocity(Controls->moveP, Controls->strafeP, Controls->riseP);
+	if (Controls->clippingOn)
+		this->updatePlayerPosition(0, Hero);
+	Hero->updatePosition();
 
 	//if (!Controls->isFiring)
 	//	Hero->idle();
@@ -140,13 +138,9 @@ void Game::updateHeroPosition()
 
 void Game::updateEnemyPosition()
 {
-	Enemy->azm = -Controls->turnH;
-	Enemy->alt = -Controls->turnV;
-	Enemy->rol = Controls->tiltP;
-
-	Enemy->x -= Controls->moveP * (float)cos(Enemy->azm) - Controls->strafeP * (float)cos(Enemy->azm + PI * 0.5);
-	Enemy->y += Controls->moveP * (float)sin(Enemy->azm) - Controls->strafeP * (float)sin(Enemy->azm + PI * 0.5);
-	Enemy->z += Controls->riseP;
+	Enemy->updateDirection(Controls->turnH, Controls->turnV, Controls->tiltP);
+	Enemy->updateVelocity(Controls->moveP, Controls->strafeP, Controls->riseP);
+	Enemy->updatePosition();
 
 	updatePlayerModel(Enemy);
 }
@@ -416,6 +410,49 @@ bool Game::hitTest(const std::shared_ptr<SolidBody>& bullet, std::vector<std::sh
 						Exp->activate(targets[i]->getPosition());
 						break;
 					}
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool Game::updatePlayerPosition(int pass, std::shared_ptr<Player>& player)
+{
+	vect3 displacement = player->getVelocity();
+	vect3 oldPos = player->getPosition();
+	vect3 newPos = oldPos + displacement;
+
+	float radius = player->getBBRadius();
+
+	for (auto& tempWall : collisionPlanes)
+	{
+		if (objectApproachingWall(oldPos, displacement, tempWall))
+		{
+			float oldDistWall = distPoint2Plane(oldPos, tempWall);
+			float newDistWall = distPoint2Plane(newPos, tempWall);
+
+			if (newDistWall <= radius)
+			{
+				vect3 oldVelocity = player->getVelocity();
+
+				if (pass == 0)
+				{
+					vect3 newVelocity = oldVelocity - (tempWall.N * (oldVelocity * tempWall.N.norm()));
+					player->setVelocity(newVelocity);
+				}
+				else
+				{
+					vect3 newVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
+					player->setVelocity(newVelocity);
+				}
+				
+
+				if (pass == 0)
+					updatePlayerPosition(pass + 1, player);
 
 				return true;
 			}

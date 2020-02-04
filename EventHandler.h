@@ -25,6 +25,7 @@ public:
 	bool showAmmo = true;
 	bool showHelp = false;
 	bool gravityOn = false;
+	bool clippingOn = true;
 	bool isPaused = false;
 	bool isFiring = false;
 	bool mouseLookBlocked = false;

@@ -500,35 +500,35 @@ textCoord Projection::getUVCoord(	const vect3& startV, const vect3& endV,
 									const textCoord& startC, const textCoord& endC,
 									const vect3& testV)
 {
-	textCoord testC;
-	
-	float a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
-	float b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
-	float d = (b != 0.0f) ? (a / b) : (0.0f);
-	
-	testC.u = startC.u + d * (endC.u - startC.u);
-	testC.v = startC.v + d * (endC.v - startC.v);
-	
-	return testC;
-
 	//textCoord testC;
 	//
-	//float esX = endV.x - startV.x;
-	//float esY = endV.y - startV.y;
-	//float esZ = endV.z - startV.z;
-	//
-	//float a =	(testV.x - startV.x) * esX +
-	//			(testV.y - startV.y) * esY +
-	//			(testV.z - startV.z) * esZ;
-	//
-	//float b = esX * esX + esY * esY + esZ * esZ;
-	//
-	//float d = a / b;
+	//float a = dotProduct(subVectors(testV, startV), subVectors(endV, startV));
+	//float b = dotProduct(subVectors(endV, startV), subVectors(endV, startV));
+	//float d = (b != 0.0f) ? (a / b) : (0.0f);
 	//
 	//testC.u = startC.u + d * (endC.u - startC.u);
 	//testC.v = startC.v + d * (endC.v - startC.v);
 	//
 	//return testC;
+
+	textCoord testC;
+	
+	float esX = endV.x - startV.x;
+	float esY = endV.y - startV.y;
+	float esZ = endV.z - startV.z;
+	
+	float a =	(testV.x - startV.x) * esX +
+				(testV.y - startV.y) * esY +
+				(testV.z - startV.z) * esZ;
+	
+	float b = esX * esX + esY * esY + esZ * esZ;
+	
+	float d = a / b;
+	
+	testC.u = startC.u + d * (endC.u - startC.u);
+	testC.v = startC.v + d * (endC.v - startC.v);
+	
+	return testC;
 }
 
 
@@ -1214,8 +1214,8 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 
 						sampleUV = getUVCoord(startVert, endVert, startUV, endUV, currentVert);
 
-						sampleXnew = (int)(64.0f * sampleUV.u);
-						sampleYnew = (int)(64.0f * sampleUV.v);
+						sampleXnew = (int)(32.0f * sampleUV.u);
+						sampleYnew = (int)(32.0f * sampleUV.v);
 
 						Uint32 blue = getColour(0, 0, 0, (byte)(255 * illCurrent));
 						Uint32 white = getColour(0, (byte)(255 * illCurrent), (byte)(255 * illCurrent), (byte)(255 * illCurrent));
@@ -1235,11 +1235,11 @@ void Projection::fillTriangleCheckerboard(const triangle3dV& T, const triangle2d
 						{
 							if (int(sampleYnew / 16) % 2)
 							{
-								screen->pixelBuffer[hg * w + i] = white;
+								screen->pixelBuffer[hg * w + i] = blue;
 							}
 							else
 							{
-								screen->pixelBuffer[hg * w + i] = blue;
+								screen->pixelBuffer[hg * w + i] = white;
 							}
 						}
 
@@ -1644,8 +1644,8 @@ void Projection::fillTriangleSunlight(const triangle3dV& V, const triangle2dG& S
 	int textureHMedium = textureHeight >> 1;
 	int textureWLow = textureWidth >> 2;
 	int textureHLow = textureHeight >> 2;
-	int textureWTiny = textureWidth >> 4;
-	int textureHTiny = textureHeight >> 4;
+	int textureWTiny = textureWidth >> 3;
+	int textureHTiny = textureHeight >> 3;
 	int sampleXold = 0, sampleYold = 0, sampleXnew = 0, sampleYnew = 0;
 	Uint32 finalPixel;
 

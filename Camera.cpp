@@ -74,6 +74,100 @@ void Camera::linkToCanvas(std::shared_ptr<Canvas> screen)
 }
 
 
+void Camera::createMipMap(txt& t)
+{
+	t.pixelsM = new Uint32[(t.w / 2) * (t.h / 2)];
+	unsigned rAcc = 0;
+	unsigned gAcc = 0;
+	unsigned bAcc = 0;
+	for (int j = 0; j < t.h; j += 2)
+	{
+		for (int i = 0; i < t.w; i += 2)
+		{
+			for (int y = 0; y < 2; y++)
+			{
+				for (int x = 0; x < 2; x++)
+				{
+					colour32 sample;
+					sample.argb = t.pixelsH[(j + y) * t.w + i + x];
+					rAcc += static_cast<int>(sample.c[2]);
+					gAcc += static_cast<int>(sample.c[1]);
+					bAcc += static_cast<int>(sample.c[0]);
+				}
+			}
+			colour32 final;
+			final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 4.0f);
+			final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 4.0f);
+			final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 4.0f);
+			t.pixelsM[(j / 2) * (t.w / 2) + (i / 2)] = final.argb;
+			rAcc = 0;
+			gAcc = 0;
+			bAcc = 0;
+		}
+	}
+
+	t.pixelsL = new Uint32[(t.w / 4) * (t.h / 4)];
+	rAcc = 0;
+	gAcc = 0;
+	bAcc = 0;
+	for (int j = 0; j < t.h; j += 4)
+	{
+		for (int i = 0; i < t.w; i += 4)
+		{
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					colour32 sample;
+					sample.argb = t.pixelsH[(j + y) * t.w + i + x];
+					rAcc += static_cast<int>(sample.c[2]);
+					gAcc += static_cast<int>(sample.c[1]);
+					bAcc += static_cast<int>(sample.c[0]);
+				}
+			}
+			colour32 final;
+			final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 16.0f);
+			final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 16.0f);
+			final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 16.0f);
+			t.pixelsL[(j / 4) * (t.w / 4) + (i / 4)] = final.argb;
+			rAcc = 0;
+			gAcc = 0;
+			bAcc = 0;
+		}
+	}
+
+	t.pixelsT = new Uint32[(t.w / 8) * (t.h / 8)];
+	rAcc = 0;
+	gAcc = 0;
+	bAcc = 0;
+	for (int j = 0; j < t.h; j += 8)
+	{
+		for (int i = 0; i < t.w; i += 8)
+		{
+			for (int y = 0; y < 8; y++)
+			{
+				for (int x = 0; x < 8; x++)
+				{
+					colour32 sample;
+					sample.argb = t.pixelsH[(j + y) * t.w + i + x];
+					rAcc += static_cast<int>(sample.c[2]);
+					gAcc += static_cast<int>(sample.c[1]);
+					bAcc += static_cast<int>(sample.c[0]);
+				}
+			}
+			colour32 final;
+			final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 64.0f);
+			final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 64.0f);
+			final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 64.0f);
+			t.pixelsT[(j / 8) * (t.w / 8) + (i / 8)] = final.argb;
+			rAcc = 0;
+			gAcc = 0;
+			bAcc = 0;
+		}
+	}
+}
+
+
 void Camera::addTexture(SDL_Surface* T)
 {
 	if (T == nullptr)
@@ -90,117 +184,7 @@ void Camera::addTexture(SDL_Surface* T)
 		tempTexture.pixelsH = (Uint32*)tempImage->pixels;
 		tempTexture.ID = textureData.size();
 
-		tempTexture.pixelsM = new Uint32[(tempTexture.w / 2) * (tempTexture.h / 2)];
-		unsigned rAcc = 0;
-		unsigned gAcc = 0;
-		unsigned bAcc = 0;
-		for (int j = 0; j < tempTexture.h; j += 2)
-		{
-			for (int i = 0; i < tempTexture.w; i += 2)
-			{
-				for (int y = 0; y < 2; y++)
-				{
-					for (int x = 0; x < 2; x++)
-					{
-						colour32 sample;
-						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
-						rAcc += static_cast<int>(sample.c[2]);
-						gAcc += static_cast<int>(sample.c[1]);
-						bAcc += static_cast<int>(sample.c[0]);
-					}
-				}
-				colour32 final;
-				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 4.0f);
-				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 4.0f);
-				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 4.0f);
-				tempTexture.pixelsM[(j / 2) * (tempTexture.w / 2) + (i / 2)] = final.argb;
-				rAcc = 0;
-				gAcc = 0;
-				bAcc = 0;
-			}
-		}
-
-		tempTexture.pixelsL = new Uint32[(tempTexture.w / 4) * (tempTexture.h / 4)];
-		rAcc = 0;
-		gAcc = 0;
-		bAcc = 0;
-		for (int j = 0; j < tempTexture.h; j += 4)
-		{
-			for (int i = 0; i < tempTexture.w; i += 4)
-			{
-				for (int y = 0; y < 4; y++)
-				{
-					for (int x = 0; x < 4; x++)
-					{
-						colour32 sample;
-						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
-						rAcc += static_cast<int>(sample.c[2]);
-						gAcc += static_cast<int>(sample.c[1]);
-						bAcc += static_cast<int>(sample.c[0]);
-					}
-				}
-				colour32 final;
-				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 16.0f);
-				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 16.0f);
-				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 16.0f);
-				tempTexture.pixelsL[(j / 4) * (tempTexture.w / 4) + (i / 4)] = final.argb;
-				rAcc = 0;
-				gAcc = 0;
-				bAcc = 0;
-			}
-		}
-
-		tempTexture.pixelsT = new Uint32[(tempTexture.w / 16) * (tempTexture.h / 16)];
-		rAcc = 0;
-		gAcc = 0;
-		bAcc = 0;
-		for (int j = 0; j < tempTexture.h; j += 16)
-		{
-			for (int i = 0; i < tempTexture.w; i += 16)
-			{
-				for (int y = 0; y < 16; y++)
-				{
-					for (int x = 0; x < 16; x++)
-					{
-						colour32 sample;
-						sample.argb = tempTexture.pixelsH[(j + y) * tempTexture.w + i + x];
-						rAcc += static_cast<int>(sample.c[2]);
-						gAcc += static_cast<int>(sample.c[1]);
-						bAcc += static_cast<int>(sample.c[0]);
-					}
-				}
-				colour32 final;
-				final.c[2] = static_cast<unsigned char>(static_cast<float>(rAcc) / 256.0f);
-				final.c[1] = static_cast<unsigned char>(static_cast<float>(gAcc) / 256.0f);
-				final.c[0] = static_cast<unsigned char>(static_cast<float>(bAcc) / 256.0f);
-				tempTexture.pixelsT[(j / 16) * (tempTexture.w / 16) + (i / 16)] = final.argb;
-				rAcc = 0;
-				gAcc = 0;
-				bAcc = 0;
-			}
-		}
-
-		std::ofstream outputFileT(std::to_string(tempTexture.ID) + "tiny" + ".ppm");
-		if (outputFileT.is_open())
-		{
-			outputFileT << "P3" << std::endl;
-			outputFileT << tempTexture.w / 16 << " " << tempTexture.h / 16 << std::endl;
-			outputFileT << "255" << std::endl;
-
-			for (int j = 0; j < (tempTexture.h / 16); j++)
-			{
-				for (int i = 0; i < (tempTexture.w / 16); i++)
-				{
-					colour32 ccc;
-					ccc.argb = tempTexture.pixelsT[j * (tempTexture.w / 16) + i];
-					outputFileT << std::to_string(ccc.c[2]) << " "
-								<< std::to_string(ccc.c[1]) << " "
-								<< std::to_string(ccc.c[0]) << std::endl;
-				}
-			}
-
-			outputFileT.close();
-		}
+		createMipMap(tempTexture);
 
 		textureData.push_back(tempTexture);
 	}
@@ -209,6 +193,8 @@ void Camera::addTexture(SDL_Surface* T)
 
 void Camera::addTexture(txt t)
 {
+	createMipMap(t);
+
 	textureData.push_back(t);
 }
 

@@ -284,9 +284,9 @@ void fps_game()
 	//Fill up explosion pool
 	fpsGame->addExplosion(20);
 
-#define _STL_READER_
+//#define _STL_READER_
 //#define _PLANETS_
-//#define _SHOOTER_
+#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
@@ -294,7 +294,7 @@ void fps_game()
 
 #ifdef _QUAKE_1_READER_
 
-	auto quake1Map = std::make_shared<BSP1Loader>("Assets/QuakeMaps/dm6.bsp", 0.01f, 0.01f, 0.01f);
+	auto quake1Map = std::make_shared<BSP1Loader>("Assets/QuakeMaps/dm6.bsp", 0.1f, 0.1f, 0.1f);
 	//quake1Map->readData();
 	fpsGame->addEntity(quake1Map);
 

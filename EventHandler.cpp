@@ -287,6 +287,9 @@ void EventHandler::HandleUserEvents()
 			case SDLK_SLASH:
 				visualStyle = projectionStyle::torchlight_solid;
 				break;
+			case SDLK_f:
+				clippingOn = clippingOn ? false : true;
+				break;
 			case SDLK_g:
 				gravityOn = gravityOn ? false : true;
 				break;

@@ -83,6 +83,8 @@ public:
 
 	void linkToCanvas(std::shared_ptr<Canvas> screen);
 
+	void createMipMap(txt&);
+
 	void addTexture(SDL_Surface*);
 
 	void addTexture(txt);

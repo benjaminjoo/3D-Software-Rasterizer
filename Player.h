@@ -26,6 +26,8 @@ private:
 	float						alt				= 0.0f;
 	float						rol				= 0.0f;
 
+	vect3						velocity		= { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	float						runningSpeed	= 0.1f;
 	float						turningSpeed	= 0.1f;
 
@@ -70,6 +72,7 @@ public:
 	void gotHitFrom(vect3);
 	void moveOutOfHarmsWay();
 	float getBBRadius();
+	vect3 getVelocity();
 	vect3 getPosition();
 	float getRange();
 	void takeDamage(unsigned int);
@@ -80,8 +83,14 @@ public:
 private:
 	
 	void setAmmo(unsigned int);
-	void shoot(std::vector<std::shared_ptr<SolidBody>>);
 
+	void updateDirection(const float& turnH, const float& turnV, const float& tiltP);
+	void updateVelocity(const float& move, const float& strafe, const float& rise);
+	void setVelocity(vect3);
+	void updatePosition();
+	void updatePosition(vect3);
+
+	void shoot(std::vector<std::shared_ptr<SolidBody>>);
 	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);
 	unsigned int pickTarget(const std::vector<std::shared_ptr<Player>>&, const unsigned int&);
 	bool lockOnTarget(vect3);
