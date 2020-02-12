@@ -79,6 +79,7 @@ private:
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::shared_ptr<Player>);
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 	bool updatePlayerPosition(int, std::shared_ptr<Player>&);
+	bool updatePlayerPositionBB(int, std::shared_ptr<Player>&);
 	bool updateMovingObject(std::shared_ptr<SolidBody>);
 	bool objectApproachingWall(vect3&, vect3&, triangle3dV&);
 

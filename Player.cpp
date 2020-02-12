@@ -4,7 +4,17 @@
 Player::Player()
 {
 	Renderer = std::make_shared<Projection>();
-	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffffff00, 1, 0.5f, 24);
+
+	updateBB();
+
+	//AABB[0] = { -bbRadius , -bbRadius, -bbRadius, 1.0f };
+	//AABB[0] = { -bbRadius , bbRadius, -bbRadius, 1.0f };
+	//AABB[0] = { bbRadius , bbRadius, -bbRadius, 1.0f };
+	//AABB[0] = { bbRadius , -bbRadius, -bbRadius, 1.0f };
+	//AABB[0] = { -bbRadius , -bbRadius, bbRadius, 1.0f };
+	//AABB[0] = { -bbRadius , bbRadius, bbRadius, 1.0f };
+	//AABB[0] = { bbRadius , bbRadius, bbRadius, 1.0f };
+	//AABB[0] = { bbRadius , -bbRadius, bbRadius, 1.0f };
 }
 
 
@@ -13,7 +23,17 @@ Player::Player(float px, float py, float pz, float rx, float ry, float rz,
 	x(px), y(py), z(pz), azm(rx), alt(ry), rol(rz), bbRadius(rad), health(hlt), ammo(amm) 
 {
 	Renderer = std::make_shared<Projection>();
-	boundingVolume = std::make_shared<SolidSphere>(1.0f, 1.0f, 1.0f, px, py, pz, rx, ry, rz, 0xffffff00, 1, 0.5f, 24);
+
+	updateBB();
+
+	//AABB[0] = { px - bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
+	//AABB[0] = { px - bbRadius , py + bbRadius, pz - bbRadius, 1.0f };
+	//AABB[0] = { px + bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
+	//AABB[0] = { px + bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
+	//AABB[0] = { px - bbRadius , py - bbRadius, pz + bbRadius, 1.0f };
+	//AABB[0] = { px - bbRadius , py + bbRadius, pz + bbRadius, 1.0f };
+	//AABB[0] = { px + bbRadius , py + bbRadius, pz + bbRadius, 1.0f };
+	//AABB[0] = { px + bbRadius , py - bbRadius, pz + bbRadius, 1.0f };
 }
 
 
@@ -91,6 +111,15 @@ vect3 Player::getPosition()
 }
 
 
+vect3 Player::getBBPosition(unsigned p)
+{
+	if (p < 8)
+		return AABB[p];
+	else
+		return { x, y, z, 1.0f };
+}
+
+
 float Player::getRange()
 {
 	return range;
@@ -141,6 +170,15 @@ void Player::updateVelocity(const float& move, const float& strafe, const float&
 					move * sinf(azm) - strafe * sinf(azm + PI * 0.5),
 					rise,
 					1.0f };
+
+	//velocity.z += -0.1f;
+	//std::cout << velocity.z << std::endl;
+}
+
+
+void Player::applyGravity(float g)
+{
+	velocity.z += g;
 }
 
 
@@ -166,27 +204,40 @@ void Player::updatePosition(vect3 p)
 }
 
 
+void Player::updateBB()
+{
+	AABB[0] = { x - bbRadius , y - bbRadius, z - bbRadius, 1.0f };
+	AABB[0] = { x - bbRadius , y + bbRadius, z - bbRadius, 1.0f };
+	AABB[0] = { x + bbRadius , y - bbRadius, z - bbRadius, 1.0f };
+	AABB[0] = { x + bbRadius , y - bbRadius, z - bbRadius, 1.0f };
+	AABB[0] = { x - bbRadius , y - bbRadius, z + bbRadius, 1.0f };
+	AABB[0] = { x - bbRadius , y + bbRadius, z + bbRadius, 1.0f };
+	AABB[0] = { x + bbRadius , y + bbRadius, z + bbRadius, 1.0f };
+	AABB[0] = { x + bbRadius , y - bbRadius, z + bbRadius, 1.0f };
+}
+
+
 void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles)
 {
 	float muzzleVelocity = 5.0f;
-	for (unsigned int i = 0; i < Projectiles.size(); i++)
+	for (auto& p : Projectiles)
 	{
-		if (Projectiles[i]->isVisible() == false)
+		if (p->isVisible() == false)
 		{
-			vect3 origin	= this->getPosition();
-			vect3 rotation	= { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };			
-			vect3 velocity	= rotation * muzzleVelocity;
+			vect3 origin = this->getPosition();
+			vect3 rotation = { cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f };
+			vect3 velocity = rotation * muzzleVelocity;
 
-			Projectiles[i]->setRotation({	static_cast<float>(alt),
-											static_cast<float>(rol),
-											static_cast<float>(-(azm + PI * 0.5f)), 1.0f });
-			Projectiles[i]->setFired(true);
-			Projectiles[i]->setPosition(origin);
-			Projectiles[i]->setVelocity(velocity);			
-			Projectiles[i]->setVisibility(true);
-			Projectiles[i]->setMotion(true);
-			Projectiles[i]->setGravity(true);
-			Projectiles[i]->setTicksSinceFired(0);
+			p->setRotation({	static_cast<float>(alt),
+								static_cast<float>(rol),
+								static_cast<float>(-(azm + PI * 0.5f)), 1.0f });
+			p->setFired(true);
+			p->setPosition(origin);
+			p->setVelocity(velocity);
+			p->setVisibility(true);
+			p->setMotion(true);
+			p->setGravity(true);
+			p->setTicksSinceFired(0);
 
 			lastShot = 0;
 			ammo--;

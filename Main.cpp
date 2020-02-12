@@ -41,6 +41,62 @@
 #include "Terrain.h"
 #include "PointCloud.h"
 #include "RayTracer.h"
+#include "Octree.h"
+
+
+void octree_visualisation()
+{
+	auto Screen		= std::make_shared<Canvas>("Octree Visualisation", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+
+	auto Controls	= std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+
+	auto catTree	= std::make_shared<Octree>("Assets/PointClouds/HighRes/cat9.vert", 10);
+
+	int overallSize = 512;
+
+	int xStart	= (SCREEN_WIDTH - overallSize) / 2;
+	int yStart	= (SCREEN_HEIGHT - overallSize) / 2;
+	int zStart	= -overallSize / 2;
+	int xCentre = SCREEN_WIDTH / 2;
+	int yCentre = SCREEN_HEIGHT / 2;
+	int zCentre = 0;
+
+	float modelSize = catTree->getSize();
+	vect3 modelCentre = catTree->getCentre();
+
+	int z = 0;
+
+	while (!Controls->quit)
+	{
+		Controls->HandleUserEvents();
+
+		Controls->ceaseMotion();
+
+		for (int y = 0; y < overallSize; y++)
+		{
+			for (int x = 0; x < overallSize; x++)
+			{
+				float xCurrent = (static_cast<float>((xStart + x) - xCentre) / static_cast<float>(overallSize)) * modelSize;
+				float yCurrent = (static_cast<float>((yStart + y) - yCentre) / static_cast<float>(overallSize)) * modelSize;
+				float zCurrent = (static_cast<float>((zStart + z) - zCentre) / static_cast<float>(overallSize))* modelSize;
+
+				vect3 vCurrent = { xCurrent, yCurrent, zCurrent, 1.0f };
+				vCurrent += modelCentre;
+
+				if (catTree->sampleTree(0, nullptr, { 0.0f, 0.0f, 0.0f, 1.0 }, vCurrent))
+					Screen->putPixel(xStart + x, yStart + y, 0x000000ff);	
+			}
+		}
+
+		if (!Controls->isPaused && z++ >= overallSize)
+		{
+			Screen->resetPixelBuffer();
+			z = 0;
+		}
+
+		Screen->update();
+	}
+}
 
 
 void editor()
@@ -284,9 +340,9 @@ void fps_game()
 	//Fill up explosion pool
 	fpsGame->addExplosion(20);
 
-//#define _STL_READER_
+#define _STL_READER_
 //#define _PLANETS_
-#define _SHOOTER_
+//#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
@@ -319,6 +375,9 @@ void fps_game()
 
 	auto teapot = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0x00ff7f00, 3, "Assets/Stl/utah_teapot.stl");
 	fpsGame->addEntity(teapot);
+
+	auto revolver = std::make_shared<SolidSTL>(1.0f, 1.0f, 1.0f, 10.0f, 12.0f, 1.5f, PI, 0.0f, 0.0f, 0x007f7f7f, 3, "Assets/Stl/Frame.stl");
+	fpsGame->addEntity(revolver);
 
 	auto board = std::make_shared<SolidPrism>(1.0f, 1.0f, 1.0f, -30.0f, -30.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0x0000007f, 6, 60.0f, 60.0f, 1.0f);
 	fpsGame->addEntity(board);
@@ -516,6 +575,7 @@ void fps_game()
 	SDL_Quit();
 }
 
+
 /*
 void opengl_renderer()
 {
@@ -595,9 +655,10 @@ void opengl_renderer()
 }
 */
 
+
 int main(int argc, char** argv)
 {
-	std::cout << "Do you want to play the Game <P>, test the OpenGL version <O>, see some point clouds <W> or use the Editor <E>?" << std::endl;
+	std::cout << "Do you want to play the Game <P>, test the Octree Visualisation tool <O>, see some point clouds <W> or use the Editor <E>?" << std::endl;
 	char userInput;
 	std::cin >> userInput;
 
@@ -613,7 +674,7 @@ int main(int argc, char** argv)
 		break;
 	case 'o':
 	case 'O':
-		//opengl_renderer();
+		octree_visualisation();
 		break;
 	case 'p':
 	case 'P':

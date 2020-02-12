@@ -52,8 +52,8 @@ private:
 	unsigned int				idlePhase		= 1;
 	float						amplitude		= 0.5f;
 
-	std::shared_ptr<SolidBody>	boundingVolume	= nullptr;
 	float						bbRadius		= 0.25f;
+	vect3						AABB[8];
 
 	std::vector<std::shared_ptr<SolidBody>>		Parts;
 
@@ -74,6 +74,7 @@ public:
 	float getBBRadius();
 	vect3 getVelocity();
 	vect3 getPosition();
+	vect3 getBBPosition(unsigned);
 	float getRange();
 	void takeDamage(unsigned int);
 	unsigned int getHealth();
@@ -86,9 +87,11 @@ private:
 
 	void updateDirection(const float& turnH, const float& turnV, const float& tiltP);
 	void updateVelocity(const float& move, const float& strafe, const float& rise);
+	void applyGravity(float);
 	void setVelocity(vect3);
 	void updatePosition();
 	void updatePosition(vect3);
+	void updateBB();
 
 	void shoot(std::vector<std::shared_ptr<SolidBody>>);
 	unsigned int pickTarget(const std::vector<std::shared_ptr<SolidBody>>&);

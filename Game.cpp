@@ -126,8 +126,12 @@ void Game::updateHeroPosition()
 	Hero->updateDirection(Controls->turnH, Controls->turnV, Controls->tiltP);
 	Hero->updateVelocity(Controls->moveP, Controls->strafeP, Controls->riseP);
 	if (Controls->clippingOn)
+	{
+		//Hero->applyGravity(-0.1f);
 		this->updatePlayerPosition(0, Hero);
+	}					
 	Hero->updatePosition();
+
 
 	//if (!Controls->isFiring)
 	//	Hero->idle();
@@ -440,6 +444,7 @@ bool Game::updatePlayerPosition(int pass, std::shared_ptr<Player>& player)
 				vect3 oldVelocity = player->getVelocity();
 
 				if (pass == 0)
+				//if (pass < 2)
 				{
 					vect3 newVelocity = oldVelocity - (tempWall.N * (oldVelocity * tempWall.N.norm()));
 					player->setVelocity(newVelocity);
@@ -448,10 +453,10 @@ bool Game::updatePlayerPosition(int pass, std::shared_ptr<Player>& player)
 				{
 					vect3 newVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 					player->setVelocity(newVelocity);
-				}
-				
+				}			
 
 				if (pass == 0)
+				//if (pass < 2)
 					updatePlayerPosition(pass + 1, player);
 
 				return true;
