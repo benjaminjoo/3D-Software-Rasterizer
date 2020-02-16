@@ -81,19 +81,36 @@ void Game::addPointCloud(std::shared_ptr<PointCloud> p)
 }
 
 
-void Game::loadProjectile(unsigned n)
+void Game::addProjectile(unsigned n)
 {
 	for (unsigned i = 0; i < n; i++)
 	{
-		auto bullet = std::make_shared<Bullet>(0.0f, 0.0f, 0.0f, 0.25f, 0.5f, 1.0f, 0xffffffff);
+		auto bullet = std::make_shared<Bullet>(0.0f, 0.0f, 0.0f, 0.125f, 0.25f, 1.0f, 0xffffffff);
 		bullet->setGravity(true);
 		bullet->setVisibility(false);
 		bullet->setBehaviour(hit_response::stick);
 		bullet->setBBRadius(0.05f);
 		Projectiles.push_back(bullet);
 		ammo++;
+
+		auto trail = std::make_shared<ParticleTrail>(10, 0.1f, 0.125f, 180.0f, 0x00ff7f00);
+		Trails.push_back(trail);
 	}
+
+	for (unsigned i = 0; i < Projectiles.size(); i++)
+		Projectiles[i]->bindTrail(Trails[i]);
+
 	Hero->setAmmo(Projectiles.size());
+}
+
+
+void Game::addImpact(unsigned n)
+{
+	for (unsigned i = 0; i < n; i++)
+	{
+		auto impact = std::make_shared<Explosion>(250, 1, 0.01f, 300.0f, 0x00ffffff, 0x00ffffff, 0x007f7f7f, 0x007f7f7f);
+		Impacts.push_back(impact);
+	}
 }
 
 
@@ -101,7 +118,7 @@ void Game::addExplosion(unsigned n)
 {
 	for (unsigned i = 0; i < n; i++)
 	{
-		auto explosion = std::make_shared<Explosion>(5000, 0.1f, 60.0f);
+		auto explosion = std::make_shared<Explosion>(5000, 2, 0.1f, 60.0f);
 		Explosions.push_back(explosion);
 	}
 }
@@ -324,11 +341,9 @@ void Game::updateProjectiles()
 		{
 			if (P->isInMotion())
 			{
-				vect3 currentPos = P->getPosition();
 				updateMovingObject(P);
 				hitTest(P, Balls);
 				hitTest(P, Hero);
-				hitTest(P, Enemy);
 				for (auto& E : Enemies)
 					hitTest(P, E);
 			}
@@ -343,6 +358,7 @@ void Game::updateProjectiles()
 				P->setVelocity(vect3{ 0.0f, 0.0f, 0.0f, 1.0f });
 				P->setVisibility(false);
 				P->setMotion(false);
+				P->resetTrail();
 				ammo++;
 			}
 		}
@@ -350,11 +366,27 @@ void Game::updateProjectiles()
 }
 
 
+void Game::updateTrails()
+{
+	for (auto& T : Trails)
+		if (T->isLive())
+			T->update();
+}
+
+
+void Game::updateImpacts()
+{
+	for (auto& Imp : Impacts)
+		if (Imp->isActive())
+			Imp->update(0.5f);
+}
+
+
 void Game::updateExplosions()
 {
 	for (auto& Exp : Explosions)
 		if (Exp->isActive())
-			Exp->update();
+			Exp->update(1.0f);
 }
 
 
@@ -508,7 +540,14 @@ bool Game::updateMovingObject(std::shared_ptr<SolidBody> object)
 				{
 					vect3 newVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
 					object->setMotion(false);
+					object->deactivateTrail();
 					object->setVelocity(newVelocity);
+					for (auto& Imp : Impacts)
+						if (!Imp->isActive() && !Imp->isUsed())
+						{
+							Imp->activate(oldPos + toIntersection);
+							break;
+						}
 				}
 				break;
 				case hit_response::bounce:
@@ -637,6 +676,14 @@ void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 			P->render(viewPort, true, SpotLight, *Sun,
 				method, Controls->torchIntensity, Controls->maxIllumination);
 
+	for (auto& T : Trails)
+		if (T->isLive())
+			T->render(viewPort, Screen);
+
+	for (auto& Imp : Impacts)
+		if (Imp->isActive())
+			Imp->render(viewPort, Screen);
+
 	for (auto& Exp : Explosions)
 		if (Exp->isActive())
 			Exp->render(viewPort, Screen);
@@ -659,19 +706,11 @@ void Game::renderAll(std::shared_ptr<Camera> viewPort, projectionStyle method)
 
 	if (StaticSurfaces.size())
 		for (auto& t : StaticSurfaces)
-		{
 			t->renderGrid(viewPort, Screen);
-			//t->renderMesh(viewPort, *Sun, method,
-			//	Controls->torchIntensity, Controls->maxIllumination);
-		}
 
 	if (PointClouds.size())
 		for (auto& p : PointClouds)
-		{
 			p->renderCloud(viewPort, Screen);
-			//p->renderMesh(viewPort, SpotLight, *Sun, method,
-			//	Controls->torchIntensity, Controls->maxIllumination);
-		}
 }
 
 
@@ -708,13 +747,15 @@ void Game::updateAll()
 		}
 
 		this->updateProjectiles();
+		this->updateTrails();
+		this->updateImpacts();
 		this->updateExplosions();
 
-		if (Hero->lastShot < 5)
+		if (Hero->lastShot < Hero->fireRate)
 			Hero->lastShot++;
 		if (Controls->isFiring)
 		{
-			if (Controls->playerControlled && Hero->lastShot >= 5)
+			if (Controls->playerControlled && Hero->lastShot >= Hero->fireRate)
 			{
 				Hero->shoot(Projectiles);
 				ammo--;
@@ -723,11 +764,11 @@ void Game::updateAll()
 
 		if (Enemy != nullptr)
 		{
-			if (Enemy->lastShot < 5)
+			if (Enemy->lastShot < Enemy->fireRate)
 				Enemy->lastShot++;
 			if (Controls->playerControlled)
 			{
-				if (Enemy->isFiring && Enemy->lastShot >= 5)
+				if (Enemy->isFiring && Enemy->lastShot >= Enemy->fireRate)
 				{
 					Enemy->shoot(Projectiles);
 					ammo--;
@@ -737,12 +778,12 @@ void Game::updateAll()
 
 		for (auto en : Enemies)
 		{
-			if (en->lastShot < 5)
+			if (en->lastShot < en->fireRate)
 				en->lastShot++;
 			if (Controls->playerControlled)
 
 			{
-				if (en->isFiring && en->lastShot >= 5)
+				if (en->isFiring && en->lastShot >= en->fireRate)
 				{
 					en->shoot(Projectiles);
 					ammo--;
@@ -752,7 +793,7 @@ void Game::updateAll()
 
 		if (Controls->enemyControlled && Enemy != nullptr)
 		{
-			if (Controls->isFiring && Enemy->lastShot >= 5)
+			if (Controls->isFiring && Enemy->lastShot >= Enemy->fireRate)
 			{
 				Enemy->shoot(Projectiles);
 				ammo--;

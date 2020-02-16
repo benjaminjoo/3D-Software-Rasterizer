@@ -278,7 +278,7 @@ void DynamicMesh::update()
 void DynamicMesh::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (int i = 0; i < size; i++)
-		eye->renderPoint(pGrid[i], screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(1, pGrid[i], screen->pixelBuffer, screen->depthBuffer);
 }
 
 

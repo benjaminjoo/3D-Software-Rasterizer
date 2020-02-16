@@ -91,9 +91,9 @@ public:
 
 	void update();
 
-	void renderPoint(point3, Uint32*, float*);
+	void renderPoint(int, point3, Uint32*, float*);
 
-	void renderVisiblePoint(point3 p, Uint32*, float*);
+	void renderVisiblePoint(int, point3, Uint32*, float*);
 
 	void renderMesh(const int& nPoly, triangle3dV* mesh, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
@@ -156,7 +156,7 @@ private:
 
 	void world2viewPointM(point3& P) const;
 
-	void projectPoint(point3, Uint32*, float*);
+	void projectPoint(int, point3, Uint32*, float*);
 
 	void renderPolygon(triangle3dV& viewT, std::shared_ptr<Lamp> spotlight, LightSource Sun,
 		const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);

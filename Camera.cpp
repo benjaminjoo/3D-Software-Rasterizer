@@ -874,39 +874,46 @@ void Camera::world2viewPointM(point3& P) const
 }
 
 
-void Camera::renderPoint(point3 p, Uint32* pixelBuffer, float* depthBuffer)
+void Camera::renderPoint(int size, point3 p, Uint32* pixelBuffer, float* depthBuffer)
 {
 	this->world2viewPointM(p);
 	if (pointInsideFrustum(p.P))
-		projectPoint(p, pixelBuffer, depthBuffer);
+		projectPoint(size, p, pixelBuffer, depthBuffer);
 }
 
 
-void Camera::renderVisiblePoint(point3 p, Uint32* pixelBuffer, float* depthBuffer)
+void Camera::renderVisiblePoint(int size, point3 p, Uint32* pixelBuffer, float* depthBuffer)
 {
 	this->world2viewPointM(p);
 	if (pointInsideFrustum(p.P) && pointFacingCamera(p))
-		projectPoint(p, pixelBuffer, depthBuffer);
+		projectPoint(size, p, pixelBuffer, depthBuffer);
 }
 
 
-void Camera::projectPoint(point3 P, Uint32* pixelBuffer, float* depthBuffer)
+void Camera::projectPoint(int size, point3 P, Uint32* pixelBuffer, float* depthBuffer)
 {
 	coord2 cp = this->view2screen(P.P, hRatio, vRatio);
-	//if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
-	//{
-	//	pixelBuffer[cp.y * w + cp.x] = P.colour;
-	//	depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
-	//}
-	if ((cp.x >= 1) && (cp.x < w - 1) && (cp.y >= 1) && (cp.y < h - 1) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
-	{
-		pixelBuffer[(cp.y - 1) * w + cp.x] = P.colour;
-		pixelBuffer[cp.y * w + cp.x - 1] = P.colour;
-		pixelBuffer[cp.y * w + cp.x] = P.colour;
-		pixelBuffer[cp.y * w + cp.x + 1] = P.colour;
-		pixelBuffer[(cp.y + 1) * w + cp.x] = P.colour;
 
-		depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
+	if (size < 2)
+	{
+		if ((cp.x >= 0) && (cp.x < w) && (cp.y >= 0) && (cp.y < h) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
+		{
+			pixelBuffer[cp.y * w + cp.x] = P.colour;
+			depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
+		}
+	}
+	else
+	{
+		if ((cp.x >= 1) && (cp.x < w - 1) && (cp.y >= 1) && (cp.y < h - 1) && (1.0f / cp.z < depthBuffer[cp.y * w + cp.x]))
+		{
+			pixelBuffer[(cp.y - 1) * w + cp.x] = P.colour;
+			pixelBuffer[cp.y * w + cp.x - 1] = P.colour;
+			pixelBuffer[cp.y * w + cp.x] = P.colour;
+			pixelBuffer[cp.y * w + cp.x + 1] = P.colour;
+			pixelBuffer[(cp.y + 1) * w + cp.x] = P.colour;
+
+			depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
+		}
 	}
 }
 

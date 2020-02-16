@@ -6,15 +6,6 @@ Player::Player()
 	Renderer = std::make_shared<Projection>();
 
 	updateBB();
-
-	//AABB[0] = { -bbRadius , -bbRadius, -bbRadius, 1.0f };
-	//AABB[0] = { -bbRadius , bbRadius, -bbRadius, 1.0f };
-	//AABB[0] = { bbRadius , bbRadius, -bbRadius, 1.0f };
-	//AABB[0] = { bbRadius , -bbRadius, -bbRadius, 1.0f };
-	//AABB[0] = { -bbRadius , -bbRadius, bbRadius, 1.0f };
-	//AABB[0] = { -bbRadius , bbRadius, bbRadius, 1.0f };
-	//AABB[0] = { bbRadius , bbRadius, bbRadius, 1.0f };
-	//AABB[0] = { bbRadius , -bbRadius, bbRadius, 1.0f };
 }
 
 
@@ -25,20 +16,17 @@ Player::Player(float px, float py, float pz, float rx, float ry, float rz,
 	Renderer = std::make_shared<Projection>();
 
 	updateBB();
-
-	//AABB[0] = { px - bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
-	//AABB[0] = { px - bbRadius , py + bbRadius, pz - bbRadius, 1.0f };
-	//AABB[0] = { px + bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
-	//AABB[0] = { px + bbRadius , py - bbRadius, pz - bbRadius, 1.0f };
-	//AABB[0] = { px - bbRadius , py - bbRadius, pz + bbRadius, 1.0f };
-	//AABB[0] = { px - bbRadius , py + bbRadius, pz + bbRadius, 1.0f };
-	//AABB[0] = { px + bbRadius , py + bbRadius, pz + bbRadius, 1.0f };
-	//AABB[0] = { px + bbRadius , py - bbRadius, pz + bbRadius, 1.0f };
 }
 
 
 Player::~Player()
 {
+}
+
+
+void Player::setTrailColour(const Uint32& col)
+{
+	trailColour = col;
 }
 
 
@@ -170,9 +158,6 @@ void Player::updateVelocity(const float& move, const float& strafe, const float&
 					move * sinf(azm) - strafe * sinf(azm + PI * 0.5),
 					rise,
 					1.0f };
-
-	//velocity.z += -0.1f;
-	//std::cout << velocity.z << std::endl;
 }
 
 
@@ -237,7 +222,8 @@ void Player::shoot(std::vector<std::shared_ptr<SolidBody>> Projectiles)
 			p->setVisibility(true);
 			p->setMotion(true);
 			p->setGravity(true);
-			p->setTicksSinceFired(0);
+			p->setTicksSinceFired(0);			
+			p->activateTrail(trailColour);
 
 			lastShot = 0;
 			ammo--;
@@ -313,7 +299,6 @@ bool Player::lockOnTarget(vect3 targetPos)
 	bool result = false;
 
 	vect3 currentPos = this->getPosition();
-	//vect3 currentRot = unitVector({ cos(-alt) * cos(-azm), cos(-alt) * sin(-azm), sin(-alt), 0.0f });
 	vect3 target = unitVector(targetPos - currentPos);
 
 	float dz = targetPos.z - z;

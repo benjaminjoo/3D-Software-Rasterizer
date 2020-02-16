@@ -111,8 +111,6 @@ void ParticleSystem::update()
 					currentVelocity += this->getRandomVelocity(currentVelocity.len() * 0.1f);
 					i.updateVelocity(currentVelocity);
 				}
-				//if (terrainMesh != nullptr)
-				//	handleCollisions();
 				if (gravity)
 					i.updateVelocity();
 			}
@@ -200,6 +198,6 @@ void ParticleSystem::render(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas>
 			point3 p;
 			p.P = i.getPosition();
 			p.colour = getColour(0, r, g, b);
-			eye->renderPoint(p, screen->pixelBuffer, screen->depthBuffer);
+			eye->renderPoint(1, p, screen->pixelBuffer, screen->depthBuffer);
 		}
 }

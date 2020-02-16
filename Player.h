@@ -39,6 +39,8 @@ private:
 
 	unsigned int				health			= 100;
 	unsigned int				ammo			= 100;
+	unsigned int				fireRate		= 25;
+	Uint32						trailColour		= 0x000000ff;
 
 	unsigned int				lastShot		= 0;
 	bool						isFiring		= false;
@@ -65,6 +67,7 @@ public:
 	Player(float, float, float, float, float, float, float, int, int);
 	~Player();
 
+	void setTrailColour(const Uint32& col);
 	bool isDestroyed();
 	void destroy();
 	bool isUnderAttack();

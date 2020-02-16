@@ -15,6 +15,33 @@ SolidBody::~SolidBody()
 }
 
 
+void SolidBody::bindTrail(std::shared_ptr<ParticleTrail> T)
+{
+	Trail = T;
+}
+
+
+void SolidBody::activateTrail(const Uint32& col)
+{
+	if (Trail != nullptr)
+		Trail->activate(position, velocity, col);
+}
+
+
+void SolidBody::deactivateTrail()
+{
+	if (Trail != nullptr)
+		Trail->deactivate();
+}
+
+
+void SolidBody::resetTrail()
+{
+	if (Trail != nullptr)
+		Trail->reset();
+}
+
+
 void SolidBody::setScale(vect3 sc)
 {
 	scale.x = sc.x;
@@ -336,12 +363,6 @@ void SolidBody::incrementBounceCount()
 int SolidBody::getBounceCount()
 {
 	return nBounces;
-}
-
-
-void SolidBody::explode()
-{
-
 }
 
 

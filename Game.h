@@ -19,6 +19,7 @@
 #include "Explosion.h"
 #include "Text.h"
 #include "ParticleSystem.h"
+#include "ParticleTrail.h"
 #include "DynamicMesh.h"
 #include "Terrain.h"
 #include "PointCloud.h"
@@ -41,7 +42,9 @@ private:
 	std::vector<std::shared_ptr<SolidBody>>		Balls;
 	std::vector<std::shared_ptr<Player>>		Enemies;
 	std::vector<std::shared_ptr<SolidBody>>		Projectiles;
+	std::vector<std::shared_ptr<ParticleTrail>> Trails;
 	std::vector<std::shared_ptr<Explosion>>		Explosions;
+	std::vector<std::shared_ptr<Explosion>>		Impacts;
 	std::vector<std::shared_ptr<DynamicMesh>>	DynamicSurfaces;
 	std::vector<std::shared_ptr<Terrain>>		StaticSurfaces;
 	std::vector<std::shared_ptr<PointCloud>>	PointClouds;
@@ -74,12 +77,13 @@ private:
 	void updateEntities();
 	void updateBalls();
 	void updateProjectiles();
+	void updateTrails();
+	void updateImpacts();
 	void updateExplosions();
 
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::shared_ptr<Player>);
 	bool hitTest(const std::shared_ptr<SolidBody>&, std::vector<std::shared_ptr<SolidBody>>);
 	bool updatePlayerPosition(int, std::shared_ptr<Player>&);
-	bool updatePlayerPositionBB(int, std::shared_ptr<Player>&);
 	bool updateMovingObject(std::shared_ptr<SolidBody>);
 	bool objectApproachingWall(vect3&, vect3&, triangle3dV&);
 
@@ -107,7 +111,8 @@ public:
 	void addDynamicSurface(std::shared_ptr<DynamicMesh>);
 	void addStaticSurface(std::shared_ptr<Terrain>);
 	void addPointCloud(std::shared_ptr<PointCloud>);
-	void loadProjectile(unsigned n);
+	void addProjectile(unsigned n);
+	void addImpact(unsigned n);
 	void addExplosion(unsigned n);
 	void updateAll();
 

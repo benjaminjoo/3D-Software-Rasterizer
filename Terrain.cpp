@@ -446,7 +446,7 @@ void Terrain::createMesh()
 void Terrain::renderGrid(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (int i = 0; i < sizeX * sizeY; i++)
-		eye->renderPoint(pGrid[i], screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(1, pGrid[i], screen->pixelBuffer, screen->depthBuffer);
 }
 
 

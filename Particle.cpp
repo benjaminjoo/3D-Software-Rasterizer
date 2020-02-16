@@ -45,6 +45,16 @@ void Particle::activate(const vect3& pos, const vect3& vel, const vect3& acc)
 }
 
 
+void Particle::deactivate()
+{
+	active = false;
+	position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	velocity = { 0.0f, 0.0f, 0.0f, 1.0f };
+	acceleration = { 0.0f, 0.0f, 0.0f, 1.0f };
+	updateKineticEnergy();
+}
+
+
 void Particle::update()
 {
 	if (active)
@@ -53,8 +63,8 @@ void Particle::update()
 		age++;
 		if (age >= lifetime)
 			reset();
-		if (kEnergy <= 0.0f)
-			reset();
+		//if (kEnergy <= 0.0f)
+		//	reset();
 	}
 }
 
@@ -76,6 +86,24 @@ void Particle::updateVelocity(vect3& v)
 void Particle::updateKineticEnergy()
 {
 	kEnergy = 0.5f * mass * velocity.len2();
+}
+
+
+void Particle::setPosition(const vect3& p)
+{
+	position = p;
+}
+
+
+void Particle::setVelocity(const vect3& v)
+{
+	velocity = v;
+}
+
+
+void Particle::setAge(const unsigned& a)
+{
+	age = a;
 }
 
 

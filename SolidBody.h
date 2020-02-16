@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Lamp.h"
 #include "Projection.h"
+#include "ParticleTrail.h"
 
 #include <memory>
 
@@ -12,49 +13,56 @@ class SolidBody
 {
 public:
 
-	vect3			scale = { 1.0f, 1.0f, 1.0f, 1.0f };
-	vect3			position = { 0.0f, 0.0f, 0.0f, 1.0f };
-	vect3			rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			scale					= { 1.0f, 1.0f, 1.0f, 1.0f };
+	vect3			position				= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			rotation				= { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	vect3			velocity = { 0.0f, 0.0f, 0.0f, 1.0f };
-	vect3			angularVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			velocity				= { 0.0f, 0.0f, 0.0f, 1.0f };
+	vect3			angularVelocity			= { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	matRT			material;
-	Uint32			colour = 255;
-	int				texture = 0;
-	float			txU = 1.0f;
+	Uint32			colour					= 0x000000ff;
+	int				texture					= 0;
+	float			txU						= 1.0f;
 
-	int				nPoly = 0;
-	triangle3dV* mesh = nullptr;
+	int				nPoly					= 0;
+	triangle3dV*	mesh					= nullptr;
 
-	std::shared_ptr<Projection> Projector = std::make_shared<Projection>();
+	std::shared_ptr<ParticleTrail> Trail	= nullptr;
+
+	std::shared_ptr<Projection> Projector	= std::make_shared<Projection>();
 
 protected:
 
-	bool			isDynamic = false;
-	bool			castsShadows = false;
-	bool			bBoxActive = false;
-	bool			gravitating = false;
-	bool			fired = false;
-	bool			inMotion = false;
-	bool			visible = true;
-	bool			breakable = false;
-	bool			destroyed = false;
-	bool			vanished = false;
+	bool			isDynamic				= false;
+	bool			castsShadows			= false;
+	bool			bBoxActive				= false;
+	bool			gravitating				= false;
+	bool			fired					= false;
+	bool			inMotion				= false;
+	bool			visible					= true;
+	bool			breakable				= false;
+	bool			destroyed				= false;
+	bool			vanished				= false;
 
-	boundingBox		BB = { (0.0f, 0.0f, 0.0f, 1.0f), (0.0f, 0.0f, 0.0f, 1.0f) };
-	float			bbRadius = 0.25f;
+	boundingBox		BB						= { (0.0f, 0.0f, 0.0f, 1.0f), (0.0f, 0.0f, 0.0f, 1.0f) };
+	float			bbRadius				= 0.25f;
 
-	hit_response	behaviour = hit_response::penetrate;
-	unsigned int	ticksSinceHit = 0;
-	unsigned int	ticksSinceFired = 0;
+	hit_response	behaviour				= hit_response::penetrate;
+	unsigned int	ticksSinceHit			= 0;
+	unsigned int	ticksSinceFired			= 0;
 
-	int				nBounces = 0;
+	int				nBounces				= 0;
 
 public:
 
 	SolidBody();
 	~SolidBody();
+
+	void bindTrail(std::shared_ptr<ParticleTrail>);
+	void activateTrail(const Uint32& col);
+	void deactivateTrail();
+	void resetTrail();
 
 	virtual int	getTotalVert() = 0;
 	virtual int	getTotalPoly() = 0;
@@ -130,7 +138,6 @@ public:
 	void incrementBounceCount();
 	int getBounceCount();
 
-	virtual void explode();
 	void updateMesh();
 	void scan(std::shared_ptr<Lamp> lamp, bool trans);
 	void render(std::shared_ptr<Camera> eye, bool trans, std::shared_ptr<Lamp> spotlight,

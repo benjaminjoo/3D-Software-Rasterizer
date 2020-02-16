@@ -212,7 +212,7 @@ void PointCloud::getPoints(std::vector<vertex3>& P)
 void PointCloud::renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (auto& p : pointArray)
-		eye->renderPoint(p, screen->pixelBuffer, screen->depthBuffer);
+		eye->renderPoint(1, p, screen->pixelBuffer, screen->depthBuffer);
 }
 
 

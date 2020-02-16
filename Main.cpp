@@ -28,12 +28,12 @@
 #include "BSP3Loader.h"
 #include "BSP1Loader.h"
 #include "BezierPatch.h"
-#include "OpenGLCanvas.h"
-#include "OpenGLCamera.h"
-#include "OpenGLTransform.h"
-#include "OpenGLAdapter.h"
-#include "OpenGLMesh.h"
-#include "OpenGLShader.h"
+//#include "OpenGLCanvas.h"
+//#include "OpenGLCamera.h"
+//#include "OpenGLTransform.h"
+//#include "OpenGLAdapter.h"
+//#include "OpenGLMesh.h"
+//#include "OpenGLShader.h"
 #include "Game.h"
 #include "Player.h"
 #include "ParticleSystem.h"
@@ -325,6 +325,7 @@ void fps_game()
 	auto weapon = std::make_shared<SolidCylinder>(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.5f, 0.0f, PI * 0.5f, 0.0f, 0xff7f7fff, 7, 0.25f, 5.0f, 32, true);
 
 	Hero->addPart(weapon);
+	Hero->setTrailColour(0x00ffff00);
 
 	auto Observer = std::make_shared<Player>(10.0f, 10.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
 
@@ -336,13 +337,14 @@ void fps_game()
 
 	fpsGame->addLamp(Lamp1);
 	//Fill up bullet pool
-	fpsGame->loadProjectile(200);
+	fpsGame->addProjectile(200);
+	fpsGame->addImpact(50);
 	//Fill up explosion pool
-	fpsGame->addExplosion(20);
+	fpsGame->addExplosion(5);
 
-#define _STL_READER_
+//#define _STL_READER_
 //#define _PLANETS_
-//#define _SHOOTER_
+#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_
@@ -504,6 +506,8 @@ void fps_game()
 	Enemy1->addPart(e_031);
 	Enemy1->addPart(e_041);
 
+	Enemy1->setTrailColour(0x00ff3f3f);
+
 	fpsGame->addEnemy(Enemy1);
 
 	auto Enemy2 = std::make_shared<Player>(40.0f, 50.0f, 60.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
@@ -518,6 +522,8 @@ void fps_game()
 	Enemy2->addPart(e_032);
 	Enemy2->addPart(e_042);
 
+	Enemy2->setTrailColour(0x007fff7f);
+
 	fpsGame->addEnemy(Enemy2);
 
 	auto Enemy3 = std::make_shared<Player>(-40.0f, -50.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
@@ -531,6 +537,8 @@ void fps_game()
 	Enemy3->addPart(e_023);
 	Enemy3->addPart(e_033);
 	Enemy3->addPart(e_043);
+
+	Enemy3->setTrailColour(0x007f7fff);
 
 	fpsGame->addEnemy(Enemy3);
 

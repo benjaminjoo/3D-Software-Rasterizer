@@ -3,6 +3,7 @@
 #include <SDL/SDL.h>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <algorithm>
 #include <immintrin.h>
 #include "c64Fonts.h"
@@ -309,6 +310,11 @@ struct vect3
 	vect3 scale(float s) const
 	{
 		return { x * s, y * s, z * s, 1.0f };
+	}
+
+	void report() const
+	{
+		std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
 	}
 
 	vect3 operator | (const vect3& p) const
