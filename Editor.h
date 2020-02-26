@@ -93,6 +93,12 @@ public:
 	void mouseMotion(int, int);
 	void leftMouseClick(screenCoord);
 
+	void handleSelection(screenCoord X, worldCoord P);
+	void handlePlacement(worldCoord P);
+	void handleLineDrawing(worldCoord P);
+	void handleRelocation(worldCoord P);
+	void handleRotation(worldCoord P);
+
 	void activateSelection();
 	void activatePlacement();
 	void activateLineDrawing();

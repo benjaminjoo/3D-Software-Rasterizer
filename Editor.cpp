@@ -453,160 +453,17 @@ void Editor::leftMouseClick(screenCoord X)
 	if (X.y > 31)
 	{
 		if (currentMode == editingMode::Selection)
-		{
-			for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-			{
-				if (!Model->isVertex3Deleted(i))
-				{
-					vertex3		tempVert = Model->getVertex3(i);
-					worldCoord	tempCoordW = tempVert.pos;
-					screenCoord tempCoordS = world2screen(tempCoordW);
-					if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
-					{
-						Model->selectVertex3byIndex(i);
-					}
-				}
-			}
-			for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-			{
-				if (!Model->isLine3Deleted(i))
-				{
-					if (!Model->isLine3Selected(i))
-					{
-						line3		tempLine = Model->getLine3(i);
-						worldCoord	currentP = P;
-						float		dist = distPoint2Line(currentP, currentView, tempLine);
-						if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 5)
-						{
-							Model->selectLine3byIndex(i);
-						}
-					}
-					else
-					{
-						line3 		tempLine = Model->getLine3(i);
-						screenCoord tempStart = world2screen(tempLine.vert[0]);
-						screenCoord tempEnd = world2screen(tempLine.vert[1]);
-
-						if (clicksInQueue > 0 && tempLine.id == currentEdit)
-						{
-							movementEnd = P;
-							worldCoord move = movementEnd - movementStart;
-							if (isOrthoOn) { this->alignToAxis(&move); }
-							if (startVertMoving) { Model->moveLine3EndPoint(i, 0, currentView, move); }
-							if (endVertMoving) { Model->moveLine3EndPoint(i, 1, currentView, move); }
-							startVertMoving = 0;
-							endVertMoving = 0;
-							currentEdit = 0;
-							clicksInQueue = 0;
-						}
-						else if (clicksInQueue == 0)
-						{
-							if (abs(tempStart.x - mousePosition.x) <= 5 &&
-								abs(tempStart.y - mousePosition.y) <= 5)
-							{
-								movementStart = tempLine.vert[0];
-								startVertMoving = 1;
-								endVertMoving = 0;
-								currentEdit = tempLine.id;
-								clicksInQueue++;
-							}
-							if (abs(tempEnd.x - mousePosition.x) <= 5 &&
-								abs(tempEnd.y - mousePosition.y) <= 5)
-							{
-								movementStart = tempLine.vert[1];
-								startVertMoving = 0;
-								endVertMoving = 1;
-								currentEdit = tempLine.id;
-								clicksInQueue++;
-							}
-						}
-					}
-				}
-			}
-		}
+			handleSelection(X, P);
 		if (currentMode == editingMode::Placement)
-		{
-			worldCoord temp = P;
-			vertex3 tempVert = { currentID, temp, false, false };
-			Model->addVertex3(tempVert);
-			currentID++;
-		}
+			handlePlacement(P);
 		if (currentMode == editingMode::LineDrawing)
-		{
-			if (clicksInQueue == 0)
-			{
-				movementStart = P;
-				clicksInQueue++;
-			}
-			else
-			{
-				movementEnd = P;
-				this->drawLine();
-				currentID++;
-				clicksInQueue = 0;
-			}
-		}
+			handleLineDrawing(P);
 		if (currentMode == editingMode::Relocation ||
 			currentMode == editingMode::CopyRelocation)
-		{
-			if (clicksInQueue == 0)
-			{
-				movementStart = P;
-				clicksInQueue++;
-			}
-			else
-			{
-				movementEnd = P;
-				if (currentMode == editingMode::Relocation)
-				{
-					this->moveSelected();
-				}
-				else if (currentMode == editingMode::CopyRelocation)
-				{
-					this->copyMoveSelected();
-				}
-				clicksInQueue = 0;
-			}
-		}
+			handleRelocation(P);
 		if (currentMode == editingMode::Rotation ||
 			currentMode == editingMode::CopyRotation)
-		{
-			if (clicksInQueue == 0)
-			{
-				rotationCentre = P;
-				clicksInQueue++;
-			}
-			else if (clicksInQueue == 1)
-			{
-				rotationStart = P;
-				if (isOrthoOn)
-				{
-					worldCoord temp = rotationStart - rotationCentre;
-					this->alignToAxis(&temp);
-					rotationStart = rotationCentre + temp;
-				}
-				clicksInQueue++;
-			}
-			else if (clicksInQueue == 2)
-			{
-				rotationEnd = P;
-				if (isOrthoOn)
-				{
-					worldCoord temp = rotationEnd - rotationCentre;
-					this->alignToAxis(&temp);
-					rotationEnd = rotationCentre + temp;
-				}
-				if (currentMode == editingMode::Rotation)
-				{
-					this->rotateSelected();
-				}
-				else if (currentMode == editingMode::CopyRotation)
-				{
-					this->copyRotateSelected();
-				}
-				clicksInQueue = 0;
-			}
-		}
+			handleRotation(P);
 	}
 	else
 	{
@@ -646,6 +503,169 @@ void Editor::leftMouseClick(screenCoord X)
 			this->toggleGridSnap();
 			break;
 		}
+	}
+}
+
+
+void Editor::handleSelection(screenCoord X, worldCoord P)
+{
+	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
+	{
+		if (!Model->isVertex3Deleted(i))
+		{
+			vertex3		tempVert = Model->getVertex3(i);
+			worldCoord	tempCoordW = tempVert.pos;
+			screenCoord tempCoordS = world2screen(tempCoordW);
+			if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
+			{
+				Model->selectVertex3byIndex(i);
+			}
+		}
+	}
+	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
+	{
+		if (!Model->isLine3Deleted(i))
+		{
+			if (!Model->isLine3Selected(i))
+			{
+				line3		tempLine = Model->getLine3(i);
+				worldCoord	currentP = P;
+				float		dist = distPoint2Line(currentP, currentView, tempLine);
+				if (pointIsAroundLine(currentP, currentView, tempLine) && (int)(dist * scale) < 5)
+				{
+					Model->selectLine3byIndex(i);
+				}
+			}
+			else
+			{
+				line3 		tempLine = Model->getLine3(i);
+				screenCoord tempStart = world2screen(tempLine.vert[0]);
+				screenCoord tempEnd = world2screen(tempLine.vert[1]);
+
+				if (clicksInQueue > 0 && tempLine.id == currentEdit)
+				{
+					movementEnd = P;
+					worldCoord move = movementEnd - movementStart;
+					if (isOrthoOn) { this->alignToAxis(&move); }
+					if (startVertMoving) { Model->moveLine3EndPoint(i, 0, currentView, move); }
+					if (endVertMoving) { Model->moveLine3EndPoint(i, 1, currentView, move); }
+					startVertMoving = 0;
+					endVertMoving = 0;
+					currentEdit = 0;
+					clicksInQueue = 0;
+				}
+				else if (clicksInQueue == 0)
+				{
+					if (abs(tempStart.x - mousePosition.x) <= 5 &&
+						abs(tempStart.y - mousePosition.y) <= 5)
+					{
+						movementStart = tempLine.vert[0];
+						startVertMoving = 1;
+						endVertMoving = 0;
+						currentEdit = tempLine.id;
+						clicksInQueue++;
+					}
+					if (abs(tempEnd.x - mousePosition.x) <= 5 &&
+						abs(tempEnd.y - mousePosition.y) <= 5)
+					{
+						movementStart = tempLine.vert[1];
+						startVertMoving = 0;
+						endVertMoving = 1;
+						currentEdit = tempLine.id;
+						clicksInQueue++;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void Editor::handlePlacement(worldCoord P)
+{
+	worldCoord temp = P;
+	vertex3 tempVert = { currentID, temp, false, false };
+	Model->addVertex3(tempVert);
+	currentID++;
+}
+
+
+void Editor::handleLineDrawing(worldCoord P)
+{
+	if (clicksInQueue == 0)
+	{
+		movementStart = P;
+		clicksInQueue++;
+	}
+	else
+	{
+		movementEnd = P;
+		this->drawLine();
+		currentID++;
+		clicksInQueue = 0;
+	}
+}
+
+
+void Editor::handleRelocation(worldCoord P)
+{
+	if (clicksInQueue == 0)
+	{
+		movementStart = P;
+		clicksInQueue++;
+	}
+	else
+	{
+		movementEnd = P;
+		if (currentMode == editingMode::Relocation)
+		{
+			this->moveSelected();
+		}
+		else if (currentMode == editingMode::CopyRelocation)
+		{
+			this->copyMoveSelected();
+		}
+		clicksInQueue = 0;
+	}
+}
+
+
+void Editor::handleRotation(worldCoord P)
+{
+	if (clicksInQueue == 0)
+	{
+		rotationCentre = P;
+		clicksInQueue++;
+	}
+	else if (clicksInQueue == 1)
+	{
+		rotationStart = P;
+		if (isOrthoOn)
+		{
+			worldCoord temp = rotationStart - rotationCentre;
+			this->alignToAxis(&temp);
+			rotationStart = rotationCentre + temp;
+		}
+		clicksInQueue++;
+	}
+	else if (clicksInQueue == 2)
+	{
+		rotationEnd = P;
+		if (isOrthoOn)
+		{
+			worldCoord temp = rotationEnd - rotationCentre;
+			this->alignToAxis(&temp);
+			rotationEnd = rotationCentre + temp;
+		}
+		if (currentMode == editingMode::Rotation)
+		{
+			this->rotateSelected();
+		}
+		else if (currentMode == editingMode::CopyRotation)
+		{
+			this->copyRotateSelected();
+		}
+		clicksInQueue = 0;
 	}
 }
 
