@@ -269,6 +269,38 @@ void Editor::updateLines()
 }
 
 
+void Editor::updateTriangles()
+{
+
+}
+
+
+void Editor::updatePolylines()
+{
+
+}
+
+
+void Editor::updateSplines()
+{
+	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
+	{
+		if (!Model->isSpline3Deleted(i))
+		{
+			spline3 tempSpline = Model->getSpline3(i);
+			for (auto& c : tempSpline.cPoints)
+			{
+				screenCoord cp = world2screen(c);
+				if (Model->isSpline3Selected(i))
+					Screen->drawSpot(cp, RED);
+				else
+					Screen->drawSpot(cp, BLUE);
+			}
+		}
+	}
+}
+
+
 void Editor::updateVertices()
 {
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
@@ -385,6 +417,12 @@ void Editor::updateScreen()
 
 	this->updateLines();
 
+	this->updateTriangles();
+
+	this->updatePolylines();
+
+	this->updateSplines();
+
 	this->updateVertices();
 
 	this->hintResult();
@@ -398,6 +436,8 @@ void Editor::drawIcons()
 	arrowButton.displayIcon();
 	crossButton.displayIcon();
 	lineButton.displayIcon();
+	triangleButton.displayIcon();
+	polylineButton.displayIcon();
 	splineButton.displayIcon();
 	moveButton.displayIcon();
 	rotateButton.displayIcon();
@@ -446,7 +486,8 @@ void Editor::mouseMotion(int mx, int my)
 void Editor::leftMouseClick(screenCoord X)
 {
 	worldCoord P = screen2world(X);
-	if (isObjectSnapOn) { this->snapToVert(&P); }
+	if (isObjectSnapOn)
+		this->snapToVert(&P);
 	if (X.y > 31)
 	{
 		if (currentMode == editingMode::Selection)
@@ -455,6 +496,10 @@ void Editor::leftMouseClick(screenCoord X)
 			handlePlacement(P);
 		if (currentMode == editingMode::LineDrawing)
 			handleLineDrawing(P);
+		if (currentMode == editingMode::TriangleDrawing)
+			handleTriangleDrawing(P);
+		if (currentMode == editingMode::PolylineDrawing)
+			handlePolylineDrawing(P);
 		if (currentMode == editingMode::SplineDrawing)
 			handleSplineDrawing(P);
 		if (currentMode == editingMode::Relocation ||
@@ -479,30 +524,40 @@ void Editor::leftMouseClick(screenCoord X)
 			this->activateLineDrawing();
 			break;
 		case 3:
-			this->activateSplineDrawing();
+			this->activateTriangleDrawing();
 			break;
 		case 4:
-			this->activateRelocation();
+			this->activatePolylineDrawing();
 			break;
 		case 5:
+			this->activateSplineDrawing();
+			break;
+		case 6:
+			this->activateRelocation();
+			break;
+		case 7:
 			this->activateRotation();
 			break;
 
-		case 6:
+		case 8:
 			this->activateTopView();
 			break;
-		case 7:
+		case 9:
 			this->activateFrontView();
 			break;
-		case 8:
+		case 10:
 			this->activateRightView();
 			break;
 
-		case 9:
+		case 11:
 			this->toggleObjectSnap();
 			break;
-		case 10:
+		case 12:
 			this->toggleGridSnap();
+			break;
+
+		default:
+			this->activateSelection();
 			break;
 		}
 	}
@@ -524,6 +579,7 @@ void Editor::handleSelection(screenCoord X, worldCoord P)
 			}
 		}
 	}
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 	{
 		if (!Model->isLine3Deleted(i))
@@ -609,9 +665,34 @@ void Editor::handleLineDrawing(worldCoord P)
 }
 
 
-void Editor::handleSplineDrawing(worldCoord P)
+void Editor::handleTriangleDrawing(worldCoord P)
 {
 
+}
+
+
+void Editor::handlePolylineDrawing(worldCoord P)
+{
+
+}
+
+
+void Editor::handleSplineDrawing(worldCoord P)
+{
+	if (clicksInQueue == 0)
+	{
+		spline3 tempSpline;
+		currentSplineID = currentID;
+		tempSpline.id = currentSplineID;
+		tempSpline.cPoints.push_back(P);
+		Model->addSpline3(tempSpline);
+		clicksInQueue++;
+		currentID++;
+	}
+	else
+	{
+		Model->addSpline3ControlPoint(currentSplineID, P);
+	}
 }
 
 
@@ -685,9 +766,13 @@ void Editor::activateSelection()
 	arrowButton.turnOn();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -698,9 +783,13 @@ void Editor::activatePlacement()
 	arrowButton.turnOff();
 	crossButton.turnOn();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -711,9 +800,47 @@ void Editor::activateLineDrawing()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOn();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
+}
+
+
+void Editor::activateTriangleDrawing()
+{
+	currentTool = tool::triangle;
+	currentMode = editingMode::TriangleDrawing;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOff();
+	triangleButton.turnOn();
+	polylineButton.turnOff();
+	splineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+
+	clicksInQueue = 0;
+}
+
+
+void Editor::activatePolylineDrawing()
+{
+	currentTool = tool::polyline;
+	currentMode = editingMode::PolylineDrawing;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOn();
+	splineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -724,9 +851,13 @@ void Editor::activateSplineDrawing()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOn();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -737,9 +868,13 @@ void Editor::activateRelocation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOn();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -750,9 +885,13 @@ void Editor::activateRotation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOn();
+
+	clicksInQueue = 0;
 }
 
 
@@ -763,9 +902,13 @@ void Editor::activateCopyRelocation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -776,9 +919,13 @@ void Editor::activateCopyRotation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	triangleButton.turnOff();
+	polylineButton.turnOff();
 	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
+
+	clicksInQueue = 0;
 }
 
 
@@ -1002,7 +1149,8 @@ unsigned int Editor::nLineSelected()
 void Editor::drawLine()
 {
 	worldCoord stretch = movementEnd - movementStart;
-	if (this->isOrthoOn) { this->alignToAxis(&stretch); }
+	if (this->isOrthoOn)
+		this->alignToAxis(&stretch);
 	line3 tempLine = { currentID, {movementStart, movementStart + stretch}, false, false };
 	Model->addLine3(tempLine);
 }

@@ -37,6 +37,12 @@ void Button::displayIcon()
 	case tool::line:
 		currentIcon = line_inactive;
 		break;
+	case tool::triangle:
+		currentIcon = triangle_inactive;
+		break;
+	case tool::polyline:
+		currentIcon = polyline_inactive;
+		break;
 	case tool::spline:
 		currentIcon = spline_inactive;
 		break;

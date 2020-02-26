@@ -35,6 +35,20 @@ void ModelElementBuffer::addLine3(line3 L)
 }
 
 
+void ModelElementBuffer::addSpline3(spline3 S)
+{
+	spline3Buffer.push_back(S);
+}
+
+
+void ModelElementBuffer::addSpline3ControlPoint(int ID, worldCoord C)
+{
+	for (auto& sp : spline3Buffer)
+		if (sp.id == ID)
+			sp.cPoints.push_back(C);
+}
+
+
 void ModelElementBuffer::selectVertex3byID(int ID)
 {
 	for (auto& i : vertex3Buffer)
@@ -256,6 +270,30 @@ int ModelElementBuffer::getLine3BufferSize()
 line3 ModelElementBuffer::getLine3(int n)
 {
 	return line3Buffer[n];
+}
+
+
+bool ModelElementBuffer::isSpline3Selected(int n)
+{
+	return spline3Buffer[n].selected;
+}
+
+
+bool ModelElementBuffer::isSpline3Deleted(int n)
+{
+	return spline3Buffer[n].deleted;
+}
+
+
+int ModelElementBuffer::getSpline3BufferSize()
+{
+	return spline3Buffer.size();
+}
+
+
+spline3 ModelElementBuffer::getSpline3(int n)
+{
+	return spline3Buffer[n];
 }
 
 

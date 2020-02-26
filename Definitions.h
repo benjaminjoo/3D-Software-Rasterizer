@@ -53,6 +53,8 @@ enum class editingMode
 	Selection,
 	Placement,
 	LineDrawing,
+	TriangleDrawing,
+	PolylineDrawing,
 	SplineDrawing,
 	Relocation,
 	Rotation,
@@ -67,6 +69,8 @@ enum class tool
 	arrow,
 	cross,
 	line,
+	triangle,
+	polyline,
 	spline,
 	move,
 	rotate,
@@ -239,6 +243,35 @@ struct line3
 	worldCoord	vert[2];
 	bool		selected = false;
 	bool		deleted = false;
+};
+
+
+struct triangle3
+{
+	int			id = 0;
+	worldCoord	vert[3];
+	bool		selected = false;
+	bool		deleted = false;
+};
+
+
+struct polyline3
+{
+	int			id = 0;
+	bool		selected = false;
+	bool		deleted = false;
+
+	std::vector<line3> segments;
+};
+
+
+struct spline3
+{
+	int			id = 0;
+	bool		selected = false;
+	bool		deleted = false;
+
+	std::vector<worldCoord> cPoints;
 };
 
 

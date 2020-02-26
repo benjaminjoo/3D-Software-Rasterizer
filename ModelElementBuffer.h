@@ -20,6 +20,9 @@ class ModelElementBuffer
 
 	std::vector<vertex3>		vertex3Buffer;
 	std::vector<line3>			line3Buffer;
+	std::vector<triangle3>		triangle3Buffer;
+	std::vector<polyline3>		polyline3Buffer;
+	std::vector<spline3>		spline3Buffer;
 	std::vector<triangle3dV>	polyBuffer;
 
 public:
@@ -29,6 +32,8 @@ public:
 	void addVertex3(vertex3);
 	void addPointCloud(std::shared_ptr<PointCloud>);
 	void addLine3(line3);
+	void addSpline3(spline3);
+	void addSpline3ControlPoint(int, worldCoord);
 
 	void selectVertex3byID(int);
 	void deselectVertex3byID(int);
@@ -60,6 +65,11 @@ public:
 	bool isLine3Deleted(int);
 	int getLine3BufferSize();
 	line3 getLine3(int);
+
+	bool isSpline3Selected(int);
+	bool isSpline3Deleted(int);
+	int getSpline3BufferSize();
+	spline3 getSpline3(int);
 
 	void exportTextFile();
 };
