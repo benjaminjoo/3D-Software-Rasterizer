@@ -37,6 +37,9 @@ void Button::displayIcon()
 	case tool::line:
 		currentIcon = line_inactive;
 		break;
+	case tool::spline:
+		currentIcon = spline_inactive;
+		break;
 	case tool::move:
 		currentIcon = move_inactive;
 		break;

@@ -13,8 +13,8 @@
 
 #define SCREEN_WIDTH		1200
 #define SCREEN_HEIGHT		600
-#define EDITOR_WIDTH		1200
-#define EDITOR_HEIGHT		600
+#define EDITOR_WIDTH		1400
+#define EDITOR_HEIGHT		700
 #define MAX_MARGIN			200
 #define SENSITIVITY			0.01f
 #define PI					3.14159f
@@ -53,6 +53,7 @@ enum class editingMode
 	Selection,
 	Placement,
 	LineDrawing,
+	SplineDrawing,
 	Relocation,
 	Rotation,
 	CopyRelocation,
@@ -66,6 +67,7 @@ enum class tool
 	arrow,
 	cross,
 	line,
+	spline,
 	move,
 	rotate,
 	copy_move,

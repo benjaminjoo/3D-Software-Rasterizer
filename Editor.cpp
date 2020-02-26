@@ -1,8 +1,15 @@
 #include "Editor.h"
 
 
-Editor::Editor(float toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer) :
-	tolerance(toler), Cam(camera), Screen(screen), Model(buffer)
+Editor::Editor(	float toler,
+				std::shared_ptr<Camera> camera,
+				std::shared_ptr < Canvas> screen,
+				std::shared_ptr < ModelElementBuffer> buffer)
+				:
+				tolerance(toler),
+				Cam(camera),
+				Screen(screen),
+				Model(buffer)
 {
 	std::cout << "Editor constructor called" << std::endl;
 }
@@ -14,7 +21,7 @@ Editor::~Editor()
 }
 
 
-worldCoord Editor::screen2world(screenCoord Sc)
+worldCoord Editor::screen2world(const screenCoord& Sc)
 {
 	worldCoord temp = { 0.0f, 0.0f, 0.0f };
 
@@ -48,7 +55,7 @@ worldCoord Editor::screen2world(screenCoord Sc)
 }
 
 
-screenCoord Editor::world2screen(worldCoord Wc)
+screenCoord Editor::world2screen(const worldCoord& Wc)
 {
 	screenCoord temp = { 0, 0 };
 
@@ -139,25 +146,19 @@ void Editor::updateUtilities()
 	{
 		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-		{
 			Screen->drawSnapTarget(planPosition, WHITE);
-		}
 	}
 	else if (currentView == Side::Front)
 	{
 		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-		{
 			Screen->drawSnapTarget(frontPosition, WHITE);
-		}
 	}
 	else if (currentView == Side::Right)
 	{
 		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
 		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-		{
 			Screen->drawSnapTarget(rightPosition, WHITE);
-		}
 	}
 
 	//Display scale
@@ -220,9 +221,7 @@ void Editor::updateLines()
 				}
 			}
 			else
-			{
 				Screen->drawLine(tempStart, tempEnd, 1, BLUE);
-			}
 		}
 		if ((	currentMode == editingMode::Relocation ||
 				currentMode == editingMode::CopyRelocation) &&
@@ -279,13 +278,9 @@ void Editor::updateVertices()
 			vertex3 tempVert = Model->getVertex3(i);
 			screenCoord temp = world2screen(tempVert.pos);
 			if (Model->isVertex3Selected(i))
-			{
 				Screen->drawSpot(temp, RED);
-			}
 			else
-			{
 				Screen->drawSpot(temp, BLUE);
-			}
 		}
 		if ((	currentMode == editingMode::Relocation ||
 				currentMode == editingMode::CopyRelocation) &&
@@ -295,7 +290,8 @@ void Editor::updateVertices()
 			{
 				vertex3 tempVert = Model->getVertex3(i);
 				worldCoord tempMove = movementStart - mouseBeforeZoom;
-				if (isOrthoOn) { this->alignToAxis(&tempMove); }
+				if (isOrthoOn)
+					this->alignToAxis(&tempMove);
 				tempVert.pos -= tempMove;
 				screenCoord temp = world2screen(tempVert.pos);
 				Screen->drawSpot(temp, ORANGE);
@@ -402,6 +398,7 @@ void Editor::drawIcons()
 	arrowButton.displayIcon();
 	crossButton.displayIcon();
 	lineButton.displayIcon();
+	splineButton.displayIcon();
 	moveButton.displayIcon();
 	rotateButton.displayIcon();
 
@@ -458,6 +455,8 @@ void Editor::leftMouseClick(screenCoord X)
 			handlePlacement(P);
 		if (currentMode == editingMode::LineDrawing)
 			handleLineDrawing(P);
+		if (currentMode == editingMode::SplineDrawing)
+			handleSplineDrawing(P);
 		if (currentMode == editingMode::Relocation ||
 			currentMode == editingMode::CopyRelocation)
 			handleRelocation(P);
@@ -480,26 +479,29 @@ void Editor::leftMouseClick(screenCoord X)
 			this->activateLineDrawing();
 			break;
 		case 3:
-			this->activateRelocation();
+			this->activateSplineDrawing();
 			break;
 		case 4:
+			this->activateRelocation();
+			break;
+		case 5:
 			this->activateRotation();
 			break;
 
-		case 5:
+		case 6:
 			this->activateTopView();
 			break;
-		case 6:
+		case 7:
 			this->activateFrontView();
 			break;
-		case 7:
+		case 8:
 			this->activateRightView();
 			break;
 
-		case 8:
+		case 9:
 			this->toggleObjectSnap();
 			break;
-		case 9:
+		case 10:
 			this->toggleGridSnap();
 			break;
 		}
@@ -607,6 +609,12 @@ void Editor::handleLineDrawing(worldCoord P)
 }
 
 
+void Editor::handleSplineDrawing(worldCoord P)
+{
+
+}
+
+
 void Editor::handleRelocation(worldCoord P)
 {
 	if (clicksInQueue == 0)
@@ -677,6 +685,7 @@ void Editor::activateSelection()
 	arrowButton.turnOn();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -689,6 +698,7 @@ void Editor::activatePlacement()
 	arrowButton.turnOff();
 	crossButton.turnOn();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -701,6 +711,20 @@ void Editor::activateLineDrawing()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOn();
+	splineButton.turnOff();
+	moveButton.turnOff();
+	rotateButton.turnOff();
+}
+
+
+void Editor::activateSplineDrawing()
+{
+	currentTool = tool::spline;
+	currentMode = editingMode::SplineDrawing;
+	arrowButton.turnOff();
+	crossButton.turnOff();
+	lineButton.turnOff();
+	splineButton.turnOn();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -713,6 +737,7 @@ void Editor::activateRelocation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOn();
 	rotateButton.turnOff();
 }
@@ -725,6 +750,7 @@ void Editor::activateRotation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOn();
 }
@@ -737,6 +763,7 @@ void Editor::activateCopyRelocation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -749,6 +776,7 @@ void Editor::activateCopyRotation()
 	arrowButton.turnOff();
 	crossButton.turnOff();
 	lineButton.turnOff();
+	splineButton.turnOff();
 	moveButton.turnOff();
 	rotateButton.turnOff();
 }
@@ -785,13 +813,9 @@ void Editor::toggleObjectSnap()
 {
 	isObjectSnapOn = isObjectSnapOn ? false : true;
 	if (isObjectSnapOn)
-	{
 		objSnapButton.turnOn();
-	}
 	else
-	{
 		objSnapButton.turnOff();
-	}
 }
 
 
@@ -799,13 +823,9 @@ void Editor::toggleGridSnap()
 {
 	isGridSnapOn = isGridSnapOn ? false : true;
 	if (isGridSnapOn)
-	{
 		grdSnapButton.turnOn();
-	}
 	else
-	{
 		grdSnapButton.turnOff();
-	}
 }
 
 
@@ -940,13 +960,9 @@ float Editor::calculateAngle(worldCoord rotStart, worldCoord rotEnd)
 void Editor::selectAll()
 {
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		Model->selectVertex3byIndex(i);
-	}
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		Model->selectLine3byIndex(i);
-	}
 	clicksInQueue = 0;
 }
 
@@ -954,13 +970,9 @@ void Editor::selectAll()
 void Editor::deselectAll()
 {
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		Model->deselectVertex3byIndex(i);
-	}
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		Model->deselectLine3byIndex(i);
-	}
 	clicksInQueue = 0;
 }
 
@@ -999,53 +1011,42 @@ void Editor::drawLine()
 void Editor::deleteSelected()
 {
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
-		{
 			Model->deleteVertex3byIndex(i);
-		}
-	}
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
-		{
 			Model->deleteLine3byIndex(i);
-		}
-	}
 }
 
 
 void Editor::moveSelected()
 {
 	worldCoord move = movementEnd - movementStart;
-	if (isOrthoOn) { this->alignToAxis(&move); }
+	if (isOrthoOn)
+		this->alignToAxis(&move);
+
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
-		{
 			Model->moveVertex3byIndex(i, move);
-		}
-	}
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
-		{
 			Model->moveLine3byIndex(i, move);
-		}
-	}
 }
 
 
 void Editor::copyMoveSelected()
 {
 	worldCoord move = movementEnd - movementStart;
-	if (isOrthoOn) { this->alignToAxis(&move); }
+	if (isOrthoOn)
+		this->alignToAxis(&move);
 
 	unsigned int nSelectedVert = this->nVertSelected();
 	std::unique_ptr<vertex3[]> tempVerts(new vertex3[nSelectedVert]);
 	unsigned int vCount = 0;
+
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
 			tempVerts[vCount].deleted = false;
@@ -1057,15 +1058,15 @@ void Editor::copyMoveSelected()
 
 			vCount++;
 		}
-	}
+
 	for (unsigned int i = 0; i < nSelectedVert; i++)
 		Model->addVertex3(tempVerts[i]);
 
 	unsigned int nSelectedLine = this->nLineSelected();
 	std::unique_ptr<line3[]> tempLines(new line3[nSelectedLine]);
 	unsigned int lCount = 0;
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
 		{
 			tempLines[lCount].deleted = false;
@@ -1079,7 +1080,7 @@ void Editor::copyMoveSelected()
 
 			lCount++;
 		}
-	}
+
 	for (unsigned int i = 0; i < nSelectedLine; i++)
 		Model->addLine3(tempLines[i]);
 }
@@ -1090,20 +1091,14 @@ void Editor::rotateSelected()
 	worldCoord startVect = unitVector2(rotationStart - rotationCentre);
 	worldCoord endVect = unitVector2(rotationEnd - rotationCentre);
 	rotationAngle = calculateAngle(startVect, endVect);
+
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
-		{
 			Model->rotVertex3byIndex(i, currentView, rotationCentre, rotationAngle);
-		}
-	}
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
-		{
 			Model->rotLine3byIndex(i, currentView, rotationCentre, rotationAngle);
-		}
-	}
 }
 
 
@@ -1116,8 +1111,8 @@ void Editor::copyRotateSelected()
 	unsigned int nSelectedVert = this->nVertSelected();
 	std::unique_ptr<vertex3[]> tempVerts(new vertex3[nSelectedVert]);
 	unsigned int vCount = 0;
+
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
-	{
 		if (!Model->isVertex3Deleted(i) && Model->isVertex3Selected(i))
 		{
 			tempVerts[vCount].deleted = false;
@@ -1127,15 +1122,15 @@ void Editor::copyRotateSelected()
 
 			vCount++;
 		}
-	}
+
 	for (unsigned int i = 0; i < nSelectedVert; i++)
 		Model->addVertex3(tempVerts[i]);
 
 	unsigned int nSelectedLine = this->nLineSelected();
 	std::unique_ptr<line3[]> tempLines(new line3[nSelectedLine]);
 	unsigned int lCount = 0;
+
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
-	{
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
 		{
 			tempLines[lCount].deleted = false;
@@ -1146,7 +1141,7 @@ void Editor::copyRotateSelected()
 
 			lCount++;
 		}
-	}
+
 	for (unsigned int i = 0; i < nSelectedLine; i++)
 		Model->addLine3(tempLines[i]);
 }

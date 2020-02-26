@@ -21,15 +21,16 @@ public:
 	Button				arrowButton = { Screen, 0, 0, false,	tool::arrow,		LIGHT_GRAY };
 	Button				crossButton = { Screen, 1, 0, true,		tool::cross,		LIGHT_GRAY };
 	Button				lineButton = { Screen, 2, 0, false,		tool::line,			LIGHT_GRAY };
-	Button				moveButton = { Screen, 3, 0, false,		tool::move,			LIGHT_GRAY };
-	Button				rotateButton = { Screen, 4, 0, false,	tool::rotate,		LIGHT_GRAY };
+	Button				splineButton = { Screen, 3, 0, false,	tool::spline,		LIGHT_GRAY };
+	Button				moveButton = { Screen, 4, 0, false,		tool::move,			LIGHT_GRAY };
+	Button				rotateButton = { Screen, 5, 0, false,	tool::rotate,		LIGHT_GRAY };
 
-	Button				topViewButton = { Screen, 5, 0, true,	tool::view_top,		LIGHT_GRAY };
-	Button				frontViewButton = { Screen, 6, 0, false,tool::view_front,	LIGHT_GRAY };
-	Button				sideViewButton = { Screen, 7, 0, false,	tool::view_side,	LIGHT_GRAY };
+	Button				topViewButton = { Screen, 6, 0, true,	tool::view_top,		LIGHT_GRAY };
+	Button				frontViewButton = { Screen, 7, 0, false,tool::view_front,	LIGHT_GRAY };
+	Button				sideViewButton = { Screen, 8, 0, false,	tool::view_side,	LIGHT_GRAY };
 
-	Button				objSnapButton = { Screen, 8, 0, false,	tool::obj_snap,		LIGHT_GRAY };
-	Button				grdSnapButton = { Screen, 9, 0, false,	tool::grid_snap,	LIGHT_GRAY };
+	Button				objSnapButton = { Screen, 9, 0, false,	tool::obj_snap,		LIGHT_GRAY };
+	Button				grdSnapButton = { Screen, 10, 0, false,	tool::grid_snap,	LIGHT_GRAY };
 
 	Side				currentView = Side::Top;
 	editingMode			currentMode = editingMode::Placement;
@@ -57,16 +58,16 @@ public:
 	float				scale = 1.0f;
 	float				tolerance;
 
-	screenCoord			planPosition = { 600, 300 };
-	screenCoord			frontPosition = { 600, 300 };
-	screenCoord			rightPosition = { 600, 300 };
+	screenCoord			planPosition = { EDITOR_WIDTH / 2, EDITOR_HEIGHT / 2 };
+	screenCoord			frontPosition = { EDITOR_WIDTH / 2, EDITOR_HEIGHT / 2 };
+	screenCoord			rightPosition = { EDITOR_WIDTH / 2, EDITOR_HEIGHT / 2 };
 
 	screenCoord			mousePosition = { 0, 0 };
 
 	worldCoord			mouseBeforeZoom = { 0.0f, 0.0f, 0.0f };
 	worldCoord			mouseAfterZoom = { 0.0f, 0.0f, 0.0f };
 
-	worldCoord			viewportCentre = { -600.0f, -300.0f, 0.0f };
+	worldCoord			viewportCentre = { -700.0f, -350.0f, 0.0f };
 
 	screenCoord			dragStart = { 0, 0 };
 
@@ -76,8 +77,8 @@ public:
 	Editor(float toler, std::shared_ptr<Camera> camera, std::shared_ptr < Canvas> screen, std::shared_ptr < ModelElementBuffer> buffer);
 	~Editor();
 
-	worldCoord screen2world(screenCoord);
-	screenCoord world2screen(worldCoord);
+	worldCoord screen2world(const screenCoord& Sc);
+	screenCoord world2screen(const worldCoord& Wc);
 
 	void updateWorldPosition();
 	void compensatePan();
@@ -96,12 +97,14 @@ public:
 	void handleSelection(screenCoord X, worldCoord P);
 	void handlePlacement(worldCoord P);
 	void handleLineDrawing(worldCoord P);
+	void handleSplineDrawing(worldCoord P);
 	void handleRelocation(worldCoord P);
 	void handleRotation(worldCoord P);
 
 	void activateSelection();
 	void activatePlacement();
 	void activateLineDrawing();
+	void activateSplineDrawing();
 	void activateRelocation();
 	void activateRotation();
 	void activateCopyRelocation();

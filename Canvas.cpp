@@ -499,6 +499,7 @@ void Canvas::drawMouseCursor(editingMode mode, screenCoord position, Uint32 colo
 	break;
 	case editingMode::Placement:
 	case editingMode::LineDrawing:
+	case editingMode::SplineDrawing:
 	{
 		for (int i = 0; i < w; i += 2)
 		{
