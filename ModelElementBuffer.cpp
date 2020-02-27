@@ -41,11 +41,11 @@ void ModelElementBuffer::addSpline3(spline3 S)
 }
 
 
-void ModelElementBuffer::addSpline3ControlPoint(int ID, worldCoord C)
+void ModelElementBuffer::addSpline3ControlPoint(int ID, vertex3 C)
 {
 	for (auto& sp : spline3Buffer)
 		if (sp.id == ID)
-			sp.cPoints.push_back(C);
+			sp.ctrlPoints.push_back(C);
 }
 
 
@@ -164,6 +164,33 @@ void ModelElementBuffer::copyVertex3byIndex(int i, int newID, worldCoord move)
 void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord origin, float angle)
 {
 	vertex3Buffer[i].pos = rotate2(vertex3Buffer[i].pos, currentView, origin, angle);
+}
+
+
+void ModelElementBuffer::selectSplineControlVertex3byIndex(int spline, int ctrl)
+{
+	spline3Buffer[spline].ctrlPoints[ctrl].selected = spline3Buffer[spline].ctrlPoints[ctrl].selected ? false : true;
+}
+
+
+void ModelElementBuffer::deselectSplineControlVertex3byIndex(int spline, int ctrl)
+{
+	spline3Buffer[spline].ctrlPoints[ctrl].selected = false;
+}
+
+
+void ModelElementBuffer::deleteSplineControlVertex3byIndex(int spline, int ctrl)
+{
+	spline3Buffer[spline].ctrlPoints[ctrl].deleted = true;
+	spline3Buffer[spline].ctrlPoints[ctrl].selected = false;
+}
+
+
+void ModelElementBuffer::moveSplineControlVertex3byIndex(int spline, int ctrl, worldCoord move)
+{
+	spline3Buffer[spline].ctrlPoints[ctrl].pos.x += move.x;
+	spline3Buffer[spline].ctrlPoints[ctrl].pos.y += move.y;
+	spline3Buffer[spline].ctrlPoints[ctrl].pos.z += move.z;
 }
 
 

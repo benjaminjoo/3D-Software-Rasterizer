@@ -101,6 +101,10 @@ public:
 	void leftMouseClick(screenCoord);
 
 	void handleSelection(screenCoord X, worldCoord P);
+	void handleVertexSelection(screenCoord X);
+	void handleLineSelection(worldCoord P);
+	void handleSplineSelection(screenCoord P);
+
 	void handlePlacement(worldCoord P);
 	void handleLineDrawing(worldCoord P);
 	void handleTriangleDrawing(worldCoord P);

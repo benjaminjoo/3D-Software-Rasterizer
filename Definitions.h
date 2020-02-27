@@ -270,8 +270,9 @@ struct spline3
 	int			id = 0;
 	bool		selected = false;
 	bool		deleted = false;
+	unsigned	resol = 10;
 
-	std::vector<worldCoord> cPoints;
+	std::vector<vertex3> ctrlPoints;
 };
 
 

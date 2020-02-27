@@ -33,7 +33,7 @@ public:
 	void addPointCloud(std::shared_ptr<PointCloud>);
 	void addLine3(line3);
 	void addSpline3(spline3);
-	void addSpline3ControlPoint(int, worldCoord);
+	void addSpline3ControlPoint(int, vertex3);
 
 	void selectVertex3byID(int);
 	void deselectVertex3byID(int);
@@ -48,6 +48,11 @@ public:
 	void moveVertex3byIndex(int, worldCoord);
 	void copyVertex3byIndex(int, int, worldCoord);
 	void rotVertex3byIndex(int, Side, worldCoord, float);
+
+	void selectSplineControlVertex3byIndex(int, int);
+	void deselectSplineControlVertex3byIndex(int, int);
+	void deleteSplineControlVertex3byIndex(int, int);
+	void moveSplineControlVertex3byIndex(int, int, worldCoord);
 
 	void selectLine3byIndex(int);
 	void deselectLine3byIndex(int);

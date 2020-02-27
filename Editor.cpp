@@ -284,20 +284,19 @@ void Editor::updatePolylines()
 void Editor::updateSplines()
 {
 	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
-	{
 		if (!Model->isSpline3Deleted(i))
 		{
 			spline3 tempSpline = Model->getSpline3(i);
-			for (auto& c : tempSpline.cPoints)
-			{
-				screenCoord cp = world2screen(c);
-				if (Model->isSpline3Selected(i))
-					Screen->drawSpot(cp, RED);
-				else
-					Screen->drawSpot(cp, BLUE);
-			}
+			for (auto& c : tempSpline.ctrlPoints)
+				if (!c.deleted)
+				{
+					screenCoord cp = world2screen(c.pos);
+					if (c.selected)
+						Screen->drawSpot(cp, RED);
+					else
+						Screen->drawSpot(cp, BLUE);
+				}
 		}
-	}
 }
 
 
@@ -566,6 +565,16 @@ void Editor::leftMouseClick(screenCoord X)
 
 void Editor::handleSelection(screenCoord X, worldCoord P)
 {
+	handleVertexSelection(X);
+
+	handleLineSelection(P);
+
+	handleSplineSelection(X);
+}
+
+
+void Editor::handleVertexSelection(screenCoord X)
+{
 	for (auto i = 0; i < Model->getVertex3BufferSize(); i++)
 	{
 		if (!Model->isVertex3Deleted(i))
@@ -574,12 +583,14 @@ void Editor::handleSelection(screenCoord X, worldCoord P)
 			worldCoord	tempCoordW = tempVert.pos;
 			screenCoord tempCoordS = world2screen(tempCoordW);
 			if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
-			{
 				Model->selectVertex3byIndex(i);
-			}
 		}
 	}
+}
 
+
+void Editor::handleLineSelection(worldCoord P)
+{
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 	{
 		if (!Model->isLine3Deleted(i))
@@ -639,6 +650,26 @@ void Editor::handleSelection(screenCoord X, worldCoord P)
 }
 
 
+void Editor::handleSplineSelection(screenCoord X)
+{
+	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
+	{
+		if (!Model->isSpline3Deleted(i))
+		{
+			spline3 tempSpline = Model->getSpline3(i);
+			for (auto j = 0; j < tempSpline.ctrlPoints.size(); j++)
+			{
+				vertex3 tempVert = tempSpline.ctrlPoints[j];
+				worldCoord	tempCoordW = tempVert.pos;
+				screenCoord tempCoordS = world2screen(tempCoordW);
+				if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
+					Model->selectSplineControlVertex3byIndex(i, j);
+			}
+		}
+	}
+}
+
+
 void Editor::handlePlacement(worldCoord P)
 {
 	worldCoord temp = P;
@@ -683,15 +714,27 @@ void Editor::handleSplineDrawing(worldCoord P)
 	{
 		spline3 tempSpline;
 		currentSplineID = currentID;
+		currentID++;
 		tempSpline.id = currentSplineID;
-		tempSpline.cPoints.push_back(P);
+
+		vertex3 tempVert;
+		tempVert.id = currentID;
+		currentID++;
+		tempVert.pos = P;
+
+		tempSpline.ctrlPoints.push_back(tempVert);
+
 		Model->addSpline3(tempSpline);
 		clicksInQueue++;
-		currentID++;
 	}
 	else
 	{
-		Model->addSpline3ControlPoint(currentSplineID, P);
+		vertex3 tempVert;
+		tempVert.id = currentID;
+		currentID++;
+		tempVert.pos = P;
+
+		Model->addSpline3ControlPoint(currentSplineID, tempVert);
 	}
 }
 
@@ -1165,6 +1208,14 @@ void Editor::deleteSelected()
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
 			Model->deleteLine3byIndex(i);
+
+	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
+	{
+		spline3 tempSpline = Model->getSpline3(i);
+		for (auto j = 0; j < tempSpline.ctrlPoints.size(); j++)
+			if (!tempSpline.ctrlPoints[j].deleted && tempSpline.ctrlPoints[j].selected)
+				Model->deleteSplineControlVertex3byIndex(i, j);
+	}
 }
 
 
