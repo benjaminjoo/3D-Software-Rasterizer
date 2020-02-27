@@ -261,7 +261,7 @@ struct polyline3
 	bool		selected = false;
 	bool		deleted = false;
 
-	std::vector<line3> segments;
+	std::vector<vertex3> ctrlPoints;
 };
 
 

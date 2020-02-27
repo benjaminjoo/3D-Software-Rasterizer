@@ -44,6 +44,7 @@ public:
 
 	int					maxUndo			= 20;
 	int					currentID		= 1;
+	int					currentPlineID	= 1;
 	int					currentSplineID = 1;
 	int					clicksInQueue	= 0;
 	int					currentEdit		= 0;
@@ -100,18 +101,19 @@ public:
 	void mouseMotion(int, int);
 	void leftMouseClick(screenCoord);
 
-	void handleSelection(screenCoord X, worldCoord P);
-	void handleVertexSelection(screenCoord X);
-	void handleLineSelection(worldCoord P);
-	void handleSplineSelection(screenCoord P);
+	void handleSelection(const screenCoord& X, const worldCoord& P);
+	void handleVertexSelection(const screenCoord& X);
+	void handleLineSelection(const worldCoord& P);
+	void handlePolylineSelection(const screenCoord& P);
+	void handleSplineSelection(const screenCoord& P);
 
-	void handlePlacement(worldCoord P);
-	void handleLineDrawing(worldCoord P);
-	void handleTriangleDrawing(worldCoord P);
-	void handlePolylineDrawing(worldCoord P);
-	void handleSplineDrawing(worldCoord P);
-	void handleRelocation(worldCoord P);
-	void handleRotation(worldCoord P);
+	void handlePlacement(const worldCoord& P);
+	void handleLineDrawing(const worldCoord& P);
+	void handleTriangleDrawing(const worldCoord& P);
+	void handlePolylineDrawing(const worldCoord& P);
+	void handleSplineDrawing(const worldCoord& P);
+	void handleRelocation(const worldCoord& P);
+	void handleRotation(const worldCoord& P);
 
 	void activateSelection();
 	void activatePlacement();

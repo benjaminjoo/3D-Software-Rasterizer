@@ -35,6 +35,20 @@ void ModelElementBuffer::addLine3(line3 L)
 }
 
 
+void ModelElementBuffer::addPolyline3(polyline3 PL)
+{
+	polyline3Buffer.push_back(PL);
+}
+
+
+void ModelElementBuffer::addPolyline3ControlPoint(int ID, vertex3 C)
+{
+	for (auto& pl : polyline3Buffer)
+		if (pl.id == ID)
+			pl.ctrlPoints.push_back(C);
+}
+
+
 void ModelElementBuffer::addSpline3(spline3 S)
 {
 	spline3Buffer.push_back(S);
@@ -164,6 +178,33 @@ void ModelElementBuffer::copyVertex3byIndex(int i, int newID, worldCoord move)
 void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord origin, float angle)
 {
 	vertex3Buffer[i].pos = rotate2(vertex3Buffer[i].pos, currentView, origin, angle);
+}
+
+
+void ModelElementBuffer::selectPolylineControlVertex3byIndex(int pline, int ctrl)
+{
+	polyline3Buffer[pline].ctrlPoints[ctrl].selected = polyline3Buffer[pline].ctrlPoints[ctrl].selected ? false : true;
+}
+
+
+void ModelElementBuffer::deselectPolylineControlVertex3byIndex(int pline, int ctrl)
+{
+	polyline3Buffer[pline].ctrlPoints[ctrl].selected = false;
+}
+
+
+void ModelElementBuffer::deletePolylineControlVertex3byIndex(int pline, int ctrl)
+{
+	polyline3Buffer[pline].ctrlPoints[ctrl].deleted = true;
+	polyline3Buffer[pline].ctrlPoints[ctrl].selected = false;
+}
+
+
+void ModelElementBuffer::movePolylineControlVertex3byIndex(int pline, int ctrl, worldCoord move)
+{
+	polyline3Buffer[pline].ctrlPoints[ctrl].pos.x += move.x;
+	polyline3Buffer[pline].ctrlPoints[ctrl].pos.y += move.y;
+	polyline3Buffer[pline].ctrlPoints[ctrl].pos.z += move.z;
 }
 
 
@@ -297,6 +338,30 @@ int ModelElementBuffer::getLine3BufferSize()
 line3 ModelElementBuffer::getLine3(int n)
 {
 	return line3Buffer[n];
+}
+
+
+bool ModelElementBuffer::isPolyline3Selected(int n)
+{
+	return polyline3Buffer[n].selected;
+}
+
+
+bool ModelElementBuffer::isPolyline3Deleted(int n)
+{
+	return polyline3Buffer[n].deleted;
+}
+
+
+int ModelElementBuffer::getPolyline3BufferSize()
+{
+	return polyline3Buffer.size();
+}
+
+
+polyline3 ModelElementBuffer::getPolyline3(int n)
+{
+	return polyline3Buffer[n];
 }
 
 
