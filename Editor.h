@@ -44,6 +44,7 @@ public:
 
 	int					maxUndo			= 20;
 	int					currentID		= 1;
+	int					currentTrigID	= 1;
 	int					currentPlineID	= 1;
 	int					currentSplineID = 1;
 	int					clicksInQueue	= 0;
@@ -104,8 +105,9 @@ public:
 	void handleSelection(const screenCoord& X, const worldCoord& P);
 	void handleVertexSelection(const screenCoord& X);
 	void handleLineSelection(const worldCoord& P);
-	void handlePolylineSelection(const screenCoord& P);
-	void handleSplineSelection(const screenCoord& P);
+	void handleTriangleSelection(const screenCoord& X);
+	void handlePolylineSelection(const screenCoord& X);
+	void handleSplineSelection(const screenCoord& X);
 
 	void handlePlacement(const worldCoord& P);
 	void handleLineDrawing(const worldCoord& P);

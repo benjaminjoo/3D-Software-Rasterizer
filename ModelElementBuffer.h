@@ -32,17 +32,12 @@ public:
 	void addVertex3(vertex3);
 	void addPointCloud(std::shared_ptr<PointCloud>);
 	void addLine3(line3);
+	void addTriangle3(triangle3);
+	void addTriangle3Vert(int, int, vertex3);
 	void addPolyline3(polyline3);
 	void addPolyline3ControlPoint(int, vertex3);
 	void addSpline3(spline3);
 	void addSpline3ControlPoint(int, vertex3);
-
-	void selectVertex3byID(int);
-	void deselectVertex3byID(int);
-	void deleteVertex3byID(int);
-	void moveVertex3byID(int, worldCoord);
-	void copyVertex3byID(int, int, worldCoord);
-	void rotVertex3byID(int, Side, worldCoord, float);
 
 	void selectVertex3byIndex(int);
 	void deselectVertex3byIndex(int);
@@ -50,6 +45,10 @@ public:
 	void moveVertex3byIndex(int, worldCoord);
 	void copyVertex3byIndex(int, int, worldCoord);
 	void rotVertex3byIndex(int, Side, worldCoord, float);
+
+	void selectTriangleVertex3byIndex(int, int);
+	void deselectTriangleVertex3byIndex(int, int);
+	void moveTriangleVertex3byIndex(int, int, worldCoord);
 
 	void selectPolylineControlVertex3byIndex(int, int);
 	void deselectPolylineControlVertex3byIndex(int, int);
@@ -77,6 +76,11 @@ public:
 	bool isLine3Deleted(int);
 	int getLine3BufferSize();
 	line3 getLine3(int);
+
+	bool isTriangle3Selected(int);
+	bool isTriangle3Deleted(int);
+	int getTriangle3BufferSize();
+	triangle3 getTriangle3(int);
 
 	bool isPolyline3Selected(int);
 	bool isPolyline3Deleted(int);

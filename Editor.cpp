@@ -142,24 +142,36 @@ void Editor::updateUtilities()
 
 	this->updateWorldPosition();
 
-	if (currentView == Side::Top)
+	screenCoord cursorPosition;
+	switch (currentView)
 	{
-		Screen->drawMouseCursor(currentMode, planPosition, LIGHT_BLUE);
-		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-			Screen->drawSnapTarget(planPosition, WHITE);
+		case Side::Top:
+			cursorPosition = planPosition;
+		break;
+		case Side::Front:
+			cursorPosition = frontPosition;
+		break;
+		case Side::Right:
+			cursorPosition = rightPosition;
+		break;
 	}
-	else if (currentView == Side::Front)
-	{
-		Screen->drawMouseCursor(currentMode, frontPosition, LIGHT_BLUE);
-		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-			Screen->drawSnapTarget(frontPosition, WHITE);
-	}
-	else if (currentView == Side::Right)
-	{
-		Screen->drawMouseCursor(currentMode, rightPosition, LIGHT_BLUE);
-		if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
-			Screen->drawSnapTarget(rightPosition, WHITE);
-	}
+
+	Screen->drawMouseCursor(currentMode, cursorPosition, LIGHT_BLUE);
+	
+	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)				//Highlight Spline control points
+		if (!Model->isSpline3Deleted(i))
+		{
+			spline3 tempSpline = Model->getSpline3(i);
+			for (auto& cp : tempSpline.ctrlPoints)
+			{
+				screenCoord tempCoordS = world2screen(cp.pos);
+				if (abs(tempCoordS.x - cursorPosition.x) <= 10 && abs(tempCoordS.y - cursorPosition.y) <= 10)
+					Screen->drawSpotHighlight(tempCoordS, YELLOW);
+			}
+		}
+
+	if (isObjectSnapOn && this->snapToVert(&mouseBeforeZoom))
+		Screen->drawSnapTarget(cursorPosition, WHITE);
 
 	//Display scale
 	Screen->displayValue(scale * 100.0f, 2, 1, 2, WHITE);
@@ -227,7 +239,7 @@ void Editor::updateLines()
 				currentMode == editingMode::CopyRelocation) &&
 				clicksInQueue == 1)
 		{
-			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))						//Draw all visible lines currently being moved
+			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))			//Draw all visible lines currently being moved
 			{
 				line3 tempLine = Model->getLine3(i);
 				worldCoord tempMove = movementStart - mouseBeforeZoom;
@@ -244,9 +256,9 @@ void Editor::updateLines()
 		}
 		if ((	currentMode == editingMode::Rotation ||
 				currentMode == editingMode::CopyRotation) &&
-				clicksInQueue == 2)		//Draw all visible lines currently being rotated
+				clicksInQueue == 2)
 		{
-			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))
+			if (Model->isLine3Selected(i) && !Model->isLine3Deleted(i))			//Draw all visible lines currently being rotated
 			{
 				line3 tempLine = Model->getLine3(i);
 				worldCoord startVect = unitVector2(rotationStart - rotationCentre);
@@ -271,7 +283,74 @@ void Editor::updateLines()
 
 void Editor::updateTriangles()
 {
+	for (auto i = 0; i < Model->getTriangle3BufferSize(); i++)
+	{
+		if (!Model->isTriangle3Deleted(i))
+		{
+			triangle3 tempTriangle = Model->getTriangle3(i);
+			screenCoord tempStart, tempEnd;
 
+			if (currentMode == editingMode::TriangleDrawing)
+			{
+				for (int v = 0; v < 3; v++)
+				{
+					screenCoord vrt = world2screen(tempTriangle.vert[v].pos);
+					if (tempTriangle.vert[v].selected)
+						Screen->drawSpot(vrt, RED);
+					else
+						Screen->drawSpot(vrt, BLUE);
+				}
+			}
+	
+			if (tempTriangle.vertDrawn[0] &&
+				tempTriangle.vertDrawn[1] &&
+				!tempTriangle.vertDrawn[2])
+			{
+				tempStart = world2screen(tempTriangle.vert[0].pos);
+				tempEnd = world2screen(tempTriangle.vert[1].pos);
+				Screen->drawLine(tempStart, tempEnd, 1, BLUE);
+			}
+
+			if (tempTriangle.vertDrawn[0] &&
+				tempTriangle.vertDrawn[1] &&
+				tempTriangle.vertDrawn[2])
+			{
+				if ((currentMode == editingMode::Relocation ||
+					currentMode == editingMode::CopyRelocation) &&
+					clicksInQueue == 1)
+				{
+					worldCoord tempMove = movementStart - mouseBeforeZoom;
+					if (isOrthoOn)
+						this->alignToAxis(&tempMove);
+
+					if (tempTriangle.vert[0].selected)
+						tempTriangle.vert[0].pos -= tempMove;
+					if (tempTriangle.vert[1].selected)
+						tempTriangle.vert[1].pos -= tempMove;
+					if (tempTriangle.vert[2].selected)
+						tempTriangle.vert[2].pos -= tempMove;
+				}
+				for (int v = 0; v < 3; v++)
+				{
+					tempStart = world2screen(tempTriangle.vert[v].pos);
+					if (v < 2)
+						tempEnd = world2screen(tempTriangle.vert[v + 1].pos);
+					else
+						tempEnd = world2screen(tempTriangle.vert[0].pos);
+
+					Screen->drawLine(tempStart, tempEnd, 1, BLUE);
+				}
+				for (int v = 0; v < 3; v++)
+				{
+					screenCoord vrt = world2screen(tempTriangle.vert[v].pos);
+					if (tempTriangle.vert[v].selected)
+						Screen->drawSpot(vrt, RED);
+					else
+						Screen->drawSpot(vrt, BLUE);
+				}
+			}
+		}
+	}
 }
 
 
@@ -282,6 +361,7 @@ void Editor::updatePolylines()
 		if (!Model->isPolyline3Deleted(i))
 		{
 			polyline3 tempPolyline = Model->getPolyline3(i);
+
 			for (auto& c : tempPolyline.ctrlPoints)
 			{
 				if (!c.deleted)
@@ -308,6 +388,49 @@ void Editor::updatePolylines()
 					}
 				}
 			}
+
+			if (tempPolyline.getSize() >= 2)
+			{
+				screenCoord tempStart;
+				screenCoord tempEnd;
+				bool startPointObtained;
+				bool endPointObtained;
+				int count = 0;
+				for (unsigned lineCount = 0; lineCount < tempPolyline.ctrlPoints.size() - 1;)
+				{
+					startPointObtained = false;
+					endPointObtained = false;
+
+					for (int c = count; c < tempPolyline.ctrlPoints.size(); c++)
+					{
+						if (!tempPolyline.ctrlPoints[c].deleted)
+						{
+							tempStart = world2screen(tempPolyline.ctrlPoints[c].pos);
+							startPointObtained = true;
+							count++;
+							break;
+						}
+					}
+
+					for (int c = count; c < tempPolyline.ctrlPoints.size(); c++)
+					{
+						if (!tempPolyline.ctrlPoints[c].deleted)
+						{
+							tempEnd = world2screen(tempPolyline.ctrlPoints[c].pos);
+							endPointObtained = true;
+							count++;
+							break;
+						}
+					}
+
+					if (startPointObtained && endPointObtained)
+					{
+						Screen->drawLine(tempStart, tempEnd, 1, BLUE);
+						lineCount++;
+						count--;
+					}
+				}
+			}
 		}
 	}
 }
@@ -320,6 +443,7 @@ void Editor::updateSplines()
 		if (!Model->isSpline3Deleted(i))
 		{
 			spline3 tempSpline = Model->getSpline3(i);
+
 			for (auto& c : tempSpline.ctrlPoints)
 			{
 				if (!c.deleted)
@@ -335,7 +459,7 @@ void Editor::updateSplines()
 					currentMode == editingMode::CopyRelocation) &&
 					clicksInQueue == 1)
 				{
-					if (c.selected && !c.deleted)					//Draw all visible vertices currently being moved
+					if (c.selected && !c.deleted)					//Draw all visible control points currently being moved
 					{
 						worldCoord tempMove = movementStart - mouseBeforeZoom;
 						if (isOrthoOn)
@@ -345,6 +469,23 @@ void Editor::updateSplines()
 						Screen->drawSpot(temp, ORANGE);
 					}
 				}
+			}
+
+			if (tempSpline.getSize() > 3)
+			{
+				for (float t = 0.0f; t < static_cast<float>(tempSpline.getSize() - 3); t += 0.001f)
+				{
+					screenCoord spl = world2screen(tempSpline.getPoint(t));
+					Screen->putPixel(spl.x, spl.y, WHITE);
+				}
+
+				//float step = 0.01f;
+				//for (float t = 0.0f; t < static_cast<float>(tempSpline.getSize() - 3); t += step)
+				//{
+				//	screenCoord tempStart	= world2screen(tempSpline.getPoint(t));
+				//	screenCoord tempEnd		= world2screen(tempSpline.getPoint(t + step));
+				//	Screen->drawLine(tempStart, tempEnd, 1, WHITE);
+				//}
 			}
 		}
 	}
@@ -446,13 +587,16 @@ void Editor::hintResult()
 		}
 	}
 
-	if (currentMode == editingMode::LineDrawing)								//Hint line of movement
+	if (currentMode == editingMode::LineDrawing ||
+		currentMode == editingMode::TriangleDrawing ||
+		currentMode == editingMode::PolylineDrawing)								//Hint line of movement
 	{
-		if (clicksInQueue == 1)
+		if (clicksInQueue > 0)
 		{
 			worldCoord tempMouse = screen2world(mousePosition);
-			worldCoord tempMove = tempMouse - movementStart;
-			if (isOrthoOn) { this->alignToAxis(&tempMove); }
+			worldCoord tempMove	= tempMouse - movementStart;
+			if (isOrthoOn)
+				this->alignToAxis(&tempMove);
 			worldCoord tempEnd;
 			tempEnd = movementStart + tempMove;
 			Screen->drawLine(world2screen(movementStart), world2screen(tempEnd), 1, BLUE);
@@ -620,6 +764,8 @@ void Editor::handleSelection(const screenCoord& X, const worldCoord& P)
 
 	handleLineSelection(P);
 
+	handleTriangleSelection(X);
+
 	handlePolylineSelection(X);
 
 	handleSplineSelection(X);
@@ -703,6 +849,24 @@ void Editor::handleLineSelection(const worldCoord& P)
 }
 
 
+void Editor::handleTriangleSelection(const screenCoord& X)
+{
+	for (auto i = 0; i < Model->getTriangle3BufferSize(); i++)
+	{
+		if (!Model->isTriangle3Deleted(i))
+		{
+			triangle3 tempTriangle = Model->getTriangle3(i);
+			for (int j = 0; j < 3; j++)
+			{
+				screenCoord tempCoordS = world2screen(tempTriangle.vert[j].pos);
+				if (abs(tempCoordS.x - X.x) <= 10 && abs(tempCoordS.y - X.y) <= 10)
+					Model->selectTriangleVertex3byIndex(i, j);			
+			}
+		}
+	}
+}
+
+
 void Editor::handlePolylineSelection(const screenCoord& X)
 {
 	for (auto i = 0; i < Model->getPolyline3BufferSize(); i++)
@@ -771,7 +935,39 @@ void Editor::handleLineDrawing(const worldCoord& P)
 
 void Editor::handleTriangleDrawing(const worldCoord& P)
 {
+	if (clicksInQueue == 0)
+	{
+		triangle3 tempTriangle;
+		currentTrigID = currentID;
+		currentID++;
+		tempTriangle.id = currentTrigID;
 
+		vertex3 tempVert;
+		tempVert.id = currentID;
+		currentID++;
+		tempVert.pos = P;
+
+		tempTriangle.vert[0] = tempVert;
+		tempTriangle.vertDrawn[0] = true;
+
+		Model->addTriangle3(tempTriangle);
+		movementStart = P;
+		clicksInQueue++;
+	}
+	else
+	{
+		vertex3 tempVert;
+		tempVert.id = currentID;
+		currentID++;
+		tempVert.pos = P;
+
+		Model->addTriangle3Vert(currentTrigID, clicksInQueue, tempVert);
+		movementStart = P;
+		clicksInQueue++;
+
+		if (clicksInQueue == 3)
+			clicksInQueue = 0;
+	}
 }
 
 
@@ -792,6 +988,7 @@ void Editor::handlePolylineDrawing(const worldCoord& P)
 		tempPolyline.ctrlPoints.push_back(tempVert);
 
 		Model->addPolyline3(tempPolyline);
+		movementStart = P;
 		clicksInQueue++;
 	}
 	else
@@ -802,6 +999,8 @@ void Editor::handlePolylineDrawing(const worldCoord& P)
 		tempVert.pos = P;
 
 		Model->addPolyline3ControlPoint(currentPlineID, tempVert);
+		movementStart = P;
+		clicksInQueue++;
 	}
 }
 
@@ -833,6 +1032,7 @@ void Editor::handleSplineDrawing(const worldCoord& P)
 		tempVert.pos = P;
 
 		Model->addSpline3ControlPoint(currentSplineID, tempVert);
+		clicksInQueue++;
 	}
 }
 
@@ -1253,8 +1453,13 @@ void Editor::selectAll()
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 		Model->selectLine3byIndex(i);
 
+	for (auto i = 0; i < Model->getTriangle3BufferSize(); i++)
+		if (!Model->isTriangle3Deleted(i))
+			for (int j = 0; j < 3; j++)
+				Model->selectTriangleVertex3byIndex(i, j);
+
 	for (auto i = 0; i < Model->getPolyline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isPolyline3Deleted(i))
 		{
 			polyline3 tempPolyline = Model->getPolyline3(i);
 			for (auto j = 0; j < tempPolyline.ctrlPoints.size(); j++)
@@ -1262,7 +1467,7 @@ void Editor::selectAll()
 		}
 
 	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isSpline3Deleted(i))
 		{
 			spline3 tempSpline = Model->getSpline3(i);
 			for (auto j = 0; j < tempSpline.ctrlPoints.size(); j++)
@@ -1281,8 +1486,13 @@ void Editor::deselectAll()
 	for (auto i = 0; i < Model->getLine3BufferSize(); i++)
 		Model->deselectLine3byIndex(i);
 
+	for (auto i = 0; i < Model->getTriangle3BufferSize(); i++)
+		if (!Model->isTriangle3Deleted(i))
+			for (int j = 0; j < 3; j++)
+				Model->deselectTriangleVertex3byIndex(i, j);
+
 	for (auto i = 0; i < Model->getPolyline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isPolyline3Deleted(i))
 		{
 			polyline3 tempPolyline = Model->getPolyline3(i);
 			for (auto j = 0; j < tempPolyline.ctrlPoints.size(); j++)
@@ -1290,7 +1500,7 @@ void Editor::deselectAll()
 		}
 
 	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isSpline3Deleted(i))
 		{
 			spline3 tempSpline = Model->getSpline3(i);
 			for (auto j = 0; j < tempSpline.ctrlPoints.size(); j++)
@@ -1375,8 +1585,14 @@ void Editor::moveSelected()
 		if (!Model->isLine3Deleted(i) && Model->isLine3Selected(i))
 			Model->moveLine3byIndex(i, move);
 
+	for (auto i = 0; i < Model->getTriangle3BufferSize(); i++)
+		if (!Model->isTriangle3Deleted(i))
+			for (int j = 0; j < 3; j++)
+				if (Model->getTriangle3(i).vert[j].selected)
+					Model->moveTriangleVertex3byIndex(i, j, move);
+
 	for (auto i = 0; i < Model->getPolyline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isPolyline3Deleted(i))
 		{
 			polyline3 tempPolyline = Model->getPolyline3(i);
 			for (auto j = 0; j < tempPolyline.ctrlPoints.size(); j++)
@@ -1388,7 +1604,7 @@ void Editor::moveSelected()
 		}
 
 	for (auto i = 0; i < Model->getSpline3BufferSize(); i++)
-		if (!Model->isVertex3Deleted(i))
+		if (!Model->isSpline3Deleted(i))
 		{
 			spline3 tempSpline = Model->getSpline3(i);
 			for (auto j = 0; j < tempSpline.ctrlPoints.size(); j++)

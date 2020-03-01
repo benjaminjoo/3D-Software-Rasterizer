@@ -249,7 +249,8 @@ struct line3
 struct triangle3
 {
 	int			id = 0;
-	worldCoord	vert[3];
+	vertex3		vert[3];
+	bool		vertDrawn[3] = { false };
 	bool		selected = false;
 	bool		deleted = false;
 };
@@ -262,6 +263,15 @@ struct polyline3
 	bool		deleted = false;
 
 	std::vector<vertex3> ctrlPoints;
+
+	unsigned getSize()
+	{
+		unsigned count = 0;
+		for (auto& c : ctrlPoints)
+			if (!c.deleted)
+				count++;
+		return count;
+	}
 };
 
 
@@ -270,9 +280,76 @@ struct spline3
 	int			id = 0;
 	bool		selected = false;
 	bool		deleted = false;
+	bool		closed = false;
 	unsigned	resol = 10;
 
 	std::vector<vertex3> ctrlPoints;
+
+	unsigned getSize()
+	{
+		unsigned count = 0;
+		for (auto& c : ctrlPoints)
+			if (!c.deleted)
+				count++;
+		return count;
+	}
+
+	worldCoord getPoint(float t)
+	{
+		int p_0, p_1, p_2, p_3;
+
+		if (!closed)
+		{
+			p_1 = static_cast<int>(t) + 1;
+			p_2 = p_1 + 1;
+			p_3 = p_1 + 2;
+			p_0 = p_1 - 1;
+		}
+		else
+		{
+			p_1 = static_cast<int>(t);
+			p_2 = (p_1 + 1) % ctrlPoints.size();
+			p_3 = (p_1 + 2) % ctrlPoints.size();
+			p_0 = p_1 >= 1 ? p_1 - 1 : ctrlPoints.size() - 1;
+		}
+		 
+		t = t - static_cast<int>(t);
+
+		float tt = t * t;
+		float ttt = t * t * t;
+
+		float q_0 = -ttt + 2.0f * tt - t;
+		float q_1 = 3.0f * ttt - 5.0f * tt + 2.0f;
+		float q_2 = -3.0f * ttt + 4.0f * tt + t;
+		float q_3 = ttt - tt;
+
+		worldCoord p;
+
+		worldCoord P0, P1, P2, P3;
+
+		int count = -1;
+		for (auto& p : ctrlPoints)
+		{
+			if (!p.deleted)
+			{
+				count++;
+				if (count == p_0)
+					P0 = p.pos;
+				if (count == p_1)
+					P1 = p.pos;
+				if (count == p_2)
+					P2 = p.pos;
+				if (count == p_3)
+					P3 = p.pos;
+			}
+		}
+
+		p.x = 0.5f * (P0.x * q_0 + P1.x * q_1 + P2.x * q_2 + P3.x * q_3);
+		p.y = 0.5f * (P0.y * q_0 + P1.y * q_1 + P2.y * q_2 + P3.y * q_3);
+		p.z = 0.5f * (P0.z * q_0 + P1.z * q_1 + P2.z * q_2 + P3.z * q_3);
+
+		return p;
+	}
 };
 
 

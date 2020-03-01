@@ -42,10 +42,11 @@ public:
 	int getWidth();
 	int getHeight();
 
-	void putPixel(int x, int y, Uint32 colour);
+	void putPixel(const int& x, const int& y, const Uint32& colour);
 	void drawLine(const coord2&, const coord2&, const Uint32&);
 	void drawLine(const screenCoord&, const screenCoord&, const int&, const Uint32&);
 	void drawSpot(const screenCoord&, const Uint32&);
+	void drawSpotHighlight(const screenCoord&, const Uint32&);
 	void drawCrosshair(int, int, Uint32);
 	void drawMouseCursor(editingMode, screenCoord position, Uint32 colour);
 	void drawSnapTarget(screenCoord position, Uint32 colour);

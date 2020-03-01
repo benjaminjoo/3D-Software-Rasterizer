@@ -35,6 +35,23 @@ void ModelElementBuffer::addLine3(line3 L)
 }
 
 
+void ModelElementBuffer::addTriangle3(triangle3 TR)
+{
+	triangle3Buffer.push_back(TR);
+}
+
+
+void ModelElementBuffer::addTriangle3Vert(int ID, int id, vertex3 V)
+{
+	for (auto& tr : triangle3Buffer)
+		if (tr.id == ID && id < 3)
+		{
+			tr.vert[id] = V;
+			tr.vertDrawn[id] = true;
+		}		
+}
+
+
 void ModelElementBuffer::addPolyline3(polyline3 PL)
 {
 	polyline3Buffer.push_back(PL);
@@ -60,74 +77,6 @@ void ModelElementBuffer::addSpline3ControlPoint(int ID, vertex3 C)
 	for (auto& sp : spline3Buffer)
 		if (sp.id == ID)
 			sp.ctrlPoints.push_back(C);
-}
-
-
-void ModelElementBuffer::selectVertex3byID(int ID)
-{
-	for (auto& i : vertex3Buffer)
-		if (i.id == ID)
-			i.selected = i.selected ? false : true;
-}
-
-
-void ModelElementBuffer::deselectVertex3byID(int ID)
-{
-	for (auto& i : vertex3Buffer)
-		if (i.id == ID)
-			i.selected = false;
-}
-
-
-void ModelElementBuffer::deleteVertex3byID(int ID)
-{
-	for (auto& i : vertex3Buffer)
-		if (i.id == ID)
-		{
-			i.deleted = true;
-			i.selected = false;
-		}
-}
-
-
-void ModelElementBuffer::moveVertex3byID(int ID, worldCoord move)
-{
-	for (auto& i : vertex3Buffer)
-		if (i.id == ID)
-		{
-			i.pos.x += move.x;
-			i.pos.y += move.y;
-			i.pos.z += move.z;
-		}
-}
-
-
-void ModelElementBuffer::copyVertex3byID(int ID, int newID, worldCoord move)
-{
-	vertex3 newTemp;
-
-	for (auto i : vertex3Buffer)
-		if (i.id == ID)
-		{
-			newTemp.id = newID;
-			newTemp.pos = i.pos;
-			newTemp.selected = true;
-			newTemp.deleted = false;
-
-			newTemp.pos.x += move.x;
-			newTemp.pos.y += move.y;
-			newTemp.pos.z += move.z;
-
-			vertex3Buffer.push_back(newTemp);
-		}
-}
-
-
-void ModelElementBuffer::rotVertex3byID(int ID, Side currentView, worldCoord origin, float angle)
-{
-	for (auto& i : vertex3Buffer)
-		if (i.id == ID)
-			i.pos = rotate2(i.pos, currentView, origin, angle);
 }
 
 
@@ -178,6 +127,26 @@ void ModelElementBuffer::copyVertex3byIndex(int i, int newID, worldCoord move)
 void ModelElementBuffer::rotVertex3byIndex(int i, Side currentView, worldCoord origin, float angle)
 {
 	vertex3Buffer[i].pos = rotate2(vertex3Buffer[i].pos, currentView, origin, angle);
+}
+
+
+void ModelElementBuffer::selectTriangleVertex3byIndex(int tr, int v)
+{
+	triangle3Buffer[tr].vert[v].selected = triangle3Buffer[tr].vert[v].selected ? false : true;
+}
+
+
+void ModelElementBuffer::deselectTriangleVertex3byIndex(int tr, int v)
+{
+	triangle3Buffer[tr].vert[v].selected = false;
+}
+
+
+void ModelElementBuffer::moveTriangleVertex3byIndex(int tr, int v, worldCoord move)
+{
+	triangle3Buffer[tr].vert[v].pos.x += move.x;
+	triangle3Buffer[tr].vert[v].pos.y += move.y;
+	triangle3Buffer[tr].vert[v].pos.z += move.z;
 }
 
 
@@ -338,6 +307,30 @@ int ModelElementBuffer::getLine3BufferSize()
 line3 ModelElementBuffer::getLine3(int n)
 {
 	return line3Buffer[n];
+}
+
+
+bool ModelElementBuffer::isTriangle3Selected(int n)
+{
+	return triangle3Buffer[n].selected;
+}
+
+
+bool ModelElementBuffer::isTriangle3Deleted(int n)
+{
+	return triangle3Buffer[n].deleted;
+}
+
+
+int ModelElementBuffer::getTriangle3BufferSize()
+{
+	return triangle3Buffer.size();
+}
+
+
+triangle3 ModelElementBuffer::getTriangle3(int n)
+{
+	return triangle3Buffer[n];
 }
 
 

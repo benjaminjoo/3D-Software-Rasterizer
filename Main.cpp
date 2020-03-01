@@ -342,9 +342,9 @@ void fps_game()
 	//Fill up explosion pool
 	fpsGame->addExplosion(5);
 
-//#define _STL_READER_
+#define _STL_READER_
 //#define _PLANETS_
-#define _SHOOTER_
+//#define _SHOOTER_
 //#define _PARTICLES_
 //#define _QUAKE_1_READER_
 //#define _QUAKE_3_READER_

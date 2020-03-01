@@ -111,7 +111,7 @@ int Canvas::getHeight()
 }
 
 
-void Canvas::putPixel(int x, int y, Uint32 colour)
+void Canvas::putPixel(const int& x, const int& y, const Uint32& colour)
 {
 	if (x >= 0 && x < w && y >= 0 && y < h)
 	{
@@ -444,6 +444,32 @@ void Canvas::drawSpot(const screenCoord& P, const Uint32& colour)
 		for (int i = xStart, p = 0; i < xStart + 4; i++, p++)
 		{
 			if ((i >= 0 && i < w) && (j >= 0 && j < h) && spot[q * 4 + p])
+			{
+				pixelBuffer[j * w + i] = colour;
+			}
+		}
+	}
+}
+
+
+void Canvas::drawSpotHighlight(const screenCoord& P, const Uint32& colour)
+{
+	const bool spot[64] = { 0, 0, 1, 1, 1, 1, 0, 0,
+							0, 1, 0, 0, 0, 0, 1, 0,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							1, 0, 0, 0, 0, 0, 0, 1,
+							0, 1, 0, 0, 0, 0, 1, 0,
+							0, 0, 1, 1, 1, 1, 0, 0 };
+
+	int xStart = P.x - 4;
+	int yStart = P.y - 4;
+	for (int j = yStart, q = 0; j < yStart + 8; j++, q++)
+	{
+		for (int i = xStart, p = 0; i < xStart + 8; i++, p++)
+		{
+			if ((i >= 0 && i < w) && (j >= 0 && j < h) && spot[q * 8 + p])
 			{
 				pixelBuffer[j * w + i] = colour;
 			}
