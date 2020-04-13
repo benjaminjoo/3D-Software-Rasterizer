@@ -9,7 +9,11 @@ SolidSphere::SolidSphere()
 }
 
 
-SolidSphere::SolidSphere(float px, float py, float pz, Uint32 c)
+SolidSphere::SolidSphere
+(
+	float px, float py, float pz,
+	Uint32 c
+)
 {
 	scale			= { 1.0f, 1.0f, 1.0f, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -29,8 +33,16 @@ SolidSphere::SolidSphere(float px, float py, float pz, Uint32 c)
 }
 
 
-SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
-							Uint32 c, int t, float r, int res)
+SolidSphere::SolidSphere
+(
+	float sx, float sy, float sz,
+	float px, float py, float pz,
+	float rx, float ry, float rz,
+	Uint32 c,
+	int t,
+	float r,
+	int res
+)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };
@@ -50,8 +62,17 @@ SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float
 }
 
 
-SolidSphere::SolidSphere(float sx, float sy, float sz, float px, float py, float pz, float rx, float ry, float rz,
-	Uint32 c, int t, float r, int res, bool dynamic)
+SolidSphere::SolidSphere
+(
+	float sx, float sy, float sz,
+	float px, float py, float pz,
+	float rx, float ry, float rz,
+	Uint32 c,
+	int t,
+	float r,
+	int res,
+	bool dynamic
+)
 {
 	scale			= { sx, sy, sz, 1.0f };
 	position		= { px, py, pz, 1.0f };

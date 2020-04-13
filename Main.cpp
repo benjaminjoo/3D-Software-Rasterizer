@@ -1,5 +1,7 @@
 #include <SDL/SDL.h>
 #include <SDLImage/SDL_image.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 //#include <GLEW/glew.h>
 //#include <GLM/glm.hpp>
 #include <stdlib.h>
@@ -123,10 +125,6 @@ void editor()
 
 		Screen->update();
 	}
-
-	IMG_Quit();
-
-	SDL_Quit();
 }
 
 
@@ -248,14 +246,70 @@ void ray_tracing()
 
 		Screen->update();
 	}
+}
 
-	SDL_Quit();
+
+void globe()
+{
+	auto Eye = std::make_shared<Camera>(
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.1f, 0.1f,
+		PI * 0.5f,
+		0.01f, 999.0f,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
+		0
+	);
+
+	auto Screen = std::make_shared<Canvas>("Globe", SCREEN_WIDTH, SCREEN_HEIGHT, 999.9f);
+
+	Eye->linkToCanvas(Screen);
+
+	auto Controls = std::make_shared<EventHandler>(0.1f, 0.1f, 0.01f);
+
+	auto Sun = std::make_shared<LightSource>(300.0f, 75.0f, 1.0f);
+
+	auto Viewer = std::make_shared<Player>(15.0f, 20.0f, 17.5f, 0.0f, 0.0f, 0.0f, 1.5f, 100, 100);
+
+	auto World = std::make_shared<Game>(Screen, Eye, Controls, Sun, Viewer, nullptr);
+
+	World->addTextScreen("Controls Text", std::make_shared<Text>("Assets/Txt/Controls_Text.txt", 480, 0x007f7fff));
+
+
+	//auto Earth = std::make_shared<PointCloud>(IMG_Load("Assets/Textures/earth_large.jpg"), 60.0f, 360);
+	//World->addPointCloud(Earth);
+
+	auto Earth_ = std::make_shared<PointCloud>("Assets/Gdl/globe.txt", -1000.0f, 1000.0f, 1000.0f);
+	//Earth_->setRadius(60.0f);
+	//Earth_->setGrid();
+	//Earth_->addSurfacePoint(51.0f, 0.0f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x000000ff);
+	//Earth_->addSurfacePoint(47.5f, 19.0f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x000000ff);
+	//Earth_->addSurfacePoint(47.5f, 19.0f, 0.0025f, 0.0025f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x0000ff00);
+	//Earth_->addSurfacePoint(-50.0f, 135.0f, 0.0025f, 0.0025f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x0000ff00);
+	//Earth_->addSurfacePoint(60.0f, 60.0f, 0.0025f, 0.0025f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x0000ff00);
+	//Earth_->addSurfacePoint(0.0f, 0.0f, 0.01f, 0.01f, 60.0f, { 0.0f, 0.0f, 0.0f, 1.0f }, 0x0000ff00);
+	World->addPointCloud(Earth_);
+
+	while (!Controls->quit)
+	{
+		World->updateAll();
+	}
 }
 
 
 void water()
 {
-	auto Eye = std::make_shared<Camera>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.1f, PI * 0.5f, 0.01f, 999.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	auto Eye = std::make_shared<Camera>(
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.1f, 0.1f,
+		PI * 0.5f,
+		0.01f, 999.0f,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
+		0
+	);
 
 	Eye->addTexture(IMG_Load("Assets/Textures/blue.jpg"));
 	Eye->addTexture(IMG_Load("Assets/Textures/wolf001.jpg"));
@@ -288,17 +342,15 @@ void water()
 	//testWorld->addStaticSurface(asteroid_surface);
 
 	auto model_test_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/cat9", 0x0066664c, false);
-	testWorld->addEntity(model_test_1);
+	//auto route_1 = std::make_shared<PointCloud>("Assets/PointClouds/HighRes/route", 0x000000ff, false);
+	//testWorld->addPointCloud(route_1);
+	testWorld->addPointCloud(model_test_1);
 
 
 	while (!Controls->quit)
 	{
 		testWorld->updateAll();
 	}
-
-	IMG_Quit();
-
-	SDL_Quit();
 }
 
 
@@ -577,10 +629,6 @@ void fps_game()
 	{
 		fpsGame->updateAll();
 	}
-
-	IMG_Quit();
-
-	SDL_Quit();
 }
 
 
@@ -678,7 +726,8 @@ int main(int argc, char** argv)
 		break;
 	case 'w':
 	case 'W':
-		water();
+		//water();
+		globe();
 		break;
 	case 'o':
 	case 'O':

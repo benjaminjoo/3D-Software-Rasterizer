@@ -76,6 +76,7 @@ private:
 	void updatePlayerModel(std::shared_ptr<Player>);
 	void updateEntities();
 	void updateBalls();
+	void updatePointClouds();
 	void updateProjectiles();
 	void updateTrails();
 	void updateImpacts();

@@ -333,6 +333,15 @@ void Game::updateBalls()
 }
 
 
+void Game::updatePointClouds()
+{
+	for (auto& pc : PointClouds)
+	{
+		pc->updateSurfacePoints();
+	}
+}
+
+
 void Game::updateProjectiles()
 {
 	for (auto& P : Projectiles)
@@ -746,6 +755,7 @@ void Game::updateAll()
 			this->updateEnemiesPositionsAI(Controls->purposeOfAI);
 		}
 
+		this->updatePointClouds();
 		this->updateProjectiles();
 		this->updateTrails();
 		this->updateImpacts();

@@ -84,6 +84,10 @@ void Canvas::cleanUp()
 	SDL_DestroyRenderer(sdl_screen);
 
 	SDL_DestroyWindow(sdl_window);
+
+	IMG_Quit();
+	
+	SDL_Quit();
 }
 
 

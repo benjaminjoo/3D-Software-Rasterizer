@@ -97,7 +97,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_72_0;C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
@@ -115,7 +115,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_72_0;C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
@@ -137,7 +137,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_72_0;C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
@@ -161,7 +161,7 @@
       <ConformanceMode>true</ConformanceMode>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_72_0;C:\Users\joobe\Desktop\C++\Software Rasterizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <AdditionalUsingDirectories>C:\Users\joobe\Desktop\C++\Software Rasterizer\lib;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>

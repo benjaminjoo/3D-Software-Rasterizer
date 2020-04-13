@@ -365,6 +365,30 @@ void Camera::clearVertexList()
 }
 
 
+void Camera::clipToFrustumL(const line3d& edge)
+{
+	memset(vertexListV, 0, MAXCLIPVERTS * sizeof(float));
+
+	vertexListV[0] = edge.A;
+	vertexListV[1] = edge.B;
+
+	plane currentPlane;
+
+	currentPlane = Frustum.getNearPlane();
+	this->clipEdge(currentPlane);
+	currentPlane = Frustum.getTopPlane();
+	this->clipEdge(currentPlane);
+	currentPlane = Frustum.getBottomPlane();
+	this->clipEdge(currentPlane);
+	currentPlane = Frustum.getLeftPlane();
+	this->clipEdge(currentPlane);
+	currentPlane = Frustum.getRightPlane();
+	this->clipEdge(currentPlane);
+	currentPlane = Frustum.getFarPlane();
+	this->clipEdge(currentPlane);
+}
+
+
 int Camera::clipToFrustum(const triangle3dV& viewT, vect3* vertList, textCoord* uvList, float* specList)
 {
 	memset(vertList, 0, MAXCLIPVERTS * sizeof(float));
@@ -458,6 +482,66 @@ inline void Camera::clipPoly(int* nVert, vect3* vertList, textCoord* uvList, flo
 }
 
 
+inline void Camera::clipEdge(const plane& p)
+{
+	float t;
+	vect3 startV = vertexListV[0];
+	vect3 endV = vertexListV[1];
+	vect3 a = startV - p.P;
+	float sStart = a * p.N;
+	vect3 b = endV - p.P;
+	float sEnd = b * p.N;
+
+	if (sign(sStart) != sign(sEnd))
+	{
+		vect3 d = endV - startV;
+		float dist = d * p.N;
+
+		if (sStart < 0)
+		{
+			if (dist)
+			{
+				t = (dist - sEnd) / dist;
+				vertexListV[0] = startV + ((endV - startV) * t);
+				vertexListV[1] = endV;
+			}
+		}
+		if (sEnd < 0)
+		{
+			if (dist)
+			{
+				t = (-dist - sStart) / dist;
+				vertexListV[0] = startV;
+				vertexListV[1] = endV - ((startV - endV) * t);
+			}
+			else
+			{
+				vertexListV[0] = startV;
+				vertexListV[1] = endV;
+			}
+		}
+		else
+		{
+			vertexListV[0] = startV;
+			vertexListV[1] = endV;
+		}
+	}
+	else
+	{
+		if (sign(sStart) > 0 && sign(sEnd) > 0)
+		{
+			vertexListV[0] = startV;
+			vertexListV[1] = endV;
+		}
+		else
+		{
+			vertexListV[0] = { 0.0f, 0.0f, 0.0f, 1.0f };
+			vertexListV[1] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		}
+	}
+}
+
+
 inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
 	const float& startSpec, const float& endSpec, int* nResult, vect3* vTemp, textCoord* uvTemp, float* specTemp)
 {
@@ -526,7 +610,6 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 			}
 			else
 			{
-
 				vTemp[*nResult].x = endV.x;
 				vTemp[*nResult].y = endV.y;
 				vTemp[*nResult].z = endV.z;
@@ -544,7 +627,6 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 		}
 		else
 		{
-
 			vTemp[*nResult].x = endV.x;
 			vTemp[*nResult].y = endV.y;
 			vTemp[*nResult].z = endV.z;
@@ -564,7 +646,6 @@ inline void Camera::clipEdge(const plane& p, const vect3& startV, const vect3& e
 	{
 		if (sign(sStart) > 0 && sign(sEnd) > 0)
 		{
-
 			vTemp[*nResult].x = endV.x;
 			vTemp[*nResult].y = endV.y;
 			vTemp[*nResult].z = endV.z;
@@ -915,6 +996,19 @@ void Camera::projectPoint(int size, point3 P, Uint32* pixelBuffer, float* depthB
 			depthBuffer[cp.y * w + cp.x] = 1 / cp.z;
 		}
 	}
+}
+
+
+void Camera::renderEdge(line3d edge)
+{
+	edge.A = transformation * edge.A;
+	edge.B = transformation * edge.B;
+
+	this->clipToFrustumL(edge);			//CLIPPING IN VIEW SPACE
+
+	coord2 startP = this->view2screen(vertexListV[0], hRatio, vRatio);
+	coord2 endP = this->view2screen(vertexListV[1], hRatio, vRatio);
+	Screen->drawLine(startP, endP, edge.colour);
 }
 
 

@@ -95,6 +95,8 @@ public:
 
 	void renderVisiblePoint(int, point3, Uint32*, float*);
 
+	void renderEdge(line3d);
+
 	void renderMesh(const int& nPoly, triangle3dV* mesh, std::shared_ptr<Lamp> spotlight,
 		LightSource Sun, const projectionStyle& visualStyle, float torchIntensity, float maxIllumination);
 
@@ -121,11 +123,15 @@ private:
 
 	void clearVertexList();
 
+	void clipToFrustumL(const line3d& edge);
+
 	int clipToFrustum(const triangle3dV&, vect3*, textCoord*, float*);
 
 	int clipToFrustumT(const triangle3dV&, vect3*, textCoord*, float*);
 
 	void clipPoly(int* nVert, vect3* vList, textCoord* uvList, float* specList, plane clippingPlane);
+
+	void clipEdge(const plane& p);
 
 	void clipEdge(const plane& p, const vect3& startV, const vect3& endV, const textCoord& startUV, const textCoord& endUV,
 		const float& startSpec, const float& endSpec, int* nResult, vect3* temp, textCoord* temp_uv, float* temp_spec);

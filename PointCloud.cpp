@@ -1,7 +1,6 @@
 #include "PointCloud.h"
 
 
-
 PointCloud::PointCloud(const std::string& fn, Uint32 col, bool sm) : fileName(fn), colour(col), smooth(sm)
 {
 	scale = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -93,8 +92,205 @@ PointCloud::PointCloud(const std::string& fn, Uint32 col, bool sm) : fileName(fn
 }
 
 
+PointCloud::PointCloud(SDL_Surface* T, float rad, int res)
+{
+	scale = { 1.0f, 1.0f, 1.0f, 1.0f };
+	position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	radius = rad;
+
+	texture = 0;
+	txU = 1.0f;
+
+	auto image = std::make_shared<txt>();
+
+	SDL_Surface* tempImage = SDL_ConvertSurfaceFormat(T, SDL_PIXELFORMAT_ARGB8888, 0);
+	image->w = T->w;
+	image->h = T->h;
+	image->pixelsH = new Uint32[image->w * image->h];
+	image->pixelsH = (Uint32*)tempImage->pixels;
+
+
+	float angleV, angleH, stepV, stepH;
+	stepV = 180.0f / res;
+	stepH = 360.0f / static_cast<float>(res * 2);
+
+	int total = 2 * res * (res - 1) + 2;
+
+	point3 temp;
+
+	temp.colour = 0x007f7fff;
+	
+	temp.P.x = 0.0f;				//South Pole
+	temp.P.y = 0.0f;
+	temp.P.z = -rad;
+	temp.P.w = 1.0f;
+	temp.colour = getPixel(image, 0.0f, 0.0f);
+
+	if (temp.colour)
+	{
+		pointArray.push_back(temp);
+	}
+
+	for (int i = 1; i < res; i++)
+	{
+		for (int j = 0; j < res * 2; j++)
+		{
+			angleV = (-90.0f + i * stepV) * PI / 180.0f;
+			angleH = (j * stepH) * PI / 180.0f;
+
+			temp.P.x = rad * cos(angleV) * cos(angleH);
+			temp.P.y = rad * cos(angleV) * sin(angleH);
+			temp.P.z = rad * sin(angleV);
+			temp.P.w = 1.0f;
+			temp.colour = getPixel(image,
+				static_cast<float>(j) / static_cast<float>(res * 2),
+				static_cast<float>(i) / static_cast<float>(res)
+			);
+
+			if (temp.colour)
+			{
+				pointArray.push_back(temp);
+			}
+		}
+	}
+
+	temp.P.x = 0.0f;				//North Pole
+	temp.P.y = 0.0f;
+	temp.P.z = rad;
+	temp.P.w = 1.0f;
+	temp.colour = getPixel(image, 0.0f, 1.0f);
+
+	if (temp.colour)
+	{
+		pointArray.push_back(temp);
+	}
+	
+	nPoints = pointArray.size();
+	nPoly = 0;
+
+	mesh = new triangle3dV[nPoly];
+	getTriangleData(mesh);
+}
+
+
+PointCloud::PointCloud(const std::string& fn, float sx, float sy, float sz)
+	:
+	fileName(fn)
+{
+	scale = { sx, sy, sz, 1.0f };
+	position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	texture = 0;
+	txU = 1.0f;
+
+	nPoints = 0;
+
+	std::ifstream edgeInput(fileName);
+	if (edgeInput.is_open())
+	{
+		std::string line = "";
+		std::string currentPen = "";
+		line3d temp;
+
+		while (std::getline(edgeInput, line))
+		{
+			std::stringstream inputLine(line);
+			if (line.length() >= 4)
+			{
+				
+				std::string command(line.begin(), line.begin() + 4);
+				if (command == "PEN ")
+				{
+					inputLine >> command >> currentPen;
+				}
+				if (command == "LIN_")
+				{
+					std::string ax = "", ay = "", az = "", bx = "", by = "", bz = "";
+					inputLine >> command >>
+						ax >> ay >> az >>
+						bx >> by >> bz;
+
+					try
+					{
+						std::string a_x = (*(ax.end() - 1) == ',') ? std::string(ax.begin(), ax.end() - 2) : ax;
+						temp.A.x = std::stof(a_x) * scale.x;
+						std::string a_y = (*(ay.end() - 1) == ',') ? std::string(ay.begin(), ay.end() - 2) : ay;
+						temp.A.y = std::stof(a_y) * scale.y;
+						std::string a_z = (*(az.end() - 1) == ',') ? std::string(az.begin(), az.end() - 2) : az;
+						temp.A.z = std::stof(a_z) * scale.z;
+						temp.A.w = 1.0f;
+
+						//if (edgeArray.size() == 1)
+						//{
+						//	float r = sqrt(pow(temp.A.x, 2) + pow(temp.A.y, 2) + pow(temp.A.z, 2));
+						//	std::cout << "Radius: " << r << std::endl;
+						//}
+						
+						std::string b_x = (*(bx.end() - 1) == ',') ? std::string(bx.begin(), bx.end() - 2) : bx;
+						temp.B.x = std::stof(b_x) * scale.x;
+						std::string b_y = (*(by.end() - 1) == ',') ? std::string(by.begin(), by.end() - 2) : by;
+						temp.B.y = std::stof(b_y) * scale.y;
+						std::string b_z = (*(bz.end() - 1) == ',') ? std::string(bz.begin(), bz.end() - 2) : bz;
+						temp.B.z = std::stof(b_z) * scale.z;
+						temp.B.w = 1.0f;
+					}
+					catch (const std::exception& e)
+					{
+						std::cout << e.what() << std::endl;
+					}
+
+					if (currentPen == "pen_borders")
+					{
+						temp.colour = 0x003f3f3f;
+					}
+					else if (currentPen == "pen_coastline")
+					{
+						temp.colour = 0x00ffffff;
+					}
+					else
+					{
+						temp.colour = 0x000000ff;
+					}
+
+					edgeArray.push_back(temp);
+				}
+				
+			}		
+		}
+		edgeInput.close();
+		nEdge = edgeArray.size();
+		std::cout << nEdge << " edges read..." << std::endl;
+	}
+	else
+	{
+		std::cout << "Could not read file: " << fileName << std::endl;
+	}
+
+	nPoly = 0;
+}
+
+
 PointCloud::~PointCloud()
 {
+}
+
+
+Uint32 PointCloud::getPixel(const std::shared_ptr<txt>& img, float x, float y)
+{
+	int imageWidth = img->w;
+	int imageHeight = img->h;
+
+	int x_ = static_cast<int>(static_cast<float>(imageWidth)* x);
+	int y_ = static_cast<int>(static_cast<float>(imageHeight)* y);
+	if (x_ >= imageWidth)
+		x_ = x_ % imageWidth;
+	if (y_ >= imageHeight)
+		y_ = y_ % imageHeight;
+
+	return img->pixelsH[y_ * imageWidth + x_];
 }
 
 
@@ -209,10 +405,121 @@ void PointCloud::getPoints(std::vector<vertex3>& P)
 }
 
 
+void PointCloud::setRadius(float r)
+{
+	radius = r;
+}
+
+
+void PointCloud::setGrid()
+{
+	grid			= true;
+	this->constructGrid();
+}
+
+
+void PointCloud::setGrid(float vs, float hs, unsigned vres, unsigned hres, Uint32 c)
+{
+	grid			= true;
+	gridVspacing	= vs;
+	gridHspacing	= hs;
+	gridVresol		= vres;
+	gridHresol		= hres;
+	gridColour		= c;
+	this->constructGrid();
+}
+
+
+void PointCloud::constructGrid()
+{
+	int numV = static_cast<int>(180.0f / gridVspacing) - 1;
+	float stepH = (360.0f / gridHresol) * PI / 180.0f;
+	for (auto j = 0; j < numV; j++)
+	{
+		float angV = (-90.0f + static_cast<float>(j + 1) * gridVspacing) * PI / 180.0f;
+		for (auto i = 0; i < gridHresol; i++)
+		{
+			float angH = i * stepH;
+			point3 temp;
+			
+			temp.P.x = radius * cos(angV) * cos(angH);
+			temp.P.y = radius * cos(angV) * sin(angH);
+			temp.P.z = radius * sin(angV);
+			temp.P.w = 1.0f;
+
+			temp.N = (temp.P - position).norm();
+
+			temp.colour = gridColour;
+
+			gridArray.push_back(temp);
+		}
+	}
+
+	int numH = static_cast<int>(360.0f / gridHspacing);
+	float stepV = 360.0f / gridVresol;
+	for (auto i = 0; i < numH; i++)
+	{
+		float angH = (i * gridHspacing) * PI / 180.0f;
+		for (auto j = 0; j < (gridVresol / 2); j++)
+		{
+			float angV = (-90.0f + static_cast<float>(j + 1)* stepV) * PI / 180.0f;
+			point3 temp;
+
+			temp.P.x = radius * cos(angV) * cos(angH);
+			temp.P.y = radius * cos(angV) * sin(angH);
+			temp.P.z = radius * sin(angV);
+			temp.P.w = 1.0f;
+
+			temp.N = (temp.P - position).norm();
+
+			temp.colour = gridColour;
+
+			gridArray.push_back(temp);
+		}
+	}
+}
+
+
+void PointCloud::addSurfacePoint(float v, float h, float rad, vect3 ct, Uint32 c)
+{
+	surfacePoint temp(v, h, rad, ct, c);
+	surfPointArray.push_back(temp);
+}
+
+
+void PointCloud::addSurfacePoint(float v, float h, float vv, float vh, float rad, vect3 ct, Uint32 c)
+{
+	surfacePoint temp(v, h, rad, ct, c);
+	temp.setVelocity(vv, vh);
+	surfPointArray.push_back(temp);
+}
+
+
+void PointCloud::updateSurfacePoints()
+{
+	for (auto& sp : surfPointArray)
+	{
+		sp.update();
+	}
+}
+
+
 void PointCloud::renderCloud(std::shared_ptr<Camera> eye, std::shared_ptr<Canvas> screen)
 {
 	for (auto& p : pointArray)
 		eye->renderPoint(1, p, screen->pixelBuffer, screen->depthBuffer);
+	for (auto& e : edgeArray)
+	{
+		eye->renderEdge(e);
+	}
+	for (auto& gp : gridArray)
+	{
+		eye->renderPoint(1, gp, screen->pixelBuffer, screen->depthBuffer);
+	}
+	for (auto& sp : surfPointArray)
+	{
+		eye->renderPoint(3, sp.position(), screen->pixelBuffer, screen->depthBuffer);
+	}
 }
 
 
